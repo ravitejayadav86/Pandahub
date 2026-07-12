@@ -1,4 +1,5 @@
 "use client";
+import Link from 'next/link';
 
 export default function GeneratedPage() {
   return (
@@ -20,40 +21,40 @@ export default function GeneratedPage() {
 </div>
 </div>
 
-<button className="w-full py-3 px-4 bg-primary-container hover:bg-primary-container/90 text-on-primary-container font-headline font-semibold text-sm rounded-xl shadow-lg shadow-primary-container/20 hover:scale-[1.02] active:scale-[0.98] transition-all duration-300 mb-8 flex items-center justify-center gap-2">
+<a href="/new" className="w-full py-3 px-4 bg-primary-container hover:bg-primary-container/90 text-on-primary-container font-headline font-semibold text-sm rounded-xl shadow-lg shadow-primary-container/20 hover:scale-[1.02] active:scale-[0.98] transition-all duration-300 mb-8 flex items-center justify-center gap-2">
 <span className="material-symbols-outlined" style={{fontVariationSettings: '"FILL" 1'}}>add</span>
             New Repository
-        </button>
+        </a>
 
 <div className="flex-1 space-y-2">
-<a className="flex items-center gap-3 px-4 py-3 bg-primary-container/30 backdrop-blur-md text-on-primary-container rounded-xl shadow-[inset_0_1px_1px_rgba(255,255,255,0.1)] transition-all duration-300 font-body text-label-sm font-medium tracking-tight" href="#">
+<a className="flex items-center gap-3 px-4 py-3 bg-primary-container/30 backdrop-blur-md text-on-primary-container rounded-xl shadow-[inset_0_1px_1px_rgba(255,255,255,0.1)] transition-all duration-300 font-body text-label-sm font-medium tracking-tight" href="/explore">
 <span className="material-symbols-outlined" style={{fontVariationSettings: '"FILL" 1'}}>dashboard</span>
                 Dashboard
             </a>
-<a className="flex items-center gap-3 px-4 py-3 text-on-surface-variant hover:text-on-surface hover:bg-surface-variant/20 rounded-xl transition-all duration-300 hover:scale-[1.02] active:scale-[0.98] font-body text-label-sm font-medium tracking-tight" href="#">
+<a className="flex items-center gap-3 px-4 py-3 text-on-surface-variant hover:text-on-surface hover:bg-surface-variant/20 rounded-xl transition-all duration-300 hover:scale-[1.02] active:scale-[0.98] font-body text-label-sm font-medium tracking-tight" href="/explore">
 <span className="material-symbols-outlined">code</span>
                 Repositories
             </a>
-<a className="flex items-center gap-3 px-4 py-3 text-on-surface-variant hover:text-on-surface hover:bg-surface-variant/20 rounded-xl transition-all duration-300 hover:scale-[1.02] active:scale-[0.98] font-body text-label-sm font-medium tracking-tight" href="#">
+<a className="flex items-center gap-3 px-4 py-3 text-on-surface-variant hover:text-on-surface hover:bg-surface-variant/20 rounded-xl transition-all duration-300 hover:scale-[1.02] active:scale-[0.98] font-body text-label-sm font-medium tracking-tight" href="/explore">
 <span className="material-symbols-outlined">adjust</span>
                 Issues
             </a>
-<a className="flex items-center gap-3 px-4 py-3 text-on-surface-variant hover:text-on-surface hover:bg-surface-variant/20 rounded-xl transition-all duration-300 hover:scale-[1.02] active:scale-[0.98] font-body text-label-sm font-medium tracking-tight" href="#">
+<a className="flex items-center gap-3 px-4 py-3 text-on-surface-variant hover:text-on-surface hover:bg-surface-variant/20 rounded-xl transition-all duration-300 hover:scale-[1.02] active:scale-[0.98] font-body text-label-sm font-medium tracking-tight" href="/explore">
 <span className="material-symbols-outlined">alt_route</span>
                 Pull Requests
             </a>
-<a className="flex items-center gap-3 px-4 py-3 text-on-surface-variant hover:text-on-surface hover:bg-surface-variant/20 rounded-xl transition-all duration-300 hover:scale-[1.02] active:scale-[0.98] font-body text-label-sm font-medium tracking-tight" href="#">
+<a className="flex items-center gap-3 px-4 py-3 text-on-surface-variant hover:text-on-surface hover:bg-surface-variant/20 rounded-xl transition-all duration-300 hover:scale-[1.02] active:scale-[0.98] font-body text-label-sm font-medium tracking-tight" href="/explore">
 <span className="material-symbols-outlined">shopping_bag</span>
                 Marketplace
             </a>
 </div>
 
 <div className="space-y-2 mt-auto pt-4 border-t border-outline-variant/10">
-<a className="flex items-center gap-3 px-4 py-3 text-on-surface-variant hover:text-on-surface hover:bg-surface-variant/20 rounded-xl transition-all duration-300 hover:scale-[1.02] active:scale-[0.98] font-body text-label-sm font-medium tracking-tight" href="#">
+<a className="flex items-center gap-3 px-4 py-3 text-on-surface-variant hover:text-on-surface hover:bg-surface-variant/20 rounded-xl transition-all duration-300 hover:scale-[1.02] active:scale-[0.98] font-body text-label-sm font-medium tracking-tight" href="/explore">
 <span className="material-symbols-outlined">settings</span>
                 Settings
             </a>
-<a className="flex items-center gap-3 px-4 py-3 text-on-surface-variant hover:text-on-surface hover:bg-surface-variant/20 rounded-xl transition-all duration-300 hover:scale-[1.02] active:scale-[0.98] font-body text-label-sm font-medium tracking-tight" href="#">
+<a className="flex items-center gap-3 px-4 py-3 text-on-surface-variant hover:text-on-surface hover:bg-surface-variant/20 rounded-xl transition-all duration-300 hover:scale-[1.02] active:scale-[0.98] font-body text-label-sm font-medium tracking-tight" href="/explore">
 <span className="material-symbols-outlined">help</span>
                 Support
             </a>
@@ -72,21 +73,21 @@ export default function GeneratedPage() {
 </div>
 
 <nav className="hidden md:flex items-center gap-6 font-headline text-on-surface text-sm font-semibold h-full">
-<a className="text-primary border-b-2 border-primary pb-1 h-full flex items-center mt-1" href="#">Overview</a>
-<a className="text-on-surface-variant hover:text-on-surface transition-colors h-full flex items-center" href="#">Activity</a>
-<a className="text-on-surface-variant hover:text-on-surface transition-colors h-full flex items-center" href="#">Stats</a>
+<a className="text-primary border-b-2 border-primary pb-1 h-full flex items-center mt-1" href="/explore">Overview</a>
+<a className="text-on-surface-variant hover:text-on-surface transition-colors h-full flex items-center" href="/explore">Activity</a>
+<a className="text-on-surface-variant hover:text-on-surface transition-colors h-full flex items-center" href="/explore">Stats</a>
 </nav>
 
 <div className="flex items-center gap-4">
 <div className="flex items-center gap-2">
-<button className="text-on-surface-variant hover:text-on-surface hover:bg-surface-variant/30 rounded-full p-2 transition-all">
+<button onClick={(e) => { e.preventDefault(); alert('Notifications coming soon!'); }} className="text-on-surface-variant hover:text-on-surface hover:bg-surface-variant/30 rounded-full p-2 transition-all">
 <span className="material-symbols-outlined">notifications</span>
 </button>
-<button className="text-on-surface-variant hover:text-on-surface hover:bg-surface-variant/30 rounded-full p-2 transition-all">
+<button onClick={(e) => { e.preventDefault(); alert('History coming soon!'); }} className="text-on-surface-variant hover:text-on-surface hover:bg-surface-variant/30 rounded-full p-2 transition-all">
 <span className="material-symbols-outlined">history</span>
 </button>
 </div>
-<button className="px-4 py-2 bg-primary-container text-on-primary-container font-headline text-sm font-semibold rounded-lg shadow-sm hover:bg-primary-container/90 transition-all hover:scale-[1.02] active:scale-[0.98]">
+<button onClick={(e) => { e.preventDefault(); alert('Deployments coming soon!'); }} className="px-4 py-2 bg-primary-container text-on-primary-container font-headline text-sm font-semibold rounded-lg shadow-sm hover:bg-primary-container/90 transition-all hover:scale-[1.02] active:scale-[0.98]">
                     Deploy
                 </button>
 <div className="w-8 h-8 rounded-full overflow-hidden border border-white/20 ml-2 shadow-sm cursor-pointer">

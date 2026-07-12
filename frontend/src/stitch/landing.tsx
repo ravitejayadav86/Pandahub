@@ -66,10 +66,10 @@ export default function GeneratedPage() {
 </div>
 
 <nav className="hidden md:flex items-center gap-8">
-<a className="text-primary font-semibold border-b-2 border-primary pb-1 active:scale-95 transition-transform duration-200 ease-out" href="#">Product</a>
-<a className="text-on-surface-variant hover:text-on-surface transition-colors duration-300 hover:bg-white/5 hover:backdrop-blur-md px-3 py-1 rounded-lg" href="#">Solutions</a>
-<a className="text-on-surface-variant hover:text-on-surface transition-colors duration-300 hover:bg-white/5 hover:backdrop-blur-md px-3 py-1 rounded-lg" href="#">Open Source</a>
-<a className="text-on-surface-variant hover:text-on-surface transition-colors duration-300 hover:bg-white/5 hover:backdrop-blur-md px-3 py-1 rounded-lg" href="#">Pricing</a>
+<a className="text-primary font-semibold border-b-2 border-primary pb-1 active:scale-95 transition-transform duration-200 ease-out" href="/explore">Product</a>
+<a className="text-on-surface-variant hover:text-on-surface transition-colors duration-300 hover:bg-white/5 hover:backdrop-blur-md px-3 py-1 rounded-lg" href="/explore">Solutions</a>
+<a className="text-on-surface-variant hover:text-on-surface transition-colors duration-300 hover:bg-white/5 hover:backdrop-blur-md px-3 py-1 rounded-lg" href="/explore">Open Source</a>
+<a className="text-on-surface-variant hover:text-on-surface transition-colors duration-300 hover:bg-white/5 hover:backdrop-blur-md px-3 py-1 rounded-lg" href="/explore">Pricing</a>
 </nav>
 
 <div className="flex items-center gap-4">
@@ -195,11 +195,11 @@ export default function GeneratedPage() {
             </div>
 
 <nav className="flex flex-wrap justify-center gap-6">
-<a className="text-outline hover:text-on-surface transition-colors duration-300 hover:opacity-80 hover:underline decoration-primary underline-offset-4" href="#">Security</a>
-<a className="text-outline hover:text-on-surface transition-colors duration-300 hover:opacity-80 hover:underline decoration-primary underline-offset-4" href="#">Privacy</a>
-<a className="text-outline hover:text-on-surface transition-colors duration-300 hover:opacity-80 hover:underline decoration-primary underline-offset-4" href="#">Terms</a>
-<a className="text-outline hover:text-on-surface transition-colors duration-300 hover:opacity-80 hover:underline decoration-primary underline-offset-4" href="#">Docs</a>
-<a className="text-outline hover:text-on-surface transition-colors duration-300 hover:opacity-80 hover:underline decoration-primary underline-offset-4" href="#">Status</a>
+<a className="text-outline hover:text-on-surface transition-colors duration-300 hover:opacity-80 hover:underline decoration-primary underline-offset-4" href="/explore">Security</a>
+<a className="text-outline hover:text-on-surface transition-colors duration-300 hover:opacity-80 hover:underline decoration-primary underline-offset-4" href="/explore">Privacy</a>
+<a className="text-outline hover:text-on-surface transition-colors duration-300 hover:opacity-80 hover:underline decoration-primary underline-offset-4" href="/explore">Terms</a>
+<a className="text-outline hover:text-on-surface transition-colors duration-300 hover:opacity-80 hover:underline decoration-primary underline-offset-4" href="/explore">Docs</a>
+<a className="text-outline hover:text-on-surface transition-colors duration-300 hover:opacity-80 hover:underline decoration-primary underline-offset-4" href="/explore">Status</a>
 </nav>
 
 <div className="text-outline text-xs">

@@ -1,6 +1,7 @@
 "use client";
 import { useState, useEffect } from 'react';
 import dynamic from 'next/dynamic';
+import Link from 'next/link';
 
 const SpaceBackground = dynamic(() => import('./SpaceBackground'), { ssr: false });
 
@@ -67,10 +68,10 @@ export default function HomePage() {
           </div>
 
           <nav className="hidden md:flex items-center gap-8">
-            <a className="text-primary font-semibold border-b-2 border-primary pb-1 transition-colors" href="#">Product</a>
-            <a className="text-on-surface-variant hover:text-on-surface transition-colors duration-200 px-3 py-1 rounded-lg hover:bg-white/5" href="#">Solutions</a>
-            <a className="text-on-surface-variant hover:text-on-surface transition-colors duration-200 px-3 py-1 rounded-lg hover:bg-white/5" href="#">Open Source</a>
-            <a className="text-on-surface-variant hover:text-on-surface transition-colors duration-200 px-3 py-1 rounded-lg hover:bg-white/5" href="#">Pricing</a>
+            <Link href="/explore" className="text-primary font-semibold border-b-2 border-primary pb-1 transition-colors">Product</Link>
+            <Link href="/explore" className="text-on-surface-variant hover:text-on-surface transition-colors duration-200 px-3 py-1 rounded-lg hover:bg-white/5">Solutions</Link>
+            <Link href="/explore" className="text-on-surface-variant hover:text-on-surface transition-colors duration-200 px-3 py-1 rounded-lg hover:bg-white/5">Open Source</Link>
+            <Link href="/explore" className="text-on-surface-variant hover:text-on-surface transition-colors duration-200 px-3 py-1 rounded-lg hover:bg-white/5">Pricing</Link>
           </nav>
 
           <div className="flex items-center gap-3">
@@ -193,7 +194,7 @@ export default function HomePage() {
           </div>
           <nav className="flex flex-wrap justify-center gap-6 text-sm">
             {['Security', 'Privacy', 'Terms', 'Docs', 'Status'].map(link => (
-              <a key={link} className="text-outline hover:text-on-surface transition-colors duration-200 hover:underline decoration-primary underline-offset-4" href="#">{link}</a>
+              <Link key={link} href="/explore" className="text-outline hover:text-on-surface transition-colors duration-200 hover:underline decoration-primary underline-offset-4">{link}</Link>
             ))}
           </nav>
           <div className="text-outline text-xs">© 2027 PandaHub, Inc.</div>

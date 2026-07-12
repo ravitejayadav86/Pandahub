@@ -26,34 +26,34 @@ export default function GeneratedPage() {
         </button>
 
 <div className="flex-1 space-y-2">
-<a className="flex items-center gap-3 px-4 py-3 bg-primary-container/30 backdrop-blur-md text-on-primary-container rounded-xl shadow-[inset_0_1px_1px_rgba(255,255,255,0.1)] transition-all duration-300 font-body text-label-sm font-medium tracking-tight" href="#">
+<a className="flex items-center gap-3 px-4 py-3 bg-primary-container/30 backdrop-blur-md text-on-primary-container rounded-xl shadow-[inset_0_1px_1px_rgba(255,255,255,0.1)] transition-all duration-300 font-body text-label-sm font-medium tracking-tight" href="/explore">
 <span className="material-symbols-outlined" style={{fontVariationSettings: '"FILL" 1'}}>dashboard</span>
                 Dashboard
             </a>
-<a className="flex items-center gap-3 px-4 py-3 text-on-surface-variant hover:text-on-surface hover:bg-surface-variant/20 rounded-xl transition-all duration-300 hover:scale-[1.02] active:scale-[0.98] font-body text-label-sm font-medium tracking-tight" href="#">
+<a className="flex items-center gap-3 px-4 py-3 text-on-surface-variant hover:text-on-surface hover:bg-surface-variant/20 rounded-xl transition-all duration-300 hover:scale-[1.02] active:scale-[0.98] font-body text-label-sm font-medium tracking-tight" href="/explore">
 <span className="material-symbols-outlined">code</span>
                 Repositories
             </a>
-<a className="flex items-center gap-3 px-4 py-3 text-on-surface-variant hover:text-on-surface hover:bg-surface-variant/20 rounded-xl transition-all duration-300 hover:scale-[1.02] active:scale-[0.98] font-body text-label-sm font-medium tracking-tight" href="#">
+<a className="flex items-center gap-3 px-4 py-3 text-on-surface-variant hover:text-on-surface hover:bg-surface-variant/20 rounded-xl transition-all duration-300 hover:scale-[1.02] active:scale-[0.98] font-body text-label-sm font-medium tracking-tight" href="/explore">
 <span className="material-symbols-outlined">adjust</span>
                 Issues
             </a>
-<a className="flex items-center gap-3 px-4 py-3 text-on-surface-variant hover:text-on-surface hover:bg-surface-variant/20 rounded-xl transition-all duration-300 hover:scale-[1.02] active:scale-[0.98] font-body text-label-sm font-medium tracking-tight" href="#">
+<a className="flex items-center gap-3 px-4 py-3 text-on-surface-variant hover:text-on-surface hover:bg-surface-variant/20 rounded-xl transition-all duration-300 hover:scale-[1.02] active:scale-[0.98] font-body text-label-sm font-medium tracking-tight" href="/explore">
 <span className="material-symbols-outlined">alt_route</span>
                 Pull Requests
             </a>
-<a className="flex items-center gap-3 px-4 py-3 text-on-surface-variant hover:text-on-surface hover:bg-surface-variant/20 rounded-xl transition-all duration-300 hover:scale-[1.02] active:scale-[0.98] font-body text-label-sm font-medium tracking-tight" href="#">
+<a className="flex items-center gap-3 px-4 py-3 text-on-surface-variant hover:text-on-surface hover:bg-surface-variant/20 rounded-xl transition-all duration-300 hover:scale-[1.02] active:scale-[0.98] font-body text-label-sm font-medium tracking-tight" href="/explore">
 <span className="material-symbols-outlined">shopping_bag</span>
                 Marketplace
             </a>
 </div>
 
 <div className="space-y-2 mt-auto pt-4 border-t border-outline-variant/10">
-<a className="flex items-center gap-3 px-4 py-3 text-on-surface-variant hover:text-on-surface hover:bg-surface-variant/20 rounded-xl transition-all duration-300 hover:scale-[1.02] active:scale-[0.98] font-body text-label-sm font-medium tracking-tight" href="#">
+<a className="flex items-center gap-3 px-4 py-3 text-on-surface-variant hover:text-on-surface hover:bg-surface-variant/20 rounded-xl transition-all duration-300 hover:scale-[1.02] active:scale-[0.98] font-body text-label-sm font-medium tracking-tight" href="/explore">
 <span className="material-symbols-outlined">settings</span>
                 Settings
             </a>
-<a className="flex items-center gap-3 px-4 py-3 text-on-surface-variant hover:text-on-surface hover:bg-surface-variant/20 rounded-xl transition-all duration-300 hover:scale-[1.02] active:scale-[0.98] font-body text-label-sm font-medium tracking-tight" href="#">
+<a className="flex items-center gap-3 px-4 py-3 text-on-surface-variant hover:text-on-surface hover:bg-surface-variant/20 rounded-xl transition-all duration-300 hover:scale-[1.02] active:scale-[0.98] font-body text-label-sm font-medium tracking-tight" href="/explore">
 <span className="material-symbols-outlined">help</span>
                 Support
             </a>
@@ -72,9 +72,9 @@ export default function GeneratedPage() {
 </div>
 
 <nav className="hidden md:flex items-center gap-6 font-headline text-on-surface text-sm font-semibold h-full">
-<a className="text-primary border-b-2 border-primary pb-1 h-full flex items-center mt-1" href="#">Overview</a>
-<a className="text-on-surface-variant hover:text-on-surface transition-colors h-full flex items-center" href="#">Activity</a>
-<a className="text-on-surface-variant hover:text-on-surface transition-colors h-full flex items-center" href="#">Stats</a>
+<a className="text-primary border-b-2 border-primary pb-1 h-full flex items-center mt-1" href="/explore">Overview</a>
+<a className="text-on-surface-variant hover:text-on-surface transition-colors h-full flex items-center" href="/explore">Activity</a>
+<a className="text-on-surface-variant hover:text-on-surface transition-colors h-full flex items-center" href="/explore">Stats</a>
 </nav>
 
 <div className="flex items-center gap-4">

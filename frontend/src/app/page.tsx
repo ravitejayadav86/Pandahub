@@ -84,7 +84,7 @@ export default function HomePage() {
   }, [charIndex, isDeleting, phraseIndex]);
 
   return (
-    <main className="min-h-screen text-on-surface font-body relative overflow-hidden bg-background transition-colors duration-300">
+    <main className="min-h-screen text-on-surface font-body relative overflow-hidden bg-transparent transition-colors duration-300">
 
       {/* Live Animated Space Background */}
       <SpaceBackground />

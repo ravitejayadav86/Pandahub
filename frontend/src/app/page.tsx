@@ -2,6 +2,7 @@
 import { useState, useEffect } from 'react';
 import dynamic from 'next/dynamic';
 import Link from 'next/link';
+import { motion } from 'framer-motion';
 
 const SpaceBackground = dynamic(() => import('./SpaceBackground'), { ssr: false });
 
@@ -40,13 +41,13 @@ export default function HomePage() {
   }, [charIndex, isDeleting, phraseIndex]);
 
   return (
-    <main className="min-h-screen text-on-surface font-body relative overflow-hidden" style={{ background: '#080a12' }}>
+    <main className="min-h-screen text-on-surface font-body relative overflow-hidden" style={{ background: 'var(--background)' }}>
 
       {/* Live Animated Space Background */}
       <SpaceBackground />
 
       {/* Header */}
-      <header className="fixed top-0 w-full z-50 backdrop-blur-xl border-b border-white/[0.06]" style={{ background: 'rgba(8,10,18,0.8)' }}>
+      <header className="fixed top-0 w-full z-50 backdrop-blur-xl border-b border-white/[0.06]" style={{ background: 'rgba(255,255,255,0.7)' }}>
         <div className="flex justify-between items-center w-full px-6 py-4 max-w-7xl mx-auto">
           <div className="flex items-center gap-2 text-xl font-bold tracking-tighter text-on-surface cursor-pointer">
             <span className="material-symbols-outlined text-primary-container" style={{fontVariationSettings: '"FILL" 1'}}>cloud_sync</span>
@@ -55,9 +56,9 @@ export default function HomePage() {
 
           <nav className="hidden md:flex items-center gap-8">
             <Link href="/explore" className="text-primary font-semibold border-b-2 border-primary pb-1 transition-colors">Product</Link>
-            <Link href="/explore" className="text-on-surface-variant hover:text-on-surface transition-colors duration-200 px-3 py-1 rounded-lg hover:bg-white/5">Solutions</Link>
-            <Link href="/explore" className="text-on-surface-variant hover:text-on-surface transition-colors duration-200 px-3 py-1 rounded-lg hover:bg-white/5">Open Source</Link>
-            <Link href="/explore" className="text-on-surface-variant hover:text-on-surface transition-colors duration-200 px-3 py-1 rounded-lg hover:bg-white/5">Pricing</Link>
+            <Link href="/explore" className="text-on-surface-variant hover:text-on-surface transition-colors duration-200 px-3 py-1 rounded-lg hover:bg-black/5">Solutions</Link>
+            <Link href="/explore" className="text-on-surface-variant hover:text-on-surface transition-colors duration-200 px-3 py-1 rounded-lg hover:bg-black/5">Open Source</Link>
+            <Link href="/explore" className="text-on-surface-variant hover:text-on-surface transition-colors duration-200 px-3 py-1 rounded-lg hover:bg-black/5">Pricing</Link>
           </nav>
 
           <div className="flex items-center gap-3">
@@ -68,7 +69,7 @@ export default function HomePage() {
       </header>
 
       {/* Hero */}
-      <section className="relative z-10 flex flex-col items-center justify-center text-center min-h-screen px-6 pt-20 pb-10 max-w-4xl mx-auto animate-fade-in-up">
+      <motion.section initial={{ opacity: 0, scale: 0.95 }} animate={{ opacity: 1, scale: 1 }} transition={{ duration: 0.8, ease: "easeOut" }} className="relative z-10 flex flex-col items-center justify-center text-center min-h-screen px-6 pt-20 pb-10 max-w-4xl mx-auto animate-fade-in-up">
         <h1 className="text-5xl md:text-7xl font-extrabold tracking-tighter text-on-surface mb-4 leading-tight drop-shadow-2xl font-display animate-fade-in-up-delay">
           Code hosting for the
           <br />
@@ -91,12 +92,12 @@ export default function HomePage() {
             View Docs
           </button>
         </div>
-      </section>
+      </motion.section>
 
       {/* Code Window */}
-      <section className="w-full max-w-5xl mx-auto px-6 mb-28 relative z-10 mt-16">
+      <motion.section initial={{ opacity: 0, y: 50 }} whileInView={{ opacity: 1, y: 0 }} viewport={{ once: true, margin: "-100px" }} transition={{ duration: 0.7 }} className="w-full max-w-5xl mx-auto px-6 mb-28 relative z-10 mt-16">
         <div className="glass-panel rounded-2xl overflow-hidden shadow-[0_20px_60px_rgba(0,0,0,0.6)] border border-white/[0.07] hover:border-primary/20 transition-all duration-500 hover:shadow-[0_30px_80px_rgba(10,132,255,0.12)]">
-          <div className="px-4 py-3 flex items-center gap-4 border-b border-white/[0.05]" style={{ background: 'rgba(14,18,28,0.8)' }}>
+          <div className="px-4 py-3 flex items-center gap-4 border-b border-white/[0.05]" style={{ background: 'rgba(240,242,245,0.8)' }}>
             <div className="flex gap-2">
               <div className="w-3 h-3 rounded-full bg-[#FF5F57]"></div>
               <div className="w-3 h-3 rounded-full bg-[#FEBC2E]"></div>
@@ -109,7 +110,7 @@ export default function HomePage() {
               </div>
             </div>
           </div>
-          <div className="p-6 md:p-8 font-mono text-sm md:text-base overflow-x-auto" style={{ background: 'rgba(6,8,16,0.9)' }}>
+          <div className="p-6 md:p-8 font-mono text-sm md:text-base overflow-x-auto" style={{ background: 'rgba(255,255,255,0.9)' }}>
             <pre className="text-on-surface-variant"><code><span className="text-[#BF5AF2]">import</span> asyncio
 <span className="text-[#BF5AF2]">from</span> pandahub <span className="text-[#BF5AF2]">import</span> Client, Repository
 
@@ -130,10 +131,10 @@ export default function HomePage() {
     asyncio.run(deploy_next_gen_app())</code></pre>
           </div>
         </div>
-      </section>
+      </motion.section>
 
       {/* Feature Cards */}
-      <section className="w-full max-w-6xl mx-auto grid grid-cols-1 md:grid-cols-3 gap-6 px-6 mb-28 relative z-10">
+      <motion.section initial={{ opacity: 0, y: 50 }} whileInView={{ opacity: 1, y: 0 }} viewport={{ once: true, margin: "-100px" }} transition={{ duration: 0.7, staggerChildren: 0.2 }} className="w-full max-w-6xl mx-auto grid grid-cols-1 md:grid-cols-3 gap-6 px-6 mb-28 relative z-10">
         {[
           { icon: 'rate_review', title: 'Code Review', desc: 'Frictionless inline commenting and AI-assisted PR summaries built right into the editor.', color: '#0A84FF', shadow: 'rgba(10,132,255,0.2)' },
           { icon: 'rocket_launch', title: 'CI/CD Pipelines', desc: 'Integrated workflows that build, test, and deploy faster than ever with smart caching.', color: '#BF5AF2', shadow: 'rgba(191,90,242,0.2)' },
@@ -151,10 +152,10 @@ export default function HomePage() {
             <p className="text-on-surface-variant leading-relaxed">{desc}</p>
           </div>
         ))}
-      </section>
+      </motion.section>
 
       {/* Footer */}
-      <footer className="w-full border-t border-white/[0.06] relative z-10" style={{ background: 'rgba(6,8,16,0.9)' }}>
+      <footer className="w-full border-t border-white/[0.06] relative z-10" style={{ background: 'rgba(255,255,255,0.9)' }}>
         <div className="flex flex-col md:flex-row justify-between items-center py-10 px-8 max-w-7xl mx-auto gap-6">
           <div className="text-lg font-black text-on-surface flex items-center gap-2">
             <span className="material-symbols-outlined text-primary-container" style={{fontVariationSettings: '"FILL" 1'}}>cloud_sync</span>

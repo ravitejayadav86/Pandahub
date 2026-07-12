@@ -47,7 +47,7 @@ export default function DashboardNav() {
           <Link href="/explore" style={navBtnStyle}>Explore</Link>
           <Link href="/new" style={{
             padding: '6px 14px', borderRadius: 8,
-            background: 'var(--bg-tertiary)',
+            background: 'var(--surface-variant)',
             border: '1px solid var(--border-color)',
             color: 'var(--text-primary)', fontSize: 13, fontWeight: 500,
           }}>+ New repo</Link>

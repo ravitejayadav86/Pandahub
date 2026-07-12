@@ -9,7 +9,7 @@ export default function GeneratedPage() {
 <div className="fixed top-[-20%] left-[-10%] w-[50%] h-[50%] rounded-full bg-primary-container/5 blur-[120px] pointer-events-none"></div>
 <div className="fixed bottom-[-20%] right-[-10%] w-[40%] h-[40%] rounded-full bg-secondary-container/10 blur-[100px] pointer-events-none"></div>
 
-<nav className="hidden md:flex bg-surface/60 backdrop-blur-3xl h-screen w-72 flex-col border-r border-outline-variant/20 shadow-2xl shadow-surface-container-lowest/50 fixed left-0 top-0 p-4 z-40">
+<nav className="hidden md:flex bg-surface/90 backdrop-blur-3xl h-screen w-72 flex-col border-r border-outline-variant/20 shadow-2xl shadow-surface-container-lowest/50 fixed left-0 top-0 p-4 z-40">
 
 <div className="flex items-center gap-4 px-2 py-4 mb-6">
 <div className="w-10 h-10 rounded-xl overflow-hidden shadow-lg border border-white/10">
@@ -63,7 +63,7 @@ export default function GeneratedPage() {
 
 <div className="flex-1 flex flex-col md:ml-72 min-h-screen overflow-hidden relative">
 
-<header className="bg-surface/40 backdrop-blur-2xl w-full h-16 sticky top-0 z-50 border-b border-outline-variant/10 shadow-sm flex justify-between items-center px-6 gap-8 backdrop-filter-transition-duration-500">
+<header className="bg-surface/90 backdrop-blur-2xl w-full h-16 sticky top-0 z-50 border-b border-outline-variant/10 shadow-sm flex justify-between items-center px-6 gap-8 backdrop-filter-transition-duration-500">
 <div className="flex items-center gap-6">
 
 <button className="md:hidden text-on-surface p-2 hover:bg-surface-variant/30 rounded-full transition-all">

@@ -78,8 +78,8 @@ export default function SpaceBackground() {
     };
 
     const draw = () => {
-      // Fade trail effect
-      ctx.fillStyle = 'rgba(8, 10, 18, 0.18)';
+      // Fade trail effect for light mode
+      ctx.fillStyle = 'rgba(250, 250, 250, 0.3)';
       ctx.fillRect(0, 0, canvas.width, canvas.height);
 
       frame++;
@@ -141,12 +141,13 @@ export default function SpaceBackground() {
         const tailX = s.x - Math.cos(s.angle) * s.length;
         const tailY = s.y - Math.sin(s.angle) * s.length;
         const grad = ctx.createLinearGradient(s.x, s.y, tailX, tailY);
-        grad.addColorStop(0, `rgba(255,255,255,${s.opacity.toFixed(2)})`);
-        grad.addColorStop(0.4, `rgba(120,180,255,${(s.opacity * 0.6).toFixed(2)})`);
-        grad.addColorStop(1, 'rgba(120,180,255,0)');
+        // Using primary blue color for shooting stars in light mode
+        grad.addColorStop(0, `rgba(10, 132, 255, ${s.opacity.toFixed(2)})`);
+        grad.addColorStop(0.4, `rgba(10, 132, 255, ${(s.opacity * 0.4).toFixed(2)})`);
+        grad.addColorStop(1, 'rgba(10, 132, 255, 0)');
         ctx.beginPath();
         ctx.strokeStyle = grad;
-        ctx.lineWidth = 1.8;
+        ctx.lineWidth = 1.5;
         ctx.lineCap = 'round';
         ctx.moveTo(s.x, s.y);
         ctx.lineTo(tailX, tailY);
@@ -155,7 +156,7 @@ export default function SpaceBackground() {
         // Head sparkle
         ctx.beginPath();
         ctx.arc(s.x, s.y, 1.5, 0, Math.PI * 2);
-        ctx.fillStyle = `rgba(255,255,255,${s.opacity.toFixed(2)})`;
+        ctx.fillStyle = `rgba(10, 132, 255, ${s.opacity.toFixed(2)})`;
         ctx.fill();
 
         s.x += Math.cos(s.angle) * s.speed;
@@ -167,8 +168,8 @@ export default function SpaceBackground() {
     };
 
     resize();
-    // Fill solid dark on first frame
-    ctx.fillStyle = '#080a12';
+    // Fill solid light on first frame
+    ctx.fillStyle = '#fafafa';
     ctx.fillRect(0, 0, canvas.width, canvas.height);
     draw();
 

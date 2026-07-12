@@ -56,7 +56,7 @@ export default function GeneratedPage() {
   };
 
   return (
-    <main className="min-h-screen text-on-surface font-body relative overflow-hidden" style={{ background: '#080a12' }}>
+    <main className="min-h-screen text-on-surface font-body relative overflow-hidden" style={{ background: 'var(--background)' }}>
 
 
 <header className="fixed top-0 w-full z-50 flex justify-between items-center px-6 py-6 max-w-7xl mx-auto left-0 right-0">

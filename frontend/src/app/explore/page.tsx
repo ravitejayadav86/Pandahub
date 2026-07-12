@@ -29,10 +29,10 @@ export default function ExplorePage() {
   };
 
   return (
-    <div style={{ minHeight: '100vh', background: 'var(--bg-primary)' }}>
+    <div style={{ minHeight: '100vh', background: 'var(--background)' }}>
       {/* Header */}
       <div style={{
-        background: 'var(--bg-secondary)',
+        background: 'var(--surface)',
         borderBottom: '1px solid var(--border-color)',
         padding: '40px 0 32px',
         position: 'relative', overflow: 'hidden',
@@ -59,7 +59,7 @@ export default function ExplorePage() {
               onChange={(e) => setQuery(e.target.value)}
               style={{
                 flex: 1, padding: '10px 16px',
-                background: 'var(--bg-tertiary)',
+                background: 'var(--surface-variant)',
                 border: '1px solid var(--border-color)',
                 borderRadius: 8, color: 'var(--text-primary)',
                 fontSize: 14, outline: 'none',

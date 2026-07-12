@@ -55,10 +55,10 @@ export default function SpaceBackground() {
       radius: 200 // wider detection radius
     };
 
-    const getColors = () => {
-      if (typeof window === 'undefined') return THEMES.multicolor;
+    const getColors = (): string[] => {
+      if (typeof window === 'undefined') return THEMES.multicolor || ['#0A84FF'];
       const themeId = document.documentElement.getAttribute('data-bg-theme') || 'multicolor';
-      return THEMES[themeId] || THEMES.multicolor;
+      return THEMES[themeId] || THEMES.multicolor || ['#0A84FF'];
     };
 
     const isDarkMode = () => {

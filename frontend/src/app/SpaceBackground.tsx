@@ -11,6 +11,8 @@ interface Particle {
   color: string;
   pulse: number;
   pulseSpeed: number;
+  baseVx: number;
+  baseVy: number;
 }
 
 interface ShootingStar {
@@ -37,6 +39,13 @@ export default function SpaceBackground() {
     let particles: Particle[] = [];
     let shootingStars: ShootingStar[] = [];
     let frame = 0;
+    
+    // Mouse positioning for interactive motion detection
+    const mouse = {
+      x: -1000,
+      y: -1000,
+      radius: 180 // detection radius
+    };
 
     const isDarkMode = () => {
       if (typeof window === 'undefined') return false;
@@ -51,17 +60,24 @@ export default function SpaceBackground() {
 
     const init = () => {
       const count = Math.floor((canvas.width * canvas.height) / 7000);
-      particles = Array.from({ length: Math.min(count, 120) }, () => ({
-        x: Math.random() * canvas.width,
-        y: Math.random() * canvas.height,
-        vx: (Math.random() - 0.5) * 0.25,
-        vy: (Math.random() - 0.5) * 0.25,
-        size: Math.random() * 1.8 + 0.4,
-        opacity: Math.random() * 0.5 + 0.2,
-        color: COLORS[Math.floor(Math.random() * COLORS.length)] ?? '#0A84FF',
-        pulse: Math.random() * Math.PI * 2,
-        pulseSpeed: Math.random() * 0.02 + 0.005,
-      }));
+      particles = Array.from({ length: Math.min(count, 120) }, () => {
+        // Antigravity upward bias drift
+        const vx = (Math.random() - 0.5) * 0.2;
+        const vy = -Math.random() * 0.3 - 0.1; // Floating upwards
+        return {
+          x: Math.random() * canvas.width,
+          y: Math.random() * canvas.height,
+          vx,
+          vy,
+          baseVx: vx,
+          baseVy: vy,
+          size: Math.random() * 2.2 + 0.6,
+          opacity: Math.random() * 0.5 + 0.2,
+          color: COLORS[Math.floor(Math.random() * COLORS.length)] ?? '#0A84FF',
+          pulse: Math.random() * Math.PI * 2,
+          pulseSpeed: Math.random() * 0.02 + 0.005,
+        };
+      });
     };
 
     const spawnShootingStar = () => {
@@ -80,6 +96,16 @@ export default function SpaceBackground() {
       const g = parseInt(hex.slice(3, 5), 16);
       const b = parseInt(hex.slice(5, 7), 16);
       return `${r},${g},${b}`;
+    };
+
+    const handleMouseMove = (e: MouseEvent) => {
+      mouse.x = e.clientX;
+      mouse.y = e.clientY;
+    };
+
+    const handleMouseLeave = () => {
+      mouse.x = -1000;
+      mouse.y = -1000;
     };
 
     const draw = () => {
@@ -121,6 +147,24 @@ export default function SpaceBackground() {
         const pulsedOpacity = p.opacity + Math.sin(p.pulse) * 0.15;
         const pulsedSize = p.size + Math.sin(p.pulse) * 0.2;
 
+        // Antigravity Motion Detection (Push away from cursor)
+        const dx = p.x - mouse.x;
+        const dy = p.y - mouse.y;
+        const distance = Math.sqrt(dx * dx + dy * dy);
+        
+        if (distance < mouse.radius) {
+          const force = (mouse.radius - distance) / mouse.radius; // 0 to 1
+          const angle = Math.atan2(dy, dx);
+          
+          // Add repulsion velocity
+          p.vx += Math.cos(angle) * force * 0.6;
+          p.vy += Math.sin(angle) * force * 0.6;
+        } else {
+          // Slow recovery back to base antigravity upward velocities
+          p.vx += (p.baseVx - p.vx) * 0.04;
+          p.vy += (p.baseVy - p.vy) * 0.04;
+        }
+
         ctx.beginPath();
         ctx.arc(p.x, p.y, Math.max(pulsedSize, 0.1), 0, Math.PI * 2);
         ctx.fillStyle = `rgba(${hexToRgb(p.color)},${Math.min(pulsedOpacity + (dark ? 0.3 : 0.1), 1).toFixed(2)})`;
@@ -128,10 +172,15 @@ export default function SpaceBackground() {
 
         p.x += p.vx;
         p.y += p.vy;
+
+        // Wrap around borders
         if (p.x < 0) p.x = canvas.width;
         if (p.x > canvas.width) p.x = 0;
         if (p.y < 0) p.y = canvas.height;
-        if (p.y > canvas.height) p.y = 0;
+        if (p.y > canvas.height) {
+          p.y = 0;
+          p.x = Math.random() * canvas.width;
+        }
       }
 
       // Shooting stars
@@ -182,15 +231,17 @@ export default function SpaceBackground() {
     draw();
 
     window.addEventListener('resize', resize);
+    window.addEventListener('mousemove', handleMouseMove);
+    window.addEventListener('mouseleave', handleMouseLeave);
     
     // Set up MutationObserver to track theme shifts (e.g. settings)
-    const observer = new MutationObserver(() => {
-      // Re-trigger color adjustments
-    });
+    const observer = new MutationObserver(() => {});
     observer.observe(document.documentElement, { attributes: true, attributeFilter: ['class'] });
 
     return () => {
       window.removeEventListener('resize', resize);
+      window.removeEventListener('mousemove', handleMouseMove);
+      window.removeEventListener('mouseleave', handleMouseLeave);
       observer.disconnect();
       cancelAnimationFrame(animationId);
     };

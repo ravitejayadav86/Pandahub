@@ -1,0 +1,42 @@
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+@layer base {
+  body {
+    @apply bg-background text-on-background font-body;
+  }
+}
+
+@layer utilities {
+  .mesh-gradient {
+    background-color: #10131b;
+    background-image: 
+        radial-gradient(at 0% 0%, hsla(217, 100%, 50%, 0.15) 0px, transparent 50%),
+        radial-gradient(at 100% 0%, hsla(217, 100%, 50%, 0.1) 0px, transparent 50%),
+        radial-gradient(at 100% 100%, hsla(217, 100%, 50%, 0.15) 0px, transparent 50%),
+        radial-gradient(at 0% 100%, hsla(217, 100%, 50%, 0.1) 0px, transparent 50%);
+  }
+  .glass-panel {
+    background: rgba(49, 53, 61, 0.4);
+    backdrop-filter: blur(24px);
+    -webkit-backdrop-filter: blur(24px);
+    border: 1px solid rgba(255, 255, 255, 0.1);
+    box-shadow: 0 8px 32px 0 rgba(0, 0, 0, 0.37);
+  }
+  .glass-card {
+    background: rgba(31, 35, 43, 0.6);
+    backdrop-filter: blur(16px);
+    -webkit-backdrop-filter: blur(16px);
+    border: 1px solid rgba(255, 255, 255, 0.05);
+    box-shadow: 0 4px 16px 0 rgba(0, 0, 0, 0.2);
+  }
+  .btn-glow {
+    box-shadow: 0 0 20px rgba(10, 132, 255, 0.4);
+    transition: all 0.3s ease;
+  }
+  .btn-glow:hover {
+    box-shadow: 0 0 30px rgba(10, 132, 255, 0.6);
+    transform: translateY(-1px);
+  }
+}

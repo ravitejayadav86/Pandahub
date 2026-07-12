@@ -1,0 +1,381 @@
+<!DOCTYPE html>
+
+<html class="dark" lang="en"><head>
+<meta charset="utf-8"/>
+<meta content="width=device-width, initial-scale=1.0" name="viewport"/>
+<title>PandaHub / core-engine - Repository Browser</title>
+<script src="https://cdn.tailwindcss.com?plugins=forms,container-queries"></script>
+<link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&amp;display=swap" rel="stylesheet"/>
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800;900&amp;family=Public+Sans:wght@400;500;600&amp;display=swap" rel="stylesheet"/>
+<link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&amp;display=swap" rel="stylesheet"/>
+<script id="tailwind-config">
+        tailwind.config = {
+          darkMode: "class",
+          theme: {
+            extend: {
+              "colors": {
+                      "outline": "#8b91a0",
+                      "primary-container": "#3e90ff",
+                      "tertiary": "#ffb691",
+                      "secondary-fixed": "#d6e3ff",
+                      "on-primary-fixed-variant": "#00468d",
+                      "on-primary-fixed": "#001b3e",
+                      "on-error-container": "#ffdad6",
+                      "inverse-on-surface": "#2d3038",
+                      "inverse-surface": "#e0e2ed",
+                      "surface-container-high": "#262a32",
+                      "tertiary-container": "#eb6a12",
+                      "on-surface": "#e0e2ed",
+                      "surface-variant": "#31353d",
+                      "tertiary-fixed-dim": "#ffb691",
+                      "secondary": "#aac7ff",
+                      "on-secondary-fixed": "#001b3e",
+                      "on-surface-variant": "#c0c6d6",
+                      "surface-dim": "#10131b",
+                      "secondary-container": "#264778",
+                      "on-secondary-container": "#98b6ee",
+                      "primary-fixed-dim": "#aac7ff",
+                      "on-primary-container": "#002957",
+                      "on-error": "#690005",
+                      "on-primary": "#003064",
+                      "secondary-fixed-dim": "#aac7ff",
+                      "on-tertiary-fixed": "#341100",
+                      "background": "#10131b",
+                      "surface-tint": "#aac7ff",
+                      "surface-container-highest": "#31353d",
+                      "on-secondary-fixed-variant": "#264778",
+                      "on-background": "#e0e2ed",
+                      "inverse-primary": "#005db8",
+                      "error": "#ffb4ab",
+                      "primary-fixed": "#d6e3ff",
+                      "on-secondary": "#083060",
+                      "primary": "#aac7ff",
+                      "surface-container-low": "#181c23",
+                      "on-tertiary-fixed-variant": "#793100",
+                      "on-tertiary-container": "#4a1b00",
+                      "on-tertiary": "#552000",
+                      "error-container": "#93000a",
+                      "tertiary-fixed": "#ffdbcb",
+                      "surface": "#10131b",
+                      "surface-container-lowest": "#0b0e15",
+                      "outline-variant": "#414754",
+                      "surface-container": "#1c2027",
+                      "surface-bright": "#363941"
+              },
+              "borderRadius": {
+                      "DEFAULT": "0.25rem",
+                      "lg": "0.5rem",
+                      "xl": "0.75rem",
+                      "full": "9999px"
+              },
+              "spacing": {},
+              "fontFamily": {
+                      "headline": [
+                              "Inter"
+                      ],
+                      "display": [
+                              "Inter"
+                      ],
+                      "body": [
+                              "Inter"
+                      ],
+                      "label": [
+                              "Public Sans"
+                      ]
+              },
+              "fontSize": {}
+      },
+          },
+        }
+    </script>
+<style>
+        body {
+            background-color: theme('colors.background');
+            background-image: radial-gradient(circle at 15% 50%, rgba(10, 132, 255, 0.05), transparent 25%),
+                              radial-gradient(circle at 85% 30%, rgba(10, 132, 255, 0.03), transparent 25%);
+            background-attachment: fixed;
+        }
+        .glass-panel {
+            background: rgba(49, 53, 61, 0.4);
+            backdrop-filter: blur(24px);
+            -webkit-backdrop-filter: blur(24px);
+            border: 1px solid rgba(255, 255, 255, 0.05);
+            box-shadow: 0 8px 32px 0 rgba(0, 0, 0, 0.3);
+        }
+        .glass-pill-nav {
+            background: rgba(38, 42, 50, 0.6);
+            backdrop-filter: blur(16px);
+            -webkit-backdrop-filter: blur(16px);
+            border: 1px solid rgba(255, 255, 255, 0.08);
+            box-shadow: 0 4px 16px 0 rgba(0, 0, 0, 0.2);
+        }
+        .glass-row {
+            transition: all 0.3s cubic-bezier(0.25, 0.8, 0.25, 1);
+        }
+        .glass-row:hover {
+            background: rgba(62, 144, 255, 0.08);
+            transform: translateX(4px);
+        }
+    </style>
+</head>
+<body class="text-on-background font-body min-h-screen antialiased flex">
+<!-- SideNavBar (Shared Component) -->
+<nav class="hidden md:flex h-screen w-72 flex-col border-r border-outline-variant/20 shadow-2xl shadow-surface-container-lowest/50 bg-surface/60 backdrop-blur-3xl fixed left-0 top-0 p-4 z-40">
+<!-- Brand -->
+<div class="flex items-center gap-4 px-4 py-6 mb-4">
+<div class="h-10 w-10 rounded-xl overflow-hidden bg-surface-container-high border border-outline-variant/20 flex items-center justify-center shadow-inner">
+<img class="h-full w-full object-cover" data-alt="A sleek, minimalist logo representing a futuristic developer tool named DevOS, featuring sharp geometric lines in a vibrant blue on a deeply dark, almost black background with a subtle liquid glass texture. Professional, high-end iOS 27 aesthetic." src="https://lh3.googleusercontent.com/aida-public/AB6AXuAyBrSGWZHfrQ7lHYU6ybuoXgzgO57Bskxe9X3dSzr_j4Zbo_hU8T4nlMVRbjXx2NHLz6wmsor6rmNsfOU6ZST9t341at-p3iCIW2nVQGwfUFl2HY7MS0dhvuU79YmTFPHvS0GbIfluzy7LpKjiXCa0sup4Oh5fhaP0OteZFj6T-0g7TEKQBoX_HwRulf8-7oMCxfL1wJKdflYqkObII_maDnNin9J5GVx-lKSFO9jvMXGLxLIK1c5GXjc7JjC1aO3ovRozC8ZypC4N"/>
+</div>
+<div>
+<h1 class="text-xl font-headline font-black tracking-tighter text-on-surface">DevOS</h1>
+<p class="text-xs text-on-surface-variant font-label tracking-wide">v27.4.0</p>
+</div>
+</div>
+<!-- Main Nav -->
+<div class="flex-1 space-y-2 flex flex-col">
+<a class="flex items-center gap-3 px-4 py-3 text-on-surface-variant hover:text-on-surface hover:bg-surface-variant/20 rounded-xl transition-all duration-300 font-body text-label-sm font-medium tracking-tight hover:scale-[1.02] active:scale-[0.98]" href="#">
+<span class="material-symbols-outlined text-xl" data-icon="dashboard">dashboard</span>
+<span>Dashboard</span>
+</a>
+<a class="flex items-center gap-3 px-4 py-3 bg-primary-container/30 backdrop-blur-md text-on-primary-container rounded-xl shadow-[inset_0_1px_1px_rgba(255,255,255,0.1)] transition-all duration-300 font-body text-label-sm font-medium tracking-tight hover:scale-[1.02] active:scale-[0.98]" href="#">
+<span class="material-symbols-outlined text-xl" data-icon="code" data-weight="fill" style="font-variation-settings: 'FILL' 1;">code</span>
+<span>Repositories</span>
+</a>
+<a class="flex items-center gap-3 px-4 py-3 text-on-surface-variant hover:text-on-surface hover:bg-surface-variant/20 rounded-xl transition-all duration-300 font-body text-label-sm font-medium tracking-tight hover:scale-[1.02] active:scale-[0.98]" href="#">
+<span class="material-symbols-outlined text-xl" data-icon="adjust">adjust</span>
+<span>Issues</span>
+</a>
+<a class="flex items-center gap-3 px-4 py-3 text-on-surface-variant hover:text-on-surface hover:bg-surface-variant/20 rounded-xl transition-all duration-300 font-body text-label-sm font-medium tracking-tight hover:scale-[1.02] active:scale-[0.98]" href="#">
+<span class="material-symbols-outlined text-xl" data-icon="alt_route">alt_route</span>
+<span>Pull Requests</span>
+</a>
+<a class="flex items-center gap-3 px-4 py-3 text-on-surface-variant hover:text-on-surface hover:bg-surface-variant/20 rounded-xl transition-all duration-300 font-body text-label-sm font-medium tracking-tight hover:scale-[1.02] active:scale-[0.98]" href="#">
+<span class="material-symbols-outlined text-xl" data-icon="shopping_bag">shopping_bag</span>
+<span>Marketplace</span>
+</a>
+</div>
+<!-- Action / Footer -->
+<div class="mt-auto space-y-4 pt-6 border-t border-outline-variant/10">
+<button class="w-full flex justify-center items-center gap-2 px-4 py-3 bg-primary/10 text-primary border border-primary/20 rounded-xl hover:bg-primary/20 transition-all duration-300 hover:scale-[1.02] active:scale-[0.98] font-body text-sm font-semibold shadow-[0_0_15px_rgba(170,199,255,0.1)]">
+<span class="material-symbols-outlined text-sm">add</span>
+                New Repository
+            </button>
+<div class="flex flex-col space-y-1">
+<a class="flex items-center gap-3 px-4 py-2.5 text-on-surface-variant hover:text-on-surface hover:bg-surface-variant/20 rounded-xl transition-all duration-300 text-sm font-medium" href="#">
+<span class="material-symbols-outlined text-[18px]" data-icon="settings">settings</span>
+<span>Settings</span>
+</a>
+<a class="flex items-center gap-3 px-4 py-2.5 text-on-surface-variant hover:text-on-surface hover:bg-surface-variant/20 rounded-xl transition-all duration-300 text-sm font-medium" href="#">
+<span class="material-symbols-outlined text-[18px]" data-icon="help">help</span>
+<span>Support</span>
+</a>
+</div>
+</div>
+</nav>
+<!-- Main Content Area -->
+<main class="flex-1 flex flex-col md:ml-72 min-h-screen relative overflow-x-hidden">
+<!-- TopNavBar (Shared Component - Mobile Only View logic integrated, though prompt requests it as a top nav pattern for web too, using the shared component definition but adapting context) -->
+<header class="w-full h-16 sticky top-0 z-30 bg-surface/40 backdrop-blur-2xl border-b border-outline-variant/10 shadow-sm flex justify-between items-center px-6 gap-8 transition-all duration-500 md:hidden">
+<div class="flex items-center gap-3">
+<span class="text-lg font-black text-on-surface tracking-tighter">DevOS Liquid</span>
+</div>
+<div class="flex items-center gap-4">
+<button class="text-on-surface-variant hover:text-on-surface hover:bg-surface-variant/30 rounded-full p-2 transition-all">
+<span class="material-symbols-outlined">notifications</span>
+</button>
+<div class="h-8 w-8 rounded-full overflow-hidden border border-outline-variant/30">
+<img alt="User Avatar" class="h-full w-full object-cover" data-alt="A small, circular avatar portrait of a modern software developer, dimly lit with subtle neon blue rim lighting, against a dark void background." src="https://lh3.googleusercontent.com/aida-public/AB6AXuB-Po7L4lTKmchlaqm85Pgeg8L1srmwEI4lVhKfyKyWf6tM_9CgOAG1SV06BR3t8KUIrZBQpqm-AAa5I3cVup9_vT6gvq6dM6AlR0yLqErOXTnCqb8mHsO5fVA3H-KXNhlGfx0BKkTo46peRH70QoDbtNTN9geADGVDdyOy95oarpzZSSrpg8eUOC4z6GEPyXndK1kVnx8H3pog3DgPiwlTQPGlV35UIeD0sjNfqmydstnTMJw3Z1IgUslCEPZTf6HgeAs1EIBArbQb"/>
+</div>
+</div>
+</header>
+<!-- Repo Header & Controls -->
+<div class="px-6 md:px-12 pt-10 pb-6 max-w-7xl mx-auto w-full flex flex-col gap-8">
+<!-- Title Row -->
+<div class="flex flex-col md:flex-row md:items-end justify-between gap-6">
+<div class="flex items-center gap-4 flex-wrap">
+<div class="h-12 w-12 rounded-2xl bg-surface-container-high border border-outline-variant/20 flex items-center justify-center shadow-[inset_0_1px_2px_rgba(255,255,255,0.05)]">
+<span class="material-symbols-outlined text-3xl text-primary opacity-80">book</span>
+</div>
+<div>
+<div class="flex items-center gap-3 mb-1">
+<a class="text-2xl font-headline font-bold text-on-surface hover:text-primary transition-colors tracking-tight" href="#">PandaHub</a>
+<span class="text-on-surface-variant font-light text-2xl">/</span>
+<a class="text-2xl font-headline font-bold text-on-surface hover:text-primary transition-colors tracking-tight" href="#">core-engine</a>
+<span class="px-2.5 py-0.5 rounded-full border border-outline-variant/30 text-xs font-label text-on-surface-variant bg-surface-container/50 backdrop-blur-sm ml-2">Public</span>
+</div>
+<p class="text-on-surface-variant text-sm max-w-2xl">High-performance liquid glass rendering engine for futuristic UI frameworks.</p>
+</div>
+</div>
+<!-- Stats/Actions -->
+<div class="flex items-center gap-3">
+<button class="flex items-center h-9 glass-panel rounded-lg overflow-hidden group hover:border-outline-variant/40 transition-colors">
+<div class="flex items-center gap-2 px-3 py-1.5 bg-surface-container-low/50 group-hover:bg-surface-variant/30 transition-colors border-r border-outline-variant/20">
+<span class="material-symbols-outlined text-[18px] text-outline group-hover:text-tertiary transition-colors">star</span>
+<span class="text-sm font-medium text-on-surface">Star</span>
+</div>
+<div class="px-3 py-1.5 text-sm font-semibold text-on-surface bg-surface/30">
+                            12.4k
+                        </div>
+</button>
+<button class="flex items-center h-9 glass-panel rounded-lg overflow-hidden group hover:border-outline-variant/40 transition-colors">
+<div class="flex items-center gap-2 px-3 py-1.5 bg-surface-container-low/50 group-hover:bg-surface-variant/30 transition-colors border-r border-outline-variant/20">
+<span class="material-symbols-outlined text-[18px] text-outline group-hover:text-primary transition-colors">fork_right</span>
+<span class="text-sm font-medium text-on-surface">Fork</span>
+</div>
+<div class="px-3 py-1.5 text-sm font-semibold text-on-surface bg-surface/30">
+                            2.1k
+                        </div>
+</button>
+</div>
+</div>
+<!-- Pill Navigation -->
+<div class="glass-pill-nav rounded-full p-1.5 inline-flex w-fit overflow-x-auto max-w-full no-scrollbar">
+<button class="flex items-center gap-2 px-5 py-2 bg-primary/10 text-primary rounded-full font-medium text-sm transition-all shadow-[inset_0_1px_1px_rgba(255,255,255,0.05),0_2px_8px_rgba(10,132,255,0.15)] border border-primary/20">
+<span class="material-symbols-outlined text-[18px]">code</span>
+                    Code
+                </button>
+<button class="flex items-center gap-2 px-5 py-2 text-on-surface-variant hover:text-on-surface hover:bg-surface-variant/40 rounded-full font-medium text-sm transition-all">
+<span class="material-symbols-outlined text-[18px]">adjust</span>
+                    Issues
+                    <span class="ml-1 bg-surface-container-high px-1.5 py-0.5 rounded-full text-xs font-bold text-on-surface">42</span>
+</button>
+<button class="flex items-center gap-2 px-5 py-2 text-on-surface-variant hover:text-on-surface hover:bg-surface-variant/40 rounded-full font-medium text-sm transition-all">
+<span class="material-symbols-outlined text-[18px]">alt_route</span>
+                    Pull Requests
+                </button>
+<button class="flex items-center gap-2 px-5 py-2 text-on-surface-variant hover:text-on-surface hover:bg-surface-variant/40 rounded-full font-medium text-sm transition-all">
+<span class="material-symbols-outlined text-[18px]">play_circle</span>
+                    Actions
+                </button>
+<button class="flex items-center gap-2 px-5 py-2 text-on-surface-variant hover:text-on-surface hover:bg-surface-variant/40 rounded-full font-medium text-sm transition-all">
+<span class="material-symbols-outlined text-[18px]">settings</span>
+                    Settings
+                </button>
+</div>
+<!-- File Explorer Container -->
+<div class="glass-panel rounded-2xl overflow-hidden mt-2 border border-outline-variant/10 relative">
+<!-- Inner glow top edge -->
+<div class="absolute top-0 left-0 right-0 h-px bg-gradient-to-r from-transparent via-primary/20 to-transparent"></div>
+<!-- Latest Commit Header -->
+<div class="bg-surface-container-low/60 border-b border-outline-variant/10 px-4 py-3 flex flex-col sm:flex-row sm:items-center justify-between gap-4">
+<div class="flex items-center gap-3">
+<div class="h-8 w-8 rounded-full overflow-hidden border border-outline-variant/20 shrink-0">
+<img class="h-full w-full object-cover" data-alt="A moody, high-contrast digital illustration of a cyberpunk panda wearing futuristic glowing visors, dark color palette with neon blue highlights, suitable for a developer avatar." src="https://lh3.googleusercontent.com/aida-public/AB6AXuB5tBj1BBfWl2vSiHJ6qT9W62BqH_JDEyGMEn04fNex-z-pr3C3quZQOPdVp0D6Xq9VElnAbczx80aWz1XkTMDUX4T6Y1GVG-RN_FySSM7xcK7WpWN3zn3pk9HipSmh8u0z5dJMpn2RDWyMIOFZslfIRYW8cFlSyg0eOHl7U93x5Z-TMxwrn2jCR08AJiEEXmktYMwtffQBm4Lshd6C8h0Z2WULRpeh6-GNIb1OtDAr29p04eW-TuGDIWWySIgvHKh_OotPaONh3DB4"/>
+</div>
+<div class="flex flex-col sm:flex-row sm:items-center gap-1 sm:gap-2">
+<span class="font-semibold text-sm text-on-surface">pandadev</span>
+<span class="text-on-surface-variant text-sm truncate max-w-[200px] sm:max-w-md">Refactor: liquid glass effects across engine</span>
+</div>
+</div>
+<div class="flex items-center gap-4 text-xs text-on-surface-variant font-label shrink-0">
+<span class="font-mono bg-surface-container px-2 py-1 rounded text-outline">a1b2c3d</span>
+<span>2 hours ago</span>
+</div>
+</div>
+<!-- File List -->
+<div class="flex flex-col">
+<!-- Folder Row -->
+<div class="glass-row flex items-center justify-between px-4 py-2.5 border-b border-outline-variant/5 group cursor-pointer">
+<div class="flex items-center gap-3 min-w-0">
+<span class="material-symbols-outlined text-secondary text-xl opacity-80 group-hover:opacity-100 transition-opacity">folder</span>
+<span class="text-sm font-medium text-on-surface truncate">.github</span>
+</div>
+<div class="hidden sm:block text-sm text-on-surface-variant truncate w-1/3 text-left pl-4">
+                            Update CI workflows for liquid build
+                        </div>
+<div class="text-xs text-on-surface-variant w-24 text-right shrink-0">
+                            2 days ago
+                        </div>
+</div>
+<!-- Folder Row -->
+<div class="glass-row flex items-center justify-between px-4 py-2.5 border-b border-outline-variant/5 group cursor-pointer">
+<div class="flex items-center gap-3 min-w-0">
+<span class="material-symbols-outlined text-secondary text-xl opacity-80 group-hover:opacity-100 transition-opacity">folder</span>
+<span class="text-sm font-medium text-on-surface truncate">src</span>
+</div>
+<div class="hidden sm:block text-sm text-on-surface-variant truncate w-1/3 text-left pl-4">
+                            Refactor: liquid glass effects
+                        </div>
+<div class="text-xs text-on-surface-variant w-24 text-right shrink-0">
+                            2 hours ago
+                        </div>
+</div>
+<!-- Folder Row -->
+<div class="glass-row flex items-center justify-between px-4 py-2.5 border-b border-outline-variant/5 group cursor-pointer">
+<div class="flex items-center gap-3 min-w-0">
+<span class="material-symbols-outlined text-secondary text-xl opacity-80 group-hover:opacity-100 transition-opacity">folder</span>
+<span class="text-sm font-medium text-on-surface truncate">tests</span>
+</div>
+<div class="hidden sm:block text-sm text-on-surface-variant truncate w-1/3 text-left pl-4">
+                            Add rendering spec tests
+                        </div>
+<div class="text-xs text-on-surface-variant w-24 text-right shrink-0">
+                            5 days ago
+                        </div>
+</div>
+<!-- File Row -->
+<div class="glass-row flex items-center justify-between px-4 py-2.5 border-b border-outline-variant/5 group cursor-pointer">
+<div class="flex items-center gap-3 min-w-0">
+<span class="material-symbols-outlined text-outline text-xl opacity-70 group-hover:opacity-100 transition-opacity">description</span>
+<span class="text-sm font-medium text-on-surface truncate">README.md</span>
+</div>
+<div class="hidden sm:block text-sm text-on-surface-variant truncate w-1/3 text-left pl-4">
+                            Docs: Update aesthetic guidelines
+                        </div>
+<div class="text-xs text-on-surface-variant w-24 text-right shrink-0">
+                            1 week ago
+                        </div>
+</div>
+<!-- File Row -->
+<div class="glass-row flex items-center justify-between px-4 py-2.5 border-b border-outline-variant/5 group cursor-pointer">
+<div class="flex items-center gap-3 min-w-0">
+<span class="material-symbols-outlined text-tertiary-fixed-dim text-xl opacity-80 group-hover:opacity-100 transition-opacity">code_blocks</span>
+<span class="text-sm font-medium text-on-surface truncate">package.json</span>
+</div>
+<div class="hidden sm:block text-sm text-on-surface-variant truncate w-1/3 text-left pl-4">
+                            Bump dependencies v27.4.0
+                        </div>
+<div class="text-xs text-on-surface-variant w-24 text-right shrink-0">
+                            3 hours ago
+                        </div>
+</div>
+<!-- File Row -->
+<div class="glass-row flex items-center justify-between px-4 py-2.5 group cursor-pointer">
+<div class="flex items-center gap-3 min-w-0">
+<span class="material-symbols-outlined text-[#38bdf8] text-xl opacity-80 group-hover:opacity-100 transition-opacity">palette</span>
+<span class="text-sm font-medium text-on-surface truncate">tailwind.config.js</span>
+</div>
+<div class="hidden sm:block text-sm text-on-surface-variant truncate w-1/3 text-left pl-4">
+                            Theme: Add deep dark tokens
+                        </div>
+<div class="text-xs text-on-surface-variant w-24 text-right shrink-0">
+                            2 days ago
+                        </div>
+</div>
+</div>
+</div>
+<!-- README Preview (Bento/Card style) -->
+<div class="glass-panel rounded-2xl p-6 md:p-8 mt-4 border border-outline-variant/10 shadow-lg relative overflow-hidden">
+<div class="absolute top-0 right-0 w-64 h-64 bg-primary/5 blur-3xl rounded-full -mr-20 -mt-20 pointer-events-none"></div>
+<div class="flex items-center gap-2 mb-6 pb-4 border-b border-outline-variant/10">
+<span class="material-symbols-outlined text-on-surface-variant">book</span>
+<h2 class="text-lg font-headline font-semibold text-on-surface">README.md</h2>
+</div>
+<article class="prose prose-invert max-w-none font-body text-on-surface-variant">
+<h1 class="text-3xl font-black text-on-surface tracking-tight mb-4">Core Engine</h1>
+<p class="text-lg mb-6 leading-relaxed">The high-performance, WebGL-accelerated rendering core for generating ultra-smooth, deeply layered liquid glass interfaces on the modern web.</p>
+<div class="bg-surface-container-high/50 rounded-xl p-4 border border-outline-variant/20 font-mono text-sm text-on-primary-container mb-6 overflow-x-auto shadow-inner">
+<span class="text-tertiary">npm</span> install @pandahub/core-engine
+                    </div>
+<h3 class="text-xl font-bold text-on-surface mt-8 mb-3">Features</h3>
+<ul class="list-disc pl-5 space-y-2">
+<li>Sub-millisecond frosted glass blurring</li>
+<li>Dynamic shadow depth calculation</li>
+<li>Hardware-accelerated micro-interactions</li>
+<li>Zero-config iOS 27 dark mode profiles</li>
+</ul>
+</article>
+</div>
+</div>
+</main>
+</body></html>

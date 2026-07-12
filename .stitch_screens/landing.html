@@ -1,0 +1,258 @@
+<!DOCTYPE html>
+
+<html class="dark" lang="en"><head>
+<meta charset="utf-8"/>
+<meta content="width=device-width, initial-scale=1.0" name="viewport"/>
+<title>PandaHub - Code Hosting for the Next Generation</title>
+<script src="https://cdn.tailwindcss.com?plugins=forms,container-queries"></script>
+<link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&amp;display=swap" rel="stylesheet"/>
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800;900&amp;family=Public+Sans:wght@400;500;600&amp;display=swap" rel="stylesheet"/>
+<link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&amp;display=swap" rel="stylesheet"/>
+<script id="tailwind-config">
+        tailwind.config = {
+            darkMode: "class",
+            theme: {
+                extend: {
+                    "colors": {
+                        "on-primary-container": "#002957",
+                        "primary": "#aac7ff",
+                        "on-surface-variant": "#c0c6d6",
+                        "surface-dim": "#10131b",
+                        "primary-fixed": "#d6e3ff",
+                        "on-surface": "#e0e2ed",
+                        "tertiary-container": "#eb6a12",
+                        "secondary-fixed-dim": "#aac7ff",
+                        "primary-fixed-dim": "#aac7ff",
+                        "on-error-container": "#ffdad6",
+                        "error": "#ffb4ab",
+                        "on-secondary-fixed": "#001b3e",
+                        "surface-container": "#1c2027",
+                        "surface-variant": "#31353d",
+                        "on-secondary-fixed-variant": "#264778",
+                        "error-container": "#93000a",
+                        "tertiary": "#ffb691",
+                        "outline-variant": "#414754",
+                        "on-secondary": "#083060",
+                        "surface-container-highest": "#31353d",
+                        "surface": "#10131b",
+                        "outline": "#8b91a0",
+                        "tertiary-fixed": "#ffdbcb",
+                        "surface-container-lowest": "#0b0e15",
+                        "primary-container": "#3e90ff",
+                        "on-tertiary-container": "#4a1b00",
+                        "inverse-surface": "#e0e2ed",
+                        "on-tertiary-fixed": "#341100",
+                        "on-primary": "#003064",
+                        "secondary-container": "#264778",
+                        "on-secondary-container": "#98b6ee",
+                        "inverse-primary": "#005db8",
+                        "background": "#10131b",
+                        "surface-tint": "#aac7ff",
+                        "surface-container-high": "#262a32",
+                        "surface-bright": "#363941",
+                        "tertiary-fixed-dim": "#ffb691",
+                        "secondary": "#aac7ff",
+                        "on-tertiary-fixed-variant": "#793100",
+                        "on-error": "#690005",
+                        "inverse-on-surface": "#2d3038",
+                        "on-background": "#e0e2ed",
+                        "surface-container-low": "#181c23",
+                        "secondary-fixed": "#d6e3ff",
+                        "on-primary-fixed": "#001b3e",
+                        "on-primary-fixed-variant": "#00468d",
+                        "on-tertiary": "#552000"
+                    },
+                    "borderRadius": {
+                        "DEFAULT": "0.25rem",
+                        "lg": "0.5rem",
+                        "xl": "0.75rem",
+                        "full": "9999px"
+                    },
+                    "spacing": {},
+                    "fontFamily": {
+                        "headline": ["Inter", "sans-serif"],
+                        "display": ["Inter", "sans-serif"],
+                        "body": ["Inter", "sans-serif"],
+                        "label": ["Public Sans", "sans-serif"]
+                    }
+                },
+            },
+        }
+    </script>
+<style>
+        .mesh-gradient {
+            background-color: #10131b;
+            background-image: 
+                radial-gradient(at 0% 0%, hsla(217, 100%, 50%, 0.15) 0px, transparent 50%),
+                radial-gradient(at 100% 0%, hsla(217, 100%, 50%, 0.1) 0px, transparent 50%),
+                radial-gradient(at 100% 100%, hsla(217, 100%, 50%, 0.15) 0px, transparent 50%),
+                radial-gradient(at 0% 100%, hsla(217, 100%, 50%, 0.1) 0px, transparent 50%);
+        }
+        .glass-panel {
+            background: rgba(49, 53, 61, 0.4);
+            backdrop-filter: blur(24px);
+            -webkit-backdrop-filter: blur(24px);
+            border: 1px solid rgba(255, 255, 255, 0.1);
+            box-shadow: 0 8px 32px 0 rgba(0, 0, 0, 0.37);
+        }
+        .btn-glow {
+            box-shadow: 0 0 20px rgba(62, 144, 255, 0.4);
+            transition: all 0.3s ease;
+        }
+        .btn-glow:hover {
+            box-shadow: 0 0 30px rgba(62, 144, 255, 0.6);
+            transform: translateY(-2px);
+        }
+    </style>
+</head>
+<body class="bg-background text-on-background font-body antialiased mesh-gradient min-h-screen flex flex-col overflow-x-hidden selection:bg-primary-container selection:text-on-primary-container">
+<!-- TopNavBar (Shared Component JSON Blueprint) -->
+<header class="fixed top-0 w-full z-50 bg-surface/70 backdrop-blur-xl border-b border-white/10 backdrop-saturate-150 shadow-[0_8px_32px_0_rgba(0,0,0,0.36)] font-headline text-body font-medium tracking-tight">
+<div class="flex justify-between items-center w-full px-6 py-4 max-w-7xl mx-auto">
+<!-- Brand Logo -->
+<div class="flex items-center gap-2 text-xl font-bold tracking-tighter text-on-surface bg-clip-text hover:bg-white/5 hover:backdrop-blur-md transition-all duration-300 rounded-lg px-3 py-1 cursor-pointer">
+<span class="material-symbols-outlined text-primary-container" style="font-variation-settings: 'FILL' 1;">cloud_sync</span>
+<span>PandaHub</span>
+</div>
+<!-- Navigation Links (Desktop) -->
+<nav class="hidden md:flex items-center gap-8">
+<a class="text-primary font-semibold border-b-2 border-primary pb-1 Active:scale-95 transition-transform duration-200 ease-out" href="#">Product</a>
+<a class="text-on-surface-variant hover:text-on-surface transition-colors duration-300 hover:bg-white/5 hover:backdrop-blur-md px-3 py-1 rounded-lg" href="#">Solutions</a>
+<a class="text-on-surface-variant hover:text-on-surface transition-colors duration-300 hover:bg-white/5 hover:backdrop-blur-md px-3 py-1 rounded-lg" href="#">Open Source</a>
+<a class="text-on-surface-variant hover:text-on-surface transition-colors duration-300 hover:bg-white/5 hover:backdrop-blur-md px-3 py-1 rounded-lg" href="#">Pricing</a>
+</nav>
+<!-- Actions -->
+<div class="flex items-center gap-4">
+<a class="hidden md:block text-on-surface hover:text-primary transition-colors text-sm font-semibold hover:bg-white/5 hover:backdrop-blur-md px-3 py-1.5 rounded-lg" href="#">Sign In</a>
+<button class="bg-primary-container text-on-primary-container px-5 py-2 rounded-lg font-bold text-sm tracking-wide btn-glow hover:bg-primary-container/90 Active:scale-95 transition-all duration-200 ease-out">Get Started</button>
+</div>
+</div>
+</header>
+<main class="flex-grow flex flex-col items-center justify-center pt-32 pb-20 px-6 max-w-7xl mx-auto w-full relative z-10">
+<!-- Hero Section -->
+<section class="text-center w-full max-w-4xl mx-auto flex flex-col items-center justify-center mb-24 animate-fade-in-up">
+<h1 class="text-5xl md:text-7xl font-extrabold tracking-tighter text-on-surface mb-6 leading-tight drop-shadow-2xl font-display">
+                Code hosting for the <span class="text-transparent bg-clip-text bg-gradient-to-r from-primary-container to-tertiary-container">next generation.</span>
+</h1>
+<p class="text-xl md:text-2xl text-on-surface-variant mb-10 max-w-2xl font-medium leading-relaxed">
+                Collaborate, build, and ship with PandaHub. The definitive platform for modern developer teams.
+            </p>
+<div class="flex flex-col sm:flex-row gap-4 w-full sm:w-auto">
+<button class="bg-primary-container text-on-primary-container px-8 py-4 rounded-xl font-bold text-lg tracking-wide btn-glow hover:bg-primary-container/90 active:scale-95 transition-all w-full sm:w-auto flex items-center justify-center gap-2 group">
+                    Get Started
+                    <span class="material-symbols-outlined group-hover:translate-x-1 transition-transform">arrow_forward</span>
+</button>
+<button class="glass-panel text-on-surface px-8 py-4 rounded-xl font-bold text-lg tracking-wide hover:bg-white/10 active:scale-95 transition-all w-full sm:w-auto flex items-center justify-center gap-2 border border-outline-variant/30">
+<span class="material-symbols-outlined">terminal</span>
+                    View Documentation
+                </button>
+</div>
+</section>
+<!-- Visual Asset Mockup -->
+<section class="w-full max-w-5xl mx-auto mb-32 group perspective">
+<div class="glass-panel rounded-2xl overflow-hidden shadow-[0_20px_50px_rgba(0,0,0,0.5)] transform transition-transform duration-700 hover:scale-[1.02] hover:shadow-[0_30px_60px_rgba(62,144,255,0.2)] border border-white/10">
+<!-- Mockup Header -->
+<div class="bg-surface-container-highest/80 backdrop-blur-md px-4 py-3 flex items-center gap-4 border-b border-white/5">
+<div class="flex gap-2">
+<div class="w-3 h-3 rounded-full bg-error"></div>
+<div class="w-3 h-3 rounded-full bg-tertiary"></div>
+<div class="w-3 h-3 rounded-full bg-primary-container"></div>
+</div>
+<div class="flex-grow flex justify-center">
+<div class="bg-surface-dim/50 px-4 py-1 rounded-md text-xs text-outline-variant font-mono flex items-center gap-2">
+<span class="material-symbols-outlined text-[14px]">lock</span>
+                            main.py — PandaHub
+                        </div>
+</div>
+</div>
+<!-- Mockup Content -->
+<div class="p-6 md:p-8 bg-surface-container-lowest/90 font-mono text-sm md:text-base overflow-x-auto">
+<pre class="text-on-surface-variant"><code class="language-python"><span class="text-tertiary-container">import</span> asyncio
+<span class="text-tertiary-container">from</span> pandahub <span class="text-tertiary-container">import</span> Client, Repository
+
+<span class="text-outline"># Initialize the advanced liquid glass client</span>
+<span class="text-primary">async def</span> <span class="text-tertiary">deploy_next_gen_app</span>():
+    client = Client(api_key=<span class="text-error">"pd_live_..."</span>)
+    
+    <span class="text-outline"># Seamless code collaboration</span>
+    repo = <span class="text-tertiary-container">await</span> client.get_repository(<span class="text-error">"core-engine"</span>)
+    
+    <span class="text-tertiary-container">if</span> repo.status == <span class="text-error">"ready"</span>:
+        <span class="text-outline"># Deploying at lightspeed</span>
+        deployment = <span class="text-tertiary-container">await</span> repo.deploy(
+            environment=<span class="text-error">"production"</span>,
+            strategy=<span class="text-error">"blue-green"</span>
+        )
+        <span class="text-primary">print</span>(<span class="text-error">f"Deployment successful: </span><span class="text-primary-container">{</span>deployment.url<span class="text-primary-container">}</span><span class="text-error">"</span>)
+
+<span class="text-tertiary-container">if</span> __name__ == <span class="text-error">"__main__"</span>:
+    asyncio.run(deploy_next_gen_app())</code></pre>
+</div>
+</div>
+</section>
+<!-- Features Bento Grid -->
+<section class="w-full max-w-6xl mx-auto grid grid-cols-1 md:grid-cols-3 gap-6 mb-20">
+<!-- Feature 1 -->
+<div class="glass-panel p-8 rounded-2xl flex flex-col gap-4 hover:-translate-y-2 transition-transform duration-300 group">
+<div class="w-12 h-12 rounded-full bg-primary-container/20 flex items-center justify-center text-primary-container group-hover:scale-110 group-hover:bg-primary-container/30 transition-all">
+<span class="material-symbols-outlined" style="font-variation-settings: 'FILL' 1;">rate_review</span>
+</div>
+<h3 class="text-xl font-bold text-on-surface font-headline">Code Review</h3>
+<p class="text-on-surface-variant leading-relaxed">Frictionless inline commenting and AI-assisted PR summaries built right into the editor view.</p>
+</div>
+<!-- Feature 2 -->
+<div class="glass-panel p-8 rounded-2xl flex flex-col gap-4 hover:-translate-y-2 transition-transform duration-300 group">
+<div class="w-12 h-12 rounded-full bg-tertiary-container/20 flex items-center justify-center text-tertiary-container group-hover:scale-110 group-hover:bg-tertiary-container/30 transition-all">
+<span class="material-symbols-outlined" style="font-variation-settings: 'FILL' 1;">rocket_launch</span>
+</div>
+<h3 class="text-xl font-bold text-on-surface font-headline">CI/CD</h3>
+<p class="text-on-surface-variant leading-relaxed">Integrated workflows that build, test, and deploy faster than ever with automated caching.</p>
+</div>
+<!-- Feature 3 -->
+<div class="glass-panel p-8 rounded-2xl flex flex-col gap-4 hover:-translate-y-2 transition-transform duration-300 group">
+<div class="w-12 h-12 rounded-full bg-error/20 flex items-center justify-center text-error group-hover:scale-110 group-hover:bg-error/30 transition-all">
+<span class="material-symbols-outlined" style="font-variation-settings: 'FILL' 1;">bug_report</span>
+</div>
+<h3 class="text-xl font-bold text-on-surface font-headline">Issue Tracking</h3>
+<p class="text-on-surface-variant leading-relaxed">Powerful boards and sprint planning tools that map directly to your commits and branches.</p>
+</div>
+</section>
+</main>
+<!-- Footer (Shared Component JSON Blueprint) -->
+<footer class="w-full relative bottom-0 bg-surface-container-lowest border-t border-outline-variant/30 font-label text-sm uppercase tracking-widest text-primary">
+<div class="flex flex-col md:flex-row justify-between items-center py-12 px-8 max-w-7xl mx-auto gap-6">
+<!-- Brand Logo -->
+<div class="text-lg font-black text-on-surface flex items-center gap-2">
+<span class="material-symbols-outlined text-primary-container" style="font-variation-settings: 'FILL' 1;">cloud_sync</span>
+                PandaHub
+            </div>
+<!-- Links -->
+<nav class="flex flex-wrap justify-center gap-6">
+<a class="text-outline hover:text-on-surface transition-colors duration-300 hover:opacity-80 hover:underline decoration-primary underline-offset-4" href="#">Security</a>
+<a class="text-outline hover:text-on-surface transition-colors duration-300 hover:opacity-80 hover:underline decoration-primary underline-offset-4" href="#">Privacy</a>
+<a class="text-outline hover:text-on-surface transition-colors duration-300 hover:opacity-80 hover:underline decoration-primary underline-offset-4" href="#">Terms</a>
+<a class="text-outline hover:text-on-surface transition-colors duration-300 hover:opacity-80 hover:underline decoration-primary underline-offset-4" href="#">Docs</a>
+<a class="text-outline hover:text-on-surface transition-colors duration-300 hover:opacity-80 hover:underline decoration-primary underline-offset-4" href="#">Status</a>
+</nav>
+<!-- Copyright -->
+<div class="text-outline text-xs">
+                © 2027 PandaHub, Inc. Liquid Glass Edition.
+            </div>
+</div>
+</footer>
+<script>
+        // Simple entry animation for main elements
+        document.addEventListener('DOMContentLoaded', () => {
+            const elements = document.querySelectorAll('.glass-panel');
+            elements.forEach((el, index) => {
+                el.style.opacity = '0';
+                el.style.transform = 'translateY(20px)';
+                el.style.transition = 'all 0.6s cubic-bezier(0.16, 1, 0.3, 1)';
+                setTimeout(() => {
+                    el.style.opacity = '1';
+                    el.style.transform = 'translateY(0)';
+                }, 100 + (index * 150));
+            });
+        });
+    </script>
+</body></html>

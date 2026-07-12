@@ -1,0 +1,46 @@
+# --- Environment & Secrets ---
+.env
+.env.*
+!.env.example
+
+# --- Python / Backend ---
+__pycache__/
+*.py[cod]
+*.egg-info/
+.venv/
+venv/
+.pytest_cache/
+.mypy_cache/
+.coverage
+htmlcov/
+
+# --- Node / Frontend ---
+node_modules/
+.next/
+out/
+dist/
+build/
+.turbo/
+
+# --- Git storage (bare repos live here in dev) ---
+storage/repositories/*
+!storage/repositories/.gitkeep
+
+# --- MinIO / local object storage volume ---
+storage/minio/
+
+# --- Logs ---
+*.log
+logs/
+
+# --- IDE ---
+.vscode/
+.idea/
+*.swp
+
+# --- OS ---
+.DS_Store
+Thumbs.db
+
+# --- Docker ---
+docker-compose.override.yml

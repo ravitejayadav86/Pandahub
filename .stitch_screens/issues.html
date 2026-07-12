@@ -1,0 +1,368 @@
+<!DOCTYPE html>
+
+<html class="dark" lang="en"><head>
+<meta charset="utf-8"/>
+<meta content="width=device-width, initial-scale=1.0" name="viewport"/>
+<title>PandaHub - Issues</title>
+<link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&amp;display=swap" rel="stylesheet"/>
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800;900&amp;family=Public+Sans:wght@400;500;600;700&amp;display=swap" rel="stylesheet"/>
+<link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&amp;display=swap" rel="stylesheet"/>
+<script src="https://cdn.tailwindcss.com?plugins=forms,container-queries"></script>
+<script id="tailwind-config">
+        tailwind.config = {
+          darkMode: "class",
+          theme: {
+            extend: {
+              "colors": {
+                      "surface-container-highest": "#31353d",
+                      "primary-fixed-dim": "#aac7ff",
+                      "surface-variant": "#31353d",
+                      "on-error": "#690005",
+                      "surface-bright": "#363941",
+                      "surface-container-lowest": "#0b0e15",
+                      "surface-container-low": "#181c23",
+                      "surface-container-high": "#262a32",
+                      "on-primary-fixed": "#001b3e",
+                      "on-surface-variant": "#c0c6d6",
+                      "primary-container": "#3e90ff",
+                      "secondary-fixed-dim": "#aac7ff",
+                      "primary-fixed": "#d6e3ff",
+                      "tertiary": "#ffb691",
+                      "surface-tint": "#aac7ff",
+                      "tertiary-fixed-dim": "#ffb691",
+                      "secondary-container": "#264778",
+                      "secondary-fixed": "#d6e3ff",
+                      "surface": "#10131b",
+                      "on-tertiary-fixed": "#341100",
+                      "inverse-primary": "#005db8",
+                      "outline-variant": "#414754",
+                      "on-primary-fixed-variant": "#00468d",
+                      "inverse-surface": "#e0e2ed",
+                      "on-background": "#e0e2ed",
+                      "error": "#ffb4ab",
+                      "on-primary-container": "#002957",
+                      "tertiary-container": "#eb6a12",
+                      "surface-dim": "#10131b",
+                      "on-error-container": "#ffdad6",
+                      "outline": "#8b91a0",
+                      "on-secondary": "#083060",
+                      "secondary": "#aac7ff",
+                      "on-secondary-fixed": "#001b3e",
+                      "surface-container": "#1c2027",
+                      "tertiary-fixed": "#ffdbcb",
+                      "on-surface": "#e0e2ed",
+                      "on-tertiary-container": "#4a1b00",
+                      "error-container": "#93000a",
+                      "background": "#10131b",
+                      "on-primary": "#003064",
+                      "primary": "#aac7ff",
+                      "on-tertiary-fixed-variant": "#793100",
+                      "on-tertiary": "#552000",
+                      "on-secondary-container": "#98b6ee",
+                      "inverse-on-surface": "#2d3038",
+                      "on-secondary-fixed-variant": "#264778"
+              },
+              "borderRadius": {
+                      "DEFAULT": "0.25rem",
+                      "lg": "0.5rem",
+                      "xl": "0.75rem",
+                      "full": "9999px"
+              },
+              "spacing": {},
+              "fontFamily": {
+                      "headline": [
+                              "Inter"
+                      ],
+                      "display": [
+                              "Inter"
+                      ],
+                      "body": [
+                              "Inter"
+                      ],
+                      "label": [
+                              "Public Sans"
+                      ]
+              },
+              "fontSize": {}
+      },
+          },
+        }
+      </script>
+<style>
+          .glass-panel {
+              background: rgba(49, 53, 61, 0.4);
+              backdrop-filter: blur(24px);
+              -webkit-backdrop-filter: blur(24px);
+              border: 1px solid rgba(255, 255, 255, 0.1);
+          }
+          
+          .glass-button {
+              background: rgba(10, 132, 255, 0.15);
+              backdrop-filter: blur(12px);
+              -webkit-backdrop-filter: blur(12px);
+              border: 1px solid rgba(10, 132, 255, 0.3);
+              box-shadow: 0 0 15px rgba(10, 132, 255, 0.2);
+          }
+          
+          .glass-button:hover {
+              background: rgba(10, 132, 255, 0.25);
+              box-shadow: 0 0 25px rgba(10, 132, 255, 0.4);
+          }
+
+          .smooth-spring-motion {
+            transition: all 0.5s cubic-bezier(0.175, 0.885, 0.32, 1.275);
+          }
+      </style>
+</head>
+<body class="bg-background text-on-surface font-body min-h-screen overflow-x-hidden selection:bg-primary-container selection:text-on-primary-container">
+<!-- Ambient Background Lighting -->
+<div class="fixed inset-0 z-0 pointer-events-none overflow-hidden">
+<div class="absolute top-[-10%] left-[-10%] w-[40%] h-[40%] rounded-full bg-primary/20 blur-[120px] opacity-50 mix-blend-screen"></div>
+<div class="absolute bottom-[-10%] right-[-10%] w-[50%] h-[50%] rounded-full bg-secondary/10 blur-[150px] opacity-30 mix-blend-screen"></div>
+</div>
+<!-- SideNavBar (from JSON) -->
+<nav class="hidden md:flex fixed left-0 top-0 h-full p-4 w-72 flex-col bg-surface/60 backdrop-blur-3xl border-r border-outline-variant/20 shadow-2xl shadow-surface-container-lowest/50 z-50">
+<!-- Header area -->
+<div class="flex items-center gap-4 px-2 mb-8">
+<div class="relative w-12 h-12 rounded-xl overflow-hidden glass-panel shrink-0">
+<img class="w-full h-full object-cover" data-alt="A highly detailed close-up portrait of a developer's futuristic avatar with neon blue accents, set against a dark tech-inspired background with subtle glowing lines. The mood is professional yet cyberpunk-leaning, shot with dramatic low-key lighting." src="https://lh3.googleusercontent.com/aida-public/AB6AXuCpigvMTM4hgcT1PIBbCB59EhPpCZS45lp2L-mMKAcycAXtXuuAniQ6eyAFjIz8eNqwXTu182i5iWZk-3hRFL0Id_iDAgbnQ-fAcqZG0WYM9xbQWbFujEbG-00Rar66dAC8jMrbP3pCmARuYp41_-Q2GkwcZk-jAzTWuVLLTA0_WT0vg9AMD3EmnsUyb_Zr2mJRvF0HS7aLdMvuooMx6WCdVlzyPML1ldIfthFuxP7CAG1w-XmgXnrpldiVxeYMesnR7VTdsDkAy1-R"/>
+</div>
+<div class="flex flex-col min-w-0">
+<span class="text-xl font-headline font-black tracking-tighter text-on-surface truncate">DevOS</span>
+<span class="text-xs text-on-surface-variant tracking-wider font-label uppercase">v27.4.0</span>
+</div>
+</div>
+<!-- Main Navigation -->
+<div class="flex-1 flex flex-col gap-2 overflow-y-auto pr-2 custom-scrollbar">
+<a class="flex items-center gap-3 px-4 py-3 text-on-surface-variant hover:text-on-surface hover:bg-surface-variant/20 rounded-xl transition-all duration-300 hover:scale-[1.02] active:scale-[0.98]" href="#">
+<span class="material-symbols-outlined" style="font-variation-settings: 'FILL' 0;">dashboard</span>
+<span class="font-body text-label-sm font-medium tracking-tight">Dashboard</span>
+</a>
+<a class="flex items-center gap-3 px-4 py-3 text-on-surface-variant hover:text-on-surface hover:bg-surface-variant/20 rounded-xl transition-all duration-300 hover:scale-[1.02] active:scale-[0.98]" href="#">
+<span class="material-symbols-outlined" style="font-variation-settings: 'FILL' 0;">code</span>
+<span class="font-body text-label-sm font-medium tracking-tight">Repositories</span>
+</a>
+<a class="flex items-center gap-3 px-4 py-3 bg-primary-container/30 backdrop-blur-md text-on-primary-container rounded-xl shadow-[inset_0_1px_1px_rgba(255,255,255,0.1)] transition-all duration-300 hover:scale-[1.02] active:scale-[0.98]" href="#">
+<span class="material-symbols-outlined text-primary" style="font-variation-settings: 'FILL' 1;">adjust</span>
+<span class="font-body text-label-sm font-medium tracking-tight text-primary">Issues</span>
+</a>
+<a class="flex items-center gap-3 px-4 py-3 text-on-surface-variant hover:text-on-surface hover:bg-surface-variant/20 rounded-xl transition-all duration-300 hover:scale-[1.02] active:scale-[0.98]" href="#">
+<span class="material-symbols-outlined" style="font-variation-settings: 'FILL' 0;">alt_route</span>
+<span class="font-body text-label-sm font-medium tracking-tight">Pull Requests</span>
+</a>
+<a class="flex items-center gap-3 px-4 py-3 text-on-surface-variant hover:text-on-surface hover:bg-surface-variant/20 rounded-xl transition-all duration-300 hover:scale-[1.02] active:scale-[0.98]" href="#">
+<span class="material-symbols-outlined" style="font-variation-settings: 'FILL' 0;">shopping_bag</span>
+<span class="font-body text-label-sm font-medium tracking-tight">Marketplace</span>
+</a>
+</div>
+<!-- Action / Footer Area -->
+<div class="mt-auto flex flex-col gap-4 pt-4 border-t border-outline-variant/10">
+<button class="w-full glass-button text-primary font-headline text-sm font-semibold py-3 px-4 rounded-xl flex items-center justify-center gap-2 hover:scale-[1.02] active:scale-[0.98] transition-all duration-300 group">
+<span class="material-symbols-outlined group-hover:rotate-90 transition-transform duration-300">add</span>
+                New Repository
+            </button>
+<div class="flex flex-col gap-1">
+<a class="flex items-center gap-3 px-4 py-2 text-on-surface-variant hover:text-on-surface hover:bg-surface-variant/20 rounded-xl transition-all duration-300" href="#">
+<span class="material-symbols-outlined text-sm">settings</span>
+<span class="font-body text-xs font-medium">Settings</span>
+</a>
+<a class="flex items-center gap-3 px-4 py-2 text-on-surface-variant hover:text-on-surface hover:bg-surface-variant/20 rounded-xl transition-all duration-300" href="#">
+<span class="material-symbols-outlined text-sm">help</span>
+<span class="font-body text-xs font-medium">Support</span>
+</a>
+</div>
+</div>
+</nav>
+<!-- Main Content Area -->
+<main class="md:ml-72 relative z-10 flex flex-col min-h-screen">
+<!-- TopNavBar (from JSON) -->
+<header class="w-full h-16 sticky top-0 z-40 bg-surface/40 backdrop-blur-2xl flex justify-between items-center px-6 gap-8 shadow-sm transition-all duration-500 border-b border-outline-variant/10">
+<!-- Mobile Menu & Brand -->
+<div class="flex items-center gap-4">
+<button class="md:hidden text-on-surface-variant hover:text-on-surface hover:bg-surface-variant/30 rounded-full p-2 transition-all">
+<span class="material-symbols-outlined">menu</span>
+</button>
+<div class="text-lg font-black text-on-surface tracking-tighter">DevOS Liquid</div>
+</div>
+<!-- Top Links (Hidden on mobile) -->
+<nav class="hidden md:flex items-center gap-6 h-full font-headline text-on-surface text-sm font-semibold">
+<a class="h-full flex items-center text-primary border-b-2 border-primary" href="#">Overview</a>
+<a class="h-full flex items-center text-on-surface-variant hover:text-on-surface transition-colors" href="#">Activity</a>
+<a class="h-full flex items-center text-on-surface-variant hover:text-on-surface transition-colors" href="#">Stats</a>
+</nav>
+<!-- Actions -->
+<div class="flex items-center gap-4">
+<div class="hidden sm:flex items-center bg-surface-container-highest/50 backdrop-blur-md rounded-full px-4 py-1.5 border border-outline-variant/20 focus-within:border-primary/50 focus-within:ring-1 focus-within:ring-primary/50 transition-all">
+<span class="material-symbols-outlined text-on-surface-variant text-sm mr-2">search</span>
+<input class="bg-transparent border-none text-sm text-on-surface focus:ring-0 p-0 w-32 focus:w-48 transition-all duration-300 placeholder:text-on-surface-variant/50" placeholder="Search..." type="text"/>
+</div>
+<div class="flex items-center gap-1">
+<button class="text-on-surface-variant hover:text-on-surface hover:bg-surface-variant/30 rounded-full p-2 transition-all">
+<span class="material-symbols-outlined">notifications</span>
+</button>
+<button class="text-on-surface-variant hover:text-on-surface hover:bg-surface-variant/30 rounded-full p-2 transition-all">
+<span class="material-symbols-outlined">history</span>
+</button>
+</div>
+<button class="hidden sm:flex bg-primary text-on-primary px-4 py-1.5 rounded-full font-semibold text-sm hover:bg-primary-fixed hover:shadow-[0_0_15px_rgba(170,199,255,0.4)] transition-all duration-300 smooth-spring-motion hover:-translate-y-0.5">
+                    Deploy
+                </button>
+<div class="w-8 h-8 rounded-full overflow-hidden border border-outline-variant/30 shrink-0">
+<img class="w-full h-full object-cover" data-alt="A striking minimalist headshot of a software engineer, illuminated by soft blue rim lighting against a pitch-black background. The style is hyper-modern and sleek, focusing on tech-professionalism." src="https://lh3.googleusercontent.com/aida-public/AB6AXuBWynD_Pv10npQXcW0M6H5MYy8gqgcCZxn4gfgblJExRSwIDIEESEwXMERLH5h9xoUWdWGiMEs9G0-PjaCSvwbkWDu8wcdqumyV0_8upheUAyF0X4Gf7x9FVpwLe1ziMA21BeAeX7rDUy_F7kIWeoWV4NxEIzIkYQGDYyB8OiD7Icrg3f2h8Pvi827LbFMh4gu6_h9E9BwIbtJpkN3LWScUec9zQFHwnPQlGFFkXx9t5lDLiokXqluFOO5mAcaz5eB6GQt_4CitnUrm"/>
+</div>
+</div>
+</header>
+<!-- Page Content Canvas -->
+<div class="flex-1 p-6 lg:p-10 max-w-7xl mx-auto w-full flex flex-col gap-6">
+<!-- Page Header & Filter Bar -->
+<div class="flex flex-col md:flex-row md:items-center justify-between gap-4 mb-2">
+<div>
+<h1 class="text-3xl font-headline font-black tracking-tight text-on-surface">PandaHub / Issues</h1>
+<p class="text-on-surface-variant text-sm mt-1">Manage and track feature requests and bugs.</p>
+</div>
+<button class="glass-button text-primary font-headline text-sm font-semibold py-2.5 px-6 rounded-full flex items-center justify-center gap-2 hover:-translate-y-1 transition-all duration-300 self-start md:self-auto">
+<span class="material-symbols-outlined text-sm">add_circle</span>
+                    New Issue
+                </button>
+</div>
+<!-- Filter Bar -->
+<div class="glass-panel rounded-2xl p-2 flex flex-wrap items-center gap-2 sticky top-20 z-30 shadow-lg">
+<div class="flex bg-surface-container-highest/40 rounded-xl p-1 shrink-0">
+<button class="px-4 py-1.5 rounded-lg bg-surface/60 text-primary font-medium text-sm shadow-sm flex items-center gap-2 transition-colors">
+<span class="material-symbols-outlined text-sm" style="font-variation-settings: 'FILL' 1;">error</span>
+                        142 Open
+                    </button>
+<button class="px-4 py-1.5 rounded-lg text-on-surface-variant hover:text-on-surface font-medium text-sm flex items-center gap-2 transition-colors">
+<span class="material-symbols-outlined text-sm">check_circle</span>
+                        89 Closed
+                    </button>
+</div>
+<div class="h-6 w-px bg-outline-variant/30 hidden md:block mx-2"></div>
+<div class="flex-1 flex items-center gap-2 overflow-x-auto custom-scrollbar pb-1 md:pb-0">
+<button class="flex items-center gap-2 px-3 py-1.5 rounded-xl border border-outline-variant/20 text-on-surface-variant text-sm hover:bg-surface-variant/30 transition-colors whitespace-nowrap">
+                        Labels <span class="material-symbols-outlined text-xs">expand_more</span>
+</button>
+<button class="flex items-center gap-2 px-3 py-1.5 rounded-xl border border-outline-variant/20 text-on-surface-variant text-sm hover:bg-surface-variant/30 transition-colors whitespace-nowrap">
+                        Assignee <span class="material-symbols-outlined text-xs">expand_more</span>
+</button>
+<button class="flex items-center gap-2 px-3 py-1.5 rounded-xl border border-outline-variant/20 text-on-surface-variant text-sm hover:bg-surface-variant/30 transition-colors whitespace-nowrap">
+                        Sort <span class="material-symbols-outlined text-xs">expand_more</span>
+</button>
+</div>
+</div>
+<!-- Issues List -->
+<div class="flex flex-col gap-3">
+<!-- Issue Card 1 -->
+<div class="bg-surface/40 backdrop-blur-2xl rounded-2xl border border-white/5 shadow-lg p-5 flex flex-col sm:flex-row sm:items-start gap-4 hover:border-white/10 hover:bg-surface/60 transition-all duration-300 group cursor-pointer">
+<div class="shrink-0 pt-1">
+<span class="material-symbols-outlined text-error" style="font-variation-settings: 'FILL' 1;">error</span>
+</div>
+<div class="flex-1 flex flex-col gap-2">
+<h3 class="text-lg font-semibold text-on-surface group-hover:text-primary transition-colors leading-tight">Implement dark mode toggle in navigation</h3>
+<div class="flex flex-wrap items-center gap-2">
+<span class="px-2 py-0.5 rounded-md text-xs font-medium bg-[#1a4a2a]/40 border border-[#1a4a2a] text-[#4ade80] backdrop-blur-sm">enhancement</span>
+<span class="px-2 py-0.5 rounded-md text-xs font-medium bg-[#4a1a4a]/40 border border-[#4a1a4a] text-[#e879f9] backdrop-blur-sm">ui/ux</span>
+</div>
+<div class="text-sm text-on-surface-variant mt-1 flex items-center gap-2 flex-wrap">
+<span>#142 opened 2 hours ago by</span>
+<div class="flex items-center gap-1.5 text-on-surface hover:text-primary transition-colors">
+<img class="w-5 h-5 rounded-full object-cover" data-alt="A small circular avatar showing a vibrant neon orange geometric shape against a deep black background, reflecting a modern digital aesthetic." src="https://lh3.googleusercontent.com/aida-public/AB6AXuBcw87-e70sbMS3Ruhgebv0VBwj8YI40tUK7tBWhIugKVaTJtebHuRLr5mrtL1LI01LYgv2AWMW9ljyvvNiZdv2mzVxJQfvgZxBWNxq1TwC07zyRefEGJJx2DlPxYJbiooslDcDAf49etxits53MIQeYOCwGFfnJFugRLBHRjF1ZoSNE2miAnRiLs960573gHRODas5EzhiDWBrU_zkjo4CcHba_Htg9aF2YATrtwxoxZCCuIvhuaO0NStv5wqfr4THQs9P2mcSFCjz"/>
+<span>sarah-dev</span>
+</div>
+</div>
+</div>
+<div class="flex items-center gap-3 shrink-0 text-on-surface-variant">
+<div class="flex items-center gap-1 hover:text-primary transition-colors">
+<span class="material-symbols-outlined text-sm">chat_bubble</span>
+<span class="text-sm font-medium">12</span>
+</div>
+</div>
+</div>
+<!-- Issue Card 2 -->
+<div class="bg-surface/40 backdrop-blur-2xl rounded-2xl border border-white/5 shadow-lg p-5 flex flex-col sm:flex-row sm:items-start gap-4 hover:border-white/10 hover:bg-surface/60 transition-all duration-300 group cursor-pointer">
+<div class="shrink-0 pt-1">
+<span class="material-symbols-outlined text-error" style="font-variation-settings: 'FILL' 1;">error</span>
+</div>
+<div class="flex-1 flex flex-col gap-2">
+<h3 class="text-lg font-semibold text-on-surface group-hover:text-primary transition-colors leading-tight">Crash on startup when offline mode is enabled</h3>
+<div class="flex flex-wrap items-center gap-2">
+<span class="px-2 py-0.5 rounded-md text-xs font-medium bg-[#4a1a1a]/40 border border-[#4a1a1a] text-error backdrop-blur-sm">bug</span>
+<span class="px-2 py-0.5 rounded-md text-xs font-medium bg-[#4a2a1a]/40 border border-[#4a2a1a] text-tertiary backdrop-blur-sm">critical</span>
+</div>
+<div class="text-sm text-on-surface-variant mt-1 flex items-center gap-2 flex-wrap">
+<span>#141 opened 5 hours ago by</span>
+<div class="flex items-center gap-1.5 text-on-surface hover:text-primary transition-colors">
+<img class="w-5 h-5 rounded-full object-cover" data-alt="A small circular avatar featuring a stylized minimalist glowing blue eye icon on a dark grey background." src="https://lh3.googleusercontent.com/aida-public/AB6AXuAzqkKrvx6N23mX7eSN1WIbZXd_xPGNNh0mhLPZpchezgjWH6L_iafmhLH2Li9EJHS0UrZdUN3zvQJu89xxVNjm2lqlSNSxUreaOBO8ffdFID3argCKaEAj0pKgqxPxdyq0wpg-L8oseGCn-03hqvEru2nBTvnbUV9WxqSFbGsxDJ-Xyx6soD2zcghJVD4Qqkx7ro-Lb04XDH_ufpxbXl75j5BDOGRwTcDZRHKy1CfsGBk_l80ysWRiHHXxXDCieLNxLEtHpYmwIoxm"/>
+<span>alex_coder</span>
+</div>
+</div>
+</div>
+<div class="flex items-center gap-3 shrink-0 text-on-surface-variant">
+<div class="flex items-center gap-1 hover:text-primary transition-colors">
+<span class="material-symbols-outlined text-sm">chat_bubble</span>
+<span class="text-sm font-medium">34</span>
+</div>
+</div>
+</div>
+<!-- Issue Card 3 -->
+<div class="bg-surface/40 backdrop-blur-2xl rounded-2xl border border-white/5 shadow-lg p-5 flex flex-col sm:flex-row sm:items-start gap-4 hover:border-white/10 hover:bg-surface/60 transition-all duration-300 group cursor-pointer">
+<div class="shrink-0 pt-1">
+<span class="material-symbols-outlined text-primary" style="font-variation-settings: 'FILL' 0;">error</span>
+</div>
+<div class="flex-1 flex flex-col gap-2">
+<h3 class="text-lg font-semibold text-on-surface group-hover:text-primary transition-colors leading-tight">Update dependency versions for Q3 release</h3>
+<div class="flex flex-wrap items-center gap-2">
+<span class="px-2 py-0.5 rounded-md text-xs font-medium bg-[#1a3a4a]/40 border border-[#1a3a4a] text-[#38bdf8] backdrop-blur-sm">maintenance</span>
+</div>
+<div class="text-sm text-on-surface-variant mt-1 flex items-center gap-2 flex-wrap">
+<span>#140 opened yesterday by</span>
+<div class="flex items-center gap-1.5 text-on-surface hover:text-primary transition-colors">
+<img class="w-5 h-5 rounded-full object-cover" data-alt="A small circular avatar showing a robotic face silhouetted against a bright white light." src="https://lh3.googleusercontent.com/aida-public/AB6AXuBHYWGFBW0wex-QdXO-4-M3jTVHgh1c42Jl9U3yUtY8PGpS7XSclJMhWaEGUCU0FmDoEJZhhJdOaGHsvuCS_Qo2erEAoe0Ev1I4EJmkN8XTvzZrb0Ybfvhu32XWZ7xNfO3aZW-v8_oSeZrqU3JbFFiERvSO3_Ar142DDuGSJw0ilNtxi9VE7AsvYEjxkYSq9LtyRHWUZyLk_VrGdiOcvxbR4U8M-lYg_hnbF_h1XtvpQmzL2seLW51-dsJW5rh6-EZAbUdGzI7ag3VT"/>
+<span>bot-auto</span>
+</div>
+</div>
+</div>
+<div class="flex items-center gap-3 shrink-0 text-on-surface-variant">
+<div class="flex items-center gap-1 hover:text-primary transition-colors">
+<span class="material-symbols-outlined text-sm">chat_bubble</span>
+<span class="text-sm font-medium">2</span>
+</div>
+</div>
+</div>
+</div>
+<!-- Pagination -->
+<div class="flex justify-center mt-6">
+<div class="flex items-center gap-1 bg-surface-container-highest/30 backdrop-blur-md rounded-full p-1 border border-outline-variant/20">
+<button class="w-8 h-8 flex items-center justify-center rounded-full text-on-surface-variant hover:bg-surface-variant/50 hover:text-on-surface transition-colors">
+<span class="material-symbols-outlined text-sm">chevron_left</span>
+</button>
+<button class="w-8 h-8 flex items-center justify-center rounded-full bg-primary/20 text-primary font-medium text-sm">1</button>
+<button class="w-8 h-8 flex items-center justify-center rounded-full text-on-surface-variant hover:bg-surface-variant/50 hover:text-on-surface transition-colors text-sm font-medium">2</button>
+<button class="w-8 h-8 flex items-center justify-center rounded-full text-on-surface-variant hover:bg-surface-variant/50 hover:text-on-surface transition-colors text-sm font-medium">3</button>
+<span class="text-on-surface-variant px-2">...</span>
+<button class="w-8 h-8 flex items-center justify-center rounded-full text-on-surface-variant hover:bg-surface-variant/50 hover:text-on-surface transition-colors text-sm font-medium">14</button>
+<button class="w-8 h-8 flex items-center justify-center rounded-full text-on-surface-variant hover:bg-surface-variant/50 hover:text-on-surface transition-colors">
+<span class="material-symbols-outlined text-sm">chevron_right</span>
+</button>
+</div>
+</div>
+</div>
+</main>
+<style>
+        /* Custom scrollbar for webkit */
+        .custom-scrollbar::-webkit-scrollbar {
+            width: 4px;
+            height: 4px;
+        }
+        .custom-scrollbar::-webkit-scrollbar-track {
+            background: transparent;
+        }
+        .custom-scrollbar::-webkit-scrollbar-thumb {
+            background: rgba(255, 255, 255, 0.1);
+            border-radius: 4px;
+        }
+        .custom-scrollbar::-webkit-scrollbar-thumb:hover {
+            background: rgba(255, 255, 255, 0.2);
+        }
+    </style>
+</body></html>

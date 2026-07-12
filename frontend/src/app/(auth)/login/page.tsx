@@ -74,7 +74,7 @@ export default function GeneratedPage() {
   <SpaceBackground />
 </div>
 
-<main className="relative z-10 flex items-center justify-center min-h-screen px-4 py-24">
+<div className="relative z-10 flex items-center justify-center min-h-screen px-4 py-24">
 
 <motion.div 
   initial={{ opacity: 0, y: 40, scale: 0.96 }} 
@@ -120,12 +120,22 @@ export default function GeneratedPage() {
 )}
 
 <div className="space-y-1">
-<label className="block text-xs font-medium text-on-surface-variant font-label tracking-wide ml-1" htmlFor="email">Email</label>
+<label className="block text-xs font-medium text-on-surface-variant font-label tracking-wide ml-1" htmlFor="email">
+  {isLogin ? 'Username or Email' : 'Email'}
+</label>
 <div className="relative">
 <div className="absolute inset-y-0 left-0 pl-4 flex items-center pointer-events-none text-outline">
-<span className="material-symbols-outlined text-[20px]">mail</span>
+<span className="material-symbols-outlined text-[20px]">{isLogin ? 'person' : 'mail'}</span>
 </div>
-<input className="block w-full pl-11 pr-4 py-3.5 bg-surface-container-low/50 input-glass border-outline-variant/30 rounded-xl text-on-surface placeholder:text-outline focus:ring-0 sm:text-sm glow-accent-focus" id="email" placeholder="name@company.com" type="email" required value={email} onChange={(e) => setEmail(e.target.value)} />
+<input 
+  className="block w-full pl-11 pr-4 py-3.5 bg-surface-container-low/50 input-glass border-outline-variant/30 rounded-xl text-on-surface placeholder:text-outline focus:ring-0 sm:text-sm glow-accent-focus" 
+  id="email" 
+  placeholder={isLogin ? "username or email" : "name@company.com"} 
+  type={isLogin ? "text" : "email"} 
+  required 
+  value={email} 
+  onChange={(e) => setEmail(e.target.value)} 
+/>
 </div>
 </div>
 <div className="space-y-1">
@@ -171,7 +181,7 @@ export default function GeneratedPage() {
 </div>
 </div>
 </motion.div>
-</main>
+</div>
 
 
           {/* Settings toggle */}

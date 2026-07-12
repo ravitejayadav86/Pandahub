@@ -24,11 +24,11 @@ export default function GeneratedPage() {
 
 <div className="flex-1 flex flex-col gap-2 overflow-y-auto pr-2 custom-scrollbar">
 <a className="flex items-center gap-3 px-4 py-3 text-on-surface-variant hover:text-on-surface hover:bg-surface-variant/20 rounded-xl transition-all duration-300 hover:scale-[1.02] active:scale-[0.98]" href="#">
-<span className="material-symbols-outlined" style={{fontVariationSettings: ''FILL' 0'}}>dashboard</span>
+<span className="material-symbols-outlined" style={{fontVariationSettings: '"FILL" 0'}}>dashboard</span>
 <span className="font-body text-label-sm font-medium tracking-tight">Dashboard</span>
 </a>
 <a className="flex items-center gap-3 px-4 py-3 text-on-surface-variant hover:text-on-surface hover:bg-surface-variant/20 rounded-xl transition-all duration-300 hover:scale-[1.02] active:scale-[0.98]" href="#">
-<span className="material-symbols-outlined" style={{fontVariationSettings: ''FILL' 0'}}>code</span>
+<span className="material-symbols-outlined" style={{fontVariationSettings: '"FILL" 0'}}>code</span>
 <span className="font-body text-label-sm font-medium tracking-tight">Repositories</span>
 </a>
 <a className="flex items-center gap-3 px-4 py-3 bg-primary-container/30 backdrop-blur-md text-on-primary-container rounded-xl shadow-[inset_0_1px_1px_rgba(255,255,255,0.1)] transition-all duration-300 hover:scale-[1.02] active:scale-[0.98]" href="#">
@@ -36,11 +36,11 @@ export default function GeneratedPage() {
 <span className="font-body text-label-sm font-medium tracking-tight text-primary">Issues</span>
 </a>
 <a className="flex items-center gap-3 px-4 py-3 text-on-surface-variant hover:text-on-surface hover:bg-surface-variant/20 rounded-xl transition-all duration-300 hover:scale-[1.02] active:scale-[0.98]" href="#">
-<span className="material-symbols-outlined" style={{fontVariationSettings: ''FILL' 0'}}>alt_route</span>
+<span className="material-symbols-outlined" style={{fontVariationSettings: '"FILL" 0'}}>alt_route</span>
 <span className="font-body text-label-sm font-medium tracking-tight">Pull Requests</span>
 </a>
 <a className="flex items-center gap-3 px-4 py-3 text-on-surface-variant hover:text-on-surface hover:bg-surface-variant/20 rounded-xl transition-all duration-300 hover:scale-[1.02] active:scale-[0.98]" href="#">
-<span className="material-symbols-outlined" style={{fontVariationSettings: ''FILL' 0'}}>shopping_bag</span>
+<span className="material-symbols-outlined" style={{fontVariationSettings: '"FILL" 0'}}>shopping_bag</span>
 <span className="font-body text-label-sm font-medium tracking-tight">Marketplace</span>
 </a>
 </div>
@@ -196,7 +196,7 @@ export default function GeneratedPage() {
 
 <div className="bg-surface/40 backdrop-blur-2xl rounded-2xl border border-white/5 shadow-lg p-5 flex flex-col sm:flex-row sm:items-start gap-4 hover:border-white/10 hover:bg-surface/60 transition-all duration-300 group cursor-pointer">
 <div className="shrink-0 pt-1">
-<span className="material-symbols-outlined text-primary" style={{fontVariationSettings: ''FILL' 0'}}>error</span>
+<span className="material-symbols-outlined text-primary" style={{fontVariationSettings: '"FILL" 0'}}>error</span>
 </div>
 <div className="flex-1 flex flex-col gap-2">
 <h3 className="text-lg font-semibold text-on-surface group-hover:text-primary transition-colors leading-tight">Update dependency versions for Q3 release</h3>

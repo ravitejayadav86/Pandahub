@@ -6,20 +6,6 @@ import Link from 'next/link';
 const SpaceBackground = dynamic(() => import('./SpaceBackground'), { ssr: false });
 
 const TYPE_PHRASES = ["next generation.", "AI era.", "future of code."];
-const TICKER_ITEMS = [
-    "🔥 @sarah merged 12 commits into core-engine",
-    "🚀 Deployment successful for api-v2",
-    "✨ @david created a new issue in frontend",
-    "⚡ @alex approved PR #459",
-    "🛡️ Security scan passed for main branch",
-    "🌐 @mike opened a new PR in ui-components",
-    "🔥 @sarah merged 12 commits into core-engine",
-    "🚀 Deployment successful for api-v2",
-    "✨ @david created a new issue in frontend",
-    "⚡ @alex approved PR #459",
-    "🛡️ Security scan passed for main branch",
-    "🌐 @mike opened a new PR in ui-components",
-];
 
 export default function HomePage() {
   const [phraseIndex, setPhraseIndex] = useState(0);
@@ -83,11 +69,6 @@ export default function HomePage() {
 
       {/* Hero */}
       <section className="relative z-10 flex flex-col items-center justify-center text-center min-h-screen px-6 pt-20 pb-10 max-w-4xl mx-auto animate-fade-in-up">
-        <div className="inline-flex items-center gap-2 px-4 py-1.5 rounded-full border border-primary/30 bg-primary/10 text-primary text-xs font-semibold mb-8 backdrop-blur-md animate-fade-in-up">
-          <span className="w-1.5 h-1.5 rounded-full bg-primary animate-pulse inline-block"></span>
-          Live platform — 12k+ developers active now
-        </div>
-
         <h1 className="text-5xl md:text-7xl font-extrabold tracking-tighter text-on-surface mb-4 leading-tight drop-shadow-2xl font-display animate-fade-in-up-delay">
           Code hosting for the
           <br />
@@ -112,21 +93,8 @@ export default function HomePage() {
         </div>
       </section>
 
-      {/* Live Ticker */}
-      <div className="w-full overflow-hidden py-4 mb-20 relative z-10 border-y border-white/[0.05]" style={{ background: 'rgba(8,10,18,0.6)', backdropFilter: 'blur(12px)' }}>
-        <div className="absolute left-0 top-0 bottom-0 w-24 bg-gradient-to-r from-[#080a12] to-transparent z-10 pointer-events-none"></div>
-        <div className="absolute right-0 top-0 bottom-0 w-24 bg-gradient-to-l from-[#080a12] to-transparent z-10 pointer-events-none"></div>
-        <div className="animate-ticker gap-6 px-4 flex w-max">
-          {TICKER_ITEMS.map((item, i) => (
-            <div key={i} className="flex items-center gap-2 text-sm font-medium text-on-surface-variant bg-white/[0.04] px-5 py-2.5 rounded-full border border-white/[0.06] hover:text-on-surface hover:bg-white/[0.07] hover:border-white/10 transition-all duration-200 cursor-default">
-              {item}
-            </div>
-          ))}
-        </div>
-      </div>
-
       {/* Code Window */}
-      <section className="w-full max-w-5xl mx-auto px-6 mb-28 relative z-10">
+      <section className="w-full max-w-5xl mx-auto px-6 mb-28 relative z-10 mt-16">
         <div className="glass-panel rounded-2xl overflow-hidden shadow-[0_20px_60px_rgba(0,0,0,0.6)] border border-white/[0.07] hover:border-primary/20 transition-all duration-500 hover:shadow-[0_30px_80px_rgba(10,132,255,0.12)]">
           <div className="px-4 py-3 flex items-center gap-4 border-b border-white/[0.05]" style={{ background: 'rgba(14,18,28,0.8)' }}>
             <div className="flex gap-2">

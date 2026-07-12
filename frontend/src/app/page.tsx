@@ -89,7 +89,7 @@ export default function HomePage() {
         </p>
 
         <div className="flex flex-col sm:flex-row gap-4 w-full sm:w-auto">
-          <a href="/login" className="bg-primary text-white dark:bg-primary-container dark:text-on-primary-container px-8 py-4 rounded-xl font-bold text-lg tracking-wide btn-glow btn-ripple w-full sm:w-auto flex items-center justify-center gap-2 group shadow-lg hover:shadow-primary/20">
+          <a href="/login" className="bg-primary text-white dark:bg-primary-container dark:text-on-primary-container px-8 py-4 rounded-xl font-bold text-lg tracking-wide btn-glow btn-ripple w-full sm:w-auto flex items-center justify-center gap-2 group">
             Get Started Free
             <span className="material-symbols-outlined group-hover:translate-x-1.5 transition-transform duration-300">arrow_forward</span>
           </a>
@@ -102,13 +102,13 @@ export default function HomePage() {
 
       {/* Code Window */}
       <motion.section 
-        initial={{ opacity: 0, y: 60, scale: 0.96 }} 
+        initial={{ opacity: 0, y: -60, scale: 0.96 }} 
         whileInView={{ opacity: 1, y: 0, scale: 1 }} 
         viewport={{ once: true, margin: "-120px" }} 
         transition={{ duration: 0.8, ease: [0.16, 1, 0.3, 1] }} 
         className="w-full max-w-5xl mx-auto px-6 mb-28 relative z-10"
       >
-        <div className="glass-panel rounded-2xl overflow-hidden border border-border-color shadow-2xl hover:border-primary/20 transition-all duration-500">
+        <div className="glass-panel rounded-2xl overflow-hidden border border-border-color shadow-md hover:border-primary/20 transition-all duration-500">
           <div className="px-4 py-3 flex items-center gap-4 border-b border-border-color bg-black/[0.03] dark:bg-white/[0.03]">
             <div className="flex gap-2">
               <div className="w-3 h-3 rounded-full bg-[#FF5F57]"></div>
@@ -154,14 +154,11 @@ export default function HomePage() {
         className="w-full max-w-6xl mx-auto grid grid-cols-1 md:grid-cols-3 gap-6 px-6 mb-28 relative z-10"
       >
         {[
-          { icon: 'rate_review', title: 'Code Review', desc: 'Frictionless inline commenting and AI-assisted PR summaries built right into the editor.', color: '#0A84FF', shadow: 'rgba(10,132,255,0.1)' },
-          { icon: 'rocket_launch', title: 'CI/CD Pipelines', desc: 'Integrated workflows that build, test, and deploy faster than ever with smart caching.', color: '#BF5AF2', shadow: 'rgba(191,90,242,0.1)' },
-          { icon: 'bug_report', title: 'Issue Tracking', desc: 'Powerful boards and sprint planning tools that map directly to your commits and branches.', color: '#30D158', shadow: 'rgba(48,209,88,0.1)' },
-        ].map(({ icon, title, desc, color, shadow }) => (
-          <div key={title} className="glass-panel p-8 rounded-2xl flex flex-col gap-4 group cursor-default transition-all duration-300 hover:-translate-y-2"
-            style={{ '--hover-shadow': shadow } as React.CSSProperties}
-            onMouseEnter={e => (e.currentTarget.style.boxShadow = `0 20px 50px ${shadow}, 0 0 0 1px ${color}22`)}
-            onMouseLeave={e => (e.currentTarget.style.boxShadow = '')}>
+          { icon: 'rate_review', title: 'Code Review', desc: 'Frictionless inline commenting and AI-assisted PR summaries built right into the editor.', color: '#0A84FF' },
+          { icon: 'rocket_launch', title: 'CI/CD Pipelines', desc: 'Integrated workflows that build, test, and deploy faster than ever with smart caching.', color: '#BF5AF2' },
+          { icon: 'bug_report', title: 'Issue Tracking', desc: 'Powerful boards and sprint planning tools that map directly to your commits and branches.', color: '#30D158' },
+        ].map(({ icon, title, desc, color }) => (
+          <div key={title} className="glass-panel p-8 rounded-2xl flex flex-col gap-4 group cursor-default transition-all duration-300 hover:-translate-y-2 hover:shadow-lg">
             <div className="w-12 h-12 rounded-2xl flex items-center justify-center transition-all duration-300 group-hover:scale-110"
               style={{ background: `${color}15`, color, boxShadow: `0 0 0 1px ${color}22` }}>
               <span className="material-symbols-outlined" style={{fontVariationSettings: '"FILL" 1'}}>{icon}</span>

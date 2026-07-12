@@ -4,6 +4,9 @@ import { useState } from 'react';
 import { useRouter } from 'next/navigation';
 import { useAuthStore } from '@/store/authStore';
 import api from '@/lib/api';
+import dynamic from 'next/dynamic';
+
+const SpaceBackground = dynamic(() => import('../../SpaceBackground'), { ssr: false });
 
 export default function GeneratedPage() {
   const [isLogin, setIsLogin] = useState(true);
@@ -53,7 +56,7 @@ export default function GeneratedPage() {
   };
 
   return (
-    <main className="min-h-screen text-on-surface bg-background font-body">
+    <main className="min-h-screen text-on-surface font-body relative overflow-hidden" style={{ background: '#080a12' }}>
 
 
 <header className="fixed top-0 w-full z-50 flex justify-between items-center px-6 py-6 max-w-7xl mx-auto left-0 right-0">
@@ -65,10 +68,8 @@ export default function GeneratedPage() {
 </a>
 </header>
 
-<div className="fixed inset-0 z-0 overflow-hidden pointer-events-none">
-<div className="absolute top-1/4 left-1/4 w-[500px] h-[500px] rounded-full bg-primary-container/20 blur-[120px] mix-blend-screen orb-1"></div>
-<div className="absolute bottom-1/4 right-1/4 w-[600px] h-[600px] rounded-full bg-secondary-container/20 blur-[150px] mix-blend-screen orb-2"></div>
-<div className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-[400px] h-[400px] rounded-full bg-tertiary-container/10 blur-[100px] mix-blend-screen orb-3"></div>
+<div className="fixed inset-0 z-0 pointer-events-none">
+  <SpaceBackground />
 </div>
 
 <main className="relative z-10 flex items-center justify-center min-h-screen px-4 py-24">

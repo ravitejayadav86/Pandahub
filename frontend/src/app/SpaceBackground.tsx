@@ -24,7 +24,13 @@ interface ShootingStar {
   angle: number;
 }
 
-const COLORS = ['#0A84FF', '#5E5CE6', '#30D158', '#64D2FF', '#BF5AF2'];
+const THEMES: Record<string, string[]> = {
+  multicolor: ['#0A84FF', '#5E5CE6', '#30D158', '#64D2FF', '#BF5AF2'],
+  emerald: ['#30D158', '#34C759', '#00C7BE', '#32D74B'],
+  ocean: ['#0A84FF', '#64D2FF', '#0040DD', '#007AFF'],
+  cyberpunk: ['#BF5AF2', '#FF2D55', '#FF375F', '#D30DF2'],
+  mono: ['#64748B', '#475569', '#334155', '#94A3B8']
+};
 
 export default function SpaceBackground() {
   const canvasRef = useRef<HTMLCanvasElement>(null);
@@ -40,11 +46,19 @@ export default function SpaceBackground() {
     let shootingStars: ShootingStar[] = [];
     let frame = 0;
     
-    // Mouse positioning for interactive motion detection
+    // Smooth Mouse tracking coordinates (with LERP target)
     const mouse = {
       x: -1000,
       y: -1000,
-      radius: 180 // detection radius
+      targetX: -1000,
+      targetY: -1000,
+      radius: 200 // wider detection radius
+    };
+
+    const getColors = () => {
+      if (typeof window === 'undefined') return THEMES.multicolor;
+      const themeId = document.documentElement.getAttribute('data-bg-theme') || 'multicolor';
+      return THEMES[themeId] || THEMES.multicolor;
     };
 
     const isDarkMode = () => {
@@ -59,11 +73,11 @@ export default function SpaceBackground() {
     };
 
     const init = () => {
+      const colors = getColors();
       const count = Math.floor((canvas.width * canvas.height) / 7000);
       particles = Array.from({ length: Math.min(count, 120) }, () => {
-        // Antigravity upward bias drift
-        const vx = (Math.random() - 0.5) * 0.2;
-        const vy = -Math.random() * 0.3 - 0.1; // Floating upwards
+        const vx = (Math.random() - 0.5) * 0.15;
+        const vy = -Math.random() * 0.25 - 0.1; // Floating upwards
         return {
           x: Math.random() * canvas.width,
           y: Math.random() * canvas.height,
@@ -72,10 +86,10 @@ export default function SpaceBackground() {
           baseVx: vx,
           baseVy: vy,
           size: Math.random() * 2.2 + 0.6,
-          opacity: Math.random() * 0.5 + 0.2,
-          color: COLORS[Math.floor(Math.random() * COLORS.length)] ?? '#0A84FF',
+          opacity: Math.random() * 0.45 + 0.15,
+          color: colors[Math.floor(Math.random() * colors.length)] ?? '#0A84FF',
           pulse: Math.random() * Math.PI * 2,
-          pulseSpeed: Math.random() * 0.02 + 0.005,
+          pulseSpeed: Math.random() * 0.015 + 0.005,
         };
       });
     };
@@ -99,20 +113,36 @@ export default function SpaceBackground() {
     };
 
     const handleMouseMove = (e: MouseEvent) => {
-      mouse.x = e.clientX;
-      mouse.y = e.clientY;
+      mouse.targetX = e.clientX;
+      mouse.targetY = e.clientY;
     };
 
     const handleMouseLeave = () => {
-      mouse.x = -1000;
-      mouse.y = -1000;
+      mouse.targetX = -1000;
+      mouse.targetY = -1000;
+    };
+
+    const updateColors = () => {
+      const colors = getColors();
+      for (const p of particles) {
+        p.color = colors[Math.floor(Math.random() * colors.length)] ?? '#0A84FF';
+      }
     };
 
     const draw = () => {
       const dark = isDarkMode();
       
+      // LERP mouse coordinates for butter smooth decay movement
+      if (mouse.targetX === -1000) {
+        mouse.x += (-1000 - mouse.x) * 0.1;
+        mouse.y += (-1000 - mouse.y) * 0.1;
+      } else {
+        mouse.x += (mouse.targetX - mouse.x) * 0.08;
+        mouse.y += (mouse.targetY - mouse.y) * 0.08;
+      }
+
       // Fade trail effect
-      ctx.fillStyle = dark ? 'rgba(8, 10, 18, 0.18)' : 'rgba(255, 255, 255, 0.18)';
+      ctx.fillStyle = dark ? 'rgba(8, 10, 18, 0.15)' : 'rgba(255, 255, 255, 0.15)';
       ctx.fillRect(0, 0, canvas.width, canvas.height);
 
       frame++;
@@ -128,7 +158,7 @@ export default function SpaceBackground() {
           const dy = p1.y - p2.y;
           const dist = Math.sqrt(dx * dx + dy * dy);
           if (dist < 130) {
-            const alpha = (dark ? 0.18 : 0.09) * (1 - dist / 130);
+            const alpha = (dark ? 0.16 : 0.08) * (1 - dist / 130);
             ctx.beginPath();
             ctx.strokeStyle = dark 
               ? `rgba(10,132,255,${alpha.toFixed(3)})`
@@ -156,18 +186,18 @@ export default function SpaceBackground() {
           const force = (mouse.radius - distance) / mouse.radius; // 0 to 1
           const angle = Math.atan2(dy, dx);
           
-          // Add repulsion velocity
-          p.vx += Math.cos(angle) * force * 0.6;
-          p.vy += Math.sin(angle) * force * 0.6;
+          // Eased repulsion acceleration
+          p.vx += Math.cos(angle) * force * 0.4;
+          p.vy += Math.sin(angle) * force * 0.4;
         } else {
           // Slow recovery back to base antigravity upward velocities
-          p.vx += (p.baseVx - p.vx) * 0.04;
-          p.vy += (p.baseVy - p.vy) * 0.04;
+          p.vx += (p.baseVx - p.vx) * 0.03;
+          p.vy += (p.baseVy - p.vy) * 0.03;
         }
 
         ctx.beginPath();
         ctx.arc(p.x, p.y, Math.max(pulsedSize, 0.1), 0, Math.PI * 2);
-        ctx.fillStyle = `rgba(${hexToRgb(p.color)},${Math.min(pulsedOpacity + (dark ? 0.3 : 0.1), 1).toFixed(2)})`;
+        ctx.fillStyle = `rgba(${hexToRgb(p.color)},${Math.min(pulsedOpacity + (dark ? 0.25 : 0.05), 1).toFixed(2)})`;
         ctx.fill();
 
         p.x += p.vx;
@@ -234,9 +264,15 @@ export default function SpaceBackground() {
     window.addEventListener('mousemove', handleMouseMove);
     window.addEventListener('mouseleave', handleMouseLeave);
     
-    // Set up MutationObserver to track theme shifts (e.g. settings)
-    const observer = new MutationObserver(() => {});
-    observer.observe(document.documentElement, { attributes: true, attributeFilter: ['class'] });
+    // Set up MutationObserver to track theme and color accent shifts
+    const observer = new MutationObserver((mutations) => {
+      for (const m of mutations) {
+        if (m.attributeName === 'data-bg-theme') {
+          updateColors();
+        }
+      }
+    });
+    observer.observe(document.documentElement, { attributes: true, attributeFilter: ['class', 'data-bg-theme'] });
 
     return () => {
       window.removeEventListener('resize', resize);

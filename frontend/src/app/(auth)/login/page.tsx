@@ -5,6 +5,7 @@ import { useRouter } from 'next/navigation';
 import { useAuthStore } from '@/store/authStore';
 import api from '@/lib/api';
 import dynamic from 'next/dynamic';
+import { motion } from 'framer-motion';
 import Settings from '../../Settings';
 
 const SpaceBackground = dynamic(() => import('../../SpaceBackground'), { ssr: false });
@@ -75,7 +76,12 @@ export default function GeneratedPage() {
 
 <main className="relative z-10 flex items-center justify-center min-h-screen px-4 py-24">
 
-<div className="w-full max-w-md glass-panel rounded-3xl overflow-hidden shadow-2xl transform transition-all duration-500 ease-out">
+<motion.div 
+  initial={{ opacity: 0, y: 40, scale: 0.96 }} 
+  animate={{ opacity: 1, y: 0, scale: 1 }} 
+  transition={{ duration: 0.8, ease: [0.16, 1, 0.3, 1] }}
+  className="w-full max-w-md glass-panel rounded-3xl overflow-hidden shadow-2xl"
+>
 
 <div className="flex border-b border-border-color w-full relative">
 
@@ -164,7 +170,7 @@ export default function GeneratedPage() {
 </div>
 </div>
 </div>
-</div>
+</motion.div>
 </main>
 
 

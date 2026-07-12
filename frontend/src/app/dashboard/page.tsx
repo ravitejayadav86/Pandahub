@@ -1,9 +1,10 @@
 "use client";
 import Link from 'next/link';
+import Settings from '../Settings';
 
 export default function GeneratedPage() {
   return (
-    <main className="min-h-screen text-on-surface bg-background font-body">
+    <main className="min-h-screen text-on-surface bg-background font-body transition-colors duration-300 relative">
 
 
 <div className="fixed top-[-20%] left-[-10%] w-[50%] h-[50%] rounded-full bg-primary-container/5 blur-[120px] pointer-events-none"></div>
@@ -344,6 +345,8 @@ export default function GeneratedPage() {
 </div>
 
 
+      {/* Settings toggle */}
+      <Settings />
     </main>
   );
 }

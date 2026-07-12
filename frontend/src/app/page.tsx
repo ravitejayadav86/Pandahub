@@ -3,6 +3,7 @@ import { useState, useEffect } from 'react';
 import dynamic from 'next/dynamic';
 import Link from 'next/link';
 import { motion } from 'framer-motion';
+import Settings from './Settings';
 
 const SpaceBackground = dynamic(() => import('./SpaceBackground'), { ssr: false });
 
@@ -41,36 +42,41 @@ export default function HomePage() {
   }, [charIndex, isDeleting, phraseIndex]);
 
   return (
-    <main className="min-h-screen text-on-surface font-body relative overflow-hidden" style={{ background: 'var(--background)' }}>
+    <main className="min-h-screen text-on-surface font-body relative overflow-hidden bg-background transition-colors duration-300">
 
       {/* Live Animated Space Background */}
       <SpaceBackground />
 
       {/* Header */}
-      <header className="fixed top-0 w-full z-50 backdrop-blur-xl border-b border-white/[0.06]" style={{ background: 'rgba(255,255,255,0.7)' }}>
+      <header className="fixed top-0 w-full z-50 backdrop-blur-xl border-b border-border-color bg-glass-bg transition-colors duration-300">
         <div className="flex justify-between items-center w-full px-6 py-4 max-w-7xl mx-auto">
           <div className="flex items-center gap-2 text-xl font-bold tracking-tighter text-on-surface cursor-pointer">
-            <span className="material-symbols-outlined text-primary-container" style={{fontVariationSettings: '"FILL" 1'}}>cloud_sync</span>
+            <span className="material-symbols-outlined text-primary" style={{fontVariationSettings: '"FILL" 1'}}>cloud_sync</span>
             <span>PandaHub</span>
           </div>
 
           <nav className="hidden md:flex items-center gap-8">
             <Link href="/explore" className="text-primary font-semibold border-b-2 border-primary pb-1 transition-colors">Product</Link>
-            <Link href="/explore" className="text-on-surface-variant hover:text-on-surface transition-colors duration-200 px-3 py-1 rounded-lg hover:bg-black/5">Solutions</Link>
-            <Link href="/explore" className="text-on-surface-variant hover:text-on-surface transition-colors duration-200 px-3 py-1 rounded-lg hover:bg-black/5">Open Source</Link>
-            <Link href="/explore" className="text-on-surface-variant hover:text-on-surface transition-colors duration-200 px-3 py-1 rounded-lg hover:bg-black/5">Pricing</Link>
+            <Link href="/explore" className="text-on-surface-variant hover:text-on-surface transition-colors duration-200 px-3 py-1 rounded-lg hover:bg-black/5 dark:hover:bg-white/5">Solutions</Link>
+            <Link href="/explore" className="text-on-surface-variant hover:text-on-surface transition-colors duration-200 px-3 py-1 rounded-lg hover:bg-black/5 dark:hover:bg-white/5">Open Source</Link>
+            <Link href="/explore" className="text-on-surface-variant hover:text-on-surface transition-colors duration-200 px-3 py-1 rounded-lg hover:bg-black/5 dark:hover:bg-white/5">Pricing</Link>
           </nav>
 
           <div className="flex items-center gap-3">
             <a href="/login" className="hidden md:block text-on-surface hover:text-primary transition-colors text-sm font-semibold px-4 py-2 rounded-lg btn-glass btn-ripple">Sign In</a>
-            <a href="/login" className="bg-primary-container text-on-primary-container px-5 py-2 rounded-lg font-bold text-sm tracking-wide btn-glow btn-ripple inline-block">Get Started</a>
+            <a href="/login" className="bg-primary text-white dark:bg-primary-container dark:text-on-primary-container px-5 py-2 rounded-lg font-bold text-sm tracking-wide btn-glow btn-ripple inline-block">Get Started</a>
           </div>
         </div>
       </header>
 
       {/* Hero */}
-      <motion.section initial={{ opacity: 0, scale: 0.95 }} animate={{ opacity: 1, scale: 1 }} transition={{ duration: 0.8, ease: "easeOut" }} className="relative z-10 flex flex-col items-center justify-center text-center min-h-screen px-6 pt-20 pb-10 max-w-4xl mx-auto animate-fade-in-up">
-        <h1 className="text-5xl md:text-7xl font-extrabold tracking-tighter text-on-surface mb-4 leading-tight drop-shadow-2xl font-display animate-fade-in-up-delay">
+      <motion.section 
+        initial={{ opacity: 0, scale: 0.94, y: 30 }} 
+        animate={{ opacity: 1, scale: 1, y: 0 }} 
+        transition={{ duration: 0.8, ease: [0.16, 1, 0.3, 1] }} 
+        className="relative z-10 flex flex-col items-center justify-center text-center min-h-screen px-6 pt-20 pb-10 max-w-4xl mx-auto"
+      >
+        <h1 className="text-5xl md:text-7xl font-extrabold tracking-tighter text-on-surface mb-4 leading-tight font-display">
           Code hosting for the
           <br />
           <span className="text-transparent bg-clip-text bg-gradient-to-r from-[#0A84FF] via-[#BF5AF2] to-[#30D158] border-r-4 border-[#0A84FF] pr-2 mt-1 inline-block">
@@ -78,12 +84,12 @@ export default function HomePage() {
           </span>
         </h1>
 
-        <p className="text-xl md:text-2xl text-on-surface-variant mb-10 max-w-2xl font-medium leading-relaxed animate-fade-in-up-delay-2">
+        <p className="text-xl md:text-2xl text-on-surface-variant mb-10 max-w-2xl font-medium leading-relaxed">
           Collaborate, build, and ship with PandaHub. The definitive platform for modern developer teams.
         </p>
 
-        <div className="flex flex-col sm:flex-row gap-4 w-full sm:w-auto animate-fade-in-up-delay-2">
-          <a href="/login" className="bg-primary-container text-on-primary-container px-8 py-4 rounded-xl font-bold text-lg tracking-wide btn-glow btn-ripple w-full sm:w-auto flex items-center justify-center gap-2 group">
+        <div className="flex flex-col sm:flex-row gap-4 w-full sm:w-auto">
+          <a href="/login" className="bg-primary text-white dark:bg-primary-container dark:text-on-primary-container px-8 py-4 rounded-xl font-bold text-lg tracking-wide btn-glow btn-ripple w-full sm:w-auto flex items-center justify-center gap-2 group shadow-lg hover:shadow-primary/20">
             Get Started Free
             <span className="material-symbols-outlined group-hover:translate-x-1.5 transition-transform duration-300">arrow_forward</span>
           </a>
@@ -95,22 +101,28 @@ export default function HomePage() {
       </motion.section>
 
       {/* Code Window */}
-      <motion.section initial={{ opacity: 0, y: 50 }} whileInView={{ opacity: 1, y: 0 }} viewport={{ once: true, margin: "-100px" }} transition={{ duration: 0.7 }} className="w-full max-w-5xl mx-auto px-6 mb-28 relative z-10 mt-16">
-        <div className="glass-panel rounded-2xl overflow-hidden shadow-[0_20px_60px_rgba(0,0,0,0.6)] border border-white/[0.07] hover:border-primary/20 transition-all duration-500 hover:shadow-[0_30px_80px_rgba(10,132,255,0.12)]">
-          <div className="px-4 py-3 flex items-center gap-4 border-b border-white/[0.05]" style={{ background: 'rgba(240,242,245,0.8)' }}>
+      <motion.section 
+        initial={{ opacity: 0, y: 60, scale: 0.96 }} 
+        whileInView={{ opacity: 1, y: 0, scale: 1 }} 
+        viewport={{ once: true, margin: "-120px" }} 
+        transition={{ duration: 0.8, ease: [0.16, 1, 0.3, 1] }} 
+        className="w-full max-w-5xl mx-auto px-6 mb-28 relative z-10"
+      >
+        <div className="glass-panel rounded-2xl overflow-hidden border border-border-color shadow-2xl hover:border-primary/20 transition-all duration-500">
+          <div className="px-4 py-3 flex items-center gap-4 border-b border-border-color bg-black/[0.03] dark:bg-white/[0.03]">
             <div className="flex gap-2">
               <div className="w-3 h-3 rounded-full bg-[#FF5F57]"></div>
               <div className="w-3 h-3 rounded-full bg-[#FEBC2E]"></div>
               <div className="w-3 h-3 rounded-full bg-[#28C840]"></div>
             </div>
             <div className="flex-grow flex justify-center">
-              <div className="bg-black/30 px-4 py-1 rounded-md text-xs text-outline-variant font-mono flex items-center gap-2">
+              <div className="bg-black/5 dark:bg-white/5 px-4 py-1 rounded-md text-xs text-on-surface-variant font-mono flex items-center gap-2">
                 <span className="material-symbols-outlined text-[13px]">lock</span>
                 main.py — PandaHub
               </div>
             </div>
           </div>
-          <div className="p-6 md:p-8 font-mono text-sm md:text-base overflow-x-auto" style={{ background: 'rgba(255,255,255,0.9)' }}>
+          <div className="p-6 md:p-8 font-mono text-sm md:text-base overflow-x-auto bg-white/40 dark:bg-black/40">
             <pre className="text-on-surface-variant"><code><span className="text-[#BF5AF2]">import</span> asyncio
 <span className="text-[#BF5AF2]">from</span> pandahub <span className="text-[#BF5AF2]">import</span> Client, Repository
 
@@ -134,31 +146,37 @@ export default function HomePage() {
       </motion.section>
 
       {/* Feature Cards */}
-      <motion.section initial={{ opacity: 0, y: 50 }} whileInView={{ opacity: 1, y: 0 }} viewport={{ once: true, margin: "-100px" }} transition={{ duration: 0.7, staggerChildren: 0.2 }} className="w-full max-w-6xl mx-auto grid grid-cols-1 md:grid-cols-3 gap-6 px-6 mb-28 relative z-10">
+      <motion.section 
+        initial={{ opacity: 0, y: 60 }} 
+        whileInView={{ opacity: 1, y: 0 }} 
+        viewport={{ once: true, margin: "-120px" }} 
+        transition={{ duration: 0.8, ease: [0.16, 1, 0.3, 1] }} 
+        className="w-full max-w-6xl mx-auto grid grid-cols-1 md:grid-cols-3 gap-6 px-6 mb-28 relative z-10"
+      >
         {[
-          { icon: 'rate_review', title: 'Code Review', desc: 'Frictionless inline commenting and AI-assisted PR summaries built right into the editor.', color: '#0A84FF', shadow: 'rgba(10,132,255,0.2)' },
-          { icon: 'rocket_launch', title: 'CI/CD Pipelines', desc: 'Integrated workflows that build, test, and deploy faster than ever with smart caching.', color: '#BF5AF2', shadow: 'rgba(191,90,242,0.2)' },
-          { icon: 'bug_report', title: 'Issue Tracking', desc: 'Powerful boards and sprint planning tools that map directly to your commits and branches.', color: '#30D158', shadow: 'rgba(48,209,88,0.2)' },
+          { icon: 'rate_review', title: 'Code Review', desc: 'Frictionless inline commenting and AI-assisted PR summaries built right into the editor.', color: '#0A84FF', shadow: 'rgba(10,132,255,0.1)' },
+          { icon: 'rocket_launch', title: 'CI/CD Pipelines', desc: 'Integrated workflows that build, test, and deploy faster than ever with smart caching.', color: '#BF5AF2', shadow: 'rgba(191,90,242,0.1)' },
+          { icon: 'bug_report', title: 'Issue Tracking', desc: 'Powerful boards and sprint planning tools that map directly to your commits and branches.', color: '#30D158', shadow: 'rgba(48,209,88,0.1)' },
         ].map(({ icon, title, desc, color, shadow }) => (
           <div key={title} className="glass-panel p-8 rounded-2xl flex flex-col gap-4 group cursor-default transition-all duration-300 hover:-translate-y-2"
             style={{ '--hover-shadow': shadow } as React.CSSProperties}
             onMouseEnter={e => (e.currentTarget.style.boxShadow = `0 20px 50px ${shadow}, 0 0 0 1px ${color}22`)}
             onMouseLeave={e => (e.currentTarget.style.boxShadow = '')}>
             <div className="w-12 h-12 rounded-2xl flex items-center justify-center transition-all duration-300 group-hover:scale-110"
-              style={{ background: `${color}22`, color, boxShadow: `0 0 0 1px ${color}33` }}>
+              style={{ background: `${color}15`, color, boxShadow: `0 0 0 1px ${color}22` }}>
               <span className="material-symbols-outlined" style={{fontVariationSettings: '"FILL" 1'}}>{icon}</span>
             </div>
-            <h3 className="text-xl font-bold text-on-surface font-headline transition-colors duration-200" style={{}} onMouseEnter={e => (e.currentTarget.style.color = color)} onMouseLeave={e => (e.currentTarget.style.color = '')}>{title}</h3>
+            <h3 className="text-xl font-bold text-on-surface font-headline transition-colors duration-200" onMouseEnter={e => (e.currentTarget.style.color = color)} onMouseLeave={e => (e.currentTarget.style.color = '')}>{title}</h3>
             <p className="text-on-surface-variant leading-relaxed">{desc}</p>
           </div>
         ))}
       </motion.section>
 
       {/* Footer */}
-      <footer className="w-full border-t border-white/[0.06] relative z-10" style={{ background: 'rgba(255,255,255,0.9)' }}>
+      <footer className="w-full border-t border-border-color bg-glass-bg relative z-10 transition-colors duration-300">
         <div className="flex flex-col md:flex-row justify-between items-center py-10 px-8 max-w-7xl mx-auto gap-6">
           <div className="text-lg font-black text-on-surface flex items-center gap-2">
-            <span className="material-symbols-outlined text-primary-container" style={{fontVariationSettings: '"FILL" 1'}}>cloud_sync</span>
+            <span className="material-symbols-outlined text-primary" style={{fontVariationSettings: '"FILL" 1'}}>cloud_sync</span>
             PandaHub
           </div>
           <nav className="flex flex-wrap justify-center gap-6 text-sm">
@@ -169,6 +187,9 @@ export default function HomePage() {
           <div className="text-outline text-xs">© 2027 PandaHub, Inc.</div>
         </div>
       </footer>
+
+      {/* Settings toggle */}
+      <Settings />
     </main>
   );
 }

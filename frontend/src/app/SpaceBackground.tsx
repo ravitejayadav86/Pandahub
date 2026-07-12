@@ -38,6 +38,11 @@ export default function SpaceBackground() {
     let shootingStars: ShootingStar[] = [];
     let frame = 0;
 
+    const isDarkMode = () => {
+      if (typeof window === 'undefined') return false;
+      return document.documentElement.classList.contains('dark') || document.body.classList.contains('dark');
+    };
+
     const resize = () => {
       canvas.width = window.innerWidth;
       canvas.height = window.innerHeight;
@@ -78,8 +83,10 @@ export default function SpaceBackground() {
     };
 
     const draw = () => {
-      // Fade trail effect for light mode
-      ctx.fillStyle = 'rgba(250, 250, 250, 0.3)';
+      const dark = isDarkMode();
+      
+      // Fade trail effect
+      ctx.fillStyle = dark ? 'rgba(8, 10, 18, 0.18)' : 'rgba(255, 255, 255, 0.18)';
       ctx.fillRect(0, 0, canvas.width, canvas.height);
 
       frame++;
@@ -95,10 +102,12 @@ export default function SpaceBackground() {
           const dy = p1.y - p2.y;
           const dist = Math.sqrt(dx * dx + dy * dy);
           if (dist < 130) {
-            const alpha = 0.18 * (1 - dist / 130);
+            const alpha = (dark ? 0.18 : 0.09) * (1 - dist / 130);
             ctx.beginPath();
-            ctx.strokeStyle = `rgba(10,132,255,${alpha.toFixed(3)})`;
-            ctx.lineWidth = 0.6;
+            ctx.strokeStyle = dark 
+              ? `rgba(10,132,255,${alpha.toFixed(3)})`
+              : `rgba(0,100,255,${alpha.toFixed(3)})`;
+            ctx.lineWidth = 0.5;
             ctx.moveTo(p1.x, p1.y);
             ctx.lineTo(p2.x, p2.y);
             ctx.stroke();
@@ -106,25 +115,15 @@ export default function SpaceBackground() {
         }
       }
 
-      // Draw and update particles
+      // Draw particles
       for (const p of particles) {
         p.pulse += p.pulseSpeed;
         const pulsedOpacity = p.opacity + Math.sin(p.pulse) * 0.15;
-        const pulsedSize = p.size + Math.sin(p.pulse * 1.3) * 0.3;
+        const pulsedSize = p.size + Math.sin(p.pulse) * 0.2;
 
-        // Glow
-        const grd = ctx.createRadialGradient(p.x, p.y, 0, p.x, p.y, pulsedSize * 4);
-        grd.addColorStop(0, `rgba(${hexToRgb(p.color)},${pulsedOpacity.toFixed(2)})`);
-        grd.addColorStop(1, `rgba(${hexToRgb(p.color)},0)`);
         ctx.beginPath();
-        ctx.arc(p.x, p.y, pulsedSize * 4, 0, Math.PI * 2);
-        ctx.fillStyle = grd;
-        ctx.fill();
-
-        // Core dot
-        ctx.beginPath();
-        ctx.arc(p.x, p.y, pulsedSize, 0, Math.PI * 2);
-        ctx.fillStyle = `rgba(${hexToRgb(p.color)},${Math.min(pulsedOpacity + 0.3, 1).toFixed(2)})`;
+        ctx.arc(p.x, p.y, Math.max(pulsedSize, 0.1), 0, Math.PI * 2);
+        ctx.fillStyle = `rgba(${hexToRgb(p.color)},${Math.min(pulsedOpacity + (dark ? 0.3 : 0.1), 1).toFixed(2)})`;
         ctx.fill();
 
         p.x += p.vx;
@@ -141,13 +140,20 @@ export default function SpaceBackground() {
         const tailX = s.x - Math.cos(s.angle) * s.length;
         const tailY = s.y - Math.sin(s.angle) * s.length;
         const grad = ctx.createLinearGradient(s.x, s.y, tailX, tailY);
-        // Using primary blue color for shooting stars in light mode
-        grad.addColorStop(0, `rgba(10, 132, 255, ${s.opacity.toFixed(2)})`);
-        grad.addColorStop(0.4, `rgba(10, 132, 255, ${(s.opacity * 0.4).toFixed(2)})`);
-        grad.addColorStop(1, 'rgba(10, 132, 255, 0)');
+        
+        if (dark) {
+          grad.addColorStop(0, `rgba(255,255,255,${s.opacity.toFixed(2)})`);
+          grad.addColorStop(0.4, `rgba(120,180,255,${(s.opacity * 0.6).toFixed(2)})`);
+          grad.addColorStop(1, 'rgba(120,180,255,0)');
+        } else {
+          grad.addColorStop(0, `rgba(10,132,255,${s.opacity.toFixed(2)})`);
+          grad.addColorStop(0.4, `rgba(94,92,230,${(s.opacity * 0.6).toFixed(2)})`);
+          grad.addColorStop(1, 'rgba(94,92,230,0)');
+        }
+        
         ctx.beginPath();
         ctx.strokeStyle = grad;
-        ctx.lineWidth = 1.5;
+        ctx.lineWidth = 1.8;
         ctx.lineCap = 'round';
         ctx.moveTo(s.x, s.y);
         ctx.lineTo(tailX, tailY);
@@ -156,7 +162,9 @@ export default function SpaceBackground() {
         // Head sparkle
         ctx.beginPath();
         ctx.arc(s.x, s.y, 1.5, 0, Math.PI * 2);
-        ctx.fillStyle = `rgba(10, 132, 255, ${s.opacity.toFixed(2)})`;
+        ctx.fillStyle = dark 
+          ? `rgba(255,255,255,${s.opacity.toFixed(2)})`
+          : `rgba(10,132,255,${s.opacity.toFixed(2)})`;
         ctx.fill();
 
         s.x += Math.cos(s.angle) * s.speed;
@@ -168,14 +176,22 @@ export default function SpaceBackground() {
     };
 
     resize();
-    // Fill solid light on first frame
-    ctx.fillStyle = '#fafafa';
+    // Fill solid base color on first frame
+    ctx.fillStyle = isDarkMode() ? '#080a12' : '#ffffff';
     ctx.fillRect(0, 0, canvas.width, canvas.height);
     draw();
 
     window.addEventListener('resize', resize);
+    
+    // Set up MutationObserver to track theme shifts (e.g. settings)
+    const observer = new MutationObserver(() => {
+      // Re-trigger color adjustments
+    });
+    observer.observe(document.documentElement, { attributes: true, attributeFilter: ['class'] });
+
     return () => {
       window.removeEventListener('resize', resize);
+      observer.disconnect();
       cancelAnimationFrame(animationId);
     };
   }, []);
@@ -183,7 +199,7 @@ export default function SpaceBackground() {
   return (
     <canvas
       ref={canvasRef}
-      className="fixed inset-0 z-0 pointer-events-none"
+      className="fixed inset-0 -z-10 pointer-events-none"
       aria-hidden="true"
     />
   );

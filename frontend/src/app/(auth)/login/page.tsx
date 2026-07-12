@@ -5,6 +5,7 @@ import { useRouter } from 'next/navigation';
 import { useAuthStore } from '@/store/authStore';
 import api from '@/lib/api';
 import dynamic from 'next/dynamic';
+import Settings from '../../Settings';
 
 const SpaceBackground = dynamic(() => import('../../SpaceBackground'), { ssr: false });
 
@@ -56,7 +57,7 @@ export default function GeneratedPage() {
   };
 
   return (
-    <main className="min-h-screen text-on-surface font-body relative overflow-hidden" style={{ background: 'var(--background)' }}>
+    <main className="min-h-screen text-on-surface font-body relative overflow-hidden bg-background transition-colors duration-300">
 
 
 <header className="fixed top-0 w-full z-50 flex justify-between items-center px-6 py-6 max-w-7xl mx-auto left-0 right-0">
@@ -74,11 +75,11 @@ export default function GeneratedPage() {
 
 <main className="relative z-10 flex items-center justify-center min-h-screen px-4 py-24">
 
-<div className="w-full max-w-md glass-panel rounded-3xl overflow-hidden shadow-[0_32px_64px_-16px_rgba(0,0,0,0.7)] transform transition-all duration-500 ease-out">
+<div className="w-full max-w-md glass-panel rounded-3xl overflow-hidden shadow-2xl transform transition-all duration-500 ease-out">
 
-<div className="flex border-b border-white/10 w-full relative">
+<div className="flex border-b border-border-color w-full relative">
 
-<div className="absolute bottom-0 left-0 w-1/2 h-[2px] bg-[#0A84FF] shadow-[0_-2px_10px_rgba(10,132,255,0.5)] transition-transform duration-300 ease-out" style={{ transform: isLogin ? 'translateX(0%)' : 'translateX(100%)' }}></div>
+<div className="absolute bottom-0 left-0 w-1/2 h-[2px] bg-primary shadow-[0_-2px_10px_rgba(10,132,255,0.5)] transition-transform duration-300 ease-out" style={{ transform: isLogin ? 'translateX(0%)' : 'translateX(100%)' }}></div>
 <button type="button" className={`flex-1 py-5 text-sm tracking-wide transition-colors duration-300 ${isLogin ? 'font-semibold text-on-surface' : 'font-medium text-on-surface-variant hover:text-on-surface'}`} onClick={() => { setIsLogin(true); setError(''); }}>
                     Sign In
                 </button>
@@ -167,6 +168,8 @@ export default function GeneratedPage() {
 </main>
 
 
+          {/* Settings toggle */}
+      <Settings />
     </main>
   );
 }

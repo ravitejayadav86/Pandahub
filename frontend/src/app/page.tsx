@@ -23,6 +23,7 @@ export default function GeneratedPage() {
 
   useEffect(() => {
     const currentPhrase = TYPE_PHRASES[phraseIndex];
+    if (!currentPhrase) return;
     
     let timer: NodeJS.Timeout;
     if (isDeleting) {

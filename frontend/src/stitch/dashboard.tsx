@@ -21,13 +21,13 @@ export default function GeneratedPage() {
 </div>
 
 <button className="w-full py-3 px-4 bg-primary-container hover:bg-primary-container/90 text-on-primary-container font-headline font-semibold text-sm rounded-xl shadow-lg shadow-primary-container/20 hover:scale-[1.02] active:scale-[0.98] transition-all duration-300 mb-8 flex items-center justify-center gap-2">
-<span className="material-symbols-outlined" style={{fontVariationSettings: ''FILL' 1'}}>add</span>
+<span className="material-symbols-outlined" style={{fontVariationSettings: '"FILL" 1'}}>add</span>
             New Repository
         </button>
 
 <div className="flex-1 space-y-2">
 <a className="flex items-center gap-3 px-4 py-3 bg-primary-container/30 backdrop-blur-md text-on-primary-container rounded-xl shadow-[inset_0_1px_1px_rgba(255,255,255,0.1)] transition-all duration-300 font-body text-label-sm font-medium tracking-tight" href="#">
-<span className="material-symbols-outlined" style={{fontVariationSettings: ''FILL' 1'}}>dashboard</span>
+<span className="material-symbols-outlined" style={{fontVariationSettings: '"FILL" 1'}}>dashboard</span>
                 Dashboard
             </a>
 <a className="flex items-center gap-3 px-4 py-3 text-on-surface-variant hover:text-on-surface hover:bg-surface-variant/20 rounded-xl transition-all duration-300 hover:scale-[1.02] active:scale-[0.98] font-body text-label-sm font-medium tracking-tight" href="#">

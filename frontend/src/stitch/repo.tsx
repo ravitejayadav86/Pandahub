@@ -23,7 +23,7 @@ export default function GeneratedPage() {
 <span>Dashboard</span>
 </a>
 <a className="flex items-center gap-3 px-4 py-3 bg-primary-container/30 backdrop-blur-md text-on-primary-container rounded-xl shadow-[inset_0_1px_1px_rgba(255,255,255,0.1)] transition-all duration-300 font-body text-label-sm font-medium tracking-tight hover:scale-[1.02] active:scale-[0.98]" href="#">
-<span className="material-symbols-outlined text-xl" data-icon="code" data-weight="fill" style={{fontVariationSettings: ''FILL' 1'}}>code</span>
+<span className="material-symbols-outlined text-xl" data-icon="code" data-weight="fill" style={{fontVariationSettings: '"FILL" 1'}}>code</span>
 <span>Repositories</span>
 </a>
 <a className="flex items-center gap-3 px-4 py-3 text-on-surface-variant hover:text-on-surface hover:bg-surface-variant/20 rounded-xl transition-all duration-300 font-body text-label-sm font-medium tracking-tight hover:scale-[1.02] active:scale-[0.98]" href="#">

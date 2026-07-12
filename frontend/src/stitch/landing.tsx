@@ -9,7 +9,7 @@ export default function GeneratedPage() {
 <div className="flex justify-between items-center w-full px-6 py-4 max-w-7xl mx-auto">
 
 <div className="flex items-center gap-2 text-xl font-bold tracking-tighter text-on-surface bg-clip-text hover:bg-white/5 hover:backdrop-blur-md transition-all duration-300 rounded-lg px-3 py-1 cursor-pointer">
-<span className="material-symbols-outlined text-primary-container" style={{fontVariationSettings: ''FILL' 1'}}>cloud_sync</span>
+<span className="material-symbols-outlined text-primary-container" style={{fontVariationSettings: '"FILL" 1'}}>cloud_sync</span>
 <span>PandaHub</span>
 </div>
 
@@ -93,7 +93,7 @@ export default function GeneratedPage() {
 
 <div className="glass-panel p-8 rounded-2xl flex flex-col gap-4 hover:-translate-y-2 transition-transform duration-300 group">
 <div className="w-12 h-12 rounded-full bg-primary-container/20 flex items-center justify-center text-primary-container group-hover:scale-110 group-hover:bg-primary-container/30 transition-all">
-<span className="material-symbols-outlined" style={{fontVariationSettings: ''FILL' 1'}}>rate_review</span>
+<span className="material-symbols-outlined" style={{fontVariationSettings: '"FILL" 1'}}>rate_review</span>
 </div>
 <h3 className="text-xl font-bold text-on-surface font-headline">Code Review</h3>
 <p className="text-on-surface-variant leading-relaxed">Frictionless inline commenting and AI-assisted PR summaries built right into the editor view.</p>
@@ -101,7 +101,7 @@ export default function GeneratedPage() {
 
 <div className="glass-panel p-8 rounded-2xl flex flex-col gap-4 hover:-translate-y-2 transition-transform duration-300 group">
 <div className="w-12 h-12 rounded-full bg-tertiary-container/20 flex items-center justify-center text-tertiary-container group-hover:scale-110 group-hover:bg-tertiary-container/30 transition-all">
-<span className="material-symbols-outlined" style={{fontVariationSettings: ''FILL' 1'}}>rocket_launch</span>
+<span className="material-symbols-outlined" style={{fontVariationSettings: '"FILL" 1'}}>rocket_launch</span>
 </div>
 <h3 className="text-xl font-bold text-on-surface font-headline">CI/CD</h3>
 <p className="text-on-surface-variant leading-relaxed">Integrated workflows that build, test, and deploy faster than ever with automated caching.</p>
@@ -109,7 +109,7 @@ export default function GeneratedPage() {
 
 <div className="glass-panel p-8 rounded-2xl flex flex-col gap-4 hover:-translate-y-2 transition-transform duration-300 group">
 <div className="w-12 h-12 rounded-full bg-error/20 flex items-center justify-center text-error group-hover:scale-110 group-hover:bg-error/30 transition-all">
-<span className="material-symbols-outlined" style={{fontVariationSettings: ''FILL' 1'}}>bug_report</span>
+<span className="material-symbols-outlined" style={{fontVariationSettings: '"FILL" 1'}}>bug_report</span>
 </div>
 <h3 className="text-xl font-bold text-on-surface font-headline">Issue Tracking</h3>
 <p className="text-on-surface-variant leading-relaxed">Powerful boards and sprint planning tools that map directly to your commits and branches.</p>
@@ -121,7 +121,7 @@ export default function GeneratedPage() {
 <div className="flex flex-col md:flex-row justify-between items-center py-12 px-8 max-w-7xl mx-auto gap-6">
 
 <div className="text-lg font-black text-on-surface flex items-center gap-2">
-<span className="material-symbols-outlined text-primary-container" style={{fontVariationSettings: ''FILL' 1'}}>cloud_sync</span>
+<span className="material-symbols-outlined text-primary-container" style={{fontVariationSettings: '"FILL" 1'}}>cloud_sync</span>
                 PandaHub
             </div>
 

@@ -8,7 +8,7 @@ export default function GeneratedPage() {
 <header className="fixed top-0 w-full z-50 flex justify-between items-center px-6 py-6 max-w-7xl mx-auto left-0 right-0">
 <a className="flex items-center gap-2 group" href="#">
 <div className="w-8 h-8 rounded-lg bg-gradient-to-br from-primary-container to-inverse-primary flex items-center justify-center text-on-primary-container shadow-[0_0_15px_rgba(10,132,255,0.3)]">
-<span className="material-symbols-outlined text-lg" style={{fontVariationSettings: ''FILL' 1'}}>widgets</span>
+<span className="material-symbols-outlined text-lg" style={{fontVariationSettings: '"FILL" 1'}}>widgets</span>
 </div>
 <span className="text-xl font-bold tracking-tighter text-on-surface">PandaHub</span>
 </a>

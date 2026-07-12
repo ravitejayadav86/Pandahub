@@ -32,7 +32,7 @@ export default function GeneratedPage() {
 <span className="font-body text-label-sm font-medium tracking-tight">Repositories</span>
 </a>
 <a className="flex items-center gap-3 px-4 py-3 bg-primary-container/30 backdrop-blur-md text-on-primary-container rounded-xl shadow-[inset_0_1px_1px_rgba(255,255,255,0.1)] transition-all duration-300 hover:scale-[1.02] active:scale-[0.98]" href="#">
-<span className="material-symbols-outlined text-primary" style={{fontVariationSettings: ''FILL' 1'}}>adjust</span>
+<span className="material-symbols-outlined text-primary" style={{fontVariationSettings: '"FILL" 1'}}>adjust</span>
 <span className="font-body text-label-sm font-medium tracking-tight text-primary">Issues</span>
 </a>
 <a className="flex items-center gap-3 px-4 py-3 text-on-surface-variant hover:text-on-surface hover:bg-surface-variant/20 rounded-xl transition-all duration-300 hover:scale-[1.02] active:scale-[0.98]" href="#">
@@ -118,7 +118,7 @@ export default function GeneratedPage() {
 <div className="glass-panel rounded-2xl p-2 flex flex-wrap items-center gap-2 sticky top-20 z-30 shadow-lg">
 <div className="flex bg-surface-container-highest/40 rounded-xl p-1 shrink-0">
 <button className="px-4 py-1.5 rounded-lg bg-surface/60 text-primary font-medium text-sm shadow-sm flex items-center gap-2 transition-colors">
-<span className="material-symbols-outlined text-sm" style={{fontVariationSettings: ''FILL' 1'}}>error</span>
+<span className="material-symbols-outlined text-sm" style={{fontVariationSettings: '"FILL" 1'}}>error</span>
                         142 Open
                     </button>
 <button className="px-4 py-1.5 rounded-lg text-on-surface-variant hover:text-on-surface font-medium text-sm flex items-center gap-2 transition-colors">
@@ -144,7 +144,7 @@ export default function GeneratedPage() {
 
 <div className="bg-surface/40 backdrop-blur-2xl rounded-2xl border border-white/5 shadow-lg p-5 flex flex-col sm:flex-row sm:items-start gap-4 hover:border-white/10 hover:bg-surface/60 transition-all duration-300 group cursor-pointer">
 <div className="shrink-0 pt-1">
-<span className="material-symbols-outlined text-error" style={{fontVariationSettings: ''FILL' 1'}}>error</span>
+<span className="material-symbols-outlined text-error" style={{fontVariationSettings: '"FILL" 1'}}>error</span>
 </div>
 <div className="flex-1 flex flex-col gap-2">
 <h3 className="text-lg font-semibold text-on-surface group-hover:text-primary transition-colors leading-tight">Implement dark mode toggle in navigation</h3>
@@ -170,7 +170,7 @@ export default function GeneratedPage() {
 
 <div className="bg-surface/40 backdrop-blur-2xl rounded-2xl border border-white/5 shadow-lg p-5 flex flex-col sm:flex-row sm:items-start gap-4 hover:border-white/10 hover:bg-surface/60 transition-all duration-300 group cursor-pointer">
 <div className="shrink-0 pt-1">
-<span className="material-symbols-outlined text-error" style={{fontVariationSettings: ''FILL' 1'}}>error</span>
+<span className="material-symbols-outlined text-error" style={{fontVariationSettings: '"FILL" 1'}}>error</span>
 </div>
 <div className="flex-1 flex flex-col gap-2">
 <h3 className="text-lg font-semibold text-on-surface group-hover:text-primary transition-colors leading-tight">Crash on startup when offline mode is enabled</h3>

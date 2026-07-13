@@ -14,12 +14,12 @@ export default function Settings() {
     let currentIndex = 0;
     
     // Set initial accent
-    document.documentElement.setAttribute('data-bg-theme', ACCENTS[0].id);
+    document.documentElement.setAttribute('data-bg-theme', ACCENTS[0]!.id);
 
     // Rotate every 10 seconds
     const interval = setInterval(() => {
       currentIndex = (currentIndex + 1) % ACCENTS.length;
-      document.documentElement.setAttribute('data-bg-theme', ACCENTS[currentIndex].id);
+      document.documentElement.setAttribute('data-bg-theme', ACCENTS[currentIndex]!.id);
     }, 10000);
 
     return () => clearInterval(interval);

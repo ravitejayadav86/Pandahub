@@ -6,8 +6,8 @@ uvicorn[standard]==0.30.6
 sqlalchemy==2.0.35
 alembic==1.13.2
 asyncpg==0.29.0          # async Postgres driver
-psycopg[binary]==3.2.13
-# sync driver, used by Alembic migrations
+psycopg[binary]==3.2.13  # sync driver, used by Alembic migrations (psycopg3: better wheel
+                         # availability on new Python/Windows than psycopg2-binary)
 
 # --- Validation / Settings ---
 pydantic==2.9.2
@@ -16,6 +16,7 @@ email-validator==2.2.0
 
 # --- Auth / Security ---
 python-jose[cryptography]==3.3.0   # JWT
+cryptography==43.0.1                # Fernet symmetric encryption (2FA secrets, OAuth tokens at rest)
 passlib[bcrypt]==1.7.4              # password hashing
 python-multipart==0.0.9             # form/file uploads (avatars)
 pyotp==2.9.0                        # TOTP for 2FA

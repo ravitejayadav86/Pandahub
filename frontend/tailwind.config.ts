@@ -1,6 +1,11 @@
 import type { Config } from "tailwindcss";
 
+// Full design token set (brand colors, typography scale) is finalized in
+// Module 6 (Frontend Foundation) alongside the UI component library.
+// This config establishes darkMode strategy + container conventions now
+// so every component built from here on already assumes class-based dark mode.
 const config: Config = {
+  darkMode: "class",
   content: [
     "./src/app/**/*.{ts,tsx}",
     "./src/components/**/*.{ts,tsx}",
@@ -64,6 +69,11 @@ const config: Config = {
         "inverse-primary": "#bae6fd",
         
         "border-color": "var(--border-color)",
+        panda: {
+          black: "#0d1117",
+          white: "#ffffff",
+          accent: "#2f9e44", // bamboo green — primary brand accent
+        },
       },
       borderRadius: {
         "DEFAULT": "0.25rem",
@@ -72,12 +82,8 @@ const config: Config = {
         "full": "9999px"
       },
       fontFamily: {
-        sans: ["Inter", "sans-serif"],
-        headline: ["Inter", "sans-serif"],
-        display: ["Inter", "sans-serif"],
-        body: ["Inter", "sans-serif"],
-        label: ["Public Sans", "sans-serif"],
-        mono: ["JetBrains Mono", "monospace"],
+        sans: ["Inter", "ui-sans-serif", "system-ui"],
+        mono: ["JetBrains Mono", "ui-monospace", "monospace"],
       },
     },
   },

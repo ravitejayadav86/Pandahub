@@ -1,44 +1,49 @@
+"""
+FastAPI application entrypoint.
+
+CORS is configured from `settings.cors_origins_list` (env-driven), never
+wildcarded ("*") in combination with credentials=True -- that combination
+is a known misconfiguration that defeats the purpose of CORS entirely.
+"""
 from contextlib import asynccontextmanager
 
 from fastapi import FastAPI
 from fastapi.middleware.cors import CORSMiddleware
 
-from app.api.v1.router import api_router
-from app.core.config import settings
+from app.api.v1 import auth
+from app.core.config import get_settings
+from app.services.storage_service import ensure_buckets_exist
+
+settings = get_settings()
 
 
 @asynccontextmanager
 async def lifespan(app: FastAPI):
-    # Startup: ensure storage dirs exist, warm caches, etc.
-    from pathlib import Path
-    Path(settings.GIT_REPOS_ROOT).mkdir(parents=True, exist_ok=True)
+    # Startup: make sure MinIO buckets exist before the first request needs them.
+    ensure_buckets_exist()
     yield
-    # Shutdown: clean up connections
+    # Shutdown: nothing to clean up yet (Module 5+ adds Redis pool teardown, etc.)
 
 
 app = FastAPI(
     title=settings.PROJECT_NAME,
+    description="Build. Collaborate. Innovate.",
     version="0.1.0",
-    description="PandaHub — self-hosted Git platform API",
-    openapi_url=f"{settings.API_V1_PREFIX}/openapi.json",
-    docs_url=f"{settings.API_V1_PREFIX}/docs",
-    redoc_url=f"{settings.API_V1_PREFIX}/redoc",
     lifespan=lifespan,
 )
 
-# ── CORS ──────────────────────────────────────────────────────────────────────
 app.add_middleware(
     CORSMiddleware,
-    allow_origins=settings.cors_origins,
+    allow_origins=settings.cors_origins_list,
     allow_credentials=True,
     allow_methods=["*"],
     allow_headers=["*"],
 )
 
-# ── Routes ────────────────────────────────────────────────────────────────────
-app.include_router(api_router, prefix=settings.API_V1_PREFIX)
+app.include_router(auth.router, prefix=settings.API_V1_PREFIX)
 
 
-@app.get("/health", tags=["health"])
+@app.get("/health", tags=["system"])
 async def health_check():
+    """Liveness/readiness probe target for Docker/orchestrator healthchecks."""
     return {"status": "ok", "service": settings.PROJECT_NAME}

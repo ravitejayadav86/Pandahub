@@ -1,0 +1,21 @@
+name: Deploy
+
+# Full deployment pipeline (build+push images, run migrations against
+# production DB, blue/green or rolling restart) is implemented in
+# Module 17 — Deployment, once infrastructure targets are finalized.
+# This scaffold reserves the trigger contract so branch protection rules
+# can be configured against it now.
+
+on:
+  push:
+    tags:
+      - "v*.*.*"
+  workflow_dispatch: {}
+
+jobs:
+  build-and-push:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - name: Placeholder — implemented in Module 17
+        run: echo "Deployment pipeline pending Module 17"

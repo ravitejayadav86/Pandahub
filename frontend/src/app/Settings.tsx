@@ -11,39 +11,14 @@ const ACCENTS = [
 
 export default function Settings() {
   const [isOpen, setIsOpen] = useState(false);
-  const [isDark, setIsDark] = useState(false);
   const [activeAccent, setActiveAccent] = useState('multicolor');
 
   useEffect(() => {
-    // Determine initial theme
-    const theme = localStorage.getItem('theme');
-    const systemPrefersDark = window.matchMedia('(prefers-color-scheme: dark)').matches;
-    const initialDark = theme === 'dark' || (!theme && systemPrefersDark);
-    
-    setIsDark(initialDark);
-    if (initialDark) {
-      document.documentElement.classList.add('dark');
-    } else {
-      document.documentElement.classList.remove('dark');
-    }
-
     // Determine initial accent
     const accent = localStorage.getItem('bg-theme') || 'multicolor';
     setActiveAccent(accent);
     document.documentElement.setAttribute('data-bg-theme', accent);
   }, []);
-
-  const toggleTheme = () => {
-    const nextDark = !isDark;
-    setIsDark(nextDark);
-    if (nextDark) {
-      document.documentElement.classList.add('dark');
-      localStorage.setItem('theme', 'dark');
-    } else {
-      document.documentElement.classList.remove('dark');
-      localStorage.setItem('theme', 'light');
-    }
-  };
 
   const selectAccent = (id: string) => {
     setActiveAccent(id);
@@ -75,20 +50,6 @@ export default function Settings() {
           </div>
 
           <div className="space-y-4">
-            {/* Theme Select */}
-            <div className="flex justify-between items-center">
-              <span className="text-sm font-medium text-on-surface-variant">Theme</span>
-              <button 
-                onClick={toggleTheme}
-                className="px-3 py-1.5 rounded-lg bg-primary-container text-on-primary-container text-xs font-semibold btn-ripple flex items-center gap-1.5"
-              >
-                <span className="material-symbols-outlined text-sm">
-                  {isDark ? 'light_mode' : 'dark_mode'}
-                </span>
-                {isDark ? 'Light' : 'Dark'}
-              </button>
-            </div>
-
             {/* Accent Selection */}
             <div className="space-y-2">
               <span className="text-sm font-medium text-on-surface-variant block">Background Colors</span>
@@ -100,7 +61,7 @@ export default function Settings() {
                     className={`px-2 py-1.5 rounded-lg text-xs font-medium border text-center transition-all ${
                       activeAccent === acc.id 
                         ? 'border-primary bg-primary/10 text-primary font-bold'
-                        : 'border-border-color hover:bg-black/5 dark:hover:bg-white/5 text-on-surface-variant'
+                        : 'border-border-color hover:bg-black/5 text-on-surface-variant'
                     }`}
                   >
                     {acc.label}

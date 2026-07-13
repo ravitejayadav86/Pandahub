@@ -99,14 +99,14 @@ export default function HomePage() {
 
           <nav className="hidden md:flex items-center gap-8">
             <Link href="/explore" className="text-primary font-semibold border-b-2 border-primary pb-1 transition-colors">Product</Link>
-            <Link href="/explore" className="text-on-surface-variant hover:text-on-surface transition-colors duration-200 px-3 py-1 rounded-lg hover:bg-black/5 dark:hover:bg-white/5">Solutions</Link>
-            <Link href="/explore" className="text-on-surface-variant hover:text-on-surface transition-colors duration-200 px-3 py-1 rounded-lg hover:bg-black/5 dark:hover:bg-white/5">Open Source</Link>
-            <Link href="/explore" className="text-on-surface-variant hover:text-on-surface transition-colors duration-200 px-3 py-1 rounded-lg hover:bg-black/5 dark:hover:bg-white/5">Pricing</Link>
+            <Link href="/explore" className="text-on-surface-variant hover:text-on-surface transition-colors duration-200 px-3 py-1 rounded-lg hover:bg-black/5">Solutions</Link>
+            <Link href="/explore" className="text-on-surface-variant hover:text-on-surface transition-colors duration-200 px-3 py-1 rounded-lg hover:bg-black/5">Open Source</Link>
+            <Link href="/explore" className="text-on-surface-variant hover:text-on-surface transition-colors duration-200 px-3 py-1 rounded-lg hover:bg-black/5">Pricing</Link>
           </nav>
 
           <div className="flex items-center gap-3">
             <a href="/login" className="hidden md:block text-on-surface hover:text-primary transition-colors text-sm font-semibold px-4 py-2 rounded-lg btn-glass btn-ripple">Sign In</a>
-            <a href="/login" className="bg-primary text-white dark:bg-primary-container dark:text-on-primary-container px-5 py-2 rounded-lg font-bold text-sm tracking-wide btn-glow btn-ripple inline-block">Get Started</a>
+            <a href="/login" className="bg-primary text-white px-5 py-2 rounded-lg font-bold text-sm tracking-wide btn-glow btn-ripple inline-block">Get Started</a>
           </div>
         </div>
       </header>
@@ -116,9 +116,9 @@ export default function HomePage() {
         initial={{ opacity: 0, scale: 0.94, y: 30 }} 
         animate={{ opacity: 1, scale: 1, y: 0 }} 
         transition={{ duration: 0.8, ease: [0.16, 1, 0.3, 1] }} 
-        className="relative z-10 flex flex-col items-center justify-center text-center min-h-screen px-6 pt-20 pb-10 max-w-4xl mx-auto"
+        className="relative z-10 flex flex-col items-center justify-center text-center min-h-screen px-4 sm:px-6 pt-24 pb-12 max-w-4xl mx-auto"
       >
-        <h1 className="text-5xl md:text-7xl font-extrabold tracking-tighter text-on-surface mb-4 leading-tight font-display">
+        <h1 className="text-4xl sm:text-5xl md:text-7xl font-extrabold tracking-tighter text-on-surface mb-4 leading-tight font-display">
           Code hosting for the
           <br />
           <span className="text-transparent bg-clip-text bg-gradient-to-r from-[#0A84FF] via-[#BF5AF2] to-[#30D158] border-r-4 border-[#0A84FF] pr-2 mt-1 inline-block">
@@ -131,7 +131,7 @@ export default function HomePage() {
         </p>
 
         <div className="flex flex-col sm:flex-row gap-4 w-full sm:w-auto">
-          <a href="/login" className="bg-primary text-white dark:bg-primary-container dark:text-on-primary-container px-8 py-4 rounded-xl font-bold text-lg tracking-wide btn-glow btn-ripple w-full sm:w-auto flex items-center justify-center gap-2 group">
+          <a href="/login" className="bg-primary text-white px-8 py-4 rounded-xl font-bold text-lg tracking-wide btn-glow btn-ripple w-full sm:w-auto flex items-center justify-center gap-2 group">
             Get Started Free
             <span className="material-symbols-outlined group-hover:translate-x-1.5 transition-transform duration-300">arrow_forward</span>
           </a>
@@ -151,20 +151,20 @@ export default function HomePage() {
         className="w-full max-w-5xl mx-auto px-6 mb-28 relative z-10"
       >
         <div className="glass-panel rounded-2xl overflow-hidden border border-border-color shadow-md hover:border-primary/20 transition-all duration-500">
-          <div className="px-4 py-3 flex items-center gap-4 border-b border-border-color bg-black/[0.03] dark:bg-white/[0.03]">
+          <div className="px-4 py-3 flex items-center gap-4 border-b border-border-color bg-black/[0.03]">
             <div className="flex gap-2">
               <div className="w-3 h-3 rounded-full bg-[#FF5F57]"></div>
               <div className="w-3 h-3 rounded-full bg-[#FEBC2E]"></div>
               <div className="w-3 h-3 rounded-full bg-[#28C840]"></div>
             </div>
             <div className="flex-grow flex justify-center">
-              <div className="bg-black/5 dark:bg-white/5 px-4 py-1 rounded-md text-xs text-on-surface-variant font-mono flex items-center gap-2">
+              <div className="bg-black/5 px-4 py-1 rounded-md text-xs text-on-surface-variant font-mono flex items-center gap-2">
                 <span className="material-symbols-outlined text-[13px]">lock</span>
                 main.py — PandaHub
               </div>
             </div>
           </div>
-          <div className="p-6 md:p-8 font-mono text-sm md:text-base overflow-x-auto bg-white/40 dark:bg-black/40">
+          <div className="p-4 sm:p-6 md:p-8 font-mono text-xs sm:text-sm md:text-base overflow-x-auto bg-white/40">
             <pre className="text-on-surface-variant"><code><span className="text-[#BF5AF2]">import</span> asyncio
 <span className="text-[#BF5AF2]">from</span> pandahub <span className="text-[#BF5AF2]">import</span> Client, Repository
 
@@ -193,7 +193,7 @@ export default function HomePage() {
         whileInView={{ opacity: 1, y: 0 }} 
         viewport={{ once: true, margin: "-120px" }} 
         transition={{ duration: 0.8, ease: [0.16, 1, 0.3, 1] }} 
-        className="w-full max-w-6xl mx-auto grid grid-cols-1 md:grid-cols-3 gap-6 px-6 mb-28 relative z-10"
+        className="w-full max-w-6xl mx-auto grid grid-cols-1 md:grid-cols-3 gap-4 sm:gap-6 px-4 sm:px-6 mb-28 relative z-10"
       >
         {[
           { icon: 'rate_review', title: 'Code Review', desc: 'Frictionless inline commenting and AI-assisted PR summaries built right into the editor.', color: '#0A84FF' },

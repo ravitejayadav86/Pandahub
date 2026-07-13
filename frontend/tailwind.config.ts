@@ -1,7 +1,6 @@
 import type { Config } from "tailwindcss";
 
 const config: Config = {
-  darkMode: "class",
   content: [
     "./src/app/**/*.{ts,tsx}",
     "./src/components/**/*.{ts,tsx}",
@@ -9,60 +8,58 @@ const config: Config = {
   theme: {
     extend: {
       colors: {
-        "on-primary-container": "#003064",
-        "primary": "#0A84FF",
-        "on-surface-variant": "#6b7280", // gray-500
-        "surface-dim": "#f3f4f6", // gray-100
+        "on-primary-container": "#002957",
+        "primary": "#aac7ff",
+        "on-surface-variant": "#c0c6d6",
+        "surface-dim": "#10131b",
         "primary-fixed": "#d6e3ff",
-        "on-surface": "#111827", // gray-900
-        "tertiary-container": "#fff3ea",
+        "on-surface": "#e0e2ed",
+        "tertiary-container": "#eb6a12",
         "secondary-fixed-dim": "#aac7ff",
-        "primary-fixed-dim": "#005db8",
-        "on-error-container": "#410002",
-        "error": "#ff3b30",
+        "primary-fixed-dim": "#aac7ff",
+        "on-error-container": "#ffdad6",
+        "error": "#ffb4ab",
         "on-secondary-fixed": "#001b3e",
-        "surface-container": "#ffffff",
-        "surface-variant": "#f3f4f6",
+        "surface-container": "#1c2027",
+        "surface-variant": "#31353d",
         "on-secondary-fixed-variant": "#264778",
-        "error-container": "#ffdad6",
-        "tertiary": "#ff9f0a",
-        "outline-variant": "#e5e7eb", // gray-200
-        "on-secondary": "#ffffff",
-        "surface-container-highest": "#e5e7eb",
-        "surface": "#ffffff",
-        "outline": "#9ca3af", // gray-400
+        "error-container": "#93000a",
+        "tertiary": "#ffb691",
+        "outline-variant": "#414754",
+        "on-secondary": "#083060",
+        "surface-container-highest": "#31353d",
+        "surface": "#10131b",
+        "outline": "#8b91a0",
         "tertiary-fixed": "#ffdbcb",
-        "surface-container-lowest": "#ffffff",
-        "primary-container": "#0A84FF", // using primary directly for buttons often
-        "on-tertiary-container": "#341100",
-        "inverse-surface": "#1f2937", // gray-800
+        "surface-container-lowest": "#0b0e15",
+        "primary-container": "#3e90ff",
+        "on-tertiary-container": "#4a1b00",
+        "inverse-surface": "#e0e2ed",
         "on-tertiary-fixed": "#341100",
-        "on-primary": "#ffffff",
-        "secondary-container": "#f1f5f9",
-        "on-secondary-container": "#334155",
-        "inverse-primary": "#aac7ff",
-        "background": "#ffffff",
-        "surface-tint": "#0A84FF",
-        "surface-container-high": "#f9fafb", // gray-50
-        "surface-bright": "#ffffff",
+        "on-primary": "#003064",
+        "secondary-container": "#264778",
+        "on-secondary-container": "#98b6ee",
+        "inverse-primary": "#005db8",
+        "background": "#10131b",
+        "surface-tint": "#aac7ff",
+        "surface-container-high": "#262a32",
+        "surface-bright": "#363941",
         "tertiary-fixed-dim": "#ffb691",
-        "secondary": "#5856D6",
+        "secondary": "#aac7ff",
         "on-tertiary-fixed-variant": "#793100",
-        "on-error": "#ffffff",
-        "inverse-on-surface": "#f3f4f6",
-        "on-background": "#111827",
-        "surface-container-low": "#ffffff",
-        "secondary-fixed": "#e0e7ff",
+        "on-error": "#690005",
+        "inverse-on-surface": "#2d3038",
+        "on-background": "#e0e2ed",
+        "surface-container-low": "#181c23",
+        "secondary-fixed": "#d6e3ff",
         "on-primary-fixed": "#001b3e",
         "on-primary-fixed-variant": "#00468d",
-        "on-tertiary": "#ffffff"
+        "on-tertiary": "#552000"
       },
       borderRadius: {
         "DEFAULT": "0.25rem",
         "lg": "0.5rem",
         "xl": "0.75rem",
-        "2xl": "1rem",
-        "3xl": "1.5rem",
         "full": "9999px"
       },
       fontFamily: {
@@ -73,18 +70,6 @@ const config: Config = {
         label: ["Public Sans", "sans-serif"],
         mono: ["JetBrains Mono", "monospace"],
       },
-      animation: {
-        'fade-in-up': 'fadeInUp 0.8s cubic-bezier(0.16, 1, 0.3, 1) forwards',
-        'fade-in-up-delay': 'fadeInUp 0.8s cubic-bezier(0.16, 1, 0.3, 1) 0.1s forwards',
-        'fade-in-up-delay-2': 'fadeInUp 0.8s cubic-bezier(0.16, 1, 0.3, 1) 0.2s forwards',
-        'pulse-slow': 'pulse 4s cubic-bezier(0.4, 0, 0.6, 1) infinite',
-      },
-      keyframes: {
-        fadeInUp: {
-          '0%': { opacity: '0', transform: 'translateY(20px)' },
-          '100%': { opacity: '1', transform: 'translateY(0)' },
-        }
-      }
     },
   },
   plugins: [],

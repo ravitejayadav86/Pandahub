@@ -87,6 +87,31 @@ const SpaceBackground = dynamic(() => import('./SpaceBackground'), { ssr: false 
 
 const TYPE_PHRASES = ["next generation.", "AI era.", "future of code."];
 
+function MobileBottomNav() {
+  return (
+    <div className="md:hidden fixed bottom-0 w-full z-50 glass-panel border-t border-glass-border pb-safe">
+      <nav className="flex justify-around items-center px-2 py-3">
+        <Link href="/explore" className="flex flex-col items-center gap-1 text-primary">
+          <span className="material-symbols-outlined text-[24px]" style={{fontVariationSettings: '"FILL" 1'}}>home</span>
+          <span className="text-[10px] font-medium">Home</span>
+        </Link>
+        <Link href="/explore" className="flex flex-col items-center gap-1 text-on-surface-variant hover:text-on-surface transition-colors">
+          <span className="material-symbols-outlined text-[24px]">category</span>
+          <span className="text-[10px] font-medium">Product</span>
+        </Link>
+        <Link href="/explore" className="flex flex-col items-center gap-1 text-on-surface-variant hover:text-on-surface transition-colors">
+          <span className="material-symbols-outlined text-[24px]">code_blocks</span>
+          <span className="text-[10px] font-medium">Open Source</span>
+        </Link>
+        <a href="/login" className="flex flex-col items-center gap-1 text-on-surface-variant hover:text-on-surface transition-colors">
+          <span className="material-symbols-outlined text-[24px]">person</span>
+          <span className="text-[10px] font-medium">Account</span>
+        </a>
+      </nav>
+    </div>
+  );
+}
+
 export default function HomePage() {
   const [phraseIndex, setPhraseIndex] = useState(0);
   const [charIndex, setCharIndex] = useState(0);
@@ -162,11 +187,11 @@ export default function HomePage() {
         </p>
 
         <div className="flex flex-col sm:flex-row gap-4 w-full sm:w-auto">
-          <a href="/login" className="bg-primary text-white px-8 py-4 rounded-xl font-bold text-lg tracking-wide btn-glow btn-ripple w-full sm:w-auto flex items-center justify-center gap-2 group">
+          <a href="/login" className="bg-primary text-white px-8 py-4 rounded-xl font-bold text-lg tracking-wide btn-glow btn-ripple w-full sm:w-auto flex items-center justify-center gap-2 group min-h-[48px]">
             Get Started Free
             <span className="material-symbols-outlined group-hover:translate-x-1.5 transition-transform duration-300">arrow_forward</span>
           </a>
-          <button className="btn-glass btn-ripple text-on-surface px-8 py-4 rounded-xl font-bold text-lg tracking-wide w-full sm:w-auto flex items-center justify-center gap-2">
+          <button className="btn-glass btn-ripple text-on-surface px-8 py-4 rounded-xl font-bold text-lg tracking-wide w-full sm:w-auto flex items-center justify-center gap-2 min-h-[48px]">
             <span className="material-symbols-outlined">terminal</span>
             View Docs
           </button>
@@ -213,13 +238,13 @@ export default function HomePage() {
       </RevealOnScroll>
 
       {/* Feature Cards */}
-      <RevealOnScroll className="w-full max-w-6xl mx-auto grid grid-cols-1 md:grid-cols-3 gap-4 sm:gap-6 px-4 sm:px-6 mb-28 relative z-10">
+      <RevealOnScroll className="w-full max-w-6xl mx-auto flex overflow-x-auto snap-x snap-mandatory hide-scrollbar md:grid md:grid-cols-3 gap-4 sm:gap-6 px-4 sm:px-6 mb-28 relative z-10 pb-8">
         {[
           { icon: 'rate_review', title: 'Code Review', desc: 'Frictionless inline commenting and AI-assisted PR summaries built right into the editor.', color: '#0A84FF' },
           { icon: 'rocket_launch', title: 'CI/CD Pipelines', desc: 'Integrated workflows that build, test, and deploy faster than ever with smart caching.', color: '#BF5AF2' },
           { icon: 'bug_report', title: 'Issue Tracking', desc: 'Powerful boards and sprint planning tools that map directly to your commits and branches.', color: '#30D158' },
         ].map(({ icon, title, desc, color }) => (
-          <TiltCard key={title} className="glass-panel p-8 rounded-2xl flex flex-col gap-4 group cursor-default transition-all duration-300 hover:shadow-lg">
+          <TiltCard key={title} className="glass-panel p-8 rounded-2xl flex flex-col gap-4 group cursor-default transition-all duration-300 hover:shadow-lg flex-none w-[85vw] md:w-auto snap-center">
             <div className="w-12 h-12 rounded-2xl flex items-center justify-center transition-all duration-300 group-hover:scale-110"
               style={{ background: `${color}15`, color, boxShadow: `0 0 0 1px ${color}22` }}>
               <span className="material-symbols-outlined" style={{fontVariationSettings: '"FILL" 1'}}>{icon}</span>
@@ -245,6 +270,9 @@ export default function HomePage() {
           <div className="text-outline text-xs">© 2027 PandaHub, Inc.</div>
         </div>
       </footer>
+
+      {/* Mobile Bottom Navigation */}
+      <MobileBottomNav />
 
       {/* Settings toggle */}
       <Settings />

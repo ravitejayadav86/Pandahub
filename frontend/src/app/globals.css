@@ -163,4 +163,13 @@
     0%, 100% { box-shadow: 0 0 12px currentColor; }
     50% { box-shadow: 0 0 24px currentColor; }
   }
+
+  /* Hide scrollbar for carousels */
+  .hide-scrollbar::-webkit-scrollbar {
+    display: none;
+  }
+  .hide-scrollbar {
+    -ms-overflow-style: none;  /* IE and Edge */
+    scrollbar-width: none;  /* Firefox */
+  }
 }

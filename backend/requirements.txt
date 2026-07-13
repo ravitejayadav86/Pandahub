@@ -6,7 +6,8 @@ uvicorn[standard]==0.30.6
 sqlalchemy==2.0.35
 alembic==1.13.2
 asyncpg==0.29.0          # async Postgres driver
-psycopg2-binary==2.9.9   # sync driver, used by Alembic migrations
+psycopg[binary]==3.2.13
+# sync driver, used by Alembic migrations
 
 # --- Validation / Settings ---
 pydantic==2.9.2

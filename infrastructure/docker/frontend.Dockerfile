@@ -9,8 +9,12 @@ RUN npm ci
 
 COPY . .
 
+# Build the production Next.js app
+RUN npm run build
+
 EXPOSE 3000
 
-# `dev` in local compose (hot reload via mounted volume); production build
-# uses a separate multi-stage target added in Module 17 (Deployment).
-CMD ["npm", "run", "dev"]
+ENV NODE_ENV=production
+
+# Start the production server
+CMD ["npm", "start"]

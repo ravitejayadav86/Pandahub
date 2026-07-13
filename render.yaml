@@ -1,0 +1,66 @@
+services:
+  # ─── Backend API (FastAPI) ──────────────────────────────────────────────────
+  - type: web
+    name: pandahub-backend
+    runtime: docker
+    dockerfilePath: ./infrastructure/docker/backend.Dockerfile
+    dockerContext: ./backend
+    plan: starter
+    envVars:
+      - key: DATABASE_URL
+        sync: false
+      - key: REDIS_URL
+        sync: false
+      - key: SECRET_KEY
+        generateValue: true
+      - key: JWT_SECRET_KEY
+        generateValue: true
+      - key: ENCRYPTION_KEY
+        generateValue: true
+      - key: MINIO_ENDPOINT
+        sync: false
+      - key: MINIO_ACCESS_KEY
+        sync: false
+      - key: MINIO_SECRET_KEY
+        sync: false
+      - key: ENVIRONMENT
+        value: production
+    healthCheckPath: /api/v1/health
+
+  # ─── Celery Worker ──────────────────────────────────────────────────────────
+  - type: worker
+    name: pandahub-worker
+    runtime: docker
+    dockerfilePath: ./infrastructure/docker/worker.Dockerfile
+    dockerContext: ./backend
+    plan: starter
+    envVars:
+      - key: DATABASE_URL
+        sync: false
+      - key: REDIS_URL
+        sync: false
+      - key: SECRET_KEY
+        sync: false
+      - key: JWT_SECRET_KEY
+        sync: false
+      - key: ENCRYPTION_KEY
+        sync: false
+      - key: MINIO_ENDPOINT
+        sync: false
+      - key: MINIO_ACCESS_KEY
+        sync: false
+      - key: MINIO_SECRET_KEY
+        sync: false
+      - key: ENVIRONMENT
+        value: production
+
+  # ─── Frontend (Next.js) ─────────────────────────────────────────────────────
+  - type: web
+    name: pandahub-frontend
+    runtime: docker
+    dockerfilePath: ./infrastructure/docker/frontend.Dockerfile
+    dockerContext: ./frontend
+    plan: starter
+    envVars:
+      - key: NEXT_PUBLIC_API_URL
+        sync: false

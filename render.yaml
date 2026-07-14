@@ -3,7 +3,7 @@ services:
   - type: web
     name: pandahub-backend
     runtime: docker
-    dockerfilePath: ./infrastructure/docker/backend.Dockerfile
+    dockerfilePath: ./backend/Dockerfile
     dockerContext: ./backend
     plan: starter
     healthCheckPath: /api/v1/health
@@ -56,7 +56,7 @@ services:
   - type: worker
     name: pandahub-worker
     runtime: docker
-    dockerfilePath: ./infrastructure/docker/worker.Dockerfile
+    dockerfilePath: ./backend/worker.Dockerfile
     dockerContext: ./backend
     plan: starter
     envVars:

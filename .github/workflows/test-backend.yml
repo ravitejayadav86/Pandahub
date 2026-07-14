@@ -50,6 +50,8 @@ jobs:
         working-directory: backend
         env:
           DATABASE_URL: postgresql+asyncpg://pandahub_test:pandahub_test@localhost:5432/pandahub_test
+          JWT_SECRET_KEY: ci_test_jwt_secret_key_32chars_min
+          ENCRYPTION_KEY: ci_test_encryption_key_32chars_min
         run: alembic upgrade head
 
       - name: Run lint (ruff)
@@ -61,5 +63,6 @@ jobs:
         env:
           DATABASE_URL: postgresql+asyncpg://pandahub_test:pandahub_test@localhost:5432/pandahub_test
           REDIS_URL: redis://localhost:6379/0
-          JWT_SECRET_KEY: ci_test_secret_key_not_for_production
+          JWT_SECRET_KEY: ci_test_jwt_secret_key_32chars_min
+          ENCRYPTION_KEY: ci_test_encryption_key_32chars_min
         run: pytest -v --cov=app --cov-report=term-missing

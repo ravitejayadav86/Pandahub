@@ -13,7 +13,10 @@ repository page can render a branch list and "N commits ahead" badges
 without shelling out to libgit2 on every page load. The git_engine
 (Module 8) is responsible for keeping this cache in sync on every push.
 """
+from __future__ import annotations
+
 import uuid
+from typing import TYPE_CHECKING
 
 from sqlalchemy import (
     String, Boolean, BigInteger, Integer, ForeignKey, UniqueConstraint,
@@ -24,6 +27,9 @@ from sqlalchemy.orm import Mapped, mapped_column, relationship
 
 from app.models.base import Base, UUIDPKMixin, TimestampMixin
 from app.models.enums import RepositoryVisibility, PermissionLevel
+
+if TYPE_CHECKING:
+    from app.models.user import User
 
 
 class Repository(Base, UUIDPKMixin, TimestampMixin):

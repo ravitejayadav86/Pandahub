@@ -9,7 +9,7 @@ FastAPI's request/response machinery.
 from fastapi import APIRouter, Depends, UploadFile, File, status
 from sqlalchemy.ext.asyncio import AsyncSession
 
-from app.api.dependencies import get_current_active_user, get_current_user
+from app.api.dependencies import get_current_active_user
 from app.core.rate_limit import login_rate_limiter, register_rate_limiter, password_reset_rate_limiter
 from app.db.session import get_db
 from app.models.user import User

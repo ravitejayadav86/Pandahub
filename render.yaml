@@ -31,12 +31,14 @@ services:
         sync: false          # Set to your Render backend URL after first deploy
       - key: CORS_ALLOWED_ORIGINS
         sync: false          # Comma-separated: https://pandahub-frontend.onrender.com
-      - key: MINIO_ENDPOINT
-        sync: false          # e.g. your-bucket.s3.amazonaws.com  (leave blank to skip)
-      - key: MINIO_ROOT_USER
-        sync: false          # S3/MinIO access key
-      - key: MINIO_ROOT_PASSWORD
-        sync: false          # S3/MinIO secret key
+      - key: B2_KEY_ID
+        sync: false          # Backblaze B2 Key ID
+      - key: B2_APPLICATION_KEY
+        sync: false          # Backblaze B2 Application Key
+      - key: B2_ENDPOINT
+        sync: false          # e.g. s3.us-east-005.backblazeb2.com
+      - key: B2_BUCKET_NAME
+        sync: false          # e.g. Pandahub
       - key: CELERY_BROKER_URL
         fromService:
           name: pandahub-redis
@@ -73,11 +75,13 @@ services:
         sync: false
       - key: ENCRYPTION_KEY
         sync: false
-      - key: MINIO_ENDPOINT
+      - key: B2_KEY_ID
         sync: false
-      - key: MINIO_ROOT_USER
+      - key: B2_APPLICATION_KEY
         sync: false
-      - key: MINIO_ROOT_PASSWORD
+      - key: B2_ENDPOINT
+        sync: false
+      - key: B2_BUCKET_NAME
         sync: false
       - key: ENVIRONMENT
         value: production

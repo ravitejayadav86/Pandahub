@@ -24,12 +24,22 @@ MAX_AVATAR_SIZE_BYTES = 5 * 1024 * 1024  # 5 MB
 
 
 def _get_s3_client():
-    scheme = "https" if settings.MINIO_USE_SSL else "http"
+    """Build a boto3 S3 client from settings.
+
+    Works with both Backblaze B2 (production — uses B2_* env vars) and
+    local MinIO (dev — uses MINIO_* env vars). The `storage_*` properties
+    on Settings transparently resolve which credentials to use.
+    """
+    endpoint = settings.storage_endpoint
+    # B2 endpoint comes without scheme; MinIO endpoint already includes it.
+    if not endpoint.startswith("http"):
+        scheme = "https" if settings.storage_use_ssl else "http"
+        endpoint = f"{scheme}://{endpoint}"
     return boto3.client(
         "s3",
-        endpoint_url=f"{scheme}://{settings.MINIO_ENDPOINT}",
-        aws_access_key_id=settings.MINIO_ROOT_USER,
-        aws_secret_access_key=settings.MINIO_ROOT_PASSWORD,
+        endpoint_url=endpoint,
+        aws_access_key_id=settings.storage_access_key,
+        aws_secret_access_key=settings.storage_secret_key,
         config=BotoConfig(signature_version="s3v4"),
         region_name="us-east-1",
     )
@@ -47,19 +57,25 @@ def ensure_buckets_exist() -> None:
     logger = logging.getLogger(__name__)
     try:
         client = _get_s3_client()
-        for bucket in (
-            settings.MINIO_BUCKET_AVATARS,
-            settings.MINIO_BUCKET_LFS,
-            settings.MINIO_BUCKET_ARTIFACTS,
-        ):
+        # B2 uses a single bucket; MinIO uses three separate ones.
+        buckets = (
+            [settings.B2_BUCKET_NAME]
+            if settings.B2_BUCKET_NAME
+            else [
+                settings.MINIO_BUCKET_AVATARS,
+                settings.MINIO_BUCKET_LFS,
+                settings.MINIO_BUCKET_ARTIFACTS,
+            ]
+        )
+        for bucket in buckets:
             try:
                 client.head_bucket(Bucket=bucket)
             except ClientError:
                 client.create_bucket(Bucket=bucket)
     except Exception as exc:  # noqa: BLE001
         logger.warning(
-            "MinIO/S3 not reachable at startup — object storage unavailable. "
-            "Configure MINIO_ENDPOINT and credentials to enable uploads. Error: %s",
+            "Object storage not reachable at startup — uploads unavailable. "
+            "Configure B2_* or MINIO_* credentials to enable storage. Error: %s",
             exc,
         )
 

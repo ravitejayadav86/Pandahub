@@ -64,6 +64,10 @@ class Settings(BaseSettings):
     GOOGLE_OAUTH_CLIENT_ID: str | None = None
     GOOGLE_OAUTH_CLIENT_SECRET: str | None = None
 
+    @property
+    def google_oauth_redirect_uri(self) -> str:
+        return f"{self.BACKEND_URL.rstrip('/')}{self.API_V1_PREFIX}/auth/google/callback"
+
     # ---- Email ----
     SMTP_HOST: str = "localhost"
     SMTP_PORT: int = 587

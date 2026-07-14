@@ -35,9 +35,11 @@ from app.core.security import (
     encrypt_secret,
     decrypt_secret,
 )
-from app.models.user import User, RefreshToken, EmailVerificationToken, PasswordResetToken
+from app.models.enums import OAuthProvider
+from app.models.user import User, RefreshToken, EmailVerificationToken, PasswordResetToken, OAuthAccount
 from app.schemas.auth_schema import UserRegister
 from app.services.email_service import send_verification_email, send_password_reset_email
+import httpx
 
 settings = get_settings()
 
@@ -307,3 +309,126 @@ def verify_totp_for_login(user: User, totp_code: str) -> bool:
         return False
     secret = decrypt_secret(user.two_factor_secret_encrypted)
     return pyotp.TOTP(secret).verify(totp_code, valid_window=1)
+
+
+# ---------------------------------------------------------------------------
+# OAuth (Google)
+# ---------------------------------------------------------------------------
+
+def google_login_url() -> str:
+    if not settings.GOOGLE_OAUTH_CLIENT_ID or not settings.GOOGLE_OAUTH_CLIENT_SECRET:
+        raise AuthError("Google OAuth is not configured", status.HTTP_501_NOT_IMPLEMENTED)
+        
+    base_url = "https://accounts.google.com/o/oauth2/v2/auth"
+    params = {
+        "client_id": settings.GOOGLE_OAUTH_CLIENT_ID,
+        "redirect_uri": settings.google_oauth_redirect_uri,
+        "response_type": "code",
+        "scope": "openid email profile",
+        "access_type": "online",
+        "prompt": "select_account"
+    }
+    query_string = "&".join(f"{k}={v}" for k, v in params.items())
+    return f"{base_url}?{query_string}"
+
+async def google_callback(db: AsyncSession, code: str) -> tuple[str, str]:
+    if not settings.GOOGLE_OAUTH_CLIENT_ID or not settings.GOOGLE_OAUTH_CLIENT_SECRET:
+        raise AuthError("Google OAuth is not configured", status.HTTP_501_NOT_IMPLEMENTED)
+
+    # 1. Exchange code for access token
+    token_url = "https://oauth2.googleapis.com/token"
+    data = {
+        "client_id": settings.GOOGLE_OAUTH_CLIENT_ID,
+        "client_secret": settings.GOOGLE_OAUTH_CLIENT_SECRET,
+        "code": code,
+        "grant_type": "authorization_code",
+        "redirect_uri": settings.google_oauth_redirect_uri,
+    }
+    async with httpx.AsyncClient() as client:
+        resp = await client.post(token_url, data=data)
+        if resp.status_code != 200:
+            raise AuthError("Failed to exchange code for token", status.HTTP_400_BAD_REQUEST)
+        
+        token_data = resp.json()
+        access_token = token_data.get("access_token")
+        
+        # 2. Fetch user profile
+        user_info_url = "https://www.googleapis.com/oauth2/v2/userinfo"
+        headers = {"Authorization": f"Bearer {access_token}"}
+        user_resp = await client.get(user_info_url, headers=headers)
+        if user_resp.status_code != 200:
+            raise AuthError("Failed to fetch user profile", status.HTTP_400_BAD_REQUEST)
+            
+        user_info = user_resp.json()
+    
+    email = user_info.get("email")
+    if not email:
+        raise AuthError("Google account has no email associated", status.HTTP_400_BAD_REQUEST)
+        
+    google_id = str(user_info.get("id"))
+    
+    # 3. Check if user exists by email
+    result = await db.execute(select(User).where(User.email == email))
+    user = result.scalar_one_or_none()
+    
+    if user:
+        # Check if OAuth account is linked
+        result = await db.execute(
+            select(OAuthAccount).where(
+                OAuthAccount.user_id == user.id,
+                OAuthAccount.provider == OAuthProvider.GOOGLE
+            )
+        )
+        oauth_account = result.scalar_one_or_none()
+        
+        if not oauth_account:
+            # Link it
+            new_oauth = OAuthAccount(
+                user_id=user.id,
+                provider=OAuthProvider.GOOGLE,
+                provider_account_id=google_id
+            )
+            db.add(new_oauth)
+            await db.commit()
+    else:
+        # Create new user
+        # We need a unique username. Let's use the email prefix, append random chars if collision.
+        base_username = email.split("@")[0][:30]
+        # Just use base_username and generate UUID prefix if it exists.
+        # But for simplicity in this function, try base_username.
+        username_query = await db.execute(select(User).where(User.username == base_username))
+        if username_query.scalar_one_or_none():
+            base_username = f"{base_username}_{uuid.uuid4().hex[:5]}"
+            
+        user = User(
+            username=base_username,
+            email=email,
+            full_name=user_info.get("name"),
+            avatar_url=user_info.get("picture"),
+            is_active=True,
+            is_verified=True,  # Trust Google's email verification
+            hashed_password=None # No password for OAuth users
+        )
+        db.add(user)
+        await db.commit()
+        await db.refresh(user)
+        
+        new_oauth = OAuthAccount(
+            user_id=user.id,
+            provider=OAuthProvider.GOOGLE,
+            provider_account_id=google_id
+        )
+        db.add(new_oauth)
+        await db.commit()
+        
+    # 4. Issue PandaHub tokens
+    if user.two_factor_enabled:
+        # If the user has 2FA enabled on Pandahub, we still require it even for OAuth.
+        challenge_token = issue_two_factor_challenge(user)
+        # We return a special string or handle it differently?
+        # Actually, in the OAuth callback, returning a TokenPair isn't enough if it's a 2FA challenge.
+        # But to keep it simple, we raise an exception or return a special URL param if 2FA is needed.
+        # For now, let's just throw an error since the UI for 2FA OAuth callback isn't built yet.
+        raise AuthError("Two-factor auth with Google Login is not supported yet.", status.HTTP_501_NOT_IMPLEMENTED)
+        
+    return await issue_token_pair(db, user)

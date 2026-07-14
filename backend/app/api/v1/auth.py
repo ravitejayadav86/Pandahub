@@ -7,6 +7,7 @@ service layer. This keeps the routes thin and testable independent of
 FastAPI's request/response machinery.
 """
 from fastapi import APIRouter, Depends, UploadFile, File, status
+from fastapi.responses import RedirectResponse
 from sqlalchemy.ext.asyncio import AsyncSession
 
 from app.api.dependencies import get_current_active_user
@@ -101,6 +102,30 @@ async def refresh(payload: RefreshRequest, db: AsyncSession = Depends(get_db)):
 @router.post("/logout", status_code=status.HTTP_204_NO_CONTENT)
 async def logout(payload: RefreshRequest, db: AsyncSession = Depends(get_db)):
     await auth_service.revoke_refresh_token(db, payload.refresh_token)
+
+
+# ---------------------------------------------------------------------------
+# OAuth (Google)
+# ---------------------------------------------------------------------------
+@router.get("/google/login")
+async def google_login():
+    url = auth_service.google_login_url()
+    return RedirectResponse(url)
+
+
+@router.get("/google/callback")
+async def google_callback(code: str, db: AsyncSession = Depends(get_db)):
+    access_token, refresh_token = await auth_service.google_callback(db, code)
+    
+    # We redirect the user back to the frontend to complete the login
+    # In production, FRONTEND_URL should come from settings
+    from app.core.config import get_settings
+    settings = get_settings()
+    frontend_url = settings.CORS_ALLOWED_ORIGINS.split(',')[0].strip()
+    
+    redirect_url = f"{frontend_url}/oauth/callback?access_token={access_token}&refresh_token={refresh_token}"
+    return RedirectResponse(redirect_url)
+
 
 
 # ---------------------------------------------------------------------------

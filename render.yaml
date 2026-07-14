@@ -6,26 +6,49 @@ services:
     dockerfilePath: ./infrastructure/docker/backend.Dockerfile
     dockerContext: ./backend
     plan: starter
+    healthCheckPath: /api/v1/health
     envVars:
       - key: DATABASE_URL
-        sync: false
+        fromDatabase:
+          name: pandahub-db
+          property: connectionString
       - key: REDIS_URL
-        sync: false
+        fromService:
+          name: pandahub-redis
+          type: redis
+          property: connectionString
       - key: SECRET_KEY
         generateValue: true
       - key: JWT_SECRET_KEY
         generateValue: true
       - key: ENCRYPTION_KEY
         generateValue: true
-      - key: MINIO_ENDPOINT
-        sync: false
-      - key: MINIO_ACCESS_KEY
-        sync: false
-      - key: MINIO_SECRET_KEY
-        sync: false
       - key: ENVIRONMENT
         value: production
-    healthCheckPath: /api/v1/health
+      - key: FRONTEND_URL
+        sync: false          # Set to your Render frontend URL after first deploy
+      - key: BACKEND_URL
+        sync: false          # Set to your Render backend URL after first deploy
+      - key: CORS_ALLOWED_ORIGINS
+        sync: false          # Comma-separated: https://pandahub-frontend.onrender.com
+      - key: MINIO_ENDPOINT
+        sync: false          # e.g. your-bucket.s3.amazonaws.com  (leave blank to skip)
+      - key: MINIO_ROOT_USER
+        sync: false          # S3/MinIO access key
+      - key: MINIO_ROOT_PASSWORD
+        sync: false          # S3/MinIO secret key
+      - key: CELERY_BROKER_URL
+        fromService:
+          name: pandahub-redis
+          type: redis
+          property: connectionString
+      - key: CELERY_RESULT_BACKEND
+        fromService:
+          name: pandahub-redis
+          type: redis
+          property: connectionString
+      - key: PORT
+        value: "8000"
 
   # ─── Celery Worker ──────────────────────────────────────────────────────────
   - type: worker
@@ -36,9 +59,14 @@ services:
     plan: starter
     envVars:
       - key: DATABASE_URL
-        sync: false
+        fromDatabase:
+          name: pandahub-db
+          property: connectionString
       - key: REDIS_URL
-        sync: false
+        fromService:
+          name: pandahub-redis
+          type: redis
+          property: connectionString
       - key: SECRET_KEY
         sync: false
       - key: JWT_SECRET_KEY
@@ -47,12 +75,22 @@ services:
         sync: false
       - key: MINIO_ENDPOINT
         sync: false
-      - key: MINIO_ACCESS_KEY
+      - key: MINIO_ROOT_USER
         sync: false
-      - key: MINIO_SECRET_KEY
+      - key: MINIO_ROOT_PASSWORD
         sync: false
       - key: ENVIRONMENT
         value: production
+      - key: CELERY_BROKER_URL
+        fromService:
+          name: pandahub-redis
+          type: redis
+          property: connectionString
+      - key: CELERY_RESULT_BACKEND
+        fromService:
+          name: pandahub-redis
+          type: redis
+          property: connectionString
 
   # ─── Frontend (Next.js) ─────────────────────────────────────────────────────
   - type: web
@@ -63,4 +101,17 @@ services:
     plan: starter
     envVars:
       - key: NEXT_PUBLIC_API_URL
-        sync: false
+        sync: false          # Set to https://pandahub-backend.onrender.com
+
+databases:
+  # ─── Render-managed PostgreSQL ──────────────────────────────────────────────
+  - name: pandahub-db
+    plan: starter            # Free tier: 1 GB, shared compute
+    databaseName: pandahub
+    user: pandahub
+
+  # ─── Render-managed Redis ───────────────────────────────────────────────────
+  - name: pandahub-redis
+    type: redis
+    plan: starter            # Free tier: 25 MB
+    ipAllowList: []          # Only services within this Render account can connect

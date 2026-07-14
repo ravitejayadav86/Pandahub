@@ -19,10 +19,14 @@ RUN pip install --no-cache-dir --upgrade pip && \
 
 COPY . .
 
+# Make the startup script executable (converts CRLF -> LF for Windows users)
+RUN sed -i 's/\r$//' entrypoint.sh && chmod +x entrypoint.sh
+
 # Non-root user for security (defense in depth — container escape doesn't grant root on host)
 RUN useradd --create-home pandahub && chown -R pandahub:pandahub /app
 USER pandahub
 
 EXPOSE 8000
 
-CMD ["uvicorn", "app.main:app", "--host", "0.0.0.0", "--port", "8000"]
+# entrypoint.sh runs: alembic upgrade head → uvicorn
+ENTRYPOINT ["./entrypoint.sh"]

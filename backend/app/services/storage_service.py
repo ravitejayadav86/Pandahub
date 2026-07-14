@@ -37,17 +37,31 @@ def _get_s3_client():
 
 def ensure_buckets_exist() -> None:
     """Called once at application startup (see main.py lifespan) so the
-    required buckets exist before the first upload request arrives."""
-    client = _get_s3_client()
-    for bucket in (
-        settings.MINIO_BUCKET_AVATARS,
-        settings.MINIO_BUCKET_LFS,
-        settings.MINIO_BUCKET_ARTIFACTS,
-    ):
-        try:
-            client.head_bucket(Bucket=bucket)
-        except ClientError:
-            client.create_bucket(Bucket=bucket)
+    required buckets exist before the first upload request arrives.
+
+    Failure is non-fatal: if MinIO is unreachable (e.g. not yet configured
+    in a staging environment) we log a warning and continue startup so the
+    rest of the API remains available.
+    """
+    import logging
+    logger = logging.getLogger(__name__)
+    try:
+        client = _get_s3_client()
+        for bucket in (
+            settings.MINIO_BUCKET_AVATARS,
+            settings.MINIO_BUCKET_LFS,
+            settings.MINIO_BUCKET_ARTIFACTS,
+        ):
+            try:
+                client.head_bucket(Bucket=bucket)
+            except ClientError:
+                client.create_bucket(Bucket=bucket)
+    except Exception as exc:  # noqa: BLE001
+        logger.warning(
+            "MinIO/S3 not reachable at startup — object storage unavailable. "
+            "Configure MINIO_ENDPOINT and credentials to enable uploads. Error: %s",
+            exc,
+        )
 
 
 async def upload_avatar(user_id: uuid.UUID, file: UploadFile) -> str:

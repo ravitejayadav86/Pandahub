@@ -44,6 +44,11 @@ app.include_router(auth.router, prefix=settings.API_V1_PREFIX)
 
 
 @app.get("/health", tags=["system"])
+@app.get(f"{settings.API_V1_PREFIX}/health", tags=["system"])
 async def health_check():
-    """Liveness/readiness probe target for Docker/orchestrator healthchecks."""
+    """Liveness/readiness probe target for Docker/orchestrator healthchecks.
+
+    Registered at both /health (local dev / Docker compose) and
+    /api/v1/health (Render healthCheckPath in render.yaml).
+    """
     return {"status": "ok", "service": settings.PROJECT_NAME}

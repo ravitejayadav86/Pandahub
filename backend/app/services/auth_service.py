@@ -424,11 +424,10 @@ async def google_callback(db: AsyncSession, code: str) -> tuple[str, str]:
     # 4. Issue PandaHub tokens
     if user.two_factor_enabled:
         # If the user has 2FA enabled on Pandahub, we still require it even for OAuth.
-        challenge_token = issue_two_factor_challenge(user)
-        # We return a special string or handle it differently?
-        # Actually, in the OAuth callback, returning a TokenPair isn't enough if it's a 2FA challenge.
-        # But to keep it simple, we raise an exception or return a special URL param if 2FA is needed.
-        # For now, let's just throw an error since the UI for 2FA OAuth callback isn't built yet.
+       # OAuth + 2FA isn't wired up yet -- the callback flow would need to
+        # return a 2FA challenge response instead of a token pair, same as
+        # the password-login path does. Raising clearly for now rather than
+        # silently skipping the user's 2FA requirement.
         raise AuthError("Two-factor auth with Google Login is not supported yet.", status.HTTP_501_NOT_IMPLEMENTED)
-        
+
     return await issue_token_pair(db, user)

@@ -54,3 +54,4 @@ faker==28.4.1
 # --- Dev tooling ---
 ruff==0.6.8
 mypy==1.11.2
+

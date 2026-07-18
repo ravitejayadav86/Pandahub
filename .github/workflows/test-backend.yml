@@ -12,6 +12,20 @@ on:
 jobs:
   test:
     runs-on: ubuntu-latest
+    # Job-level env: applies to EVERY step below, including migrations --
+    # this is the fix for the bug we hit locally: settings are validated
+    # (and required) at import time, so ANY step that imports app.core.config
+    # (migrations, lint, tests) needs the full required env set, not just
+    # the step that happens to run pytest.
+    env:
+      DATABASE_URL: postgresql+asyncpg://pandahub_test:pandahub_test@localhost:5432/pandahub_test
+      REDIS_URL: redis://localhost:6379/0
+      JWT_SECRET_KEY: ci_test_secret_key_not_for_production_use_only
+      # Fixed, non-secret Fernet key -- valid format required (config.py
+      # validates min_length, and Fernet() itself validates it's a real
+      # urlsafe-base64 32-byte key at runtime). This key is CI-only and
+      # intentionally committed -- it protects nothing in production.
+      ENCRYPTION_KEY: 0vTE1sUSc8jg2g7Grf_b-yZm-1jmsxXItS5pM3YGzUI=
     services:
       postgres:
         image: postgres:16-alpine
@@ -48,10 +62,6 @@ jobs:
 
       - name: Run migrations
         working-directory: backend
-        env:
-          DATABASE_URL: postgresql+asyncpg://pandahub_test:pandahub_test@localhost:5432/pandahub_test
-          JWT_SECRET_KEY: ci_test_jwt_secret_key_32chars_min
-          ENCRYPTION_KEY: ci_test_encryption_key_32chars_min
         run: alembic upgrade head
 
       - name: Run lint (ruff)
@@ -60,9 +70,4 @@ jobs:
 
       - name: Run tests with coverage
         working-directory: backend
-        env:
-          DATABASE_URL: postgresql+asyncpg://pandahub_test:pandahub_test@localhost:5432/pandahub_test
-          REDIS_URL: redis://localhost:6379/0
-          JWT_SECRET_KEY: ci_test_jwt_secret_key_32chars_min
-          ENCRYPTION_KEY: ci_test_encryption_key_32chars_min
         run: pytest -v --cov=app --cov-report=term-missing

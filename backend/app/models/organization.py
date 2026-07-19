@@ -1,3 +1,4 @@
+from __future__ import annotations
 """
 Organizations, Teams, and team-level repository permissions.
 
@@ -11,6 +12,10 @@ grant access — via team membership — while still allowing one-off
 individual exceptions.
 """
 import uuid
+from typing import TYPE_CHECKING
+
+if TYPE_CHECKING:
+    from app.models.user import User
 
 from sqlalchemy import String, ForeignKey, UniqueConstraint
 from sqlalchemy.dialects.postgresql import UUID

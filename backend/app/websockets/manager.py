@@ -15,7 +15,6 @@ whichever of ITS OWN locally-connected clients match the target user_id.
 """
 import asyncio
 import json
-import uuid
 
 from fastapi import WebSocket
 

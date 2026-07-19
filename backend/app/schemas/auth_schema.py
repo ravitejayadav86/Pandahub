@@ -7,7 +7,6 @@ the API boundary rather than surfacing as an opaque database
 IntegrityError deep in the service layer.
 """
 import re
-import uuid
 
 from pydantic import BaseModel, EmailStr, Field, field_validator
 

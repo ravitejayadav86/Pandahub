@@ -1,3 +1,4 @@
+from __future__ import annotations
 """
 Repository and everything that hangs directly off it.
 
@@ -14,6 +15,10 @@ without shelling out to libgit2 on every page load. The git_engine
 (Module 8) is responsible for keeping this cache in sync on every push.
 """
 import uuid
+from typing import TYPE_CHECKING
+
+if TYPE_CHECKING:
+    from app.models.user import User
 
 from sqlalchemy import (
     String, Boolean, BigInteger, Integer, ForeignKey, UniqueConstraint,

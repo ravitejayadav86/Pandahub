@@ -28,21 +28,6 @@ class Settings(BaseSettings):
     # ---- Database ----
     DATABASE_URL: str
 
-    @property
-    def async_database_url(self) -> str:
-        """Ensure the asyncpg driver prefix is present.
-
-        Render's managed Postgres provides a plain `postgresql://` URL.
-        SQLAlchemy's async engine requires `postgresql+asyncpg://`.
-        This property normalises either form so both local and Render
-        deployments work without manual URL editing.
-        """
-        url = self.DATABASE_URL
-        if url.startswith("postgresql://") or url.startswith("postgres://"):
-            url = url.replace("postgres://", "postgresql+asyncpg://", 1)
-            url = url.replace("postgresql://", "postgresql+asyncpg://", 1)
-        return url
-
     # ---- Redis ----
     REDIS_URL: str = "redis://redis:6379/0"
 
@@ -64,10 +49,6 @@ class Settings(BaseSettings):
     GOOGLE_OAUTH_CLIENT_ID: str | None = None
     GOOGLE_OAUTH_CLIENT_SECRET: str | None = None
 
-    @property
-    def google_oauth_redirect_uri(self) -> str:
-        return f"{self.BACKEND_URL.rstrip('/')}{self.API_V1_PREFIX}/auth/google/callback"
-
     # ---- Email ----
     SMTP_HOST: str = "localhost"
     SMTP_PORT: int = 587
@@ -76,50 +57,14 @@ class Settings(BaseSettings):
     SMTP_FROM_EMAIL: str = "no-reply@pandahub.dev"
     SMTP_TLS: bool = True
 
-    # ---- Object Storage (Backblaze B2 / MinIO / S3-compatible) ----
-    # Backblaze B2 credentials (set these in Render env vars)
-    B2_KEY_ID: str | None = None           # B2_KEY_ID from Render env
-    B2_APPLICATION_KEY: str | None = None  # B2_APPLICATION_KEY from Render env
-    B2_ENDPOINT: str | None = None         # e.g. s3.us-east-005.backblazeb2.com
-    B2_BUCKET_NAME: str | None = None      # e.g. Pandahub
-
-    # Legacy MinIO vars (used in local docker-compose)
+    # ---- MinIO ----
     MINIO_ROOT_USER: str = "pandahub_admin"
     MINIO_ROOT_PASSWORD: str = "change_me"
     MINIO_ENDPOINT: str = "minio:9000"
-    MINIO_USE_SSL: bool = False
-
     MINIO_BUCKET_AVATARS: str = "pandahub-avatars"
     MINIO_BUCKET_LFS: str = "pandahub-lfs"
     MINIO_BUCKET_ARTIFACTS: str = "pandahub-artifacts"
-
-    @property
-    def storage_endpoint(self) -> str:
-        """Return the active S3-compatible endpoint (B2 takes priority over MinIO)."""
-        if self.B2_ENDPOINT:
-            return self.B2_ENDPOINT
-        scheme = "https" if self.MINIO_USE_SSL else "http"
-        return f"{scheme}://{self.MINIO_ENDPOINT}"
-
-    @property
-    def storage_access_key(self) -> str:
-        """B2_KEY_ID when using Backblaze, otherwise MinIO root user."""
-        return self.B2_KEY_ID or self.MINIO_ROOT_USER
-
-    @property
-    def storage_secret_key(self) -> str:
-        """B2_APPLICATION_KEY when using Backblaze, otherwise MinIO root password."""
-        return self.B2_APPLICATION_KEY or self.MINIO_ROOT_PASSWORD
-
-    @property
-    def storage_use_ssl(self) -> bool:
-        """B2 always uses HTTPS; MinIO follows MINIO_USE_SSL."""
-        return bool(self.B2_ENDPOINT) or self.MINIO_USE_SSL
-
-    @property
-    def default_bucket(self) -> str:
-        """Single B2 bucket name, or fall back to the avatars bucket."""
-        return self.B2_BUCKET_NAME or self.MINIO_BUCKET_AVATARS
+    MINIO_USE_SSL: bool = False
 
     # ---- Git storage ----
     GIT_REPOS_ROOT: str = "/data/repositories"

@@ -5,6 +5,7 @@
 @tailwind utilities;
 
 :root {
+  --color-primary: #0A84FF;
   --bg-primary: #ffffff;
   --bg-secondary: #f8fafc;
   --text-primary: #0f172a;
@@ -17,6 +18,7 @@
 }
 
 .dark {
+  --color-primary: #0A84FF;
   --bg-primary: #080a12;
   --bg-secondary: #0f121e;
   --text-primary: #f8fafc;

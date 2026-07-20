@@ -1,5 +1,5 @@
 export interface User {
-  id: number;
+  id: string;
   username: string;
   email?: string;
   full_name?: string;
@@ -14,7 +14,7 @@ export interface User {
 }
 
 export interface Repository {
-  id: number;
+  id: string;
   name: string;
   slug: string;
   description?: string;
@@ -24,8 +24,8 @@ export interface Repository {
   fork_count: number;
   open_issues_count: number;
   is_fork: boolean;
-  owner_id?: number;
-  org_id?: number;
+  owner_id?: string;
+  org_id?: string;
   owner_username?: string;
   created_at: string;
   updated_at: string;
@@ -33,15 +33,15 @@ export interface Repository {
 }
 
 export interface Issue {
-  id: number;
+  id: string;
   number: number;
   title: string;
   body?: string;
   state: 'open' | 'closed';
   priority?: 'low' | 'medium' | 'high' | 'critical';
-  repository_id: number;
-  author_id: number;
-  assignee_id?: number;
+  repository_id: string;
+  author_id: string;
+  assignee_id?: string;
   created_at: string;
   updated_at: string;
   closed_at?: string;
@@ -49,9 +49,9 @@ export interface Issue {
 }
 
 export interface IssueComment {
-  id: number;
-  issue_id: number;
-  author_id: number;
+  id: string;
+  issue_id: string;
+  author_id: string;
   body: string;
   created_at: string;
   updated_at: string;

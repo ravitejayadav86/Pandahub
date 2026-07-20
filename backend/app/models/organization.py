@@ -1,4 +1,3 @@
-from __future__ import annotations
 """
 Organizations, Teams, and team-level repository permissions.
 
@@ -11,18 +10,20 @@ single flattened ACL table) mirrors how real engineering orgs actually
 grant access — via team membership — while still allowing one-off
 individual exceptions.
 """
+from __future__ import annotations
+
 import uuid
-from typing import TYPE_CHECKING
-
-if TYPE_CHECKING:
-    from app.models.user import User
-
 from sqlalchemy import String, ForeignKey, UniqueConstraint
 from sqlalchemy.dialects.postgresql import UUID
 from sqlalchemy.orm import Mapped, mapped_column, relationship
 
 from app.models.base import Base, UUIDPKMixin, TimestampMixin
 from app.models.enums import OrganizationRole, TeamRole, PermissionLevel
+
+from typing import TYPE_CHECKING
+
+if TYPE_CHECKING:
+    from app.models.user import User
 
 
 class Organization(Base, UUIDPKMixin, TimestampMixin):

@@ -1,269 +1,366 @@
 "use client";
 
-export default function GeneratedPage() {
+import { useState, useEffect } from "react";
+
+import { useAuthStore } from '@/store/authStore';
+
+// ── Main ──────────────────────────────────────────────────────────────────────
+
+// ── Main ──────────────────────────────────────────────────────────────────────
+export default function DashboardPage() {
+  const { user } = useAuthStore();
+  const [tab, setTab] = useState("Overview");
+  const [mounted, setMounted] = useState(false);
+  const [isProfileOpen, setIsProfileOpen] = useState(false);
+
+  useEffect(() => { setMounted(true); document.documentElement.classList.remove('dark'); }, []);
+
+  // Close dropdown when clicking outside
+  useEffect(() => {
+    const handleClickOutside = (event: MouseEvent) => {
+      if (isProfileOpen && !(event.target as Element).closest('.profile-dropdown-container')) {
+        setIsProfileOpen(false);
+      }
+    };
+    document.addEventListener('mousedown', handleClickOutside);
+    return () => document.removeEventListener('mousedown', handleClickOutside);
+  }, [isProfileOpen]);
+
   return (
-    <main className="min-h-screen text-on-surface bg-background font-body">
+    <div className="min-h-screen bg-[#F8F9FB] text-slate-900 font-sans antialiased overflow-x-hidden flex">
+      
+      {/* ── Sticky Sidebar ── */}
+      <aside className="self-start sticky top-0 h-screen w-[260px] shrink-0 bg-white border-r border-slate-200/60 z-50 flex flex-col overflow-y-auto overscroll-contain scroll-smooth hidden md:flex transition-all duration-300 hover:shadow-[4px_0_24px_rgba(0,0,0,0.02)]">
+        {/* Logo */}
+        <div className="h-[72px] flex items-center gap-3 px-6 border-b border-slate-100">
+          <div className="w-10 h-10 rounded-xl overflow-hidden shadow-sm border border-slate-200/50">
+            {/* Using a placeholder for the logo */}
+            <div className="w-full h-full bg-slate-900 flex items-center justify-center text-white">
+               <span className="material-symbols-outlined text-[20px]">public</span>
+            </div>
+          </div>
+          <div>
+            <h1 className="text-base font-bold tracking-tight leading-tight">PandaHub</h1>
+            <p className="text-[11px] text-slate-500 font-medium">v27.4.0</p>
+          </div>
+        </div>
 
+        {/* New Repo Button */}
+        <div className="px-5 py-6">
+          <button className="btn-primary btn-ripple w-full flex items-center justify-center gap-2 h-10 text-sm">
+            <span className="material-symbols-outlined text-[18px]">add</span>
+            New Repository
+          </button>
+        </div>
 
-<nav className="hidden md:flex h-screen w-72 flex-col border-r border-outline-variant/20 shadow-2xl shadow-surface-container-lowest/50 bg-surface/60 backdrop-blur-3xl fixed left-0 top-0 p-4 z-40">
+        {/* Nav Links */}
+        <nav className="flex-1 px-3 space-y-1 stagger-children">
+          {[
+            { id: "dashboard", label: "Dashboard",     icon: "grid_view",    active: true  },
+            { id: "code",      label: "Code",          icon: "code",         active: false },
+            { id: "commits",   label: "Commits",       icon: "commit",       active: false },
+            { id: "issues",    label: "Issues",        icon: "adjust",       active: false },
+            { id: "prs",       label: "Pull Requests", icon: "alt_route",    active: false },
+            { id: "actions",   label: "Actions",       icon: "play_circle",  active: false },
+            { id: "projects",  label: "Projects",      icon: "kanban",       active: false },
+            { id: "wiki",      label: "Wiki",          icon: "menu_book",    active: false },
+            { id: "security",  label: "Security",      icon: "security",     active: false },
+            { id: "insights",  label: "Insights",      icon: "insights",     active: false },
+            { id: "market",    label: "Marketplace",   icon: "shopping_bag", active: false },
+          ].map(item => (
+            <a key={item.id} href="#"
+              className={`sidebar-item ${item.active ? 'active' : ''}`}
+              data-tooltip={item.label}
+            >
+              <span className="material-symbols-outlined icon text-[20px]">{item.icon}</span>
+              {item.label}
+            </a>
+          ))}
+        </nav>
 
-<div className="flex items-center gap-4 px-4 py-6 mb-4">
-<div className="h-10 w-10 rounded-xl overflow-hidden bg-surface-container-high border border-outline-variant/20 flex items-center justify-center shadow-inner">
-<img className="h-full w-full object-cover" data-alt="A sleek, minimalist logo representing a futuristic developer tool named DevOS, featuring sharp geometric lines in a vibrant blue on a deeply dark, almost black background with a subtle liquid glass texture. Professional, high-end iOS 27 aesthetic." src="https://lh3.googleusercontent.com/aida-public/AB6AXuAyBrSGWZHfrQ7lHYU6ybuoXgzgO57Bskxe9X3dSzr_j4Zbo_hU8T4nlMVRbjXx2NHLz6wmsor6rmNsfOU6ZST9t341at-p3iCIW2nVQGwfUFl2HY7MS0dhvuU79YmTFPHvS0GbIfluzy7LpKjiXCa0sup4Oh5fhaP0OteZFj6T-0g7TEKQBoX_HwRulf8-7oMCxfL1wJKdflYqkObII_maDnNin9J5GVx-lKSFO9jvMXGLxLIK1c5GXjc7JjC1aO3ovRozC8ZypC4N"/>
-</div>
-<div>
-<h1 className="text-xl font-headline font-black tracking-tighter text-on-surface">DevOS</h1>
-<p className="text-xs text-on-surface-variant font-label tracking-wide">v27.4.0</p>
-</div>
-</div>
+        {/* Bottom Links */}
+        <div className="px-3 pb-6 pt-4 border-t border-slate-100 space-y-1">
+          <a href="#" className="sidebar-item">
+            <span className="material-symbols-outlined icon text-[20px]">settings</span>
+            Settings
+          </a>
+          <a href="#" className="sidebar-item">
+            <span className="material-symbols-outlined icon text-[20px]">help_outline</span>
+            Support
+          </a>
+        </div>
+      </aside>
 
-<div className="flex-1 space-y-2 flex flex-col">
-<a className="flex items-center gap-3 px-4 py-3 text-on-surface-variant hover:text-on-surface hover:bg-surface-variant/20 rounded-xl transition-all duration-300 font-body text-label-sm font-medium tracking-tight hover:scale-[1.02] active:scale-[0.98]" href="#">
-<span className="material-symbols-outlined text-xl" data-icon="dashboard">dashboard</span>
-<span>Dashboard</span>
-</a>
-<a className="flex items-center gap-3 px-4 py-3 bg-primary-container/30 backdrop-blur-md text-on-primary-container rounded-xl shadow-[inset_0_1px_1px_rgba(255,255,255,0.1)] transition-all duration-300 font-body text-label-sm font-medium tracking-tight hover:scale-[1.02] active:scale-[0.98]" href="#">
-<span className="material-symbols-outlined text-xl" data-icon="code" data-weight="fill" style={{fontVariationSettings: '"FILL" 1'}}>code</span>
-<span>Repositories</span>
-</a>
-<a className="flex items-center gap-3 px-4 py-3 text-on-surface-variant hover:text-on-surface hover:bg-surface-variant/20 rounded-xl transition-all duration-300 font-body text-label-sm font-medium tracking-tight hover:scale-[1.02] active:scale-[0.98]" href="#">
-<span className="material-symbols-outlined text-xl" data-icon="adjust">adjust</span>
-<span>Issues</span>
-</a>
-<a className="flex items-center gap-3 px-4 py-3 text-on-surface-variant hover:text-on-surface hover:bg-surface-variant/20 rounded-xl transition-all duration-300 font-body text-label-sm font-medium tracking-tight hover:scale-[1.02] active:scale-[0.98]" href="#">
-<span className="material-symbols-outlined text-xl" data-icon="alt_route">alt_route</span>
-<span>Pull Requests</span>
-</a>
-<a className="flex items-center gap-3 px-4 py-3 text-on-surface-variant hover:text-on-surface hover:bg-surface-variant/20 rounded-xl transition-all duration-300 font-body text-label-sm font-medium tracking-tight hover:scale-[1.02] active:scale-[0.98]" href="#">
-<span className="material-symbols-outlined text-xl" data-icon="shopping_bag">shopping_bag</span>
-<span>Marketplace</span>
-</a>
-</div>
+      {/* ── Main Content Wrapper ── */}
+      <main className="flex-1 flex flex-col min-h-screen min-w-0">
+        
+        {/* ── Top Header ── */}
+        <header className="h-[72px] bg-white border-b border-slate-200/60 sticky top-0 z-40 px-8 flex items-center justify-between">
+          <div className="flex items-center gap-8">
+            <h2 className="text-xl font-bold tracking-tight">PandaHub</h2>
+            <span className="px-2 py-0.5 rounded-md bg-slate-100 text-slate-600 text-xs font-bold border border-slate-200">Public</span>
+            
+            {/* Tabs */}
+            <div className="flex items-center h-full pt-1 gap-6">
+              {["Overview", "Activity", "Stats"].map(t => (
+                <button 
+                  key={t}
+                  onClick={() => setTab(t)}
+                  className={`relative h-full flex items-center text-sm font-medium transition-colors ${
+                    tab === t ? "text-blue-600" : "text-slate-500 hover:text-slate-900"
+                  }`}
+                >
+                  {t}
+                  {tab === t && (
+                    <span className="absolute bottom-[-1px] left-0 right-0 h-0.5 bg-blue-600 rounded-t-full" />
+                  )}
+                </button>
+              ))}
+            </div>
+          </div>
 
-<div className="mt-auto space-y-4 pt-6 border-t border-outline-variant/10">
-<button className="w-full flex justify-center items-center gap-2 px-4 py-3 bg-primary/10 text-primary border border-primary/20 rounded-xl hover:bg-primary/20 transition-all duration-300 hover:scale-[1.02] active:scale-[0.98] font-body text-sm font-semibold shadow-[0_0_15px_rgba(170,199,255,0.1)]">
-<span className="material-symbols-outlined text-sm">add</span>
-                New Repository
+          {/* Right Actions */}
+          <div className="flex items-center gap-4">
+            <button className="text-slate-400 hover:text-slate-700 transition-colors">
+              <span className="material-symbols-outlined">notifications</span>
             </button>
-<div className="flex flex-col space-y-1">
-<a className="flex items-center gap-3 px-4 py-2.5 text-on-surface-variant hover:text-on-surface hover:bg-surface-variant/20 rounded-xl transition-all duration-300 text-sm font-medium" href="#">
-<span className="material-symbols-outlined text-[18px]" data-icon="settings">settings</span>
-<span>Settings</span>
-</a>
-<a className="flex items-center gap-3 px-4 py-2.5 text-on-surface-variant hover:text-on-surface hover:bg-surface-variant/20 rounded-xl transition-all duration-300 text-sm font-medium" href="#">
-<span className="material-symbols-outlined text-[18px]" data-icon="help">help</span>
-<span>Support</span>
-</a>
-</div>
-</div>
-</nav>
+            <button className="text-slate-400 hover:text-slate-700 transition-colors">
+              <span className="material-symbols-outlined">history</span>
+            </button>
+            <button className="px-4 py-2 bg-slate-50 border border-slate-200 rounded-lg text-sm font-semibold text-slate-700 hover:bg-slate-100 transition-colors shadow-sm">
+              Deploy
+            </button>
+            
+            {/* Profile Dropdown Container */}
+            <div className="relative profile-dropdown-container">
+              <button 
+                onClick={() => setIsProfileOpen(!isProfileOpen)}
+                className="w-8 h-8 rounded-full overflow-hidden border border-slate-200 cursor-pointer hover:ring-2 hover:ring-slate-200 transition-all focus:outline-none flex items-center justify-center bg-slate-100"
+              >
+                {user?.avatar_url ? (
+                  <img src={user.avatar_url} alt="User" className="w-full h-full object-cover" />
+                ) : (
+                  <span className="text-xs font-bold text-slate-500">{user?.username?.charAt(0).toUpperCase() || 'U'}</span>
+                )}
+              </button>
 
-<main className="flex-1 flex flex-col md:ml-72 min-h-screen relative overflow-x-hidden">
+              {/* Dropdown Menu */}
+              {isProfileOpen && (
+                <div className="absolute right-0 mt-2 w-56 bg-white rounded-xl shadow-[0_8px_30px_rgb(0,0,0,0.12)] border border-slate-100 py-2 z-50 animate-fade-in-up origin-top-right">
+                  <div className="px-4 py-2 border-b border-slate-100 mb-1">
+                    <p className="text-sm font-bold text-slate-900">{user?.username || 'user'}</p>
+                    <p className="text-xs text-slate-500 truncate">{user?.email || 'No email'}</p>
+                  </div>
+                  
+                  <div className="px-2 py-1">
+                    <a href="#" className="flex items-center gap-2 px-3 py-2 text-sm text-slate-600 hover:bg-slate-50 hover:text-slate-900 rounded-lg transition-colors">
+                      <span className="material-symbols-outlined text-[18px]">person</span>
+                      Your profile
+                    </a>
+                    <a href="#" className="flex items-center gap-2 px-3 py-2 text-sm text-slate-600 hover:bg-slate-50 hover:text-slate-900 rounded-lg transition-colors">
+                      <span className="material-symbols-outlined text-[18px]">code_blocks</span>
+                      Your repositories
+                    </a>
+                    <a href="#" className="flex items-center gap-2 px-3 py-2 text-sm text-slate-600 hover:bg-slate-50 hover:text-slate-900 rounded-lg transition-colors">
+                      <span className="material-symbols-outlined text-[18px]">star</span>
+                      Your stars
+                    </a>
+                  </div>
 
-<header className="w-full h-16 sticky top-0 z-30 bg-surface/40 backdrop-blur-2xl border-b border-outline-variant/10 shadow-sm flex justify-between items-center px-6 gap-8 transition-all duration-500 md:hidden">
-<div className="flex items-center gap-3">
-<span className="text-lg font-black text-on-surface tracking-tighter">DevOS Liquid</span>
-</div>
-<div className="flex items-center gap-4">
-<button className="text-on-surface-variant hover:text-on-surface hover:bg-surface-variant/30 rounded-full p-2 transition-all">
-<span className="material-symbols-outlined">notifications</span>
-</button>
-<div className="h-8 w-8 rounded-full overflow-hidden border border-outline-variant/30">
-<img alt="User Avatar" className="h-full w-full object-cover" data-alt="A small, circular avatar portrait of a modern software developer, dimly lit with subtle neon blue rim lighting, against a dark void background." src="https://lh3.googleusercontent.com/aida-public/AB6AXuB-Po7L4lTKmchlaqm85Pgeg8L1srmwEI4lVhKfyKyWf6tM_9CgOAG1SV06BR3t8KUIrZBQpqm-AAa5I3cVup9_vT6gvq6dM6AlR0yLqErOXTnCqb8mHsO5fVA3H-KXNhlGfx0BKkTo46peRH70QoDbtNTN9geADGVDdyOy95oarpzZSSrpg8eUOC4z6GEPyXndK1kVnx8H3pog3DgPiwlTQPGlV35UIeD0sjNfqmydstnTMJw3Z1IgUslCEPZTf6HgeAs1EIBArbQb"/>
-</div>
-</div>
-</header>
+                  <div className="px-2 py-1 border-t border-slate-100 mt-1">
+                    <a href="#" className="flex items-center gap-2 px-3 py-2 text-sm text-slate-600 hover:bg-slate-50 hover:text-slate-900 rounded-lg transition-colors">
+                      <span className="material-symbols-outlined text-[18px]">settings</span>
+                      Settings
+                    </a>
+                    <a href="#" className="flex items-center gap-2 px-3 py-2 text-sm text-red-600 hover:bg-red-50 rounded-lg transition-colors">
+                      <span className="material-symbols-outlined text-[18px]">logout</span>
+                      Sign out
+                    </a>
+                  </div>
+                </div>
+              )}
+            </div>
+          </div>
+        </header>
 
-<div className="px-6 md:px-12 pt-10 pb-6 max-w-7xl mx-auto w-full flex flex-col gap-8">
+        {/* ── Dashboard Grid ── */}
+        <div className={`p-8 max-w-[1400px] mx-auto w-full grid grid-cols-1 xl:grid-cols-[280px_1fr_320px] gap-8 transition-all duration-700 ${mounted ? "opacity-100 translate-y-0" : "opacity-0 translate-y-4"}`}>
+          
+          {/* ━━━ LEFT COLUMN: Profile ━━━ */}
+          <div className="space-y-6">
+            
+            {/* Profile Card */}
+            <div className="bg-white rounded-3xl p-8 border border-slate-100 shadow-[0_8px_30px_rgb(0,0,0,0.04)] flex flex-col items-center text-center relative overflow-hidden group card-lift">
+              {/* Subtle gradient background */}
+              <div className="absolute inset-0 bg-gradient-to-b from-slate-50/50 to-white pointer-events-none" />
+              
+              <div className="w-24 h-24 rounded-full p-1 bg-white shadow-sm border border-slate-100 mb-5 relative z-10 flex items-center justify-center overflow-hidden">
+                {user?.avatar_url ? (
+                  <img src={user.avatar_url} alt="User avatar" className="w-full h-full rounded-full object-cover" />
+                ) : (
+                  <div className="w-full h-full rounded-full bg-slate-100 flex items-center justify-center text-3xl font-bold text-slate-400">
+                    {user?.username?.charAt(0).toUpperCase() || 'U'}
+                  </div>
+                )}
+              </div>
+              
+              <h2 className="text-2xl font-bold tracking-tight mb-1 relative z-10">{user?.username || 'user'}</h2>
+              <p className="text-slate-500 text-sm mb-8 relative z-10">{user?.email || 'No email'}</p>
 
-<div className="flex flex-col md:flex-row md:items-end justify-between gap-6">
-<div className="flex items-center gap-4 flex-wrap">
-<div className="h-12 w-12 rounded-2xl bg-surface-container-high border border-outline-variant/20 flex items-center justify-center shadow-[inset_0_1px_2px_rgba(255,255,255,0.05)]">
-<span className="material-symbols-outlined text-3xl text-primary opacity-80">book</span>
-</div>
-<div>
-<div className="flex items-center gap-3 mb-1">
-<a className="text-2xl font-headline font-bold text-on-surface hover:text-primary transition-colors tracking-tight" href="#">PandaHub</a>
-<span className="text-on-surface-variant font-light text-2xl">/</span>
-<a className="text-2xl font-headline font-bold text-on-surface hover:text-primary transition-colors tracking-tight" href="#">core-engine</a>
-<span className="px-2.5 py-0.5 rounded-full border border-outline-variant/30 text-xs font-label text-on-surface-variant bg-surface-container/50 backdrop-blur-sm ml-2">Public</span>
-</div>
-<p className="text-on-surface-variant text-sm max-w-2xl">High-performance liquid glass rendering engine for futuristic UI frameworks.</p>
-</div>
-</div>
+              {/* Stats row */}
+              <div className="flex w-full justify-between items-center px-2 relative z-10 pt-6 border-t border-slate-100">
+                <div className="flex flex-col">
+                  <span className="text-xl font-bold">42</span>
+                  <span className="text-[10px] font-bold text-slate-400 tracking-wider uppercase mt-0.5">Repos</span>
+                </div>
+                <div className="flex flex-col">
+                  <span className="text-xl font-bold">1.2k</span>
+                  <span className="text-[10px] font-bold text-slate-400 tracking-wider uppercase mt-0.5">Followers</span>
+                </div>
+                <div className="flex flex-col">
+                  <span className="text-xl font-bold">89</span>
+                  <span className="text-[10px] font-bold text-slate-400 tracking-wider uppercase mt-0.5">Following</span>
+                </div>
+              </div>
+            </div>
 
-<div className="flex items-center gap-3">
-<button className="flex items-center h-9 glass-panel rounded-lg overflow-hidden group hover:border-outline-variant/40 transition-colors">
-<div className="flex items-center gap-2 px-3 py-1.5 bg-surface-container-low/50 group-hover:bg-surface-variant/30 transition-colors border-r border-outline-variant/20">
-<span className="material-symbols-outlined text-[18px] text-outline group-hover:text-tertiary transition-colors">star</span>
-<span className="text-sm font-medium text-on-surface">Star</span>
-</div>
-<div className="px-3 py-1.5 text-sm font-semibold text-on-surface bg-surface/30">
-                            12.4k
+            {/* Recent Activity Mini-card */}
+            <div className="bg-white rounded-3xl p-6 border border-slate-100 shadow-[0_8px_30px_rgb(0,0,0,0.04)] card-lift">
+              <div className="flex items-center justify-between mb-4">
+                <h3 className="font-bold">Recent Activity</h3>
+                <a href="#" className="text-blue-500"><span className="material-symbols-outlined text-[16px]">open_in_new</span></a>
+              </div>
+              <div className="flex items-center gap-3">
+                <div className="w-10 h-10 rounded-full bg-slate-50 border border-slate-100 flex items-center justify-center shrink-0">
+                  <span className="material-symbols-outlined text-slate-600 text-[18px]">public</span>
+                </div>
+                <div className="min-w-0">
+                  <h4 className="text-sm font-semibold truncate">liquid-glass-ui</h4>
+                  <p className="text-xs text-slate-500">Updated 2h ago</p>
+                </div>
+              </div>
+            </div>
+
+          </div>
+
+          {/* ━━━ CENTER COLUMN: Overview Feed ━━━ */}
+          <div className="space-y-6">
+            
+            {/* Feed Header */}
+            <div className="flex items-center justify-between px-2">
+              <h2 className="text-2xl font-bold tracking-tight">Overview</h2>
+              <div className="flex items-center gap-2">
+                <button className="px-3 py-1.5 bg-slate-100 text-slate-900 rounded-lg text-xs font-bold transition-colors">All</button>
+                <button className="px-3 py-1.5 text-slate-500 hover:text-slate-900 rounded-lg text-xs font-bold transition-colors">Commits</button>
+                <button className="px-3 py-1.5 text-slate-500 hover:text-slate-900 rounded-lg text-xs font-bold transition-colors">PRs</button>
+              </div>
+            </div>
+
+            {/* Feed Cards */}
+            <div className="space-y-6 stagger-children">
+              {FEED.map(item => (
+                <div key={item.id} className="bg-white rounded-3xl p-6 border border-slate-100 shadow-[0_8px_30px_rgb(0,0,0,0.04)] relative card-glow">
+                
+                {/* Connector line for 'push' type */}
+                {item.type === 'push' && (
+                  <div className="absolute left-10 top-[72px] bottom-6 w-px bg-slate-200" />
+                )}
+
+                {/* Event Header */}
+                <div className="flex items-start gap-4 mb-4 relative z-10">
+                  {/* Event Icon/Avatar */}
+                  <div className="w-8 h-8 rounded-full bg-white border border-slate-200 flex items-center justify-center shrink-0 shadow-sm z-10">
+                    {item.type === 'pr' ? (
+                      <span className="material-symbols-outlined text-[16px] text-slate-700">call_merge</span>
+                    ) : (
+                      <span className="material-symbols-outlined text-[14px] text-slate-700">commit</span>
+                    )}
+                  </div>
+                  
+                  <div className="flex-1 pt-1.5">
+                    <p className="text-sm text-slate-600">
+                      <strong className="text-slate-900 font-bold">{item.author}</strong> {item.action} <span className={item.type === 'pr' ? "text-blue-500 bg-blue-50 px-1.5 py-0.5 rounded text-xs font-mono" : "bg-slate-100 px-1.5 py-0.5 rounded text-xs font-mono"}>{item.target}</span>
+                    </p>
+                  </div>
+                </div>
+
+                {/* Event Content */}
+                <div className="ml-12 relative z-10">
+                  {item.type === 'pr' ? (
+                    <>
+                      <h3 className="text-lg font-bold mb-2">{item.title}</h3>
+                      <p className="text-slate-500 text-sm leading-relaxed mb-4">{item.desc}</p>
+                    </>
+                  ) : (
+                    <div className="bg-slate-50 rounded-xl border border-slate-100 p-1 mb-4 font-mono text-[13px]">
+                      {item.commits?.map((c, i) => (
+                        <div key={c.hash} className={`flex items-center justify-between px-3 py-2 ${i !== (item.commits?.length || 0) - 1 ? 'border-b border-slate-200/60' : ''}`}>
+                          <span className="text-slate-700 truncate mr-4">{c.msg}</span>
+                          <span className="text-blue-500 shrink-0">{c.hash}</span>
                         </div>
-</button>
-<button className="flex items-center h-9 glass-panel rounded-lg overflow-hidden group hover:border-outline-variant/40 transition-colors">
-<div className="flex items-center gap-2 px-3 py-1.5 bg-surface-container-low/50 group-hover:bg-surface-variant/30 transition-colors border-r border-outline-variant/20">
-<span className="material-symbols-outlined text-[18px] text-outline group-hover:text-primary transition-colors">fork_right</span>
-<span className="text-sm font-medium text-on-surface">Fork</span>
-</div>
-<div className="px-3 py-1.5 text-sm font-semibold text-on-surface bg-surface/30">
-                            2.1k
-                        </div>
-</button>
-</div>
-</div>
-
-<div className="glass-pill-nav rounded-full p-1.5 inline-flex w-fit overflow-x-auto max-w-full no-scrollbar">
-<button className="flex items-center gap-2 px-5 py-2 bg-primary/10 text-primary rounded-full font-medium text-sm transition-all shadow-[inset_0_1px_1px_rgba(255,255,255,0.05),0_2px_8px_rgba(10,132,255,0.15)] border border-primary/20">
-<span className="material-symbols-outlined text-[18px]">code</span>
-                    Code
-                </button>
-<button className="flex items-center gap-2 px-5 py-2 text-on-surface-variant hover:text-on-surface hover:bg-surface-variant/40 rounded-full font-medium text-sm transition-all">
-<span className="material-symbols-outlined text-[18px]">adjust</span>
-                    Issues
-                    <span className="ml-1 bg-surface-container-high px-1.5 py-0.5 rounded-full text-xs font-bold text-on-surface">42</span>
-</button>
-<button className="flex items-center gap-2 px-5 py-2 text-on-surface-variant hover:text-on-surface hover:bg-surface-variant/40 rounded-full font-medium text-sm transition-all">
-<span className="material-symbols-outlined text-[18px]">alt_route</span>
-                    Pull Requests
-                </button>
-<button className="flex items-center gap-2 px-5 py-2 text-on-surface-variant hover:text-on-surface hover:bg-surface-variant/40 rounded-full font-medium text-sm transition-all">
-<span className="material-symbols-outlined text-[18px]">play_circle</span>
-                    Actions
-                </button>
-<button className="flex items-center gap-2 px-5 py-2 text-on-surface-variant hover:text-on-surface hover:bg-surface-variant/40 rounded-full font-medium text-sm transition-all">
-<span className="material-symbols-outlined text-[18px]">settings</span>
-                    Settings
-                </button>
-</div>
-
-<div className="glass-panel rounded-2xl overflow-hidden mt-2 border border-outline-variant/10 relative">
-
-<div className="absolute top-0 left-0 right-0 h-px bg-gradient-to-r from-transparent via-primary/20 to-transparent"></div>
-
-<div className="bg-surface-container-low/60 border-b border-outline-variant/10 px-4 py-3 flex flex-col sm:flex-row sm:items-center justify-between gap-4">
-<div className="flex items-center gap-3">
-<div className="h-8 w-8 rounded-full overflow-hidden border border-outline-variant/20 shrink-0">
-<img className="h-full w-full object-cover" data-alt="A moody, high-contrast digital illustration of a cyberpunk panda wearing futuristic glowing visors, dark color palette with neon blue highlights, suitable for a developer avatar." src="https://lh3.googleusercontent.com/aida-public/AB6AXuB5tBj1BBfWl2vSiHJ6qT9W62BqH_JDEyGMEn04fNex-z-pr3C3quZQOPdVp0D6Xq9VElnAbczx80aWz1XkTMDUX4T6Y1GVG-RN_FySSM7xcK7WpWN3zn3pk9HipSmh8u0z5dJMpn2RDWyMIOFZslfIRYW8cFlSyg0eOHl7U93x5Z-TMxwrn2jCR08AJiEEXmktYMwtffQBm4Lshd6C8h0Z2WULRpeh6-GNIb1OtDAr29p04eW-TuGDIWWySIgvHKh_OotPaONh3DB4"/>
-</div>
-<div className="flex flex-col sm:flex-row sm:items-center gap-1 sm:gap-2">
-<span className="font-semibold text-sm text-on-surface">pandadev</span>
-<span className="text-on-surface-variant text-sm truncate max-w-[200px] sm:max-w-md">Refactor: liquid glass effects across engine</span>
-</div>
-</div>
-<div className="flex items-center gap-4 text-xs text-on-surface-variant font-label shrink-0">
-<span className="font-mono bg-surface-container px-2 py-1 rounded text-outline">a1b2c3d</span>
-<span>2 hours ago</span>
-</div>
-</div>
-
-<div className="flex flex-col">
-
-<div className="glass-row flex items-center justify-between px-4 py-2.5 border-b border-outline-variant/5 group cursor-pointer">
-<div className="flex items-center gap-3 min-w-0">
-<span className="material-symbols-outlined text-secondary text-xl opacity-80 group-hover:opacity-100 transition-opacity">folder</span>
-<span className="text-sm font-medium text-on-surface truncate">.github</span>
-</div>
-<div className="hidden sm:block text-sm text-on-surface-variant truncate w-1/3 text-left pl-4">
-                            Update CI workflows for liquid build
-                        </div>
-<div className="text-xs text-on-surface-variant w-24 text-right shrink-0">
-                            2 days ago
-                        </div>
-</div>
-
-<div className="glass-row flex items-center justify-between px-4 py-2.5 border-b border-outline-variant/5 group cursor-pointer">
-<div className="flex items-center gap-3 min-w-0">
-<span className="material-symbols-outlined text-secondary text-xl opacity-80 group-hover:opacity-100 transition-opacity">folder</span>
-<span className="text-sm font-medium text-on-surface truncate">src</span>
-</div>
-<div className="hidden sm:block text-sm text-on-surface-variant truncate w-1/3 text-left pl-4">
-                            Refactor: liquid glass effects
-                        </div>
-<div className="text-xs text-on-surface-variant w-24 text-right shrink-0">
-                            2 hours ago
-                        </div>
-</div>
-
-<div className="glass-row flex items-center justify-between px-4 py-2.5 border-b border-outline-variant/5 group cursor-pointer">
-<div className="flex items-center gap-3 min-w-0">
-<span className="material-symbols-outlined text-secondary text-xl opacity-80 group-hover:opacity-100 transition-opacity">folder</span>
-<span className="text-sm font-medium text-on-surface truncate">tests</span>
-</div>
-<div className="hidden sm:block text-sm text-on-surface-variant truncate w-1/3 text-left pl-4">
-                            Add rendering spec tests
-                        </div>
-<div className="text-xs text-on-surface-variant w-24 text-right shrink-0">
-                            5 days ago
-                        </div>
-</div>
-
-<div className="glass-row flex items-center justify-between px-4 py-2.5 border-b border-outline-variant/5 group cursor-pointer">
-<div className="flex items-center gap-3 min-w-0">
-<span className="material-symbols-outlined text-outline text-xl opacity-70 group-hover:opacity-100 transition-opacity">description</span>
-<span className="text-sm font-medium text-on-surface truncate">README.md</span>
-</div>
-<div className="hidden sm:block text-sm text-on-surface-variant truncate w-1/3 text-left pl-4">
-                            Docs: Update aesthetic guidelines
-                        </div>
-<div className="text-xs text-on-surface-variant w-24 text-right shrink-0">
-                            1 week ago
-                        </div>
-</div>
-
-<div className="glass-row flex items-center justify-between px-4 py-2.5 border-b border-outline-variant/5 group cursor-pointer">
-<div className="flex items-center gap-3 min-w-0">
-<span className="material-symbols-outlined text-tertiary-fixed-dim text-xl opacity-80 group-hover:opacity-100 transition-opacity">code_blocks</span>
-<span className="text-sm font-medium text-on-surface truncate">package.json</span>
-</div>
-<div className="hidden sm:block text-sm text-on-surface-variant truncate w-1/3 text-left pl-4">
-                            Bump dependencies v27.4.0
-                        </div>
-<div className="text-xs text-on-surface-variant w-24 text-right shrink-0">
-                            3 hours ago
-                        </div>
-</div>
-
-<div className="glass-row flex items-center justify-between px-4 py-2.5 group cursor-pointer">
-<div className="flex items-center gap-3 min-w-0">
-<span className="material-symbols-outlined text-[#38bdf8] text-xl opacity-80 group-hover:opacity-100 transition-opacity">palette</span>
-<span className="text-sm font-medium text-on-surface truncate">tailwind.config.js</span>
-</div>
-<div className="hidden sm:block text-sm text-on-surface-variant truncate w-1/3 text-left pl-4">
-                            Theme: Add deep dark tokens
-                        </div>
-<div className="text-xs text-on-surface-variant w-24 text-right shrink-0">
-                            2 days ago
-                        </div>
-</div>
-</div>
-</div>
-
-<div className="glass-panel rounded-2xl p-6 md:p-8 mt-4 border border-outline-variant/10 shadow-lg relative overflow-hidden">
-<div className="absolute top-0 right-0 w-64 h-64 bg-primary/5 blur-3xl rounded-full -mr-20 -mt-20 pointer-events-none"></div>
-<div className="flex items-center gap-2 mb-6 pb-4 border-b border-outline-variant/10">
-<span className="material-symbols-outlined text-on-surface-variant">book</span>
-<h2 className="text-lg font-headline font-semibold text-on-surface">README.md</h2>
-</div>
-<article className="prose prose-invert max-w-none font-body text-on-surface-variant">
-<h1 className="text-3xl font-black text-on-surface tracking-tight mb-4">Core Engine</h1>
-<p className="text-lg mb-6 leading-relaxed">The high-performance, WebGL-accelerated rendering core for generating ultra-smooth, deeply layered liquid glass interfaces on the modern web.</p>
-<div className="bg-surface-container-high/50 rounded-xl p-4 border border-outline-variant/20 font-mono text-sm text-on-primary-container mb-6 overflow-x-auto shadow-inner">
-<span className="text-tertiary">npm</span> install @pandahub/core-engine
+                      ))}
                     </div>
-<h3 className="text-xl font-bold text-on-surface mt-8 mb-3">Features</h3>
-<ul className="list-disc pl-5 space-y-2">
-<li>Sub-millisecond frosted glass blurring</li>
-<li>Dynamic shadow depth calculation</li>
-<li>Hardware-accelerated micro-interactions</li>
-<li>Zero-config iOS 27 dark mode profiles</li>
-</ul>
-</article>
-</div>
-</div>
-</main>
+                  )}
 
-    </main>
+                  {/* Footer Meta */}
+                  <div className="flex items-center gap-4 text-xs font-medium text-slate-500">
+                    <div className="flex items-center gap-1.5">
+                      <div className="w-2 h-2 rounded-full" style={{ backgroundColor: item.color }} />
+                      <span>{item.repo}</span>
+                    </div>
+                    <div className="flex items-center gap-1.5">
+                      <span className="material-symbols-outlined text-[14px]">schedule</span>
+                      <span>{item.time}</span>
+                    </div>
+                  </div>
+                </div>
+              </div>
+            ))}
+            </div>
+          </div>
+
+          {/* ━━━ RIGHT COLUMN: Trending ━━━ */}
+          <div className="space-y-6">
+            
+            <div className="bg-white rounded-3xl p-6 border border-slate-100 shadow-[0_8px_30px_rgb(0,0,0,0.04)] card-lift">
+              <h3 className="text-lg font-bold mb-6 flex items-center gap-2">
+                <span className="material-symbols-outlined text-slate-700 text-[20px]">trending_up</span>
+                Trending
+              </h3>
+              
+              <div className="space-y-6 stagger-children">
+                {TRENDING.map((repo, i) => (
+                  <div key={repo.name} className={`pb-6 ${i !== TRENDING.length - 1 ? 'border-b border-slate-100' : 'pb-0'}`}>
+                    <div className="flex justify-between items-start mb-2">
+                      <a href="#" className="font-bold text-[15px] hover:text-blue-600 transition-colors truncate pr-2">{repo.name}</a>
+                      <div className="flex items-center gap-1 text-xs text-slate-500 font-medium shrink-0 bg-slate-50 px-2 py-1 rounded-md border border-slate-100">
+                        <span className="material-symbols-outlined text-[14px]">star</span>
+                        {repo.stars}
+                      </div>
+                    </div>
+                    
+                    <p className="text-sm text-slate-500 line-clamp-2 mb-3 leading-relaxed">
+                      {repo.desc}
+                    </p>
+                    
+                    <div className="flex items-center gap-4 text-[11px] font-semibold text-slate-400 uppercase tracking-wide">
+                      <div className="flex items-center gap-1.5">
+                        <div className="w-2 h-2 rounded-full" style={{ backgroundColor: repo.color }} />
+                        <span>{repo.lang}</span>
+                      </div>
+                      <div className="flex items-center gap-1">
+                        Built by {repo.today} stars today
+                      </div>
+                    </div>
+                  </div>
+                ))}
+              </div>
+            </div>
+
+          </div>
+
+        </div>
+      </main>
+    </div>
   );
 }

@@ -18,6 +18,7 @@ email-validator==2.2.0
 python-jose[cryptography]==3.3.0   # JWT
 cryptography==43.0.1                # Fernet symmetric encryption (2FA secrets, OAuth tokens at rest)
 passlib[bcrypt]==1.7.4              # password hashing
+bcrypt==4.0.1                       # pin: passlib 1.7.4 is incompatible with bcrypt>=4.1 (__about__ removed)
 python-multipart==0.0.9             # form/file uploads (avatars)
 pyotp==2.9.0                        # TOTP for 2FA
 

@@ -33,38 +33,47 @@ export default function NewRepoPage() {
   };
 
   return (
-    <div style={{ minHeight: '100vh', background: 'var(--bg-primary)', display: 'flex', flexDirection: 'column' }}>
+    <main className="min-h-screen text-on-surface bg-background font-body transition-colors duration-300 relative">
+      {/* Background Orbs */}
+      <div className="fixed top-[-20%] left-[-10%] w-[50%] h-[50%] rounded-full bg-primary-container/5 blur-[120px] pointer-events-none"></div>
+      <div className="fixed bottom-[-20%] right-[-10%] w-[40%] h-[40%] rounded-full bg-secondary-container/10 blur-[100px] pointer-events-none"></div>
+
       {/* Header */}
-      <div style={{ borderBottom: '1px solid var(--border-color)', background: 'var(--bg-secondary)', padding: '16px 0' }}>
-        <div className="container" style={{ display: 'flex', alignItems: 'center', gap: 8 }}>
-          <Link href="/dashboard" style={{ color: 'var(--text-secondary)', fontSize: 13 }}>← Dashboard</Link>
-          <span style={{ color: 'var(--text-muted)' }}>/</span>
-          <span style={{ fontWeight: 600, fontSize: 14 }}>Create a new repository</span>
-        </div>
-      </div>
+      <header className="bg-surface/80 backdrop-blur-2xl w-full h-16 sticky top-0 z-50 border-b border-outline-variant/20 shadow-sm flex items-center px-6 gap-3">
+        <Link href="/dashboard" className="flex items-center gap-2 text-on-surface-variant hover:text-on-surface transition-colors font-medium text-sm">
+          <span className="material-symbols-outlined text-[18px]">arrow_back</span>
+          Dashboard
+        </Link>
+        <span className="text-on-surface-variant/50">/</span>
+        <span className="font-semibold text-sm">Create a new repository</span>
+      </header>
 
-      <div className="container" style={{ maxWidth: 680, padding: '40px 1.5rem' }}>
-        <div className="glass-card animate-fade-in" style={{ padding: '36px 40px' }}>
-          <h1 style={{ fontSize: '1.4rem', fontWeight: 700, marginBottom: 6 }}>
-            📦 New repository
-          </h1>
-          <p style={{ color: 'var(--text-secondary)', fontSize: 14, marginBottom: 32 }}>
-            A repository contains all your project's files and revision history.
-          </p>
+      {/* Main Content */}
+      <div className="max-w-2xl mx-auto px-6 py-12 animate-fade-in-up">
+        <div className="glass-panel card-glow rounded-3xl p-8 sm:p-12 shadow-[0_8px_40px_rgb(0,0,0,0.06)] border border-white/20 relative overflow-hidden">
+          {/* Subtle top highlight */}
+          <div className="absolute top-0 left-0 right-0 h-1 bg-gradient-to-r from-primary to-secondary opacity-80" />
+          
+          <div className="mb-10">
+            <h1 className="text-3xl font-bold tracking-tight mb-2 flex items-center gap-3">
+              <span className="text-4xl">📦</span> New repository
+            </h1>
+            <p className="text-on-surface-variant text-sm font-medium">
+              A repository contains all your project&apos;s files and revision history.
+            </p>
+          </div>
 
-          <form onSubmit={handleSubmit} style={{ display: 'flex', flexDirection: 'column', gap: 24 }}>
-            {/* Owner + name */}
-            <div>
-              <label style={labelStyle}>Repository name *</label>
-              <div style={{ display: 'flex', alignItems: 'center', gap: 8 }}>
-                <div style={{
-                  padding: '10px 14px', background: 'var(--bg-tertiary)',
-                  border: '1px solid var(--border-color)', borderRadius: 8,
-                  color: 'var(--text-secondary)', fontSize: 14,
-                }}>
-                  {user?.username}
+          <form onSubmit={handleSubmit} className="space-y-8 stagger-children">
+            
+            {/* Owner + Name */}
+            <div className="space-y-2">
+              <label className="block text-sm font-bold text-on-surface">Repository name <span className="text-error">*</span></label>
+              <div className="flex items-center gap-3">
+                <div className="px-4 py-3 bg-surface-container-low/50 input-glass border-outline-variant/30 rounded-xl text-on-surface-variant font-semibold text-sm shrink-0 flex items-center gap-2">
+                  <span className="material-symbols-outlined text-[18px]">person</span>
+                  {user?.username || 'user'}
                 </div>
-                <span style={{ color: 'var(--text-muted)', fontWeight: 600 }}>/</span>
+                <span className="text-xl font-light text-on-surface-variant/50">/</span>
                 <input
                   id="new-repo-name"
                   type="text"
@@ -72,128 +81,128 @@ export default function NewRepoPage() {
                   onChange={(e) => setForm({ ...form, name: e.target.value })}
                   required
                   placeholder="my-awesome-project"
-                  style={{ ...inputStyle, flex: 1 }}
-                  onFocus={(e) => { e.target.style.borderColor = 'var(--brand-primary)'; }}
-                  onBlur={(e) => { e.target.style.borderColor = 'var(--border-color)'; }}
+                  className="block w-full px-4 py-3 bg-surface-container-low/50 input-glass border-outline-variant/30 rounded-xl text-on-surface placeholder:text-outline focus:ring-0 text-sm font-medium glow-accent-focus"
                 />
               </div>
             </div>
 
             {/* Description */}
-            <div>
-              <label style={labelStyle}>Description <span style={{ fontWeight: 400, color: 'var(--text-muted)' }}>(optional)</span></label>
+            <div className="space-y-2">
+              <label className="block text-sm font-bold text-on-surface">
+                Description <span className="font-normal text-on-surface-variant ml-1">(optional)</span>
+              </label>
               <input
                 id="new-repo-desc"
                 type="text"
                 value={form.description}
                 onChange={(e) => setForm({ ...form, description: e.target.value })}
                 placeholder="A short description of your project"
-                style={inputStyle}
+                className="block w-full px-4 py-3 bg-surface-container-low/50 input-glass border-outline-variant/30 rounded-xl text-on-surface placeholder:text-outline focus:ring-0 text-sm font-medium glow-accent-focus"
               />
             </div>
 
+            <hr className="border-outline-variant/20" />
+
             {/* Visibility */}
-            <div>
-              <label style={labelStyle}>Visibility</label>
-              <div style={{ display: 'flex', flexDirection: 'column', gap: 10 }}>
-                {([
-                  { value: 'public', icon: '🌍', title: 'Public', desc: 'Anyone can see this repository.' },
-                  { value: 'private', icon: '🔒', title: 'Private', desc: 'Only you can access this repository.' },
-                ] as const).map((opt) => (
+            <div className="space-y-4">
+              <label className="block text-sm font-bold text-on-surface">Visibility</label>
+              <div className="grid gap-3">
+                {[
+                  { value: 'public', icon: 'public', color: 'text-blue-500', title: 'Public', desc: 'Anyone on the internet can see this repository.' },
+                  { value: 'private', icon: 'lock', color: 'text-amber-500', title: 'Private', desc: 'You choose who can see and commit to this repository.' },
+                ].map((opt) => (
                   <label
                     key={opt.value}
-                    style={{
-                      display: 'flex', alignItems: 'center', gap: 14,
-                      padding: '14px 16px', borderRadius: 10,
-                      border: `1px solid ${form.visibility === opt.value ? 'rgba(124,58,237,0.4)' : 'var(--border-color)'}`,
-                      background: form.visibility === opt.value ? 'rgba(124,58,237,0.08)' : 'var(--bg-tertiary)',
-                      cursor: 'pointer', transition: 'all var(--transition-fast)',
-                    }}
+                    className={`relative flex items-start gap-4 p-5 rounded-2xl cursor-pointer transition-all duration-300 border ${
+                      form.visibility === opt.value 
+                        ? 'bg-primary/5 border-primary shadow-[0_0_20px_rgba(10,132,255,0.15)] scale-[1.01]' 
+                        : 'bg-surface-container-low/30 border-outline-variant/30 hover:bg-surface-container-low/60 hover:border-outline-variant/50'
+                    }`}
                   >
                     <input
                       type="radio"
                       name="visibility"
                       value={opt.value}
                       checked={form.visibility === opt.value}
-                      onChange={() => setForm({ ...form, visibility: opt.value })}
-                      style={{ accentColor: 'var(--brand-primary)' }}
+                      onChange={() => setForm({ ...form, visibility: opt.value as 'public' | 'private' })}
+                      className="peer sr-only"
                     />
-                    <span style={{ fontSize: 20 }}>{opt.icon}</span>
-                    <div>
-                      <div style={{ fontWeight: 600, fontSize: 14 }}>{opt.title}</div>
-                      <div style={{ fontSize: 12, color: 'var(--text-secondary)' }}>{opt.desc}</div>
+                    <div className={`mt-0.5 flex items-center justify-center w-5 h-5 rounded-full border-2 transition-all ${
+                      form.visibility === opt.value ? 'border-primary' : 'border-outline-variant'
+                    }`}>
+                      <div className={`w-2.5 h-2.5 rounded-full bg-primary transition-all scale-0 ${
+                        form.visibility === opt.value ? 'scale-100' : ''
+                      }`} />
+                    </div>
+                    
+                    <span className={`material-symbols-outlined mt-0.5 ${opt.color}`} style={{ fontVariationSettings: '"FILL" 1' }}>{opt.icon}</span>
+                    <div className="flex-1">
+                      <div className={`font-bold text-sm mb-1 transition-colors ${form.visibility === opt.value ? 'text-primary' : 'text-on-surface'}`}>
+                        {opt.title}
+                      </div>
+                      <div className="text-xs text-on-surface-variant font-medium leading-relaxed">
+                        {opt.desc}
+                      </div>
                     </div>
                   </label>
                 ))}
               </div>
             </div>
 
-            {/* Initialize repo */}
-            <div style={{
-              padding: '16px', borderRadius: 10,
-              border: '1px solid var(--border-color)',
-              background: 'var(--bg-tertiary)',
-            }}>
-              <label style={{ display: 'flex', alignItems: 'center', gap: 10, cursor: 'pointer' }}>
-                <input
-                  type="checkbox"
-                  checked={form.auto_init}
-                  onChange={(e) => setForm({ ...form, auto_init: e.target.checked })}
-                  style={{ accentColor: 'var(--brand-primary)', width: 16, height: 16 }}
-                />
-                <div>
-                  <div style={{ fontWeight: 600, fontSize: 14 }}>Initialize with a README</div>
-                  <div style={{ fontSize: 12, color: 'var(--text-secondary)', marginTop: 2 }}>
-                    Creates an initial commit with a README.md file.
-                  </div>
-                </div>
-              </label>
-            </div>
+            <hr className="border-outline-variant/20" />
 
+            {/* Initialize repo */}
+            <label className="flex items-start gap-3 p-4 rounded-xl bg-surface-container-low/30 border border-outline-variant/20 cursor-pointer hover:bg-surface-container-low/50 transition-colors">
+              <input
+                type="checkbox"
+                checked={form.auto_init}
+                onChange={(e) => setForm({ ...form, auto_init: e.target.checked })}
+                className="mt-1 w-4 h-4 rounded border-outline-variant text-primary focus:ring-primary focus:ring-offset-0 bg-transparent transition-all"
+              />
+              <div>
+                <div className="font-bold text-sm text-on-surface">Initialize this repository with a README</div>
+                <div className="text-xs text-on-surface-variant font-medium mt-1">
+                  This will allow you to immediately clone the repository to your computer.
+                </div>
+              </div>
+            </label>
+
+            {/* Error Message */}
             {error && (
-              <div style={{
-                padding: '10px 14px', borderRadius: 8,
-                background: 'rgba(248, 81, 73, 0.1)',
-                border: '1px solid rgba(248, 81, 73, 0.3)',
-                color: 'var(--accent-red)', fontSize: 13,
-              }}>
+              <div className="p-4 bg-error/10 border border-error/30 rounded-xl text-error text-sm text-center animate-bounce-in flex items-center gap-2 justify-center font-medium">
+                <span className="material-symbols-outlined text-[18px]">error</span>
                 {error}
               </div>
             )}
 
-            <div style={{ borderTop: '1px solid var(--border-color)', paddingTop: 24 }}>
+            {/* Submit Button */}
+            <div className="pt-4">
               <button
                 id="create-repo-submit"
                 type="submit"
                 disabled={loading || !form.name}
-                style={{
-                  padding: '12px 28px', borderRadius: 8,
-                  background: 'var(--gradient-brand)',
-                  color: '#fff', fontWeight: 700, fontSize: 15,
-                  border: 'none', cursor: loading || !form.name ? 'not-allowed' : 'pointer',
-                  opacity: loading || !form.name ? 0.6 : 1,
-                  boxShadow: '0 4px 16px rgba(124,58,237,0.3)',
-                }}
+                className="btn-primary btn-ripple w-full flex justify-center items-center gap-2 py-4 px-4 text-sm disabled:opacity-50 disabled:cursor-not-allowed shadow-[0_8px_20px_rgba(10,132,255,0.3)] hover:shadow-[0_12px_25px_rgba(10,132,255,0.4)] transition-all"
               >
-                {loading ? '⏳ Creating…' : '📦 Create repository'}
+                {loading ? (
+                  <>
+                    <svg className="animate-spin h-5 w-5 text-white" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24">
+                      <circle className="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" strokeWidth="4"/>
+                      <path className="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4z"/>
+                    </svg>
+                    Creating repository…
+                  </>
+                ) : (
+                  <>
+                    <span className="material-symbols-outlined text-[18px]">add_box</span>
+                    Create repository
+                  </>
+                )}
               </button>
             </div>
+
           </form>
         </div>
       </div>
-    </div>
+    </main>
   );
 }
-
-const labelStyle: React.CSSProperties = {
-  display: 'block', marginBottom: 8, fontSize: 14,
-  fontWeight: 600, color: 'var(--text-secondary)',
-};
-const inputStyle: React.CSSProperties = {
-  width: '100%', padding: '10px 14px',
-  background: 'var(--bg-tertiary)',
-  border: '1px solid var(--border-color)',
-  borderRadius: 8, color: 'var(--text-primary)',
-  fontSize: 14, outline: 'none',
-  transition: 'border-color 0.15s',
-};

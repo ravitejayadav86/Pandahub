@@ -15,7 +15,7 @@ export default function GeneratedPage() {
 <img alt="Developer Profile Picture" className="w-full h-full object-cover" data-alt="A sleek, futuristic developer avatar icon with neon blue accents, set against a dark obsidian background, conveying a high-tech iOS liquid glass aesthetic." src="https://lh3.googleusercontent.com/aida-public/AB6AXuCFk9JqOLJeJaaP14SBY5mXYabptOPlKRSmVSBw8IhdjllQeisPz8LzyHG3B2_W6bWNVoCZLRacGC43EOx5yxVJYA3f9khu7qgkv6VUFoA_eYQuJR79N4dlWNGUIyoj4OOMV4p61hjHGEjDhltfXTUGqYgBGUfeq27w1xFhlP2W6pLO8d5l2pQxBWF3jMA7qYfI-2d1aHgWBm_h4zwALJjVsE6YqbRD541-0XRroIvLjusfas9YMtDRbEW19yGXqznkew6jhBfq3WZ7"/>
 </div>
 <div>
-<h1 className="text-xl font-headline font-black tracking-tighter text-on-surface">DevOS</h1>
+<h1 className="text-xl font-headline font-black tracking-tighter text-on-surface">PandaHub</h1>
 <p className="text-xs text-on-surface-variant font-medium">v27.4.0</p>
 </div>
 </div>
@@ -68,7 +68,7 @@ export default function GeneratedPage() {
 <button className="md:hidden text-on-surface p-2 hover:bg-surface-variant/30 rounded-full transition-all">
 <span className="material-symbols-outlined">menu</span>
 </button>
-<div className="text-lg font-black text-on-surface tracking-tighter hidden md:block">DevOS Liquid</div>
+<div className="text-lg font-black text-on-surface tracking-tighter hidden md:block">PandaHub</div>
 </div>
 
 <nav className="hidden md:flex items-center gap-6 font-headline text-on-surface text-sm font-semibold h-full">
@@ -311,7 +311,7 @@ export default function GeneratedPage() {
                                         8.9k
                                     </div>
 </div>
-<p className="text-xs text-on-surface-variant line-clamp-2 mb-2">Blazing fast core engine for the DevOS platform rewritten in Rust for safety and concurrency.</p>
+<p className="text-xs text-on-surface-variant line-clamp-2 mb-2">Blazing fast core engine for the PandaHub platform rewritten in Rust for safety and concurrency.</p>
 <div className="flex items-center gap-3 text-[10px] text-on-surface-variant">
 <span className="flex items-center gap-1"><span className="w-1.5 h-1.5 rounded-full bg-orange-500"></span> Rust</span>
 <span>Built by 28 stars today</span>

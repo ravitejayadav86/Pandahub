@@ -17,7 +17,7 @@ export default function GeneratedPage() {
 <img className="w-full h-full object-cover" data-alt="A highly detailed close-up portrait of a developer's futuristic avatar with neon blue accents, set against a dark tech-inspired background with subtle glowing lines. The mood is professional yet cyberpunk-leaning, shot with dramatic low-key lighting." src="https://lh3.googleusercontent.com/aida-public/AB6AXuCpigvMTM4hgcT1PIBbCB59EhPpCZS45lp2L-mMKAcycAXtXuuAniQ6eyAFjIz8eNqwXTu182i5iWZk-3hRFL0Id_iDAgbnQ-fAcqZG0WYM9xbQWbFujEbG-00Rar66dAC8jMrbP3pCmARuYp41_-Q2GkwcZk-jAzTWuVLLTA0_WT0vg9AMD3EmnsUyb_Zr2mJRvF0HS7aLdMvuooMx6WCdVlzyPML1ldIfthFuxP7CAG1w-XmgXnrpldiVxeYMesnR7VTdsDkAy1-R"/>
 </div>
 <div className="flex flex-col min-w-0">
-<span className="text-xl font-headline font-black tracking-tighter text-on-surface truncate">DevOS</span>
+<span className="text-xl font-headline font-black tracking-tighter text-on-surface truncate">PandaHub</span>
 <span className="text-xs text-on-surface-variant tracking-wider font-label uppercase">v27.4.0</span>
 </div>
 </div>
@@ -71,7 +71,7 @@ export default function GeneratedPage() {
 <button className="md:hidden text-on-surface-variant hover:text-on-surface hover:bg-surface-variant/30 rounded-full p-2 transition-all">
 <span className="material-symbols-outlined">menu</span>
 </button>
-<div className="text-lg font-black text-on-surface tracking-tighter">DevOS Liquid</div>
+<div className="text-lg font-black text-on-surface tracking-tighter">PandaHub</div>
 </div>
 
 <nav className="hidden md:flex items-center gap-6 h-full font-headline text-on-surface text-sm font-semibold">

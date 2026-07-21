@@ -209,30 +209,25 @@ export default function HomePage() {
             </div>
             <div className="flex-grow flex justify-center">
               <div className="bg-black/5 px-4 py-1 rounded-md text-xs text-on-surface-variant font-mono flex items-center gap-2">
-                <span className="material-symbols-outlined text-[13px]">lock</span>
-                main.py — PandaHub
+                <span className="material-symbols-outlined text-[13px]">account_tree</span>
+                architecture.txt — PandaHub
               </div>
             </div>
           </div>
           <div className="p-4 sm:p-6 md:p-8 font-mono text-xs sm:text-sm md:text-base overflow-x-auto bg-white/40">
-            <pre className="text-on-surface-variant"><code><span className="text-[#BF5AF2]">import</span> asyncio
-<span className="text-[#BF5AF2]">from</span> pandahub <span className="text-[#BF5AF2]">import</span> Client, Repository
-
-<span className="text-outline"># Initialize the next-gen PandaHub client</span>
-<span className="text-[#0A84FF]">async def</span> <span className="text-[#30D158]">deploy_next_gen_app</span>():
-    client = Client(api_key=<span className="text-[#FF6B6B]">"pd_live_..."</span>)
-    
-    repo = <span className="text-[#BF5AF2]">await</span> client.get_repository(<span className="text-[#FF6B6B]">"core-engine"</span>)
-    
-    <span className="text-[#BF5AF2]">if</span> repo.status == <span className="text-[#FF6B6B]">"ready"</span>:
-        deployment = <span className="text-[#BF5AF2]">await</span> repo.deploy(
-            environment=<span className="text-[#FF6B6B]">"production"</span>,
-            strategy=<span className="text-[#FF6B6B]">"blue-green"</span>
-        )
-        <span className="text-[#0A84FF]">print</span>(<span className="text-[#FF6B6B]">f"✅ Live at: </span><span className="text-[#64D2FF]">&#123;</span>deployment.url<span className="text-[#64D2FF]">&#125;</span><span className="text-[#FF6B6B]">"</span>)
-
-<span className="text-[#BF5AF2]">if</span> __name__ == <span className="text-[#FF6B6B]">"__main__"</span>:
-    asyncio.run(deploy_next_gen_app())</code></pre>
+            <pre className="text-on-surface-variant"><code><span className="text-[#30D158] font-bold">FastAPI Application (The Brain)</span>
+│   ├── <span className="text-[#0A84FF]">app/</span>
+│   │   ├── <span className="text-[#0A84FF]">api/</span>              <span className="text-outline"># RESTful routing (users, repos, issues)</span>
+│   │   ├── <span className="text-[#0A84FF]">models/</span>           <span className="text-outline"># SQLAlchemy database schemas</span>
+│   │   └── <span className="text-[#0A84FF]">services/</span>         <span className="text-outline"># Business logic (auth, permissions)</span>
+│
+├── <span className="text-[#BF5AF2] font-bold">git-server/</span>               <span className="text-outline"># The Protocol Layer (Go/Rust/Python)</span>
+│   ├── <span className="text-[#0A84FF]">ssh_handler/</span>          <span className="text-outline"># Validates SSH keys for push/pull</span>
+│   └── <span className="text-[#0A84FF]">git_engine/</span>           <span className="text-outline"># Talks directly to the LibGit2 C-library</span>
+│
+└── <span className="text-[#FF6B6B] font-bold">infrastructure/</span>           <span className="text-outline"># Deployment & DevOps</span>
+    ├── docker-compose.yml    <span className="text-outline"># Runs Postgres, Redis, and services locally</span>
+    └── <span className="text-[#0A84FF]">runners/</span>              <span className="text-outline"># Scripts to spin up isolated CI/CD containers</span></code></pre>
           </div>
         </div>
       </RevealOnScroll>
@@ -240,9 +235,9 @@ export default function HomePage() {
       {/* Feature Cards */}
       <RevealOnScroll className="w-full max-w-6xl mx-auto flex overflow-x-auto snap-x snap-mandatory hide-scrollbar md:grid md:grid-cols-3 gap-4 sm:gap-6 px-4 sm:px-6 mb-28 relative z-10 pb-8">
         {[
-          { icon: 'rate_review', title: 'Code Review', desc: 'Frictionless inline commenting and AI-assisted PR summaries built right into the editor.', color: '#0A84FF' },
-          { icon: 'rocket_launch', title: 'CI/CD Pipelines', desc: 'Integrated workflows that build, test, and deploy faster than ever with smart caching.', color: '#BF5AF2' },
-          { icon: 'bug_report', title: 'Issue Tracking', desc: 'Powerful boards and sprint planning tools that map directly to your commits and branches.', color: '#30D158' },
+          { icon: 'source', title: 'Version Control Hosting Service', desc: 'Its core function is hosting Git repositories. It acts as the central server where a permanent, tracked history of source code is stored, allowing you to branch off, experiment, and merge code safely.', color: '#0A84FF' },
+          { icon: 'group', title: 'Collaborative Development Platform', desc: 'It provides the interface for project management. It includes built-in tools for tracking bugs (Issues), planning sprints with project boards, and reviewing code (Pull Requests) before it is integrated into the main codebase.', color: '#BF5AF2' },
+          { icon: 'rocket_launch', title: 'CI/CD & Automation Platform', desc: 'Through features like PandaHub Actions, it functions as an automation engine. When you push updates to a full-stack web application, the platform can automatically run tests and trigger live deployments directly to external hosting environments like Vercel.', color: '#30D158' },
         ].map(({ icon, title, desc, color }) => (
           <TiltCard key={title} className="glass-panel p-8 rounded-2xl flex flex-col gap-4 group cursor-default transition-all duration-300 hover:shadow-lg flex-none w-[85vw] md:w-auto snap-center">
             <div className="w-12 h-12 rounded-2xl flex items-center justify-center transition-all duration-300 group-hover:scale-110"
@@ -253,6 +248,115 @@ export default function HomePage() {
             <p className="text-on-surface-variant leading-relaxed">{desc}</p>
           </TiltCard>
         ))}
+      </RevealOnScroll>
+
+      {/* Architecture Bento Box */}
+      <RevealOnScroll className="w-full max-w-6xl mx-auto px-4 sm:px-6 mb-28 relative z-10">
+        <div className="text-center mb-12">
+          <h2 className="text-3xl md:text-5xl font-extrabold tracking-tighter text-on-surface mb-4 font-display">
+            Platform <span className="text-transparent bg-clip-text bg-gradient-to-r from-primary to-purple-500">Architecture</span>
+          </h2>
+          <p className="text-on-surface-variant max-w-2xl mx-auto font-medium text-lg">
+            Built from the ground up for massive scale, extreme concurrency, and unbreakable security.
+          </p>
+        </div>
+
+        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-12 gap-6">
+          {/* 1. Protocol Layer (Spans 8 columns) */}
+          <div className="lg:col-span-8 glass-panel p-8 rounded-3xl group hover:border-primary/30 transition-colors relative overflow-hidden">
+            <div className="absolute top-0 right-0 w-64 h-64 bg-blue-500/10 rounded-full blur-[80px] -mr-20 -mt-20"></div>
+            <div className="flex items-center gap-3 mb-6 relative z-10">
+              <span className="material-symbols-outlined text-3xl text-blue-500">terminal</span>
+              <h3 className="text-2xl font-bold text-on-surface">1. The Protocol Layer</h3>
+            </div>
+            <p className="text-on-surface-variant mb-6 relative z-10">The engine that speaks directly to developers&apos; local terminals.</p>
+            <div className="grid grid-cols-1 sm:grid-cols-3 gap-4 relative z-10">
+              <div className="bg-surface-container/50 p-4 rounded-2xl border border-outline-variant/10">
+                <h4 className="font-bold text-on-surface mb-2 flex items-center gap-2"><span className="material-symbols-outlined text-[18px] text-primary">key</span> SSH Server</h4>
+                <p className="text-xs text-on-surface-variant leading-relaxed">Handles secure connections, verifies keys, and routes git-receive-pack commands.</p>
+              </div>
+              <div className="bg-surface-container/50 p-4 rounded-2xl border border-outline-variant/10">
+                <h4 className="font-bold text-on-surface mb-2 flex items-center gap-2"><span className="material-symbols-outlined text-[18px] text-green-500">http</span> Smart HTTP</h4>
+                <p className="text-xs text-on-surface-variant leading-relaxed">Efficient stream processing over HTTPS so massive codebases don&apos;t crash memory.</p>
+              </div>
+              <div className="bg-surface-container/50 p-4 rounded-2xl border border-outline-variant/10">
+                <h4 className="font-bold text-on-surface mb-2 flex items-center gap-2"><span className="material-symbols-outlined text-[18px] text-purple-500">memory</span> Git Abstraction</h4>
+                <p className="text-xs text-on-surface-variant leading-relaxed">Low-level library parsing raw Git objects directly for instant frontend diffs.</p>
+              </div>
+            </div>
+          </div>
+
+          {/* 2. Dual Storage (Spans 4 columns) */}
+          <div className="lg:col-span-4 glass-panel p-8 rounded-3xl group hover:border-orange-500/30 transition-colors relative overflow-hidden flex flex-col">
+            <div className="absolute bottom-0 left-0 w-48 h-48 bg-orange-500/10 rounded-full blur-[60px] -ml-10 -mb-10"></div>
+            <div className="flex items-center gap-3 mb-4 relative z-10">
+              <span className="material-symbols-outlined text-3xl text-orange-500">database</span>
+              <h3 className="text-2xl font-bold text-on-surface">2. Dual-Storage</h3>
+            </div>
+            <p className="text-on-surface-variant text-sm mb-6 flex-grow relative z-10">A split architecture to separate metadata from raw blobs.</p>
+            <div className="space-y-3 relative z-10">
+              <div className="flex items-start gap-3 bg-surface-container-lowest/50 p-3 rounded-xl border border-outline-variant/10">
+                <span className="material-symbols-outlined text-orange-400 mt-0.5">table</span>
+                <div>
+                  <h4 className="text-sm font-bold text-on-surface">Relational DB</h4>
+                  <p className="text-[11px] text-on-surface-variant">PostgreSQL for users, issues, PRs.</p>
+                </div>
+              </div>
+              <div className="flex items-start gap-3 bg-surface-container-lowest/50 p-3 rounded-xl border border-outline-variant/10">
+                <span className="material-symbols-outlined text-orange-400 mt-0.5">folder_zip</span>
+                <div>
+                  <h4 className="text-sm font-bold text-on-surface">Object Storage</h4>
+                  <p className="text-[11px] text-on-surface-variant">AWS S3/MinIO for raw Git files & LFS.</p>
+                </div>
+              </div>
+            </div>
+          </div>
+
+          {/* 3. Web App & API (Spans 5 columns) */}
+          <div className="lg:col-span-5 glass-panel p-8 rounded-3xl group hover:border-pink-500/30 transition-colors relative overflow-hidden">
+            <div className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-64 h-64 bg-pink-500/10 rounded-full blur-[80px]"></div>
+            <div className="flex items-center gap-3 mb-6 relative z-10">
+              <span className="material-symbols-outlined text-3xl text-pink-500">api</span>
+              <h3 className="text-2xl font-bold text-on-surface">3. Web App & API</h3>
+            </div>
+            <div className="space-y-4 relative z-10">
+              <div>
+                <h4 className="font-bold text-on-surface flex items-center gap-2"><span className="w-1.5 h-1.5 rounded-full bg-pink-500"></span> Dynamic Frontend</h4>
+                <p className="text-xs text-on-surface-variant pl-3.5 mt-1">Next.js & React for file trees and side-by-side diffs.</p>
+              </div>
+              <div>
+                <h4 className="font-bold text-on-surface flex items-center gap-2"><span className="w-1.5 h-1.5 rounded-full bg-pink-500"></span> Fast Backend API</h4>
+                <p className="text-xs text-on-surface-variant pl-3.5 mt-1">Go/Rust/FastAPI for concurrent user auth and permissions.</p>
+              </div>
+              <div>
+                <h4 className="font-bold text-on-surface flex items-center gap-2"><span className="w-1.5 h-1.5 rounded-full bg-pink-500"></span> Search Engine</h4>
+                <p className="text-xs text-on-surface-variant pl-3.5 mt-1">Elasticsearch to index millions of files instantly.</p>
+              </div>
+            </div>
+          </div>
+
+          {/* 4. Background Workers (Spans 7 columns) */}
+          <div className="lg:col-span-7 glass-panel p-8 rounded-3xl group hover:border-green-500/30 transition-colors relative overflow-hidden">
+             <div className="absolute right-0 bottom-0 w-64 h-64 bg-green-500/10 rounded-full blur-[80px]"></div>
+             <div className="flex items-center gap-3 mb-6 relative z-10">
+              <span className="material-symbols-outlined text-3xl text-green-500">conveyor_belt</span>
+              <h3 className="text-2xl font-bold text-on-surface">4. Workers & CI/CD</h3>
+            </div>
+            <p className="text-on-surface-variant mb-6 relative z-10">Doing the heavy lifting asynchronously to keep the platform lightning fast.</p>
+            <div className="flex flex-col sm:flex-row gap-4 relative z-10">
+              <div className="flex-1 bg-surface-container/50 p-5 rounded-2xl border border-outline-variant/10">
+                <span className="material-symbols-outlined text-2xl text-green-400 mb-3 block">queue</span>
+                <h4 className="font-bold text-on-surface mb-2">Message Brokers</h4>
+                <p className="text-xs text-on-surface-variant leading-relaxed">Redis or RabbitMQ queue background tasks like notifications and webhook triggers.</p>
+              </div>
+              <div className="flex-1 bg-surface-container/50 p-5 rounded-2xl border border-outline-variant/10">
+                <span className="material-symbols-outlined text-2xl text-green-400 mb-3 block">dns</span>
+                <h4 className="font-bold text-on-surface mb-2">Runner Infrastructure</h4>
+                <p className="text-xs text-on-surface-variant leading-relaxed">Isolated Docker & Kubernetes clusters to safely execute untrusted CI build scripts.</p>
+              </div>
+            </div>
+          </div>
+        </div>
       </RevealOnScroll>
 
       {/* Footer */}

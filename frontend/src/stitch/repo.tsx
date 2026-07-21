@@ -12,7 +12,7 @@ export default function GeneratedPage() {
 <img className="h-full w-full object-cover" data-alt="A sleek, minimalist logo representing a futuristic developer tool named DevOS, featuring sharp geometric lines in a vibrant blue on a deeply dark, almost black background with a subtle liquid glass texture. Professional, high-end iOS 27 aesthetic." src="https://lh3.googleusercontent.com/aida-public/AB6AXuAyBrSGWZHfrQ7lHYU6ybuoXgzgO57Bskxe9X3dSzr_j4Zbo_hU8T4nlMVRbjXx2NHLz6wmsor6rmNsfOU6ZST9t341at-p3iCIW2nVQGwfUFl2HY7MS0dhvuU79YmTFPHvS0GbIfluzy7LpKjiXCa0sup4Oh5fhaP0OteZFj6T-0g7TEKQBoX_HwRulf8-7oMCxfL1wJKdflYqkObII_maDnNin9J5GVx-lKSFO9jvMXGLxLIK1c5GXjc7JjC1aO3ovRozC8ZypC4N"/>
 </div>
 <div>
-<h1 className="text-xl font-headline font-black tracking-tighter text-on-surface">DevOS</h1>
+<h1 className="text-xl font-headline font-black tracking-tighter text-on-surface">PandaHub</h1>
 <p className="text-xs text-on-surface-variant font-label tracking-wide">v27.4.0</p>
 </div>
 </div>
@@ -62,7 +62,7 @@ export default function GeneratedPage() {
 
 <header className="w-full h-16 sticky top-0 z-30 bg-surface/40 backdrop-blur-2xl border-b border-outline-variant/10 shadow-sm flex justify-between items-center px-6 gap-8 transition-all duration-500 md:hidden">
 <div className="flex items-center gap-3">
-<span className="text-lg font-black text-on-surface tracking-tighter">DevOS Liquid</span>
+<span className="text-lg font-black text-on-surface tracking-tighter">PandaHub</span>
 </div>
 <div className="flex items-center gap-4">
 <button className="text-on-surface-variant hover:text-on-surface hover:bg-surface-variant/30 rounded-full p-2 transition-all">

@@ -16,6 +16,7 @@ export default function GeneratedPage() {
   const [password, setPassword] = useState('');
   const [error, setError] = useState('');
   const [loading, setLoading] = useState(false);
+  const [isSuccess, setIsSuccess] = useState(false);
   
   const router = useRouter();
   const fetchMe = useAuthStore(state => state.fetchMe);
@@ -48,7 +49,13 @@ export default function GeneratedPage() {
       }
       
       await fetchMe();
-      router.push('/dashboard');
+      
+      // Trigger success animation
+      setIsSuccess(true);
+      setTimeout(() => {
+        router.push('/dashboard');
+      }, 2000);
+      
     } catch (err: any) {
       setError(err.response?.data?.detail || 'An error occurred. Please try again.');
     } finally {
@@ -75,31 +82,46 @@ export default function GeneratedPage() {
 
 <div className="relative z-10 flex items-center justify-center min-h-screen px-4 py-24">
 
-<div className="w-full max-w-md glass-panel rounded-3xl overflow-hidden shadow-2xl animate-fade-in-up">
+<div className="w-full max-w-md glass-panel card-glow rounded-3xl overflow-hidden shadow-2xl animate-fade-in-up border border-white/20">
 
 <div className="flex border-b border-border-color w-full relative">
 
 <div className="absolute bottom-0 left-0 w-1/2 h-[2px] bg-primary shadow-[0_-2px_10px_rgba(10,132,255,0.5)] transition-transform duration-300 ease-out" style={{ transform: isLogin ? 'translateX(0%)' : 'translateX(100%)' }}></div>
-<button type="button" className={`flex-1 py-5 text-sm tracking-wide transition-colors duration-300 ${isLogin ? 'font-semibold text-on-surface' : 'font-medium text-on-surface-variant hover:text-on-surface'}`} onClick={() => { setIsLogin(true); setError(''); }}>
+<button type="button" className={`flex-1 py-5 text-sm tracking-wide transition-all duration-300 ${isLogin ? 'font-semibold text-on-surface scale-105' : 'font-medium text-on-surface-variant hover:text-on-surface'}`} onClick={() => { setIsLogin(true); setError(''); }} disabled={isSuccess}>
                     Sign In
                 </button>
-<button type="button" className={`flex-1 py-5 text-sm tracking-wide transition-colors duration-300 ${!isLogin ? 'font-semibold text-on-surface' : 'font-medium text-on-surface-variant hover:text-on-surface'}`} onClick={() => { setIsLogin(false); setError(''); }}>
+<button type="button" className={`flex-1 py-5 text-sm tracking-wide transition-all duration-300 ${!isLogin ? 'font-semibold text-on-surface scale-105' : 'font-medium text-on-surface-variant hover:text-on-surface'}`} onClick={() => { setIsLogin(false); setError(''); }} disabled={isSuccess}>
                     Create Account
                 </button>
 </div>
-<div className="p-8 sm:p-10">
+<div className="p-8 sm:p-10 relative">
+
+{isSuccess ? (
+  <div className="flex flex-col items-center justify-center py-10 animate-fade-in-scale">
+    <div className="w-20 h-20 bg-green-100 rounded-full flex items-center justify-center mb-6 shadow-[0_0_30px_rgba(34,197,94,0.3)] relative">
+      <div className="absolute inset-0 rounded-full border-4 border-green-500 border-t-transparent animate-spin-slow"></div>
+      <span className="material-symbols-outlined text-green-600 text-4xl animate-bounce-in" style={{ animationDelay: '0.2s' }}>check_circle</span>
+    </div>
+    <h2 className="text-2xl font-bold text-on-surface mb-2 animate-fade-in-up">Success!</h2>
+    <p className="text-on-surface-variant text-center animate-fade-in-up" style={{ animationDelay: '0.1s' }}>
+      Welcome to PandaHub.<br/>Redirecting to your dashboard...
+    </p>
+  </div>
+) : (
+  <>
 <div className="mb-8 text-center">
 <h1 className="text-3xl font-display font-bold tracking-tight text-on-surface mb-2">{isLogin ? 'Welcome back' : 'Create an account'}</h1>
 <p className="text-on-surface-variant text-sm font-label">{isLogin ? 'Enter your details to access your workspace.' : 'Get started with PandaHub today.'}</p>
 </div>
 
 {error && (
-  <div className="mb-4 p-3 bg-error/20 border border-error/50 rounded-xl text-error text-sm text-center">
+  <div className="mb-4 p-3 bg-error/20 border border-error/50 rounded-xl text-error text-sm text-center animate-bounce-in flex items-center gap-2 justify-center">
+    <span className="material-symbols-outlined text-[16px]">error</span>
     {error}
   </div>
 )}
 
-<form className="space-y-5" onSubmit={handleSubmit}>
+<form className="space-y-5 stagger-children" onSubmit={handleSubmit}>
 
 {!isLogin && (
   <div className="space-y-1">
@@ -144,9 +166,17 @@ export default function GeneratedPage() {
 <input className="block w-full pl-11 pr-10 py-3.5 bg-surface-container-low/50 input-glass border-outline-variant/30 rounded-xl text-on-surface placeholder:text-outline focus:ring-0 sm:text-sm glow-accent-focus" id="password" placeholder="••••••••" type="password" required value={password} onChange={(e) => setPassword(e.target.value)} />
 </div>
 </div>
-<button className="w-full flex justify-center py-4 px-4 border border-transparent rounded-xl shadow-sm text-sm font-bold text-white bg-[#0A84FF] hover:bg-blue-500 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-[#0A84FF] focus:ring-offset-background transition-all duration-200 active:scale-[0.98] glow-accent mt-8 disabled:opacity-50 disabled:cursor-not-allowed" type="submit" disabled={loading}>
-                        {loading ? 'Processing...' : (isLogin ? 'Sign In' : 'Create Account')}
-                    </button>
+<button className="btn-primary btn-ripple w-full flex justify-center items-center gap-2 py-4 px-4 text-sm mt-8 disabled:opacity-50 disabled:cursor-not-allowed" type="submit" disabled={loading}>
+  {loading ? (
+    <>
+      <svg className="animate-spin h-4 w-4 text-white" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24">
+        <circle className="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" strokeWidth="4"/>
+        <path className="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4z"/>
+      </svg>
+      Processing…
+    </>
+  ) : (isLogin ? 'Sign In' : 'Create Account')}
+</button>
 </form>
 <div className="mt-8">
 <div className="relative">
@@ -173,6 +203,8 @@ export default function GeneratedPage() {
 </button>
 </div>
 </div>
+  </>
+)}
 </div>
 </div>
 </div>

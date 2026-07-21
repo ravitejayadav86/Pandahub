@@ -258,64 +258,18 @@ export default function DashboardPage() {
 
             {/* Feed Cards */}
             <div className="space-y-6 stagger-children">
-              {FEED.map(item => (
-                <div key={item.id} className="bg-white rounded-3xl p-6 border border-slate-100 shadow-[0_8px_30px_rgb(0,0,0,0.04)] relative card-glow">
-                
-                {/* Connector line for 'push' type */}
-                {item.type === 'push' && (
-                  <div className="absolute left-10 top-[72px] bottom-6 w-px bg-slate-200" />
-                )}
-
-                {/* Event Header */}
-                <div className="flex items-start gap-4 mb-4 relative z-10">
-                  {/* Event Icon/Avatar */}
-                  <div className="w-8 h-8 rounded-full bg-white border border-slate-200 flex items-center justify-center shrink-0 shadow-sm z-10">
-                    {item.type === 'pr' ? (
-                      <span className="material-symbols-outlined text-[16px] text-slate-700">call_merge</span>
-                    ) : (
-                      <span className="material-symbols-outlined text-[14px] text-slate-700">commit</span>
-                    )}
-                  </div>
-                  
-                  <div className="flex-1 pt-1.5">
-                    <p className="text-sm text-slate-600">
-                      <strong className="text-slate-900 font-bold">{item.author}</strong> {item.action} <span className={item.type === 'pr' ? "text-blue-500 bg-blue-50 px-1.5 py-0.5 rounded text-xs font-mono" : "bg-slate-100 px-1.5 py-0.5 rounded text-xs font-mono"}>{item.target}</span>
-                    </p>
-                  </div>
+              <div className="bg-white rounded-3xl p-8 border border-slate-100 shadow-[0_8px_30px_rgb(0,0,0,0.04)] text-center flex flex-col items-center card-lift">
+                <div className="w-16 h-16 rounded-full bg-slate-50 border border-slate-100 flex items-center justify-center mb-4">
+                  <span className="material-symbols-outlined text-slate-400 text-3xl">notifications_paused</span>
                 </div>
-
-                {/* Event Content */}
-                <div className="ml-12 relative z-10">
-                  {item.type === 'pr' ? (
-                    <>
-                      <h3 className="text-lg font-bold mb-2">{item.title}</h3>
-                      <p className="text-slate-500 text-sm leading-relaxed mb-4">{item.desc}</p>
-                    </>
-                  ) : (
-                    <div className="bg-slate-50 rounded-xl border border-slate-100 p-1 mb-4 font-mono text-[13px]">
-                      {item.commits?.map((c, i) => (
-                        <div key={c.hash} className={`flex items-center justify-between px-3 py-2 ${i !== (item.commits?.length || 0) - 1 ? 'border-b border-slate-200/60' : ''}`}>
-                          <span className="text-slate-700 truncate mr-4">{c.msg}</span>
-                          <span className="text-blue-500 shrink-0">{c.hash}</span>
-                        </div>
-                      ))}
-                    </div>
-                  )}
-
-                  {/* Footer Meta */}
-                  <div className="flex items-center gap-4 text-xs font-medium text-slate-500">
-                    <div className="flex items-center gap-1.5">
-                      <div className="w-2 h-2 rounded-full" style={{ backgroundColor: item.color }} />
-                      <span>{item.repo}</span>
-                    </div>
-                    <div className="flex items-center gap-1.5">
-                      <span className="material-symbols-outlined text-[14px]">schedule</span>
-                      <span>{item.time}</span>
-                    </div>
-                  </div>
-                </div>
+                <h3 className="text-lg font-bold text-slate-800 mb-2">No recent activity</h3>
+                <p className="text-sm text-slate-500 max-w-sm mb-6">
+                  There hasn't been any activity in this repository yet. Push some code or open an issue to get started!
+                </p>
+                <button className="px-5 py-2.5 bg-slate-900 text-white font-semibold text-sm rounded-xl hover:bg-slate-800 transition-all shadow-sm">
+                  View Setup Instructions
+                </button>
               </div>
-            ))}
             </div>
           </div>
 
@@ -329,31 +283,13 @@ export default function DashboardPage() {
               </h3>
               
               <div className="space-y-6 stagger-children">
-                {TRENDING.map((repo, i) => (
-                  <div key={repo.name} className={`pb-6 ${i !== TRENDING.length - 1 ? 'border-b border-slate-100' : 'pb-0'}`}>
-                    <div className="flex justify-between items-start mb-2">
-                      <a href="#" className="font-bold text-[15px] hover:text-blue-600 transition-colors truncate pr-2">{repo.name}</a>
-                      <div className="flex items-center gap-1 text-xs text-slate-500 font-medium shrink-0 bg-slate-50 px-2 py-1 rounded-md border border-slate-100">
-                        <span className="material-symbols-outlined text-[14px]">star</span>
-                        {repo.stars}
-                      </div>
-                    </div>
-                    
-                    <p className="text-sm text-slate-500 line-clamp-2 mb-3 leading-relaxed">
-                      {repo.desc}
-                    </p>
-                    
-                    <div className="flex items-center gap-4 text-[11px] font-semibold text-slate-400 uppercase tracking-wide">
-                      <div className="flex items-center gap-1.5">
-                        <div className="w-2 h-2 rounded-full" style={{ backgroundColor: repo.color }} />
-                        <span>{repo.lang}</span>
-                      </div>
-                      <div className="flex items-center gap-1">
-                        Built by {repo.today} stars today
-                      </div>
-                    </div>
+                <div className="flex flex-col items-center justify-center py-6 text-center">
+                  <div className="w-12 h-12 rounded-full bg-slate-50 border border-slate-100 flex items-center justify-center mb-3">
+                    <span className="material-symbols-outlined text-slate-400 text-xl">star_border</span>
                   </div>
-                ))}
+                  <p className="text-sm font-semibold text-slate-700 mb-1">No trending repos</p>
+                  <p className="text-xs text-slate-500">Star repositories to see them here</p>
+                </div>
               </div>
             </div>
 

@@ -6,6 +6,7 @@ upstream repo from your own fork) — it defaults to the same repository for
 the common same-repo-branch-to-branch case, but is a separate column so a
 PR from a fork doesn't require modeling source/target as always identical.
 """
+from app.models import User
 import uuid
 
 from sqlalchemy import String, Boolean, Integer, ForeignKey, UniqueConstraint, DateTime

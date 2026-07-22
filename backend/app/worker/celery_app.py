@@ -24,7 +24,7 @@ celery_app = Celery(
     backend=settings.CELERY_RESULT_BACKEND,
     include=[
         "app.worker.tasks.email_tasks",
-        # "app.worker.tasks.git_tasks",   -- added in Module 8
+        "app.worker.tasks.git_tasks",
         # "app.worker.tasks.ai_tasks",    -- added in Module 11
     ],
 )

@@ -8,8 +8,10 @@ export default function GeneratedPage() {
   const { user } = useAuthStore();
   const [isEntering, setIsEntering] = useState(true);
   const [isMenuOpen, setIsMenuOpen] = useState(false);
+  const [mounted, setMounted] = useState(false);
 
   useEffect(() => {
+    setMounted(true);
     // Only play the animation once per session
     if (sessionStorage.getItem('dashboard_animated') === 'true') {
       setIsEntering(false);
@@ -90,11 +92,11 @@ export default function GeneratedPage() {
             <button className="p-1 hover:text-on-surface hover:bg-surface-variant/30 rounded-md transition-all"><span className="material-symbols-outlined text-[20px]">alt_route</span></button>
             <button className="p-1 hover:text-on-surface hover:bg-surface-variant/30 rounded-md transition-all"><span className="material-symbols-outlined text-[20px]">inbox</span></button>
             <div className="w-7 h-7 rounded-full overflow-hidden border border-outline-variant/20 ml-2 cursor-pointer shadow-sm bg-surface-container-highest">
-              {user?.avatar_url ? (
+              {mounted && user?.avatar_url ? (
                 <img alt="User Avatar" className="w-full h-full object-cover" src={user.avatar_url} />
               ) : (
                 <div className="w-full h-full flex items-center justify-center text-xs font-bold text-on-surface-variant">
-                  {user?.username?.charAt(0).toUpperCase() || 'U'}
+                  {mounted && user?.username ? user.username.charAt(0).toUpperCase() : 'U'}
                 </div>
               )}
             </div>
@@ -175,15 +177,15 @@ export default function GeneratedPage() {
         <aside className="lg:col-span-3 space-y-6 hidden lg:block self-start sticky top-[84px] h-[calc(100vh-84px)] overflow-y-auto overscroll-contain custom-scrollbar pb-10">
           <div className="flex items-center gap-3">
             <div className="w-7 h-7 rounded-full overflow-hidden border border-outline-variant/20 bg-surface-container-highest">
-              {user?.avatar_url ? (
+              {mounted && user?.avatar_url ? (
                 <img alt="User Avatar" className="w-full h-full object-cover" src={user.avatar_url} />
               ) : (
                 <div className="w-full h-full flex items-center justify-center text-xs font-bold text-on-surface-variant">
-                  {user?.username?.charAt(0).toUpperCase() || 'U'}
+                  {mounted && user?.username ? user.username.charAt(0).toUpperCase() : 'U'}
                 </div>
               )}
             </div>
-            <span className="font-semibold text-sm text-on-surface">{user?.username || 'user'}</span>
+            <span className="font-semibold text-sm text-on-surface">{mounted && user?.username ? user.username : 'user'}</span>
             <span className="material-symbols-outlined text-[16px] text-on-surface-variant cursor-pointer hover:text-on-surface ml-auto">expand_more</span>
           </div>
 

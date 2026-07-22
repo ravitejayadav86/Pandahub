@@ -41,8 +41,12 @@ from app.schemas.pr_schema import (
     PRCommentOut,
     PRReviewCreate,
     PRReviewOut,
+    AIReviewResultOut,
 )
 from app.services import pr_service
+from app.models.pull_request import PullRequest, AIReviewResult
+from sqlalchemy import select
+from app.worker.tasks.ai_tasks import generate_pr_review_task
 
 router = APIRouter(tags=["pulls"])
 
@@ -222,3 +226,44 @@ async def create_review(
         db, repository.id, number, current_user, payload
     )
     return PRReviewOut.model_validate(review)
+
+
+@router.post(
+    "/{owner}/{repo}/pulls/{number}/ai-review",
+    status_code=status.HTTP_202_ACCEPTED,
+    summary="Trigger AI code review for a pull request",
+)
+async def trigger_ai_review(
+    number: int,
+    repository: Repository = Depends(get_repository),
+    db: AsyncSession = Depends(get_db),
+    _perm: PermissionLevel = Depends(require_repo_permission(PermissionLevel.READ)),
+) -> dict:
+    pr = await pr_service.get_pull_request(db, repository.id, number)
+    # Trigger Celery task asynchronously
+    generate_pr_review_task.delay(str(pr.id))
+    return {"message": "AI code review triggered."}
+
+
+@router.get(
+    "/{owner}/{repo}/pulls/{number}/ai-review",
+    response_model=Optional[AIReviewResultOut],
+    summary="Get cached AI code review results",
+)
+async def get_ai_review(
+    number: int,
+    repository: Repository = Depends(get_repository),
+    db: AsyncSession = Depends(get_db),
+    _perm: PermissionLevel = Depends(require_repo_permission(PermissionLevel.READ)),
+) -> Optional[AIReviewResultOut]:
+    pr = await pr_service.get_pull_request(db, repository.id, number)
+    
+    result = await db.execute(
+        select(AIReviewResult).where(AIReviewResult.pull_request_id == pr.id)
+    )
+    review = result.scalar_one_or_none()
+    
+    if not review:
+        return None
+        
+    return AIReviewResultOut.model_validate(review)

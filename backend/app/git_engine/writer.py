@@ -27,6 +27,7 @@ from dataclasses import dataclass, field
 from pathlib import Path
 from typing import Optional
 
+# pyrefly: ignore [missing-import]
 import pygit2
 
 from app.core.logging import get_logger

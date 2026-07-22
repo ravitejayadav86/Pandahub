@@ -37,6 +37,9 @@ class PullRequest(Base, UUIDPKMixin, TimestampMixin):
     merge_commit_sha: Mapped[str | None] = mapped_column(String(40), nullable=True)
     closed_at: Mapped[object | None] = mapped_column(DateTime(timezone=True), nullable=True)
 
+    author: Mapped["User"] = relationship(foreign_keys=[author_id])
+    merged_by: Mapped["User"] = relationship(foreign_keys=[merged_by_id])
+
     reviews: Mapped[list["PRReview"]] = relationship(back_populates="pull_request", cascade="all, delete-orphan")
     comments: Mapped[list["PRComment"]] = relationship(back_populates="pull_request", cascade="all, delete-orphan")
 
@@ -49,6 +52,8 @@ class PRReview(Base, UUIDPKMixin):
     state: Mapped[ReviewState] = mapped_column(nullable=False, default=ReviewState.PENDING)
     body: Mapped[str | None] = mapped_column(String(10000), nullable=True)
     created_at: Mapped[object] = mapped_column(DateTime(timezone=True), server_default="now()", nullable=False)
+
+    reviewer: Mapped["User"] = relationship(foreign_keys=[reviewer_id])
 
     pull_request: Mapped["PullRequest"] = relationship(back_populates="reviews")
     inline_comments: Mapped[list["PRReviewComment"]] = relationship(back_populates="review", cascade="all, delete-orphan")
@@ -66,6 +71,7 @@ class PRReviewComment(Base, UUIDPKMixin):
     body: Mapped[str] = mapped_column(String(10000), nullable=False)
     created_at: Mapped[object] = mapped_column(DateTime(timezone=True), server_default="now()", nullable=False)
 
+    author: Mapped["User"] = relationship(foreign_keys=[author_id])
     review: Mapped["PRReview"] = relationship(back_populates="inline_comments")
 
 
@@ -77,6 +83,7 @@ class PRComment(Base, UUIDPKMixin, TimestampMixin):
     author_id: Mapped[uuid.UUID] = mapped_column(UUID(as_uuid=True), ForeignKey("users.id", ondelete="SET NULL"), nullable=True)
     body: Mapped[str] = mapped_column(String(20000), nullable=False)
 
+    author: Mapped["User"] = relationship(foreign_keys=[author_id])
     pull_request: Mapped["PullRequest"] = relationship(back_populates="comments")
 
 

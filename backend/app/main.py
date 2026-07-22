@@ -10,7 +10,7 @@ from contextlib import asynccontextmanager
 from fastapi import FastAPI
 from fastapi.middleware.cors import CORSMiddleware
 
-from app.api.v1 import auth, repos, git, issues
+from app.api.v1 import auth, repos, git, issues, pulls
 from app.api import ws
 from app.core.config import get_settings
 from app.core.exceptions import register_exception_handlers
@@ -61,6 +61,7 @@ register_exception_handlers(app)
 app.include_router(auth.router, prefix=settings.API_V1_PREFIX)
 app.include_router(repos.router, prefix=settings.API_V1_PREFIX)
 app.include_router(issues.router, prefix=settings.API_V1_PREFIX)
+app.include_router(pulls.router, prefix=settings.API_V1_PREFIX)
 # Git transport routes are NOT under /api/v1 — they use the /git/ prefix
 # that nginx routes separately (proxy_request_buffering off, long timeouts).
 # The .git URL convention is a well-known client expectation that must not

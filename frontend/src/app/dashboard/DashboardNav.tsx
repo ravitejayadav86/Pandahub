@@ -6,16 +6,26 @@ import { Input } from '@/components/ui/Input'
 import { Button } from '@/components/ui/Button'
 import { Avatar } from '@/components/ui/Avatar'
 import { useAuthStore } from '@/store/authStore'
-import { Search, Plus, Bell, Settings } from 'lucide-react'
+import { Search, Plus, Bell, Settings, Menu } from 'lucide-react'
 
-export function DashboardNav() {
+interface DashboardNavProps {
+  onMenuClick: () => void;
+}
+
+export function DashboardNav({ onMenuClick }: DashboardNavProps) {
   const { user } = useAuthStore()
 
   return (
-    <header className="sticky top-0 z-50 h-[64px] bg-white/80 dark:bg-slate-900/80 backdrop-blur-xl border-b border-slate-200 dark:border-slate-800 flex items-center justify-between px-6">
+    <header className="sticky top-0 z-50 h-[64px] bg-white/80 dark:bg-slate-900/80 backdrop-blur-xl border-b border-slate-200 dark:border-slate-800 flex items-center justify-between px-4 md:px-6">
       
       {/* Left section: Logo & Context */}
-      <div className="flex items-center gap-6">
+      <div className="flex items-center gap-4 md:gap-6">
+        <button 
+          onClick={onMenuClick}
+          className="p-1 hover:bg-slate-100 dark:hover:bg-slate-800 rounded-md transition-colors text-slate-500"
+        >
+          <Menu className="w-5 h-5" />
+        </button>
         <Link href="/dashboard" className="flex items-center gap-2">
           <span className="text-2xl animate-wiggle inline-block">🐼</span>
           <span className="font-bold text-xl tracking-tight hidden md:block text-slate-900 dark:text-white">
@@ -55,6 +65,7 @@ export function DashboardNav() {
               size="md" 
               src={user?.avatar_url} 
               alt={user?.username || 'User'} 
+              fallback={user?.username?.charAt(0).toUpperCase() || 'U'}
             />
           </div>
         </div>

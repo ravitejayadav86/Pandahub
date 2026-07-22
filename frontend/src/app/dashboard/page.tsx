@@ -2,7 +2,6 @@
 
 import React, { useState, useEffect } from 'react'
 import Link from 'next/link'
-import { formatDistanceToNow } from 'date-fns'
 import { LayoutDashboard, GitMerge, CircleDot, Rocket, Bookmark, Clock, Plus, X } from 'lucide-react'
 
 import { DashboardNav } from './DashboardNav'

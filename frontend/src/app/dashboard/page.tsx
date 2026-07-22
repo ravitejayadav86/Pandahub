@@ -23,9 +23,9 @@ const MOCK_REPOS = [
 ]
 
 const MOCK_ACTIVITY = [
-  { id: '101', type: 'pr_opened', repo: 'pandahub/core', title: 'feat: implement module 11', time: new Date(Date.now() - 1000 * 60 * 30), author: 'ravit' },
-  { id: '102', type: 'issue_closed', repo: 'pandahub/frontend', title: 'Fix glassmorphism blur on Safari', time: new Date(Date.now() - 1000 * 60 * 60 * 2), author: 'ravit' },
-  { id: '103', type: 'pr_merged', repo: 'pandahub/core', title: 'feat: implement module 10', time: new Date(Date.now() - 1000 * 60 * 60 * 5), author: 'ravit' },
+  { id: '101', type: 'pr_opened', repo: 'pandahub/core', title: 'feat: implement module 11', timeDisplay: '30 minutes ago', author: 'ravit' },
+  { id: '102', type: 'issue_closed', repo: 'pandahub/frontend', title: 'Fix glassmorphism blur on Safari', timeDisplay: '2 hours ago', author: 'ravit' },
+  { id: '103', type: 'pr_merged', repo: 'pandahub/core', title: 'feat: implement module 10', timeDisplay: '5 hours ago', author: 'ravit' },
 ]
 
 const MOCK_STARTUPS = [
@@ -206,7 +206,7 @@ export default function DashboardPage() {
               {act.title}
             </p>
             <p className="text-xs text-slate-400 mt-1 flex items-center gap-1">
-              <Clock className="w-3 h-3" /> {formatDistanceToNow(act.time, { addSuffix: true })}
+              <Clock className="w-3 h-3" /> {act.timeDisplay}
             </p>
           </div>
         </Card>

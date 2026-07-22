@@ -1,214 +1,318 @@
-"use client"
+"use client";
+import { useState, useEffect } from 'react';
+import Link from 'next/link';
+import Settings from '../Settings';
+import { useAuthStore } from '@/store/authStore';
 
-import React, { useState } from 'react'
-import Link from 'next/link'
-import { formatDistanceToNow } from 'date-fns'
-import { LayoutDashboard, GitMerge, CircleDot, Rocket, Bookmark, Clock, Plus } from 'lucide-react'
+export default function GeneratedPage() {
+  const { user } = useAuthStore();
+  const [isEntering, setIsEntering] = useState(true);
+  const [isMenuOpen, setIsMenuOpen] = useState(false);
 
-import { DashboardNav } from './DashboardNav'
-import { Button } from '@/components/ui/Button'
-import { Card, CardHeader, CardTitle, CardContent } from '@/components/ui/Card'
-import { Tabs } from '@/components/ui/Tabs'
-import { Avatar } from '@/components/ui/Avatar'
-import { Badge } from '@/components/ui/Badge'
-import { Tooltip } from '@/components/ui/Tooltip'
+  useEffect(() => {
+    // Only play the animation once per session
+    if (sessionStorage.getItem('dashboard_animated') === 'true') {
+      setIsEntering(false);
+      return;
+    }
 
-// ----------------------------------------------------------------------
-// Mock Data (until backend feed endpoints are fully implemented)
-// ----------------------------------------------------------------------
-const MOCK_REPOS = [
-  { id: '1', name: 'pandahub/core', description: 'The core backend written in FastAPI', language: 'Python', stars: 12 },
-  { id: '2', name: 'pandahub/frontend', description: 'Next.js web interface', language: 'TypeScript', stars: 8 },
-  { id: '3', name: 'ravit/personal-website', description: 'My portfolio site', language: 'TypeScript', stars: 2 },
-]
+    const timer = setTimeout(() => {
+      sessionStorage.setItem('dashboard_animated', 'true');
+      setIsEntering(false);
+    }, 2000);
+    return () => clearTimeout(timer);
+  }, []);
 
-const MOCK_ACTIVITY = [
-  { id: '101', type: 'pr_opened', repo: 'pandahub/core', title: 'feat: implement module 11', time: new Date(Date.now() - 1000 * 60 * 30), author: 'ravit' },
-  { id: '102', type: 'issue_closed', repo: 'pandahub/frontend', title: 'Fix glassmorphism blur on Safari', time: new Date(Date.now() - 1000 * 60 * 60 * 2), author: 'ravit' },
-  { id: '103', type: 'pr_merged', repo: 'pandahub/core', title: 'feat: implement module 10', time: new Date(Date.now() - 1000 * 60 * 60 * 5), author: 'ravit' },
-]
+  useEffect(() => {
+    if (isMenuOpen) {
+      document.body.style.overflow = 'hidden';
+    } else {
+      document.body.style.overflow = '';
+    }
+    return () => {
+      document.body.style.overflow = '';
+    };
+  }, [isMenuOpen]);
 
-const MOCK_STARTUPS = [
-  { id: 's1', name: 'AeroSpace.ai', tags: ['AI', 'Aerospace'] },
-  { id: 's2', name: 'FinFlow', tags: ['Fintech', 'React'] },
-]
-
-// ----------------------------------------------------------------------
-// Components
-// ----------------------------------------------------------------------
-export default function DashboardPage() {
-  
-  const renderSidebar = () => (
-    <div className="w-full md:w-64 flex flex-col gap-2 shrink-0 animate-fade-in-up">
-      <div className="text-xs font-semibold text-slate-400 uppercase tracking-wider mb-2 pl-3">Menu</div>
-      
-      <Button variant="ghost" className="justify-start text-slate-700 font-medium bg-slate-100 dark:bg-slate-800 dark:text-slate-200">
-        <LayoutDashboard className="w-4 h-4 mr-2" /> Home
-      </Button>
-      <Button variant="ghost" className="justify-start text-slate-500 hover:text-slate-700">
-        <CircleDot className="w-4 h-4 mr-2" /> Issues
-      </Button>
-      <Button variant="ghost" className="justify-start text-slate-500 hover:text-slate-700">
-        <GitMerge className="w-4 h-4 mr-2" /> Pull Requests
-      </Button>
-      <Button variant="ghost" className="justify-start text-slate-500 hover:text-slate-700">
-        <Rocket className="w-4 h-4 mr-2" /> Startup Hub
-      </Button>
-
-      <div className="text-xs font-semibold text-slate-400 uppercase tracking-wider mt-6 mb-2 pl-3">Pinned</div>
-      <Button variant="ghost" className="justify-start text-slate-600 text-sm py-1.5 h-auto">
-        <Bookmark className="w-3.5 h-3.5 mr-2 text-slate-400" /> pandahub/core
-      </Button>
-      <Button variant="ghost" className="justify-start text-slate-600 text-sm py-1.5 h-auto">
-        <Bookmark className="w-3.5 h-3.5 mr-2 text-slate-400" /> pandahub/frontend
-      </Button>
-    </div>
-  )
-
-  const renderActivityFeed = () => (
-    <div className="space-y-4">
-      {MOCK_ACTIVITY.map((act, i) => (
-        <Card 
-          key={act.id} 
-          variant="glass-panel" 
-          interactive="glow" 
-          className="flex flex-row items-center gap-4 p-4 animate-fade-in-up"
-          style={{ animationDelay: `${i * 0.1}s` }}
-        >
-          <div className="p-2 bg-blue-50 dark:bg-blue-900/30 rounded-full text-blue-500 shrink-0">
-            {act.type.includes('pr') ? <GitMerge className="w-5 h-5" /> : <CircleDot className="w-5 h-5" />}
-          </div>
-          <div className="flex-1 min-w-0">
-            <p className="text-sm text-slate-600 dark:text-slate-300">
-              <span className="font-semibold text-slate-900 dark:text-white">{act.author}</span>
-              {' '}
-              {act.type === 'pr_opened' && 'opened a pull request in'}
-              {act.type === 'pr_merged' && 'merged a pull request in'}
-              {act.type === 'issue_closed' && 'closed an issue in'}
-              {' '}
-              <Link href={`/${act.repo}`} className="font-medium text-blue-600 hover:underline">{act.repo}</Link>
-            </p>
-            <p className="text-sm font-medium text-slate-900 dark:text-white truncate mt-0.5">
-              {act.title}
-            </p>
-            <p className="text-xs text-slate-400 mt-1 flex items-center gap-1">
-              <Clock className="w-3 h-3" /> {formatDistanceToNow(act.time, { addSuffix: true })}
-            </p>
-          </div>
-        </Card>
-      ))}
-      <Button variant="ghost" className="w-full mt-4 text-blue-600">View All Activity</Button>
-    </div>
-  )
-
-  const renderRepos = () => (
-    <div className="grid grid-cols-1 sm:grid-cols-2 gap-4 animate-fade-in-up">
-      {MOCK_REPOS.map((repo, i) => (
-        <Card 
-          key={repo.id} 
-          variant="default" 
-          interactive="lift"
-          style={{ animationDelay: `${i * 0.05}s` }}
-          className="animate-fade-in-up p-5"
-        >
-          <div className="flex justify-between items-start mb-2">
-            <Link href={`/${repo.name}`} className="font-semibold text-blue-600 hover:underline text-lg truncate">
-              {repo.name}
-            </Link>
-            <Badge variant="default" className="text-[10px] uppercase">Public</Badge>
-          </div>
-          <p className="text-sm text-slate-500 line-clamp-2 mb-4 h-10">
-            {repo.description}
-          </p>
-          <div className="flex items-center gap-4 text-xs font-medium text-slate-600">
-            <span className="flex items-center gap-1.5">
-              <span className="w-2.5 h-2.5 rounded-full bg-yellow-400" />
-              {repo.language}
-            </span>
-            <span className="flex items-center gap-1">
-              <svg className="w-3.5 h-3.5 text-slate-400" viewBox="0 0 16 16" fill="currentColor"><path d="M8 .25a.75.75 0 0 1 .673.418l1.882 3.815 4.21.612a.75.75 0 0 1 .416 1.279l-3.046 2.97.719 4.192a.75.75 0 0 1-1.088.791L8 12.347l-3.766 1.98a.75.75 0 0 1-1.088-.79l.72-4.194L.818 6.374a.75.75 0 0 1 .416-1.28l4.21-.611L7.327.668A.75.75 0 0 1 8 .25Z"></path></svg>
-              {repo.stars}
-            </span>
-          </div>
-        </Card>
-      ))}
-    </div>
-  )
-
-  const renderWidgets = () => (
-    <div className="w-full md:w-80 flex flex-col gap-6 shrink-0 animate-fade-in-up" style={{ animationDelay: '0.2s' }}>
-      <Card variant="glass-card">
-        <CardHeader className="pb-3">
-          <CardTitle className="text-sm flex items-center justify-between">
-            Suggested Startups
-            <Badge variant="purple">Hub</Badge>
-          </CardTitle>
-        </CardHeader>
-        <CardContent className="space-y-4">
-          {MOCK_STARTUPS.map(startup => (
-            <div key={startup.id} className="flex items-center justify-between group">
-              <div className="flex items-center gap-3">
-                <Avatar size="sm" fallback={startup.name.charAt(0)} />
-                <div className="flex flex-col">
-                  <span className="text-sm font-semibold group-hover:text-blue-600 transition-colors cursor-pointer">{startup.name}</span>
-                  <span className="text-xs text-slate-500">{startup.tags.join(', ')}</span>
-                </div>
-              </div>
-              <Button variant="ghost" className="h-7 px-2 text-xs">Follow</Button>
+  if (isEntering) {
+    return (
+      <div className="fixed inset-0 flex flex-col items-center justify-center bg-[#F8F9FB] z-[9999] overflow-hidden">
+        {/* Animated background blobs */}
+        <div className="absolute top-[20%] left-[30%] w-[40vw] h-[40vw] bg-blue-500/10 rounded-full blur-[100px] animate-pulse-ring mix-blend-multiply"></div>
+        <div className="absolute bottom-[20%] right-[30%] w-[35vw] h-[35vw] bg-purple-500/10 rounded-full blur-[100px] animate-pulse-ring mix-blend-multiply" style={{ animationDelay: '0.75s' }}></div>
+        
+        {/* Loader Core */}
+        <div className="relative z-10 flex flex-col items-center animate-bounce-in">
+          <div className="relative w-24 h-24 mb-8">
+            <div className="absolute inset-0 rounded-[28px] bg-gradient-to-br from-[#0A84FF] to-[#6d28d9] shadow-[0_0_40px_rgba(10,132,255,0.4)] animate-spin-slow"></div>
+            <div className="absolute inset-1 rounded-[24px] bg-white flex items-center justify-center">
+              <span className="text-4xl">🐼</span>
             </div>
-          ))}
-        </CardContent>
-      </Card>
-      
-      <Card variant="default" className="bg-gradient-to-br from-blue-50 to-indigo-50 dark:from-slate-800 dark:to-slate-900 border-blue-100 dark:border-slate-700">
-        <CardContent className="p-5 flex flex-col items-start gap-2">
-          <div className="p-2 bg-white dark:bg-slate-800 rounded-xl shadow-sm mb-1">
-            <Rocket className="w-5 h-5 text-blue-500" />
-          </div>
-          <h3 className="font-semibold text-slate-900 dark:text-white">Upgrade to Pro</h3>
-          <p className="text-xs text-slate-600 dark:text-slate-400 mb-2">Get advanced AI code reviews and private startup metrics.</p>
-          <Button variant="primary" className="w-full text-xs h-8">View Plans</Button>
-        </CardContent>
-      </Card>
-    </div>
-  )
-
-  return (
-    <div className="min-h-screen bg-slate-50/50 dark:bg-[#0f172a]">
-      <DashboardNav />
-      
-      {/* Background ambient light */}
-      <div className="fixed top-[-20%] left-[-10%] w-[50%] h-[50%] rounded-full bg-blue-400/5 blur-[120px] pointer-events-none" />
-      <div className="fixed bottom-[-20%] right-[-10%] w-[40%] h-[40%] rounded-full bg-purple-400/5 blur-[100px] pointer-events-none" />
-
-      <main className="max-w-7xl mx-auto p-4 md:p-6 lg:p-8 flex flex-col md:flex-row gap-8 relative z-10">
-        
-        {/* Left Sidebar */}
-        {renderSidebar()}
-        
-        {/* Center Feed */}
-        <div className="flex-1 flex flex-col min-w-0">
-          <div className="flex items-center justify-between mb-6">
-            <h1 className="text-2xl font-bold tracking-tight text-slate-900 dark:text-white">Dashboard</h1>
-            <Button variant="primary" className="h-9 text-sm">
-              <Plus className="w-4 h-4 mr-1" /> New Repository
-            </Button>
+            {/* Spinning orbital ring */}
+            <div className="absolute -inset-4 border border-[#0A84FF]/30 rounded-[36px] animate-[spin_3s_linear_infinite]">
+              <div className="absolute top-0 left-1/2 w-2 h-2 bg-[#0A84FF] rounded-full -translate-x-1/2 -translate-y-1/2 shadow-[0_0_10px_#0A84FF]"></div>
+            </div>
           </div>
           
-          <Tabs 
-            className="w-full"
-            tabs={[
-              { id: 'activity', label: 'Activity Feed', content: renderActivityFeed() },
-              { id: 'repos', label: 'Your Repositories', content: renderRepos() }
-            ]}
-          />
+          <h1 className="text-2xl font-bold tracking-tight text-slate-900 mb-2 font-display">PandaHub</h1>
+          <div className="flex items-center gap-2 text-slate-500 font-medium text-sm">
+            <div className="w-4 h-4 border-2 border-slate-300 border-t-[#0A84FF] rounded-full animate-spin"></div>
+            Initializing Workspace...
+          </div>
+        </div>
+      </div>
+    );
+  }
+
+  return (
+    <div className="min-h-screen text-on-surface bg-background font-body transition-colors duration-300 relative animate-fade-in-up flex flex-col">
+      {/* Background blobs for Liquid UI */}
+      <div className="fixed top-[-20%] left-[-10%] w-[50%] h-[50%] rounded-full bg-primary-container/5 blur-[120px] pointer-events-none"></div>
+      <div className="fixed bottom-[-20%] right-[-10%] w-[40%] h-[40%] rounded-full bg-secondary-container/10 blur-[100px] pointer-events-none"></div>
+
+      {/* Global Header */}
+      <header className="h-[60px] bg-surface-container-highest/80 backdrop-blur-3xl border-b border-outline-variant/10 flex items-center px-4 justify-between sticky top-0 z-50">
+        <div className="flex items-center gap-4">
+          <button onClick={() => setIsMenuOpen(true)} className="text-on-surface-variant hover:text-on-surface p-1 rounded-md transition-colors"><span className="material-symbols-outlined">menu</span></button>
+          <div className="text-on-surface font-black text-xl flex items-center gap-2 tracking-tighter">
+            <span className="text-2xl">🐼</span> PandaHub
+          </div>
+          <div className="hidden md:flex items-center text-sm font-semibold text-on-surface ml-2">Dashboard</div>
+        </div>
+        <div className="flex items-center gap-4">
+          <div className="relative hidden md:block">
+            <span className="material-symbols-outlined absolute left-2.5 top-1.5 text-on-surface-variant text-[18px]">search</span>
+            <input type="text" placeholder="Type / to search" className="bg-surface border border-outline-variant/20 rounded-lg py-1.5 pl-9 pr-3 text-sm text-on-surface placeholder-on-surface-variant focus:outline-none focus:border-primary w-72 transition-all shadow-sm" />
+          </div>
+          <div className="flex items-center gap-2 text-on-surface-variant">
+            <button className="p-1 hover:text-on-surface hover:bg-surface-variant/30 rounded-md transition-all"><span className="material-symbols-outlined text-[20px]">add</span></button>
+            <button className="p-1 hover:text-on-surface hover:bg-surface-variant/30 rounded-md transition-all"><span className="material-symbols-outlined text-[20px]">adjust</span></button>
+            <button className="p-1 hover:text-on-surface hover:bg-surface-variant/30 rounded-md transition-all"><span className="material-symbols-outlined text-[20px]">alt_route</span></button>
+            <button className="p-1 hover:text-on-surface hover:bg-surface-variant/30 rounded-md transition-all"><span className="material-symbols-outlined text-[20px]">inbox</span></button>
+            <div className="w-7 h-7 rounded-full overflow-hidden border border-outline-variant/20 ml-2 cursor-pointer shadow-sm bg-surface-container-highest">
+              {user?.avatar_url ? (
+                <img alt="User Avatar" className="w-full h-full object-cover" src={user.avatar_url} />
+              ) : (
+                <div className="w-full h-full flex items-center justify-center text-xs font-bold text-on-surface-variant">
+                  {user?.username?.charAt(0).toUpperCase() || 'U'}
+                </div>
+              )}
+            </div>
+          </div>
+        </div>
+      </header>
+
+      {/* Slide-out Navigation Menu Overlay */}
+      {isMenuOpen && (
+        <div className="fixed inset-0 z-[100] flex">
+          {/* Backdrop */}
+          <div className="absolute inset-0 bg-black/40 backdrop-blur-sm transition-opacity" onClick={() => setIsMenuOpen(false)}></div>
+          
+          {/* Menu Panel */}
+          <div className="relative w-80 max-w-[85vw] h-full bg-surface shadow-2xl animate-[slide-in-left_0.3s_ease-out] border-r border-outline-variant/20 flex flex-col">
+            <div className="p-4 border-b border-outline-variant/10 flex items-center justify-between bg-surface-container-lowest">
+               <div className="flex items-center gap-2 text-on-surface font-black text-xl tracking-tighter">
+                  <span className="text-2xl">🐼</span> PandaHub
+               </div>
+               <button onClick={() => setIsMenuOpen(false)} className="text-on-surface-variant hover:text-on-surface transition-colors p-1 rounded-md hover:bg-surface-variant/50"><span className="material-symbols-outlined">close</span></button>
+            </div>
+            
+            <div className="flex-1 overflow-y-auto p-4 space-y-6 custom-scrollbar">
+               {/* Navigation Sections */}
+               <div>
+                  <h3 className="text-[11px] font-bold text-on-surface-variant uppercase tracking-wider mb-2 px-1">Home</h3>
+                  <div className="space-y-0.5">
+                     <a href="/dashboard" className="flex items-center gap-3 px-3 py-2 rounded-lg bg-primary-container text-on-primary-container font-medium text-sm transition-colors"><span className="material-symbols-outlined text-[18px]">dashboard</span> Dashboard</a>
+                     <a href="#" className="flex items-center gap-3 px-3 py-2 rounded-lg hover:bg-surface-variant/50 text-on-surface font-medium text-sm transition-colors"><span className="material-symbols-outlined text-[18px]">account_circle</span> Your profile</a>
+                  </div>
+               </div>
+               
+               <div>
+                  <h3 className="text-[11px] font-bold text-on-surface-variant uppercase tracking-wider mb-2 px-1">Work</h3>
+                  <div className="space-y-0.5">
+                     <a href="#" className="flex items-center gap-3 px-3 py-2 rounded-lg hover:bg-surface-variant/50 text-on-surface font-medium text-sm transition-colors"><span className="material-symbols-outlined text-[18px]">adjust</span> Issues</a>
+                     <a href="#" className="flex items-center gap-3 px-3 py-2 rounded-lg hover:bg-surface-variant/50 text-on-surface font-medium text-sm transition-colors"><span className="material-symbols-outlined text-[18px]">alt_route</span> Pull requests</a>
+                     <a href="#" className="flex items-center gap-3 px-3 py-2 rounded-lg hover:bg-surface-variant/50 text-on-surface font-medium text-sm transition-colors"><span className="material-symbols-outlined text-[18px]">forum</span> Discussions</a>
+                     <a href="#" className="flex items-center gap-3 px-3 py-2 rounded-lg hover:bg-surface-variant/50 text-on-surface font-medium text-sm transition-colors"><span className="material-symbols-outlined text-[18px]">view_kanban</span> Projects</a>
+                  </div>
+               </div>
+               
+               <div>
+                  <h3 className="text-[11px] font-bold text-on-surface-variant uppercase tracking-wider mb-2 px-1">Code & Automation</h3>
+                  <div className="space-y-0.5">
+                     <a href="#" className="flex items-center gap-3 px-3 py-2 rounded-lg hover:bg-surface-variant/50 text-on-surface font-medium text-sm transition-colors"><span className="material-symbols-outlined text-[18px]">code</span> Repositories</a>
+                     <a href="#" className="flex items-center gap-3 px-3 py-2 rounded-lg hover:bg-surface-variant/50 text-on-surface font-medium text-sm transition-colors"><span className="material-symbols-outlined text-[18px]">terminal</span> Codespaces</a>
+                     <a href="#" className="flex items-center gap-3 px-3 py-2 rounded-lg hover:bg-surface-variant/50 text-on-surface font-medium text-sm transition-colors"><span className="material-symbols-outlined text-[18px]">play_circle</span> Actions</a>
+                     <a href="#" className="flex items-center gap-3 px-3 py-2 rounded-lg hover:bg-surface-variant/50 text-on-surface font-medium text-sm transition-colors"><span className="material-symbols-outlined text-[18px]">inventory_2</span> Packages</a>
+                  </div>
+               </div>
+
+               <div>
+                  <h3 className="text-[11px] font-bold text-on-surface-variant uppercase tracking-wider mb-2 px-1">Organizations</h3>
+                  <div className="space-y-0.5">
+                     <a href="#" className="flex items-center gap-3 px-3 py-2 rounded-lg hover:bg-surface-variant/50 text-on-surface font-medium text-sm transition-colors">
+                       <span className="w-5 h-5 rounded bg-blue-500/20 text-blue-500 border border-blue-500/20 flex items-center justify-center text-xs font-bold">D</span> DevOS
+                     </a>
+                     <a href="#" className="flex items-center gap-3 px-3 py-2 rounded-lg hover:bg-surface-variant/50 text-on-surface font-medium text-sm transition-colors">
+                       <span className="w-5 h-5 rounded bg-purple-500/20 text-purple-500 border border-purple-500/20 flex items-center justify-center text-xs font-bold">U</span> UI Labs
+                     </a>
+                  </div>
+               </div>
+            </div>
+            
+            <div className="p-4 border-t border-outline-variant/10 bg-surface-container-lowest">
+               <a href="#" className="flex items-center gap-3 px-3 py-2 rounded-lg hover:bg-surface-variant/50 text-on-surface font-medium text-sm transition-colors"><span className="material-symbols-outlined text-[18px]">settings</span> Settings</a>
+               <a href="#" className="flex items-center gap-3 px-3 py-2 rounded-lg hover:bg-surface-variant/50 text-error font-medium text-sm transition-colors"><span className="material-symbols-outlined text-[18px]">logout</span> Sign out</a>
+            </div>
+          </div>
+        </div>
+      )}
+
+      {/* Main 3-Column Layout */}
+      <div className="flex-1 w-full max-w-[1400px] mx-auto p-4 md:p-6 grid grid-cols-1 lg:grid-cols-12 gap-8 relative z-10">
+        
+        {/* Left Column (Sidebar) */}
+        <aside className="lg:col-span-3 space-y-6 hidden lg:block self-start sticky top-[84px] h-[calc(100vh-84px)] overflow-y-auto overscroll-contain custom-scrollbar pb-10">
+          <div className="flex items-center gap-3">
+            <div className="w-7 h-7 rounded-full overflow-hidden border border-outline-variant/20 bg-surface-container-highest">
+              {user?.avatar_url ? (
+                <img alt="User Avatar" className="w-full h-full object-cover" src={user.avatar_url} />
+              ) : (
+                <div className="w-full h-full flex items-center justify-center text-xs font-bold text-on-surface-variant">
+                  {user?.username?.charAt(0).toUpperCase() || 'U'}
+                </div>
+              )}
+            </div>
+            <span className="font-semibold text-sm text-on-surface">{user?.username || 'user'}</span>
+            <span className="material-symbols-outlined text-[16px] text-on-surface-variant cursor-pointer hover:text-on-surface ml-auto">expand_more</span>
+          </div>
+
+          <div className="pt-2 border-t border-outline-variant/10">
+            <div className="flex items-center justify-between mb-3">
+              <h2 className="font-semibold text-sm text-on-surface">Top repositories</h2>
+              <a href="/new" className="bg-primary hover:bg-primary/90 text-on-primary text-xs font-semibold px-2.5 py-1.5 rounded-lg flex items-center gap-1 transition-colors shadow-sm shadow-primary/20">
+                <span className="material-symbols-outlined text-[14px]" style={{fontVariationSettings: '"FILL" 1'}}>book</span> New
+              </a>
+            </div>
+
+            <div className="relative mb-3">
+              <span className="material-symbols-outlined absolute left-2.5 top-1.5 text-on-surface-variant text-[16px]">search</span>
+              <input type="text" placeholder="Find a repository..." className="w-full bg-surface border border-outline-variant/20 rounded-lg py-1.5 pl-8 pr-3 text-sm text-on-surface placeholder-on-surface-variant focus:outline-none focus:border-primary transition-colors shadow-sm" />
+            </div>
+
+            <div className="space-y-1">
+              <div className="py-8 px-4 text-center border border-dashed border-outline-variant/30 rounded-xl bg-surface-container-lowest/50">
+                <span className="material-symbols-outlined text-[32px] text-on-surface-variant/40 mb-2">inventory_2</span>
+                <p className="text-sm font-medium text-on-surface-variant">No repositories yet</p>
+                <p className="text-xs text-on-surface-variant/70 mt-1 mb-3">Create your first repository to get started.</p>
+                <Link href="/new" className="text-xs font-semibold text-primary hover:text-primary-fixed transition-colors">
+                  Create repository →
+                </Link>
+              </div>
+            </div>
+          </div>
+        </aside>
+
+        {/* Center Column (Feed) */}
+        <div className="lg:col-span-6 space-y-6 pb-20">
+          <h1 className="text-2xl font-bold font-headline text-on-surface">Home</h1>
+
+          {/* AI Ask Box */}
+          <div className="glass-panel border border-outline-variant/20 rounded-2xl overflow-hidden shadow-md">
+            <div className="p-5 border-b border-outline-variant/10 bg-surface-container-lowest/50">
+              <input type="text" placeholder="Ask anything or type @ to add context" className="w-full bg-transparent outline-none text-lg text-on-surface placeholder-on-surface-variant/50 font-medium" />
+            </div>
+            <div className="p-3 bg-surface/50 backdrop-blur-md flex items-center justify-between">
+              <div className="flex items-center gap-2">
+                 <button className="px-3 py-1.5 bg-surface-variant/50 hover:bg-surface-variant border border-outline-variant/10 rounded-lg text-sm flex items-center gap-1 font-medium text-on-surface transition-colors">
+                   <span className="material-symbols-outlined text-[16px]">chat</span> Ask <span className="material-symbols-outlined text-[16px]">arrow_drop_down</span>
+                 </button>
+                 <button className="px-3 py-1.5 bg-transparent hover:bg-surface-variant/50 rounded-lg text-sm flex items-center gap-1 font-medium text-on-surface-variant hover:text-on-surface transition-colors">
+                   <span className="material-symbols-outlined text-[16px]">book</span> All repositories <span className="material-symbols-outlined text-[16px]">arrow_drop_down</span>
+                 </button>
+                 <button className="w-8 h-8 flex items-center justify-center bg-transparent hover:bg-surface-variant/50 rounded-lg text-on-surface-variant hover:text-on-surface transition-colors">
+                   <span className="material-symbols-outlined text-[18px]">add</span>
+                 </button>
+              </div>
+              <div className="flex items-center gap-3">
+                 <button className="text-sm font-medium flex items-center gap-1 text-on-surface-variant hover:text-on-surface transition-colors">
+                   <span className="material-symbols-outlined text-[16px]">group</span> Auto
+                 </button>
+                 <div className="w-px h-4 bg-outline-variant/20"></div>
+                 <button className="text-on-surface-variant hover:text-on-surface transition-colors flex items-center">
+                   <span className="material-symbols-outlined text-[18px]">history</span>
+                 </button>
+                 <button className="text-on-surface-variant hover:text-primary transition-colors flex items-center">
+                   <span className="material-symbols-outlined text-[18px]">send</span>
+                 </button>
+              </div>
+            </div>
+          </div>
+
+          {/* Action Pills */}
+          <div className="flex items-center gap-3 flex-wrap pt-2">
+            <button className="px-4 py-2 rounded-full bg-surface-container-low border border-outline-variant/20 shadow-sm text-sm font-medium flex items-center gap-2 hover:bg-surface-variant hover:border-outline-variant/40 hover:-translate-y-0.5 transition-all text-on-surface">
+              <span className="material-symbols-outlined text-[18px] text-primary">smart_toy</span> Agent
+            </button>
+            <button className="px-4 py-2 rounded-full bg-surface-container-low border border-outline-variant/20 shadow-sm text-sm font-medium flex items-center gap-2 hover:bg-surface-variant hover:border-outline-variant/40 hover:-translate-y-0.5 transition-all text-on-surface">
+              <span className="material-symbols-outlined text-[18px] text-error">adjust</span> Create issue
+            </button>
+            <button className="px-4 py-2 rounded-full bg-surface-container-low border border-outline-variant/20 shadow-sm text-sm font-medium flex items-center gap-2 hover:bg-surface-variant hover:border-outline-variant/40 hover:-translate-y-0.5 transition-all text-on-surface">
+              <span className="material-symbols-outlined text-[18px] text-tertiary">code</span> Write code <span className="material-symbols-outlined text-[16px] text-on-surface-variant">expand_more</span>
+            </button>
+            <button className="px-4 py-2 rounded-full bg-surface-container-low border border-outline-variant/20 shadow-sm text-sm font-medium flex items-center gap-2 hover:bg-surface-variant hover:border-outline-variant/40 hover:-translate-y-0.5 transition-all text-on-surface">
+              <span className="material-symbols-outlined text-[18px] text-orange-500">terminal</span> Git <span className="material-symbols-outlined text-[16px] text-on-surface-variant">expand_more</span>
+            </button>
+            <button className="px-4 py-2 rounded-full bg-surface-container-low border border-outline-variant/20 shadow-sm text-sm font-medium flex items-center gap-2 hover:bg-surface-variant hover:border-outline-variant/40 hover:-translate-y-0.5 transition-all text-on-surface">
+              <span className="material-symbols-outlined text-[18px] text-green-500">alt_route</span> Pull requests <span className="material-symbols-outlined text-[16px] text-on-surface-variant">expand_more</span>
+            </button>
+          </div>
+
+          {/* Feed */}
+          <div className="pt-6">
+            <div className="flex items-center justify-between mb-4">
+              <h2 className="text-sm font-bold text-on-surface">Feed</h2>
+              <button className="px-3 py-1.5 rounded-lg bg-surface-container hover:bg-surface-variant border border-outline-variant/10 text-sm font-medium flex items-center gap-1.5 text-on-surface transition-colors shadow-sm">
+                <span className="material-symbols-outlined text-[16px]">filter_list</span> Filter
+              </button>
+            </div>
+
+            <div className="space-y-4">
+              <div className="glass-card rounded-2xl p-10 border border-outline-variant/10 flex flex-col items-center justify-center text-center">
+                <div className="w-16 h-16 rounded-full bg-surface-container-high border border-outline-variant/20 flex items-center justify-center text-on-surface-variant/50 mb-4 shadow-inner">
+                  <span className="material-symbols-outlined text-3xl">notifications_paused</span>
+                </div>
+                <h3 className="text-lg font-bold font-headline text-on-surface mb-2">Activity is quiet</h3>
+                <p className="text-sm text-on-surface-variant max-w-sm mb-6">
+                  When you star repositories, follow users, or join organizations, their activity will show up here.
+                </p>
+                <Link href="/explore" className="px-5 py-2.5 bg-primary-container text-on-primary-container font-semibold text-sm rounded-xl hover:bg-primary-container/90 transition-all shadow-sm">
+                  Explore PandaHub
+                </Link>
+              </div>
+            </div>
+          </div>
         </div>
 
-        {/* Right Widgets */}
-        <div className="hidden lg:block">
-          {renderWidgets()}
-        </div>
-      </main>
+        {/* Right Column (Widgets) */}
+        <aside className="lg:col-span-3 space-y-6 hidden lg:block self-start sticky top-[84px]">
+          
+          <div className="glass-panel border border-outline-variant/20 rounded-2xl p-6 text-center shadow-sm">
+             <span className="text-4xl block mb-3 animate-bounce-in">🐼</span>
+             <h3 className="font-bold text-on-surface text-base mb-2">Welcome to PandaHub</h3>
+             <p className="text-xs text-on-surface-variant mb-4">
+               The platform for modern developers to build, ship, and collaborate.
+             </p>
+             <div className="text-[10px] font-mono text-outline-variant uppercase tracking-widest px-3 py-1 bg-surface-container rounded-full inline-block border border-outline-variant/10">
+               Coming Soon
+             </div>
+          </div>
+
+        </aside>
+
+      </div>
+
+      <Settings />
     </div>
-  )
+  );
 }

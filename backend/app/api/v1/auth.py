@@ -6,7 +6,7 @@ only translate between HTTP (request parsing, status codes) and the
 service layer. This keeps the routes thin and testable independent of
 FastAPI's request/response machinery.
 """
-from fastapi import APIRouter, Depends, UploadFile, File, status
+from fastapi import APIRouter, Depends, UploadFile, File, status, Response
 from sqlalchemy.ext.asyncio import AsyncSession
 
 from app.api.dependencies import get_current_active_user
@@ -49,12 +49,12 @@ async def register(payload: UserRegister, db: AsyncSession = Depends(get_db)):
     return user
 
 
-@router.post("/verify-email", status_code=status.HTTP_204_NO_CONTENT)
+@router.post("/verify-email", status_code=status.HTTP_204_NO_CONTENT, response_model=None)
 async def verify_email(payload: EmailVerificationConfirm, db: AsyncSession = Depends(get_db)):
     await auth_service.verify_email(db, payload.token)
 
 
-@router.post("/resend-verification", status_code=status.HTTP_204_NO_CONTENT)
+@router.post("/resend-verification", status_code=status.HTTP_204_NO_CONTENT, response_model=None)
 async def resend_verification(payload: ResendVerificationRequest, db: AsyncSession = Depends(get_db)):
     await auth_service.resend_verification(db, payload.email)
 
@@ -98,7 +98,7 @@ async def refresh(payload: RefreshRequest, db: AsyncSession = Depends(get_db)):
     return TokenPair(access_token=access_token, refresh_token=refresh_token)
 
 
-@router.post("/logout", status_code=status.HTTP_204_NO_CONTENT)
+@router.post("/logout", status_code=status.HTTP_204_NO_CONTENT, response_model=None)
 async def logout(payload: RefreshRequest, db: AsyncSession = Depends(get_db)):
     await auth_service.revoke_refresh_token(db, payload.refresh_token)
 
@@ -109,18 +109,19 @@ async def logout(payload: RefreshRequest, db: AsyncSession = Depends(get_db)):
 @router.post(
     "/password-reset/request",
     status_code=status.HTTP_204_NO_CONTENT,
+    response_model=None,
     dependencies=[Depends(password_reset_rate_limiter)],
 )
 async def request_password_reset(payload: PasswordResetRequest, db: AsyncSession = Depends(get_db)):
     await auth_service.request_password_reset(db, payload.email)
 
 
-@router.post("/password-reset/confirm", status_code=status.HTTP_204_NO_CONTENT)
+@router.post("/password-reset/confirm", status_code=status.HTTP_204_NO_CONTENT, response_model=None)
 async def confirm_password_reset(payload: PasswordResetConfirm, db: AsyncSession = Depends(get_db)):
     await auth_service.confirm_password_reset(db, payload.token, payload.new_password)
 
 
-@router.post("/change-password", status_code=status.HTTP_204_NO_CONTENT)
+@router.post("/change-password", status_code=status.HTTP_204_NO_CONTENT, response_model=None)
 async def change_password(
     payload: ChangePasswordRequest,
     db: AsyncSession = Depends(get_db),
@@ -138,7 +139,7 @@ async def setup_two_factor(current_user: User = Depends(get_current_active_user)
     return TwoFactorSetupResponse(secret=secret, provisioning_uri=uri)
 
 
-@router.post("/2fa/enable", status_code=status.HTTP_204_NO_CONTENT)
+@router.post("/2fa/enable", status_code=status.HTTP_204_NO_CONTENT, response_model=None)
 async def enable_two_factor(
     payload: TwoFactorVerifyRequest,
     raw_secret: str,
@@ -151,7 +152,7 @@ async def enable_two_factor(
     await auth_service.enable_two_factor(db, current_user, raw_secret, payload.totp_code)
 
 
-@router.post("/2fa/disable", status_code=status.HTTP_204_NO_CONTENT)
+@router.post("/2fa/disable", status_code=status.HTTP_204_NO_CONTENT, response_model=None)
 async def disable_two_factor(
     payload: TwoFactorDisableRequest,
     db: AsyncSession = Depends(get_db),

@@ -31,7 +31,7 @@ from __future__ import annotations
 import uuid
 from typing import Annotated, Optional
 
-from fastapi import APIRouter, Depends, Query, status
+from fastapi import APIRouter, Depends, Query, status, Response
 from sqlalchemy.ext.asyncio import AsyncSession
 
 from app.api.dependencies import (
@@ -161,6 +161,7 @@ async def update_issue(
 @router.delete(
     "/{owner}/{repo}/issues/{number}",
     status_code=status.HTTP_204_NO_CONTENT,
+    response_model=None,
     summary="Delete an issue",
 )
 async def delete_issue(
@@ -273,6 +274,7 @@ async def update_comment(
 @router.delete(
     "/{owner}/{repo}/issues/{number}/comments/{comment_id}",
     status_code=status.HTTP_204_NO_CONTENT,
+    response_model=None,
     summary="Delete a comment",
 )
 async def delete_comment(
@@ -345,6 +347,7 @@ async def update_label(
 @router.delete(
     "/{owner}/{repo}/labels/{label_id}",
     status_code=status.HTTP_204_NO_CONTENT,
+    response_model=None,
     summary="Delete a label",
 )
 async def delete_label(
@@ -417,6 +420,7 @@ async def update_milestone(
 @router.delete(
     "/{owner}/{repo}/milestones/{milestone_id}",
     status_code=status.HTTP_204_NO_CONTENT,
+    response_model=None,
     summary="Delete a milestone",
 )
 async def delete_milestone(

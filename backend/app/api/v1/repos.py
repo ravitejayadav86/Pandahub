@@ -37,7 +37,7 @@ from __future__ import annotations
 import uuid
 from typing import Annotated, Optional
 
-from fastapi import APIRouter, Depends, Query, status
+from fastapi import APIRouter, Depends, Query, status, Response
 from sqlalchemy.ext.asyncio import AsyncSession
 
 from app.api.dependencies import (
@@ -127,6 +127,7 @@ async def update_repository(
 @router.delete(
     "/{owner}/{repo}",
     status_code=status.HTTP_204_NO_CONTENT,
+    response_model=None,
     summary="Delete a repository",
 )
 async def delete_repository(
@@ -394,6 +395,7 @@ async def add_collaborator(
 @router.delete(
     "/{owner}/{repo}/collaborators/{collaborator_id}",
     status_code=status.HTTP_204_NO_CONTENT,
+    response_model=None,
     summary="Remove a collaborator",
 )
 async def remove_collaborator(

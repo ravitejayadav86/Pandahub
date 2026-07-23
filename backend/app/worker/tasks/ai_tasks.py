@@ -7,7 +7,7 @@ from sqlalchemy import select
 
 from app.core.config import get_settings
 from app.models.pull_request import PullRequest, AIReviewResult
-from app.models.repository import Repository
+from app.models.repo import Repository
 from app.services.ai_service import generate_code_review
 from app.git_engine.merger import get_pr_diff
 from app.worker.celery_app import celery_app

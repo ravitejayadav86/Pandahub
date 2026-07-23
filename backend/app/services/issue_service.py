@@ -147,7 +147,7 @@ async def update_label(
     )
     label = result.scalar_one_or_none()
     if label is None:
-        raise NotFoundError(f"Label not found.")
+        raise NotFoundError("Label not found.")
 
     if payload.name is not None:
         label.name = payload.name

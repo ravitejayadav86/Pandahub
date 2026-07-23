@@ -60,12 +60,10 @@ from app.schemas.repo_schema import (
     CommitListOut,
     ReadmeOut,
     RepositoryCreate,
-    RepositoryListOut,
     RepositoryOut,
     RepositoryUpdate,
     StarStatusOut,
     TreeOut,
-    WatchStatusOut,
 )
 from app.services import git_service, repo_service
 

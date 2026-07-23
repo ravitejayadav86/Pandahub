@@ -15,8 +15,6 @@ import uuid
 # pyrefly: ignore [missing-import]
 import pygit2
 from datetime import datetime, timezone
-from pathlib import Path
-from typing import Optional, Tuple
 
 from app.core.exceptions import ConflictError, AppError
 from app.core.logging import get_logger

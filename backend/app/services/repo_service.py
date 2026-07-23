@@ -27,11 +27,11 @@ from typing import Optional
 
 import pygit2
 
-from sqlalchemy import select, delete, func
+from sqlalchemy import select, delete
 from sqlalchemy.ext.asyncio import AsyncSession
 
 from app.core.config import get_settings
-from app.core.exceptions import ConflictError, NotFoundError, PermissionDeniedError
+from app.core.exceptions import ConflictError, PermissionDeniedError
 from app.core.logging import get_logger
 from app.models.enums import (
     OrganizationRole,

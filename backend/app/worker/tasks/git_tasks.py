@@ -29,7 +29,6 @@ import hmac
 import json
 import uuid
 from datetime import datetime, timezone
-from typing import Optional
 
 import requests  # synchronous HTTP client for webhook delivery
 
@@ -156,7 +155,7 @@ def post_receive_hook(
     # ------------------------------------------------------------------
     repo_uuid = uuid.UUID(repo_id)
     try:
-        from sqlalchemy import select, delete, update as sql_update
+        from sqlalchemy import select, delete
         from app.models.repo import Branch, Repository, Webhook
 
         session = _get_sync_session()
@@ -282,7 +281,6 @@ def _build_webhook_payload(
     pushed_at: datetime,
 ) -> dict:
     """Build the JSON payload delivered to webhook URLs."""
-    from app.git_engine.writer import RefUpdate
     refs = []
     primary_ref = ""
 

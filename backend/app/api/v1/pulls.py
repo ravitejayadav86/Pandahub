@@ -44,7 +44,7 @@ from app.schemas.pr_schema import (
     AIReviewResultOut,
 )
 from app.services import pr_service
-from app.models.pull_request import PullRequest, AIReviewResult
+from app.models.pull_request import AIReviewResult
 from sqlalchemy import select
 from app.worker.tasks.ai_tasks import generate_pr_review_task
 

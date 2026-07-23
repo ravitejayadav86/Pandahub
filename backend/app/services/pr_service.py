@@ -20,9 +20,9 @@ from sqlalchemy.orm import selectinload
 
 from app.core.exceptions import ConflictError, NotFoundError, PermissionDeniedError, AppError
 from app.core.logging import get_logger
-from app.git_engine.merger import check_mergeability, get_pr_diff, merge_commit
+from app.git_engine.merger import get_pr_diff, merge_commit
 from app.models.enums import PullRequestState, PermissionLevel
-from app.models.pull_request import PullRequest, PRComment, PRReview, PRReviewComment
+from app.models.pull_request import PullRequest, PRComment, PRReview
 from app.models.repo import Repository
 from app.models.user import User
 from app.schemas.pr_schema import (
@@ -30,7 +30,6 @@ from app.schemas.pr_schema import (
     PullRequestUpdate,
     PRCommentCreate,
     PRReviewCreate,
-    PRReviewCommentCreate,
 )
 
 logger = get_logger("app.services.pr_service")

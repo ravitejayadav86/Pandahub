@@ -114,6 +114,6 @@ async def generate_code_review(diff_text: str) -> Dict[str, Any]:
     except json.JSONDecodeError as e:
         logger.error(f"Failed to parse AI review JSON: {e}\nRaw output: {reply_text}")
         raise AppError("AI provider returned malformed JSON.")
-    except Exception as e:
+    except Exception:
         logger.exception("Unexpected error during AI review generation")
         raise AppError("An unexpected error occurred during AI review generation.")

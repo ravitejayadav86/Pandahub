@@ -50,7 +50,7 @@ from app.core.exceptions import NotFoundError, PermissionDeniedError, Unauthoriz
 from app.core.logging import get_logger
 from app.db.session import get_db
 from app.git_engine.auth import authenticate_git_request, make_www_authenticate_header
-from app.models.enums import PermissionLevel, RepositoryVisibility
+from app.models.enums import PermissionLevel
 from app.models.repo import Repository
 from app.models.user import User
 from app.permissions.resolver import resolve_permission

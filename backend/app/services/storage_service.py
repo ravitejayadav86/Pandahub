@@ -16,7 +16,6 @@ Artifacts (CI outputs, release bundles) are namespaced by
 """
 import uuid
 from io import BytesIO
-from typing import Optional
 
 import boto3
 from botocore.client import Config as BotoConfig

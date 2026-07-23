@@ -23,7 +23,6 @@ from __future__ import annotations
 import asyncio
 import base64
 import mimetypes
-import os
 from datetime import datetime, timezone
 from typing import Optional
 

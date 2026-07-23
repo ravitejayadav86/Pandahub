@@ -29,8 +29,8 @@ const STAGES = [
   { key: 'scale',          label: 'Scale',          color: '#f59e0b' },
 ];
 
-function stageInfo(stage: string) {
-  return STAGES.find(s => s.key === stage) ?? STAGES[0];
+function stageInfo(stage: string): { key: string; label: string; color: string } {
+  return STAGES.find(s => s.key === stage) ?? STAGES[0]!;
 }
 
 const MOCK_STARTUPS: Startup[] = [
@@ -136,7 +136,7 @@ export default function StartupsPage() {
         <div style={{ display: 'flex', gap: 16, marginBottom: 32, flexWrap: 'wrap', alignItems: 'center' }}>
           <div style={{ flex: 1, minWidth: 260, position: 'relative' }}>
             <span className="material-symbols-outlined" style={{ position: 'absolute', left: 14, top: '50%', transform: 'translateY(-50%)', fontSize: 20, color: 'var(--text-muted)' }}>search</span>
-            <input type="text" placeholder="Search startups…" value={search} onChange={e => setSearch(e.target.value)} style={{
+            <input type="text" placeholder="Search startupsâ€¦" value={search} onChange={e => setSearch(e.target.value)} style={{
               width: '100%', height: 44, paddingLeft: 44, paddingRight: 16, border: '1px solid var(--border-color)',
               borderRadius: 12, fontSize: 14, outline: 'none', background: '#fff', fontFamily: 'Inter, sans-serif',
               boxSizing: 'border-box',
@@ -158,7 +158,7 @@ export default function StartupsPage() {
         {loading ? (
           <div style={{ textAlign: 'center', padding: '80px', color: 'var(--text-muted)' }}>
             <span className="material-symbols-outlined" style={{ fontSize: 40, display: 'block', marginBottom: 12 }}>hourglass_empty</span>
-            Loading startups…
+            Loading startupsâ€¦
           </div>
         ) : filtered.length === 0 ? (
           <div style={{ textAlign: 'center', padding: '80px', background: '#fff', borderRadius: 24, border: '1px solid var(--border-color)' }}>

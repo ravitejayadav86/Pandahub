@@ -32,7 +32,7 @@ export default function Navbar() {
       {/* Search */}
       <div style={{ flex: 1, maxWidth: 400, margin: '0 32px', position: 'relative' }}>
         <span className="material-symbols-outlined" style={{ position: 'absolute', left: 12, top: '50%', transform: 'translateY(-50%)', fontSize: 18, color: 'var(--text-muted)' }}>search</span>
-        <input type="text" placeholder="Search repositories, users…" style={{
+        <input type="text" placeholder="Search repositories, usersâ€¦" style={{
           width: '100%', height: 36, paddingLeft: 38, paddingRight: 12,
           border: '1.5px solid var(--border-color)', borderRadius: 8,
           fontSize: 13, outline: 'none', background: 'var(--bg-primary)',

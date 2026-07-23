@@ -3,7 +3,7 @@ interface LoadingSpinnerProps {
   label?: string;
 }
 
-export default function LoadingSpinner({ size = 32, label = 'Loading…' }: LoadingSpinnerProps) {
+export default function LoadingSpinner({ size = 32, label = 'Loadingâ€¦' }: LoadingSpinnerProps) {
   return (
     <div style={{ display: 'flex', flexDirection: 'column', alignItems: 'center', justifyContent: 'center', gap: 12, padding: 40, color: 'var(--text-muted)' }}>
       <div style={{

@@ -188,7 +188,7 @@ function IssueRow({ issue, owner, repoName, isLast }: {
       onMouseLeave={() => setHovered(false)}
     >
       <span style={{ fontSize: 18, marginTop: 2, flexShrink: 0 }}>
-        {issue.state === 'open' ? '🐛' : '✅'}
+        {issue.state === 'open' ? '🐛' : '�…'}
       </span>
       <div style={{ flex: 1 }}>
         <Link

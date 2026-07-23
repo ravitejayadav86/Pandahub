@@ -140,7 +140,7 @@ export default function AdminPage() {
           <div style={{ background: '#fff', borderRadius: 20, border: '1px solid var(--border-color)', boxShadow: '0 4px 20px rgba(0,0,0,0.04)', overflow: 'hidden' }}>
             <div style={{ padding: '20px 24px', borderBottom: '1px solid var(--border-color)', display: 'flex', alignItems: 'center', gap: 12 }}>
               <span className="material-symbols-outlined" style={{ fontSize: 20, color: 'var(--text-muted)' }}>search</span>
-              <input type="text" placeholder="Search users by username or email…" value={search} onChange={e => setSearch(e.target.value)}
+              <input type="text" placeholder="Search users by username or emailâ€¦" value={search} onChange={e => setSearch(e.target.value)}
                 style={{ flex: 1, border: 'none', outline: 'none', fontSize: 14, background: 'transparent', fontFamily: 'Inter, sans-serif' }} />
               <span style={{ fontSize: 12, color: 'var(--text-muted)', fontWeight: 500 }}>{filtered.length} users</span>
             </div>
@@ -150,7 +150,7 @@ export default function AdminPage() {
               ))}
             </div>
             {loading ? (
-              <div style={{ padding: '60px', textAlign: 'center', color: 'var(--text-muted)' }}>Loading users…</div>
+              <div style={{ padding: '60px', textAlign: 'center', color: 'var(--text-muted)' }}>Loading usersâ€¦</div>
             ) : filtered.length === 0 ? (
               <div style={{ padding: '60px', textAlign: 'center', color: 'var(--text-muted)' }}>
                 <span className="material-symbols-outlined" style={{ fontSize: 48, display: 'block', marginBottom: 12 }}>group_off</span>

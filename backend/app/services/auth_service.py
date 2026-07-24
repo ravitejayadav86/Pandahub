@@ -298,13 +298,88 @@ async def disable_two_factor(db: AsyncSession, user: User, password: str, totp_c
     if not pyotp.TOTP(secret).verify(totp_code, valid_window=1):
         raise AuthError("Invalid authentication code", status.HTTP_400_BAD_REQUEST)
 
-    user.two_factor_enabled = False
     user.two_factor_secret_encrypted = None
+    user.two_factor_enabled = False
     await db.commit()
 
 
 def verify_totp_for_login(user: User, totp_code: str) -> bool:
-    if user.two_factor_secret_encrypted is None:
+    if not user.two_factor_enabled or user.two_factor_secret_encrypted is None:
         return False
     secret = decrypt_secret(user.two_factor_secret_encrypted)
     return pyotp.TOTP(secret).verify(totp_code, valid_window=1)
+
+
+# ---------------------------------------------------------------------------
+# OAuth (Google / GitHub)
+# ---------------------------------------------------------------------------
+async def handle_oauth_login(
+    db: AsyncSession,
+    provider: str,
+    provider_account_id: str,
+    email: str,
+    name: str | None = None,
+    avatar_url: str | None = None,
+) -> User:
+    from app.models.user import OAuthAccount
+    from app.models.enums import OAuthProvider
+    
+    # 1. Check if OAuth account exists
+    result = await db.execute(
+        select(OAuthAccount).where(
+            OAuthAccount.provider == provider,
+            OAuthAccount.provider_account_id == provider_account_id
+        )
+    )
+    oauth_account = result.scalar_one_or_none()
+    
+    if oauth_account:
+        # Existing linked account
+        user_result = await db.execute(select(User).where(User.id == oauth_account.user_id))
+        user = user_result.scalar_one()
+        return user
+        
+    # 2. Check if user with this email already exists (linking)
+    user_result = await db.execute(select(User).where(User.email == email))
+    user = user_result.scalar_one_or_none()
+    
+    if not user:
+        # 3. Create new user
+        # Generate a unique username derived from email or name
+        base_username = (email.split("@")[0] if email else "user").lower()
+        import re
+        base_username = re.sub(r'[^a-z0-9]', '', base_username)
+        if not base_username:
+            base_username = "oauthuser"
+            
+        username = base_username
+        
+        # Ensure uniqueness
+        while True:
+            existing_u = await db.execute(select(User.id).where(User.username == username))
+            if not existing_u.scalar_one_or_none():
+                break
+            import random
+            username = f"{base_username}{random.randint(100, 9999)}"
+            
+        user = User(
+            username=username,
+            email=email,
+            full_name=name,
+            avatar_url=avatar_url,
+            is_verified=True,  # OAuth emails are inherently verified by the provider
+            hashed_password=None, # OAuth only
+        )
+        db.add(user)
+        await db.flush()
+        
+    # Link OAuth account to the user
+    new_oauth = OAuthAccount(
+        user_id=user.id,
+        provider=provider,
+        provider_account_id=provider_account_id,
+    )
+    db.add(new_oauth)
+    await db.commit()
+    await db.refresh(user)
+    return user

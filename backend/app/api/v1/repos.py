@@ -71,6 +71,72 @@ router = APIRouter(tags=["repositories"])
 
 
 # ---------------------------------------------------------------------------
+# Public explore / discovery
+# ---------------------------------------------------------------------------
+
+@router.get(
+    "/explore/repos",
+    response_model=list[RepositoryOut],
+    summary="Discover public repositories",
+    tags=["explore"],
+)
+async def explore_repos(
+    db: AsyncSession = Depends(get_db),
+    q: Optional[str] = Query(None, description="Search name or description"),
+    sort: str = Query("updated", regex="^(updated|stars|forks)$"),
+    limit: Annotated[int, Query(ge=1, le=100)] = 24,
+    offset: Annotated[int, Query(ge=0)] = 0,
+) -> list[RepositoryOut]:
+    """
+    Return a paginated list of public repositories for the explore/discovery feed.
+
+    - ``q``: case-insensitive search on repository name and description.
+    - ``sort``: ``updated`` (default), ``stars``, or ``forks``.
+    """
+    from sqlalchemy import or_, func as sqlfunc, desc
+    from app.models.enums import RepositoryVisibility
+
+    stmt = (
+        select(Repository)
+        .where(Repository.visibility == RepositoryVisibility.PUBLIC)
+    )
+
+    if q:
+        pattern = f"%{q.lower()}%"
+        stmt = stmt.where(
+            or_(
+                sqlfunc.lower(Repository.name).like(pattern),
+                sqlfunc.lower(Repository.description).like(pattern),
+            )
+        )
+
+    if sort == "stars":
+        stmt = stmt.order_by(desc(Repository.star_count))
+    elif sort == "forks":
+        stmt = stmt.order_by(desc(Repository.fork_count))
+    else:
+        stmt = stmt.order_by(desc(Repository.updated_at))
+
+    stmt = stmt.limit(limit).offset(offset)
+    result = await db.execute(stmt)
+    repos = result.scalars().all()
+
+    # Attach owner username for display in cards
+    out: list[RepositoryOut] = []
+    for repo in repos:
+        repo_out = RepositoryOut.model_validate(repo)
+        if repo.owner_user_id:
+            from app.models.user import User as UserModel
+            u_result = await db.execute(
+                select(UserModel.username).where(UserModel.id == repo.owner_user_id)
+            )
+            username = u_result.scalar_one_or_none()
+            repo_out.owner_username = username
+        out.append(repo_out)
+    return out
+
+
+# ---------------------------------------------------------------------------
 # Repository CRUD
 # ---------------------------------------------------------------------------
 

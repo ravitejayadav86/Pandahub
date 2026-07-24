@@ -88,6 +88,9 @@ class RepositoryOut(BaseModel):
     created_at: datetime
     updated_at: datetime
 
+    # Not a DB column — populated by the explore endpoint for display purposes
+    owner_username: Optional[str] = None
+
 
 class RepositoryListOut(BaseModel):
     """Paginated list wrapper returned by list-style endpoints."""

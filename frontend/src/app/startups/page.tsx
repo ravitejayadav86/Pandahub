@@ -13,7 +13,7 @@ interface Startup {
   description?: string;
   logo_url?: string;
   website_url?: string;
-  stage: 'idea' | 'mvp' | 'early_traction' | 'growth' | 'scale';
+  stage: 'idea' | 'mvp' | 'early_traction' | 'growth' | 'scaling';
   created_by: string;
   created_at: string;
   open_roles_count?: number;
@@ -26,27 +26,19 @@ const STAGES = [
   { key: 'mvp',            label: 'MVP',            color: '#0A84FF' },
   { key: 'early_traction', label: 'Early Traction', color: '#06b6d4' },
   { key: 'growth',         label: 'Growth',         color: '#22c55e' },
-  { key: 'scale',          label: 'Scale',          color: '#f59e0b' },
+  { key: 'scaling',        label: 'Scale',          color: '#f59e0b' },
 ];
 
 function stageInfo(stage: string): { key: string; label: string; color: string } {
   return STAGES.find(s => s.key === stage) ?? STAGES[0]!;
 }
 
-const MOCK_STARTUPS: Startup[] = [
-  { id: '1', name: 'CodeLens AI', slug: 'codelens-ai', tagline: 'AI-powered code review for teams', stage: 'growth', created_by: 'alice', created_at: new Date().toISOString(), open_roles_count: 3, member_count: 8 },
-  { id: '2', name: 'DataPulse', slug: 'datapulse', tagline: 'Real-time analytics without the complexity', stage: 'mvp', created_by: 'bob', created_at: new Date().toISOString(), open_roles_count: 5, member_count: 3 },
-  { id: '3', name: 'DevSecOps Hub', slug: 'devsecops-hub', tagline: 'Security baked into every deploy', stage: 'idea', created_by: 'carol', created_at: new Date().toISOString(), open_roles_count: 2, member_count: 2 },
-  { id: '4', name: 'FlowForge', slug: 'flowforge', tagline: 'Visual CI/CD pipeline builder', stage: 'early_traction', created_by: 'dave', created_at: new Date().toISOString(), open_roles_count: 4, member_count: 6 },
-  { id: '5', name: 'Infracraft', slug: 'infracraft', tagline: 'Infrastructure as code, simplified', stage: 'scale', created_by: 'eve', created_at: new Date().toISOString(), open_roles_count: 0, member_count: 22 },
-  { id: '6', name: 'SyncBoard', slug: 'syncboard', tagline: 'Async-first project management for devs', stage: 'mvp', created_by: 'frank', created_at: new Date().toISOString(), open_roles_count: 3, member_count: 4 },
-];
-
 export default function StartupsPage() {
   const { user } = useAuthStore();
   const router = useRouter();
   const [startups, setStartups] = useState<Startup[]>([]);
   const [loading, setLoading] = useState(true);
+  const [error, setError] = useState<string | null>(null);
   const [search, setSearch] = useState('');
   const [stageFilter, setStageFilter] = useState('all');
   const [mounted, setMounted] = useState(false);
@@ -56,22 +48,41 @@ export default function StartupsPage() {
   useEffect(() => {
     const load = async () => {
       setLoading(true);
+      setError(null);
       try {
-        const res = await api.get<Startup[]>('/startups');
-        setStartups(res.data.length ? res.data : MOCK_STARTUPS);
+        const params: Record<string, string> = {};
+        if (stageFilter !== 'all') params.stage = stageFilter;
+        if (search) params.q = search;
+        const res = await api.get<Startup[]>('/startups', { params });
+        setStartups(res.data);
       } catch {
-        setStartups(MOCK_STARTUPS);
+        setError('Failed to load startups. Please try again later.');
+        setStartups([]);
       }
       setLoading(false);
     };
     load();
-  }, []);
+  }, [stageFilter]);
 
-  const filtered = startups.filter(s => {
-    const matchStage = stageFilter === 'all' || s.stage === stageFilter;
-    const matchSearch = !search || s.name.toLowerCase().includes(search.toLowerCase()) || (s.tagline || '').toLowerCase().includes(search.toLowerCase());
-    return matchStage && matchSearch;
-  });
+  const handleSearch = (e: React.FormEvent) => {
+    e.preventDefault();
+    const load = async () => {
+      setLoading(true);
+      setError(null);
+      try {
+        const params: Record<string, string> = {};
+        if (stageFilter !== 'all') params.stage = stageFilter;
+        if (search) params.q = search;
+        const res = await api.get<Startup[]>('/startups', { params });
+        setStartups(res.data);
+      } catch {
+        setError('Failed to load startups. Please try again later.');
+        setStartups([]);
+      }
+      setLoading(false);
+    };
+    load();
+  };
 
   return (
     <div style={{ minHeight: '100vh', background: 'var(--bg-primary)', fontFamily: 'Inter, sans-serif' }}>
@@ -113,7 +124,7 @@ export default function StartupsPage() {
         </div>
       </div>
 
-      {/* Stats Banner */}
+      {/* Stats Banner — derived from real data */}
       <div style={{ background: '#fff', borderBottom: '1px solid var(--border-color)', padding: '0 24px' }}>
         <div style={{ maxWidth: 1200, margin: '0 auto', display: 'flex', gap: 0 }}>
           {[
@@ -133,18 +144,24 @@ export default function StartupsPage() {
       {/* Main Content */}
       <div id="explore" style={{ maxWidth: 1200, margin: '0 auto', padding: '40px 24px' }}>
         {/* Search + Filter */}
-        <div style={{ display: 'flex', gap: 16, marginBottom: 32, flexWrap: 'wrap', alignItems: 'center' }}>
+        <form onSubmit={handleSearch} style={{ display: 'flex', gap: 16, marginBottom: 32, flexWrap: 'wrap', alignItems: 'center' }}>
           <div style={{ flex: 1, minWidth: 260, position: 'relative' }}>
             <span className="material-symbols-outlined" style={{ position: 'absolute', left: 14, top: '50%', transform: 'translateY(-50%)', fontSize: 20, color: 'var(--text-muted)' }}>search</span>
-            <input type="text" placeholder="Search startups…" value={search} onChange={e => setSearch(e.target.value)} style={{
-              width: '100%', height: 44, paddingLeft: 44, paddingRight: 16, border: '1px solid var(--border-color)',
-              borderRadius: 12, fontSize: 14, outline: 'none', background: '#fff', fontFamily: 'Inter, sans-serif',
-              boxSizing: 'border-box',
-            }} />
+            <input
+              type="text"
+              placeholder="Search startups…"
+              value={search}
+              onChange={e => setSearch(e.target.value)}
+              style={{
+                width: '100%', height: 44, paddingLeft: 44, paddingRight: 16, border: '1px solid var(--border-color)',
+                borderRadius: 12, fontSize: 14, outline: 'none', background: '#fff', fontFamily: 'Inter, sans-serif',
+                boxSizing: 'border-box',
+              }}
+            />
           </div>
           <div style={{ display: 'flex', gap: 8, flexWrap: 'wrap' }}>
             {STAGES.map(s => (
-              <button key={s.key} onClick={() => setStageFilter(s.key)} style={{
+              <button key={s.key} type="button" onClick={() => setStageFilter(s.key)} style={{
                 padding: '8px 16px', borderRadius: 999, fontSize: 13, fontWeight: 600, cursor: 'pointer',
                 border: stageFilter === s.key ? `2px solid ${s.color}` : '1.5px solid var(--border-color)',
                 background: stageFilter === s.key ? `${s.color}15` : '#fff',
@@ -153,18 +170,34 @@ export default function StartupsPage() {
               }}>{s.label}</button>
             ))}
           </div>
-        </div>
+          <button type="submit" style={{
+            padding: '10px 20px', borderRadius: 12, background: 'linear-gradient(135deg, #6366f1, #8b5cf6)',
+            color: '#fff', fontWeight: 600, fontSize: 14, border: 'none', cursor: 'pointer',
+          }}>Search</button>
+        </form>
 
         {loading ? (
           <div style={{ textAlign: 'center', padding: '80px', color: 'var(--text-muted)' }}>
             <span className="material-symbols-outlined" style={{ fontSize: 40, display: 'block', marginBottom: 12 }}>hourglass_empty</span>
             Loading startups…
           </div>
-        ) : filtered.length === 0 ? (
+        ) : error ? (
+          <div style={{ textAlign: 'center', padding: '80px', background: '#fff1f1', borderRadius: 24, border: '1px solid #fca5a5' }}>
+            <span className="material-symbols-outlined" style={{ fontSize: 48, display: 'block', marginBottom: 12, color: '#ef4444' }}>error</span>
+            <p style={{ color: '#ef4444', fontWeight: 600 }}>{error}</p>
+            <button onClick={() => window.location.reload()} style={{ marginTop: 16, padding: '10px 24px', borderRadius: 10, background: '#ef4444', color: '#fff', fontWeight: 600, border: 'none', cursor: 'pointer' }}>
+              Retry
+            </button>
+          </div>
+        ) : startups.length === 0 ? (
           <div style={{ textAlign: 'center', padding: '80px', background: '#fff', borderRadius: 24, border: '1px solid var(--border-color)' }}>
             <span className="material-symbols-outlined" style={{ fontSize: 56, display: 'block', marginBottom: 16, color: 'var(--text-muted)' }}>rocket_launch</span>
             <h2 style={{ fontSize: 20, fontWeight: 700, marginBottom: 8 }}>No startups found</h2>
-            <p style={{ color: 'var(--text-muted)', marginBottom: 24 }}>Be the first to list yours!</p>
+            <p style={{ color: 'var(--text-muted)', marginBottom: 24 }}>
+              {search || stageFilter !== 'all'
+                ? 'Try adjusting your search or filter.'
+                : 'Be the first to list yours!'}
+            </p>
             {user && (
               <button onClick={() => router.push('/startups/new')} style={{ padding: '12px 24px', borderRadius: 10, background: 'linear-gradient(135deg, #6366f1, #8b5cf6)', color: '#fff', fontWeight: 600, border: 'none', cursor: 'pointer' }}>
                 List a Startup
@@ -173,7 +206,7 @@ export default function StartupsPage() {
           </div>
         ) : (
           <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fill, minmax(320px, 1fr))', gap: 24 }}>
-            {filtered.map(startup => {
+            {startups.map(startup => {
               const stage = stageInfo(startup.stage);
               return (
                 <div key={startup.id} style={{
@@ -183,6 +216,7 @@ export default function StartupsPage() {
                 }}
                   onMouseEnter={e => { (e.currentTarget as HTMLElement).style.transform = 'translateY(-4px)'; (e.currentTarget as HTMLElement).style.boxShadow = '0 12px 40px rgba(0,0,0,0.1)'; }}
                   onMouseLeave={e => { (e.currentTarget as HTMLElement).style.transform = 'none'; (e.currentTarget as HTMLElement).style.boxShadow = '0 4px 20px rgba(0,0,0,0.04)'; }}
+                  onClick={() => router.push(`/startups/${startup.slug}`)}
                 >
                   {/* Card Header */}
                   <div style={{ height: 80, background: `linear-gradient(135deg, ${stage.color}22, ${stage.color}08)`, padding: '20px 24px', display: 'flex', alignItems: 'center', justifyContent: 'space-between', borderBottom: '1px solid var(--border-color)' }}>
@@ -213,7 +247,10 @@ export default function StartupsPage() {
                           </span>
                         )}
                       </div>
-                      <button style={{ padding: '7px 16px', borderRadius: 8, background: 'var(--text-primary)', color: '#fff', fontSize: 12, fontWeight: 600, border: 'none', cursor: 'pointer' }}>
+                      <button
+                        onClick={e => { e.stopPropagation(); router.push(`/startups/${startup.slug}`); }}
+                        style={{ padding: '7px 16px', borderRadius: 8, background: 'var(--text-primary)', color: '#fff', fontSize: 12, fontWeight: 600, border: 'none', cursor: 'pointer' }}
+                      >
                         View
                       </button>
                     </div>

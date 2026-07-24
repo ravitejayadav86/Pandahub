@@ -322,7 +322,6 @@ async def handle_oauth_login(
     avatar_url: str | None = None,
 ) -> User:
     from app.models.user import OAuthAccount
-    from app.models.enums import OAuthProvider
     
     # 1. Check if OAuth account exists
     result = await db.execute(

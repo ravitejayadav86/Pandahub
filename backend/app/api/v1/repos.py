@@ -38,6 +38,7 @@ import uuid
 from typing import Annotated, Optional
 
 from fastapi import APIRouter, Depends, Query, status
+from sqlalchemy import select
 from sqlalchemy.ext.asyncio import AsyncSession
 
 from app.api.dependencies import (
@@ -94,7 +95,7 @@ async def explore_repos(
     - ``sort``: ``updated`` (default), ``stars``, or ``forks``.
     """
     from sqlalchemy import or_, func as sqlfunc, desc
-    from app.models.enums import RepositoryVisibility
+    from app.models.enums import RepositoryVisibility  # noqa: PLC0415
 
     stmt = (
         select(Repository)
@@ -126,9 +127,8 @@ async def explore_repos(
     for repo in repos:
         repo_out = RepositoryOut.model_validate(repo)
         if repo.owner_user_id:
-            from app.models.user import User as UserModel
             u_result = await db.execute(
-                select(UserModel.username).where(UserModel.id == repo.owner_user_id)
+                select(User.username).where(User.id == repo.owner_user_id)
             )
             username = u_result.scalar_one_or_none()
             repo_out.owner_username = username

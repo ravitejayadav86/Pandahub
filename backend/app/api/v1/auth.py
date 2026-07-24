@@ -6,7 +6,7 @@ only translate between HTTP (request parsing, status codes) and the
 service layer. This keeps the routes thin and testable independent of
 FastAPI's request/response machinery.
 """
-from fastapi import APIRouter, Depends, UploadFile, File, status, Response
+from fastapi import APIRouter, Depends, UploadFile, File, status
 from sqlalchemy.ext.asyncio import AsyncSession
 
 from app.api.dependencies import get_current_active_user

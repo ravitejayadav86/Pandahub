@@ -78,7 +78,7 @@ export default function IssuesPage() {
                   cursor: 'pointer', fontSize: 13,
                 }}
               >
-                {s === 'open' ? `🐛 ${repo?.open_issues_count ?? 0} Open` : '✓ Closed'}
+                {s === 'open' ? `ðŸ› ${repo?.open_issues_count ?? 0} Open` : 'âœ“ Closed'}
               </button>
             ))}
           </div>
@@ -112,7 +112,7 @@ export default function IssuesPage() {
                 style={inputStyle}
               />
               <textarea
-                placeholder="Describe the issue…"
+                placeholder="Describe the issueâ€¦"
                 value={newIssue.body}
                 onChange={(e) => setNewIssue({ ...newIssue, body: e.target.value })}
                 rows={5}
@@ -128,7 +128,7 @@ export default function IssuesPage() {
                     color: '#fff', fontWeight: 600, border: 'none', cursor: 'pointer',
                   }}
                 >
-                  {submitting ? 'Submitting…' : 'Submit issue'}
+                  {submitting ? 'Submittingâ€¦' : 'Submit issue'}
                 </button>
                 <button
                   type="button"
@@ -149,11 +149,11 @@ export default function IssuesPage() {
         {/* Issue list */}
         {loading ? (
           <div style={{ textAlign: 'center', padding: '60px', color: 'var(--text-secondary)' }}>
-            Loading issues…
+            Loading issuesâ€¦
           </div>
         ) : issues.length === 0 ? (
           <div className="glass-card" style={{ padding: '60px', textAlign: 'center' }}>
-            <div style={{ fontSize: 48, marginBottom: 12 }}>🎉</div>
+            <div style={{ fontSize: 48, marginBottom: 12 }}>ðŸŽ‰</div>
             <h3 style={{ fontWeight: 600, marginBottom: 8 }}>No {filter} issues</h3>
             <p style={{ color: 'var(--text-secondary)' }}>
               {filter === 'open' ? 'Everything looks good!' : 'No issues have been closed yet.'}
@@ -188,7 +188,7 @@ function IssueRow({ issue, owner, repoName, isLast }: {
       onMouseLeave={() => setHovered(false)}
     >
       <span style={{ fontSize: 18, marginTop: 2, flexShrink: 0 }}>
-        {issue.state === 'open' ? '🐛' : '�…'}
+        {issue.state === 'open' ? 'ðŸ›' : 'âœâ€¦'}
       </span>
       <div style={{ flex: 1 }}>
         <Link
@@ -206,7 +206,7 @@ function IssueRow({ issue, owner, repoName, isLast }: {
       </div>
       {issue.comment_count > 0 && (
         <div style={{ display: 'flex', alignItems: 'center', gap: 4, fontSize: 13, color: 'var(--text-muted)' }}>
-          💬 {issue.comment_count}
+          ðŸ’¬ {issue.comment_count}
         </div>
       )}
     </div>

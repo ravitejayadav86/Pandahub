@@ -47,16 +47,20 @@ def _get_s3_client():
 def ensure_buckets_exist() -> None:
     """Called once at application startup (see main.py lifespan) so the
     required buckets exist before the first upload request arrives."""
-    client = _get_s3_client()
-    for bucket in (
-        settings.MINIO_BUCKET_AVATARS,
-        settings.MINIO_BUCKET_LFS,
-        settings.MINIO_BUCKET_ARTIFACTS,
-    ):
-        try:
-            client.head_bucket(Bucket=bucket)
-        except ClientError:
-            client.create_bucket(Bucket=bucket)
+    try:
+        client = _get_s3_client()
+        for bucket in (
+            settings.MINIO_BUCKET_AVATARS,
+            settings.MINIO_BUCKET_LFS,
+            settings.MINIO_BUCKET_ARTIFACTS,
+        ):
+            try:
+                client.head_bucket(Bucket=bucket)
+            except ClientError:
+                client.create_bucket(Bucket=bucket)
+    except Exception as e:
+        import logging
+        logging.getLogger("app.startup").warning(f"MinIO storage is unreachable. S3 uploads will fail. Error: {e}")
 
 
 # ─────────────────────────────────────────────────────────────────────────────

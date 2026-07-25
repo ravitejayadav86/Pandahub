@@ -1,5 +1,5 @@
 """
-Repository lifecycle service — all create/delete/fork/star/watch operations.
+Repository lifecycle service Ã¢â‚¬â€ all create/delete/fork/star/watch operations.
 
 Design principles:
 - Every mutation that touches BOTH the database and the filesystem (create,
@@ -124,7 +124,7 @@ def _init_bare_repo(disk_path: str, default_branch: str, auto_init: bool) -> Non
             sig,
             "Initial commit",
             tree_id,
-            [],  # no parents — this IS the root commit
+            [],  # no parents Ã¢â‚¬â€ this IS the root commit
         )
 
 
@@ -253,7 +253,7 @@ async def create_repository(
     # Flush (not commit) to surface constraint violations before going to disk.
     await db.flush()
 
-    # Initialise the bare repo on disk — run in executor to avoid blocking
+    # Initialise the bare repo on disk Ã¢â‚¬â€ run in executor to avoid blocking
     # the event loop (pygit2 is synchronous / GIL-holding).
     try:
         loop = asyncio.get_event_loop()
@@ -275,7 +275,7 @@ async def create_repository(
 
     # If auto_init, cache the initial branch row.
     if payload.auto_init:
-        # We need the HEAD SHA — open the repo synchronously (cheap, already created).
+        # We need the HEAD SHA Ã¢â‚¬â€ open the repo synchronously (cheap, already created).
         def _get_head_sha() -> str:
             r = pygit2.Repository(disk_path)
             return str(r.head.target)
@@ -295,7 +295,7 @@ async def create_repository(
     await db.refresh(repo)
     logger.info(
         "Repository created",
-        extra={"repo_id": str(repo_id), "name": repo.name, "disk_path": disk_path},
+        extra={"repo_id": str(repo_id), "repo_name": repo.name, "disk_path": disk_path},
     )
     return repo
 
@@ -348,7 +348,7 @@ async def delete_repository(
             )
     logger.info(
         "Repository deleted",
-        extra={"repo_id": repo_id, "name": name, "disk_path": disk_path},
+        extra={"repo_id": repo_id, "repo_name": name, "disk_path": disk_path},
     )
 
 

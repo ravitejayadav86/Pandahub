@@ -432,3 +432,92 @@ async def google_callback(code: str, db: AsyncSession = Depends(get_db)):
     # Redirect to frontend callback page
     frontend_callback = f"{settings.FRONTEND_URL}/oauth/callback?access_token={panda_access}&refresh_token={panda_refresh}"
     return RedirectResponse(frontend_callback)
+
+
+@router.get("/github/login", summary="Initiate GitHub OAuth login")
+async def github_login():
+    from fastapi.responses import RedirectResponse
+    from fastapi import HTTPException
+    from app.core.config import get_settings
+    settings = get_settings()
+    client_id = settings.GITHUB_OAUTH_CLIENT_ID
+    if not client_id:
+        raise HTTPException(status_code=500, detail="GitHub OAuth not configured")
+    
+    redirect_uri = f"{settings.BACKEND_URL}/api/v1/auth/github/callback"
+    url = f"https://github.com/login/oauth/authorize?client_id={client_id}&redirect_uri={redirect_uri}&scope=user:email"
+    return RedirectResponse(url)
+
+
+@router.get("/github/callback", summary="GitHub OAuth callback")
+async def github_callback(code: str, db: AsyncSession = Depends(get_db)):
+    from fastapi.responses import RedirectResponse
+    from fastapi import HTTPException
+    from app.core.config import get_settings
+    import httpx
+    
+    settings = get_settings()
+    client_id = settings.GITHUB_OAUTH_CLIENT_ID
+    client_secret = settings.GITHUB_OAUTH_CLIENT_SECRET
+    
+    async with httpx.AsyncClient() as client:
+        # Exchange code for token
+        token_response = await client.post(
+            "https://github.com/login/oauth/access_token",
+            data={
+                "client_id": client_id,
+                "client_secret": client_secret,
+                "code": code,
+            },
+            headers={"Accept": "application/json"}
+        )
+        if token_response.status_code != 200:
+            raise HTTPException(status_code=400, detail="Failed to exchange token with GitHub")
+            
+        tokens = token_response.json()
+        if "access_token" not in tokens:
+            raise HTTPException(status_code=400, detail="Failed to get access token from GitHub")
+        access_token = tokens["access_token"]
+        
+        # Get user info
+        user_response = await client.get(
+            "https://api.github.com/user",
+            headers={"Authorization": f"Bearer {access_token}"}
+        )
+        if user_response.status_code != 200:
+            raise HTTPException(status_code=400, detail="Failed to fetch user info from GitHub")
+            
+        user_info = user_response.json()
+        
+        # Get user email
+        email_response = await client.get(
+            "https://api.github.com/user/emails",
+            headers={"Authorization": f"Bearer {access_token}"}
+        )
+        if email_response.status_code != 200:
+            raise HTTPException(status_code=400, detail="Failed to fetch user emails from GitHub")
+            
+        emails = email_response.json()
+        primary_email = next((e["email"] for e in emails if e["primary"]), None)
+        if not primary_email and emails:
+            primary_email = emails[0]["email"]
+            
+        if not primary_email:
+            raise HTTPException(status_code=400, detail="No email found on GitHub account")
+        
+    # Handle user login/creation
+    user = await auth_service.handle_oauth_login(
+        db=db,
+        provider="github",
+        provider_account_id=str(user_info["id"]),
+        email=primary_email,
+        name=user_info.get("name") or user_info.get("login"),
+        avatar_url=user_info.get("avatar_url")
+    )
+    
+    # Generate our JWT tokens
+    panda_access, panda_refresh = await auth_service.issue_token_pair(db, user)
+    
+    # Redirect to frontend callback page
+    frontend_callback = f"{settings.FRONTEND_URL}/oauth/callback?access_token={panda_access}&refresh_token={panda_refresh}"
+    return RedirectResponse(frontend_callback)

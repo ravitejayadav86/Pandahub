@@ -7,19 +7,41 @@ Design decisions:
   (e.g. "we have exactly 1,842 users") and make merging data across future
   shards/read-replicas conflict-free.
 - `naming_convention` is set explicitly because Alembic's autogenerate diffing
-  is unreliable without deterministic constraint/index names — without this,
+  is unreliable without deterministic constraint/index names -- without this,
   renaming a column can produce a migration that drops and recreates an
   unrelated, auto-named constraint.
 - TimestampMixin uses `server_default=func.now()` (DB-side) rather than a
   Python-side default, so timestamps are correct even for rows inserted by
   raw SQL, triggers, or another service directly against Postgres.
+- `type_annotation_map` is CRITICAL: without it, SQLAlchemy serializes Python
+  str-Enum members using their .name ("PUBLIC") instead of their .value
+  ("public"). Our Postgres enum types only accept the lowercase .value
+  strings (see models/enums.py), so every enum column would fail on insert
+  without this. `values_callable` forces SQLAlchemy to always use .value.
 """
 import uuid
 from datetime import datetime
 
 from sqlalchemy import MetaData, DateTime, func
+from sqlalchemy import Enum as SQLEnum
 from sqlalchemy.dialects.postgresql import UUID
 from sqlalchemy.orm import DeclarativeBase, Mapped, mapped_column
+
+from app.models.enums import (
+    RepositoryVisibility,
+    OwnerType,
+    PermissionLevel,
+    OrganizationRole,
+    TeamRole,
+    IssueState,
+    PullRequestState,
+    ReviewState,
+    MilestoneState,
+    DiscussionCategory,
+    StartupStage,
+    CollaborationRequestStatus,
+    OAuthProvider,
+)
 
 NAMING_CONVENTION = {
     "ix": "ix_%(column_0_label)s",
@@ -30,9 +52,31 @@ NAMING_CONVENTION = {
 }
 
 
+def _enum_type(enum_cls):
+    """Every enum column uses .value ('public'), never .name ('PUBLIC'),
+    matching the lowercase values the Postgres enum types actually accept."""
+    return SQLEnum(enum_cls, values_callable=lambda obj: [e.value for e in obj])
+
+
 class Base(DeclarativeBase):
     """Shared declarative base for all models. Import this, never create a second Base."""
     metadata = MetaData(naming_convention=NAMING_CONVENTION)
+
+    type_annotation_map = {
+        RepositoryVisibility: _enum_type(RepositoryVisibility),
+        OwnerType: _enum_type(OwnerType),
+        PermissionLevel: _enum_type(PermissionLevel),
+        OrganizationRole: _enum_type(OrganizationRole),
+        TeamRole: _enum_type(TeamRole),
+        IssueState: _enum_type(IssueState),
+        PullRequestState: _enum_type(PullRequestState),
+        ReviewState: _enum_type(ReviewState),
+        MilestoneState: _enum_type(MilestoneState),
+        DiscussionCategory: _enum_type(DiscussionCategory),
+        StartupStage: _enum_type(StartupStage),
+        CollaborationRequestStatus: _enum_type(CollaborationRequestStatus),
+        OAuthProvider: _enum_type(OAuthProvider),
+    }
 
 
 class UUIDPKMixin:
@@ -40,7 +84,7 @@ class UUIDPKMixin:
 
     Application-side generation (vs. Postgres' gen_random_uuid()) means the
     ORM object has a valid `.id` immediately after construction, before any
-    flush — useful for building related objects in the same transaction
+    flush -- useful for building related objects in the same transaction
     without needing to round-trip to the DB first.
     """
     id: Mapped[uuid.UUID] = mapped_column(

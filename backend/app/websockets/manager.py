@@ -77,10 +77,14 @@ class ConnectionManager:
         """Run once at app startup (see main.py lifespan). Subscribes to the
         shared Redis channel and forwards each event to this process's
         locally-connected clients, if any."""
-        redis_client = aioredis.from_url(settings.REDIS_URL, decode_responses=True)
-        pubsub = redis_client.pubsub()
-        await pubsub.subscribe(NOTIFICATIONS_CHANNEL)
-        logger.info("websocket redis listener started")
+        try:
+            redis_client = aioredis.from_url(settings.REDIS_URL, decode_responses=True)
+            pubsub = redis_client.pubsub()
+            await pubsub.subscribe(NOTIFICATIONS_CHANNEL)
+            logger.info("websocket redis listener started")
+        except Exception as e:
+            logger.warning(f"Failed to start Redis listener. Real-time events will not work. Error: {e}")
+            return
 
         async def _listen():
             async for message in pubsub.listen():

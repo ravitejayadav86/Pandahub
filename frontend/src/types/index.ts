@@ -10,6 +10,7 @@ export interface User {
   company?: string;
   is_active: boolean;
   is_verified: boolean;
+  two_factor_enabled?: boolean;
   created_at: string;
 }
 

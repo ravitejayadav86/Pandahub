@@ -1,10 +1,11 @@
-﻿'use client';
+'use client';
 import { useState, useEffect } from 'react';
 import { useRouter } from 'next/navigation';
 import api from '@/lib/api';
 import { useAuthStore } from '@/store/authStore';
 import { User } from '@/types';
 import Navbar from '@/components/shared/Navbar';
+import { QRCodeSVG } from 'qrcode.react';
 
 type Section = 'profile' | 'account' | 'notifications' | 'danger';
 
@@ -20,6 +21,12 @@ export default function SettingsPage() {
   const [passwords, setPasswords] = useState({ current_password: '', new_password: '', confirm_password: '' });
   const [deleteConfirm, setDeleteConfirm] = useState('');
   const [showDeleteModal, setShowDeleteModal] = useState(false);
+
+  const [twoFaSetup, setTwoFaSetup] = useState<{ secret: string, provisioning_uri: string } | null>(null);
+  const [totpCode, setTotpCode] = useState('');
+  const [twoFaError, setTwoFaError] = useState('');
+  const [isTwoFaLoading, setIsTwoFaLoading] = useState(false);
+  const [disablePassword, setDisablePassword] = useState('');
 
   useEffect(() => {
     setMounted(true);
@@ -51,6 +58,53 @@ export default function SettingsPage() {
       setTimeout(() => setSaved(false), 3000);
     } catch {}
     setSaving(false);
+  };
+
+  const setupTwoFactor = async () => {
+    setIsTwoFaLoading(true);
+    setTwoFaError('');
+    try {
+      const { data } = await api.post('/auth/2fa/setup');
+      setTwoFaSetup(data);
+    } catch (err: any) {
+      setTwoFaError(err.response?.data?.detail || 'Failed to setup 2FA');
+    }
+    setIsTwoFaLoading(false);
+  };
+
+  const enableTwoFactor = async (e: React.FormEvent) => {
+    e.preventDefault();
+    if (!twoFaSetup) return;
+    setIsTwoFaLoading(true);
+    setTwoFaError('');
+    try {
+      await api.post(`/auth/2fa/enable?raw_secret=${twoFaSetup.secret}`, { totp_code: totpCode });
+      setTwoFaSetup(null);
+      setTotpCode('');
+      if (user) {
+        setUser({ ...user, two_factor_enabled: true });
+      }
+    } catch (err: any) {
+      setTwoFaError(err.response?.data?.detail || 'Invalid verification code');
+    }
+    setIsTwoFaLoading(false);
+  };
+
+  const disableTwoFactor = async (e: React.FormEvent) => {
+    e.preventDefault();
+    setIsTwoFaLoading(true);
+    setTwoFaError('');
+    try {
+      await api.post('/auth/2fa/disable', { password: disablePassword, totp_code: totpCode });
+      setDisablePassword('');
+      setTotpCode('');
+      if (user) {
+        setUser({ ...user, two_factor_enabled: false });
+      }
+    } catch (err: any) {
+      setTwoFaError(err.response?.data?.detail || 'Failed to disable 2FA');
+    }
+    setIsTwoFaLoading(false);
   };
 
   const SECTIONS: { id: Section; label: string; icon: string }[] = [
@@ -172,6 +226,73 @@ export default function SettingsPage() {
                   {saved && <span style={{ fontSize: 13, color: '#22c55e', fontWeight: 600 }}>✓ Updated!</span>}
                 </div>
               </form>
+
+              <div style={{ height: 1, background: 'var(--border-color)' }} />
+              
+              <div style={{ padding: '28px 32px' }}>
+                <h3 style={{ fontSize: 16, fontWeight: 700, margin: '0 0 16px 0' }}>Two-Factor Authentication (2FA)</h3>
+                
+                {user?.two_factor_enabled ? (
+                  <div>
+                    <div style={{ display: 'flex', alignItems: 'center', gap: 8, marginBottom: 16, color: '#22c55e', fontWeight: 600, fontSize: 14 }}>
+                      <span className="material-symbols-outlined" style={{ fontSize: 20 }}>check_circle</span>
+                      2FA is enabled
+                    </div>
+                    <form onSubmit={disableTwoFactor} style={{ padding: 20, background: '#f8fafc', borderRadius: 12, border: '1px solid var(--border-color)' }}>
+                      <p style={{ fontSize: 13, color: 'var(--text-secondary)', marginBottom: 16 }}>To disable 2FA, please verify your password and enter a 2FA code.</p>
+                      
+                      {twoFaError && (
+                        <div style={{ padding: '10px 14px', borderRadius: 8, background: '#fef2f2', color: '#ef4444', fontSize: 13, marginBottom: 16, border: '1px solid #fecaca' }}>
+                          {twoFaError}
+                        </div>
+                      )}
+
+                      <div style={{ display: 'flex', flexDirection: 'column', gap: 12, marginBottom: 16 }}>
+                        <input type="password" value={disablePassword} onChange={e => setDisablePassword(e.target.value)} placeholder="Current password" required style={inputStyle} />
+                        <input type="text" value={totpCode} onChange={e => setTotpCode(e.target.value.replace(/\D/g, '').slice(0, 6))} placeholder="6-digit authentication code" required style={inputStyle} />
+                      </div>
+                      
+                      <button type="submit" disabled={isTwoFaLoading || totpCode.length !== 6 || !disablePassword} style={{ padding: '9px 20px', borderRadius: 9, background: '#ef4444', color: '#fff', fontWeight: 700, fontSize: 13, border: 'none', cursor: 'pointer' }}>
+                        {isTwoFaLoading ? 'Disabling...' : 'Disable 2FA'}
+                      </button>
+                    </form>
+                  </div>
+                ) : twoFaSetup ? (
+                  <form onSubmit={enableTwoFactor} style={{ padding: 24, background: '#f8fafc', borderRadius: 12, border: '1px solid var(--border-color)' }}>
+                    <p style={{ fontSize: 14, fontWeight: 600, marginBottom: 12 }}>Scan this QR code with your authenticator app</p>
+                    <div style={{ padding: 16, background: '#fff', borderRadius: 12, display: 'inline-block', marginBottom: 16, border: '1px solid var(--border-color)' }}>
+                      <QRCodeSVG value={twoFaSetup.provisioning_uri} size={150} />
+                    </div>
+                    
+                    {twoFaError && (
+                      <div style={{ padding: '10px 14px', borderRadius: 8, background: '#fef2f2', color: '#ef4444', fontSize: 13, marginBottom: 16, border: '1px solid #fecaca' }}>
+                        {twoFaError}
+                      </div>
+                    )}
+
+                    <div style={{ marginBottom: 16 }}>
+                      <label style={{ fontSize: 13, fontWeight: 600, color: 'var(--text-secondary)', display: 'block', marginBottom: 6 }}>Verify Code</label>
+                      <input type="text" value={totpCode} onChange={e => setTotpCode(e.target.value.replace(/\D/g, '').slice(0, 6))} placeholder="6-digit code" required style={{ ...inputStyle, maxWidth: 200, letterSpacing: '2px', fontSize: 16 }} />
+                    </div>
+
+                    <div style={{ display: 'flex', gap: 10 }}>
+                      <button type="submit" disabled={isTwoFaLoading || totpCode.length !== 6} style={{ padding: '10px 24px', borderRadius: 10, background: 'var(--color-primary)', color: '#fff', fontWeight: 700, fontSize: 14, border: 'none', cursor: 'pointer' }}>
+                        {isTwoFaLoading ? 'Enabling...' : 'Enable 2FA'}
+                      </button>
+                      <button type="button" onClick={() => { setTwoFaSetup(null); setTotpCode(''); setTwoFaError(''); }} style={{ padding: '10px 24px', borderRadius: 10, background: '#fff', color: 'var(--text-secondary)', fontWeight: 600, fontSize: 14, border: '1px solid var(--border-color)', cursor: 'pointer' }}>
+                        Cancel
+                      </button>
+                    </div>
+                  </form>
+                ) : (
+                  <div>
+                    <p style={{ fontSize: 14, color: 'var(--text-secondary)', marginBottom: 16 }}>Protect your account with an extra layer of security. Once configured, you'll be required to enter both your password and an authentication code from your mobile phone in order to sign in.</p>
+                    <button type="button" onClick={setupTwoFactor} disabled={isTwoFaLoading} style={{ padding: '10px 24px', borderRadius: 10, background: '#fff', color: 'var(--text-primary)', fontWeight: 600, fontSize: 14, border: '1px solid var(--border-color)', cursor: 'pointer', boxShadow: '0 1px 2px rgba(0,0,0,0.05)' }}>
+                      {isTwoFaLoading ? 'Loading...' : 'Set up two-factor authentication'}
+                    </button>
+                  </div>
+                )}
+              </div>
             </div>
           )}
 

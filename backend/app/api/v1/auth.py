@@ -371,7 +371,7 @@ async def google_login():
     if not client_id:
         raise HTTPException(status_code=500, detail="Google OAuth not configured")
     
-    redirect_uri = "http://localhost:8000/api/v1/auth/google/callback"
+    redirect_uri = f"{settings.BACKEND_URL}/api/v1/auth/google/callback"
     url = f"https://accounts.google.com/o/oauth2/v2/auth?response_type=code&client_id={client_id}&redirect_uri={redirect_uri}&scope=openid%20email%20profile&access_type=offline"
     return RedirectResponse(url)
 
@@ -386,7 +386,7 @@ async def google_callback(code: str, db: AsyncSession = Depends(get_db)):
     settings = get_settings()
     client_id = settings.GOOGLE_OAUTH_CLIENT_ID
     client_secret = settings.GOOGLE_OAUTH_CLIENT_SECRET
-    redirect_uri = "http://localhost:8000/api/v1/auth/google/callback"
+    redirect_uri = f"{settings.BACKEND_URL}/api/v1/auth/google/callback"
     
     async with httpx.AsyncClient() as client:
         # Exchange code for token
@@ -430,5 +430,5 @@ async def google_callback(code: str, db: AsyncSession = Depends(get_db)):
     panda_access, panda_refresh = await auth_service.issue_token_pair(db, user)
     
     # Redirect to frontend callback page
-    frontend_callback = f"http://localhost:3000/oauth/callback?access_token={panda_access}&refresh_token={panda_refresh}"
+    frontend_callback = f"{settings.FRONTEND_URL}/oauth/callback?access_token={panda_access}&refresh_token={panda_refresh}"
     return RedirectResponse(frontend_callback)

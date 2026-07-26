@@ -1,8 +1,7 @@
-# ── Stage 1: Builder ──────────────────────────────────────────────────────────
-# This Dockerfile lives at the repo root so Render can find it
-# regardless of dockerContext configuration.
-FROM python:3.12-slim AS builder
+FROM python:3.12-slim
 
+# Install system deps for pygit2 (libgit2) and pip build tools.
+# libgit2-dev pulls in the correct runtime lib automatically.
 RUN apt-get update && apt-get install -y --no-install-recommends \
     build-essential \
     cmake \
@@ -11,27 +10,18 @@ RUN apt-get update && apt-get install -y --no-install-recommends \
     pkg-config \
     && rm -rf /var/lib/apt/lists/*
 
-WORKDIR /build
-
-COPY backend/requirements.txt .
-RUN pip install --no-cache-dir --prefix=/install -r requirements.txt
-
-
-# ── Stage 2: Runtime ──────────────────────────────────────────────────────────
-FROM python:3.12-slim
-
-RUN apt-get update && apt-get install -y --no-install-recommends \
-    libgit2-1.7 \
-    && rm -rf /var/lib/apt/lists/*
-
-COPY --from=builder /install /usr/local
-
 WORKDIR /app
 
+COPY backend/requirements.txt .
+RUN pip install --no-cache-dir -r requirements.txt
+
+# Copy backend application code
 COPY backend/ .
 
-RUN addgroup --system appgroup && adduser --system --ingroup appgroup appuser
-RUN chown -R appuser:appgroup /app
+# Non-root user for security
+RUN addgroup --system appgroup \
+ && adduser --system --ingroup appgroup appuser \
+ && chown -R appuser:appgroup /app
 USER appuser
 
 ENV PORT=8000

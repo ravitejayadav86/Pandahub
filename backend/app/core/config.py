@@ -10,7 +10,7 @@ secrets must have "a single validated source of truth."
 """
 from functools import lru_cache
 
-from pydantic import Field
+from pydantic import Field, field_validator
 from pydantic_settings import BaseSettings, SettingsConfigDict
 
 
@@ -27,6 +27,17 @@ class Settings(BaseSettings):
 
     # ---- Database ----
     DATABASE_URL: str
+
+    @field_validator("DATABASE_URL")
+    @classmethod
+    def fix_database_url(cls, v: str) -> str:
+        # Render provides `postgres://...` or `postgresql://...`
+        # We must rewrite it to use the asyncpg driver.
+        if v.startswith("postgres://"):
+            return v.replace("postgres://", "postgresql+asyncpg://", 1)
+        if v.startswith("postgresql://") and not v.startswith("postgresql+"):
+            return v.replace("postgresql://", "postgresql+asyncpg://", 1)
+        return v
 
     # ---- Redis ----
     REDIS_URL: str = "redis://redis:6379/0"

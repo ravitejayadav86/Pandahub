@@ -3,8 +3,8 @@ services:
   - type: web
     name: pandahub-backend
     runtime: docker
-    dockerfilePath: ./backend/Dockerfile
-    dockerContext: .    # repo root — Dockerfile COPYs from backend/ prefix
+    dockerfilePath: ./Dockerfile
+    dockerContext: .    # repo root
     plan: starter
     healthCheckPath: /health
     envVars:

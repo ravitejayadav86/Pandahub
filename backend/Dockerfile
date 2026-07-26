@@ -1,4 +1,6 @@
 # ── Stage 1: Builder ──────────────────────────────────────────────────────────
+# Build context is the repo ROOT (dockerContext: . in render.yaml), so all
+# paths below are relative to the repo root.
 FROM python:3.12-slim AS builder
 
 # libgit2 is required by pygit2; build deps only needed during compile.
@@ -12,7 +14,7 @@ RUN apt-get update && apt-get install -y --no-install-recommends \
 
 WORKDIR /build
 
-COPY requirements.txt .
+COPY backend/requirements.txt .
 RUN pip install --no-cache-dir --prefix=/install -r requirements.txt
 
 
@@ -29,8 +31,8 @@ COPY --from=builder /install /usr/local
 
 WORKDIR /app
 
-# Copy application code
-COPY . .
+# Copy the backend application code
+COPY backend/ .
 
 # Create non-root user for security
 RUN addgroup --system appgroup && adduser --system --ingroup appgroup appuser
@@ -41,7 +43,6 @@ USER appuser
 ENV PORT=8000
 
 # Run DB migrations then start uvicorn.
-# Using a shell form so $PORT is expanded at runtime.
 CMD alembic upgrade head && \
     uvicorn app.main:app \
         --host 0.0.0.0 \

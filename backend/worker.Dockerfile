@@ -1,4 +1,5 @@
 # ── Stage 1: Builder ──────────────────────────────────────────────────────────
+# Build context is the repo ROOT (dockerContext: . in render.yaml)
 FROM python:3.12-slim AS builder
 
 RUN apt-get update && apt-get install -y --no-install-recommends \
@@ -11,7 +12,7 @@ RUN apt-get update && apt-get install -y --no-install-recommends \
 
 WORKDIR /build
 
-COPY requirements.txt .
+COPY backend/requirements.txt .
 RUN pip install --no-cache-dir --prefix=/install -r requirements.txt
 
 
@@ -26,7 +27,7 @@ COPY --from=builder /install /usr/local
 
 WORKDIR /app
 
-COPY . .
+COPY backend/ .
 
 RUN addgroup --system appgroup && adduser --system --ingroup appgroup appuser
 RUN chown -R appuser:appgroup /app

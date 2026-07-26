@@ -4,7 +4,7 @@ services:
     name: pandahub-backend
     runtime: docker
     dockerfilePath: ./backend/Dockerfile
-    dockerContext: ./backend
+    dockerContext: .    # repo root — Dockerfile COPYs from backend/ prefix
     plan: starter
     healthCheckPath: /health
     envVars:
@@ -30,13 +30,13 @@ services:
       - key: BACKEND_URL
         sync: false          # Set to your Render backend URL after first deploy
       - key: CORS_ALLOWED_ORIGINS
-        value: "https://pandahub-taupe.vercel.app"  # Vercel frontend
+        value: "https://pandahub-taupe.vercel.app"
       - key: FRONTEND_URL
-        value: "https://pandahub-taupe.vercel.app"  # Where OAuth redirects go after login
+        value: "https://pandahub-taupe.vercel.app"
       - key: GOOGLE_OAUTH_CLIENT_ID
-        sync: false          # Paste from Google Cloud Console
+        sync: false
       - key: GOOGLE_OAUTH_CLIENT_SECRET
-        sync: false          # Paste from Google Cloud Console
+        sync: false
       - key: B2_KEY_ID
         sync: false          # Backblaze B2 Key ID
       - key: B2_APPLICATION_KEY
@@ -63,7 +63,7 @@ services:
     name: pandahub-worker
     runtime: docker
     dockerfilePath: ./backend/worker.Dockerfile
-    dockerContext: ./backend
+    dockerContext: .    # repo root — same as API service
     plan: starter
     envVars:
       - key: DATABASE_URL

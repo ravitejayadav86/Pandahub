@@ -370,24 +370,38 @@ async def google_login():
     client_id = settings.GOOGLE_OAUTH_CLIENT_ID
     if not client_id:
         raise HTTPException(status_code=500, detail="Google OAuth not configured")
-    
+
     redirect_uri = f"{settings.BACKEND_URL}/api/v1/auth/google/callback"
-    url = f"https://accounts.google.com/o/oauth2/v2/auth?response_type=code&client_id={client_id}&redirect_uri={redirect_uri}&scope=openid%20email%20profile&access_type=offline"
+    url = (
+        "https://accounts.google.com/o/oauth2/v2/auth"
+        f"?response_type=code"
+        f"&client_id={client_id}"
+        f"&redirect_uri={redirect_uri}"
+        f"&scope=openid%20email%20profile"
+        f"&access_type=offline"
+        f"&prompt=select_account"  # always show account chooser
+    )
     return RedirectResponse(url)
 
 
 @router.get("/google/callback", summary="Google OAuth callback")
-async def google_callback(code: str, db: AsyncSession = Depends(get_db)):
+async def google_callback(code: str | None = None, error: str | None = None, db: AsyncSession = Depends(get_db)):
     from fastapi.responses import RedirectResponse
     from fastapi import HTTPException
     from app.core.config import get_settings
     import httpx
-    
+
     settings = get_settings()
+
+    # User cancelled the Google OAuth flow or Google returned an error.
+    if error or not code:
+        frontend_error = f"{settings.FRONTEND_URL}/login?error=Google+login+cancelled"
+        return RedirectResponse(frontend_error)
+
     client_id = settings.GOOGLE_OAUTH_CLIENT_ID
     client_secret = settings.GOOGLE_OAUTH_CLIENT_SECRET
     redirect_uri = f"{settings.BACKEND_URL}/api/v1/auth/google/callback"
-    
+
     async with httpx.AsyncClient() as client:
         # Exchange code for token
         token_response = await client.post(
@@ -402,10 +416,12 @@ async def google_callback(code: str, db: AsyncSession = Depends(get_db)):
         )
         if token_response.status_code != 200:
             raise HTTPException(status_code=400, detail="Failed to exchange token with Google")
-            
+
         tokens = token_response.json()
+        if "access_token" not in tokens:
+            raise HTTPException(status_code=400, detail="Google did not return an access token")
         access_token = tokens["access_token"]
-        
+
         # Get user info
         user_response = await client.get(
             "https://www.googleapis.com/oauth2/v2/userinfo",
@@ -413,9 +429,9 @@ async def google_callback(code: str, db: AsyncSession = Depends(get_db)):
         )
         if user_response.status_code != 200:
             raise HTTPException(status_code=400, detail="Failed to fetch user info from Google")
-            
+
         user_info = user_response.json()
-        
+
     # Handle user login/creation
     user = await auth_service.handle_oauth_login(
         db=db,
@@ -425,10 +441,10 @@ async def google_callback(code: str, db: AsyncSession = Depends(get_db)):
         name=user_info.get("name"),
         avatar_url=user_info.get("picture")
     )
-    
+
     # Generate our JWT tokens
     panda_access, panda_refresh = await auth_service.issue_token_pair(db, user)
-    
+
     # Redirect to frontend callback page
     frontend_callback = f"{settings.FRONTEND_URL}/oauth/callback?access_token={panda_access}&refresh_token={panda_refresh}"
     return RedirectResponse(frontend_callback)

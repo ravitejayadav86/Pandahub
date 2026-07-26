@@ -16,6 +16,8 @@ simpler (if slightly blunter) version of full token-family tracking, and
 sufficient for now. A dedicated `token_family_id` column can be added
 later without a breaking migration if finer-grained revocation is needed.
 """
+import random
+import re
 import uuid
 from datetime import datetime, timedelta, timezone
 
@@ -322,60 +324,68 @@ async def handle_oauth_login(
     avatar_url: str | None = None,
 ) -> User:
     from app.models.user import OAuthAccount
-    
-    # 1. Check if OAuth account exists
+    from app.models.enums import OAuthProvider
+
+    # Convert the plain string provider name to the enum the column expects.
+    # Raises KeyError if an unknown provider is supplied -- intentional, since
+    # that would be a programming error in the calling route handler.
+    try:
+        provider_enum = OAuthProvider(provider.lower())
+    except ValueError:
+        raise AuthError(f"Unknown OAuth provider: {provider}", status.HTTP_400_BAD_REQUEST)
+
+    # 1. Check if OAuth account already exists (returning user).
     result = await db.execute(
         select(OAuthAccount).where(
-            OAuthAccount.provider == provider,
-            OAuthAccount.provider_account_id == provider_account_id
+            OAuthAccount.provider == provider_enum,
+            OAuthAccount.provider_account_id == provider_account_id,
         )
     )
     oauth_account = result.scalar_one_or_none()
-    
+
     if oauth_account:
-        # Existing linked account
+        # Existing linked account -- just return the associated user.
         user_result = await db.execute(select(User).where(User.id == oauth_account.user_id))
         user = user_result.scalar_one()
+        if not user.is_active:
+            raise AuthError("Account is disabled", status.HTTP_403_FORBIDDEN)
         return user
-        
-    # 2. Check if user with this email already exists (linking)
+
+    # 2. Check if a user with this email already exists (account linking).
     user_result = await db.execute(select(User).where(User.email == email))
     user = user_result.scalar_one_or_none()
-    
+
     if not user:
-        # 3. Create new user
-        # Generate a unique username derived from email or name
-        base_username = (email.split("@")[0] if email else "user").lower()
-        import re
-        base_username = re.sub(r'[^a-z0-9]', '', base_username)
+        # 3. No existing account -- create a new user.
+        # Derive a username from the email local-part, stripping non-alphanumeric chars.
+        base_username = re.sub(r'[^a-z0-9]', '', (email.split("@")[0] if email else "user").lower())
         if not base_username:
             base_username = "oauthuser"
-            
+
         username = base_username
-        
-        # Ensure uniqueness
+        # Ensure uniqueness by appending a random suffix until we find a free slot.
         while True:
             existing_u = await db.execute(select(User.id).where(User.username == username))
             if not existing_u.scalar_one_or_none():
                 break
-            import random
             username = f"{base_username}{random.randint(100, 9999)}"
-            
+
         user = User(
             username=username,
             email=email,
             full_name=name,
             avatar_url=avatar_url,
-            is_verified=True,  # OAuth emails are inherently verified by the provider
-            hashed_password=None, # OAuth only
+            is_verified=True,  # OAuth provider has already verified the email.
+            hashed_password=None,  # OAuth-only account; no password.
         )
         db.add(user)
-        await db.flush()
-        
-    # Link OAuth account to the user
+        await db.flush()  # populate user.id before we reference it below
+
+    # Link the OAuth identity to this user (new row regardless of whether the
+    # user account is brand-new or a pre-existing email-match).
     new_oauth = OAuthAccount(
         user_id=user.id,
-        provider=provider,
+        provider=provider_enum,
         provider_account_id=provider_account_id,
     )
     db.add(new_oauth)

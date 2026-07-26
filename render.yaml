@@ -6,7 +6,7 @@ services:
     dockerfilePath: ./backend/Dockerfile
     dockerContext: ./backend
     plan: starter
-    healthCheckPath: /api/v1/health
+    healthCheckPath: /health
     envVars:
       - key: DATABASE_URL
         fromDatabase:
@@ -30,7 +30,13 @@ services:
       - key: BACKEND_URL
         sync: false          # Set to your Render backend URL after first deploy
       - key: CORS_ALLOWED_ORIGINS
-        sync: false          # Comma-separated: https://pandahub-frontend.onrender.com
+        value: "https://pandahub-taupe.vercel.app"  # Vercel frontend
+      - key: FRONTEND_URL
+        value: "https://pandahub-taupe.vercel.app"  # Where OAuth redirects go after login
+      - key: GOOGLE_OAUTH_CLIENT_ID
+        sync: false          # Paste from Google Cloud Console
+      - key: GOOGLE_OAUTH_CLIENT_SECRET
+        sync: false          # Paste from Google Cloud Console
       - key: B2_KEY_ID
         sync: false          # Backblaze B2 Key ID
       - key: B2_APPLICATION_KEY

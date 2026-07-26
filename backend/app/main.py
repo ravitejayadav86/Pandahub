@@ -73,6 +73,7 @@ app.include_router(ws.router)
 
 
 @app.get("/health", tags=["system"])
+@app.get("/api/v1/health", tags=["system"])
 async def health_check():
     """Liveness/readiness probe target for Docker/orchestrator healthchecks."""
     return {"status": "ok", "service": settings.PROJECT_NAME}

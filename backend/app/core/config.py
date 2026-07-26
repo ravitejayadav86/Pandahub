@@ -25,6 +25,12 @@ class Settings(BaseSettings):
     FRONTEND_URL: str = "http://localhost:3000"
     BACKEND_URL: str = "http://localhost:8000"
 
+    @field_validator("FRONTEND_URL", "BACKEND_URL")
+    @classmethod
+    def strip_trailing_slash(cls, v: str) -> str:
+        return v.rstrip("/")
+
+
     # ---- Database ----
     DATABASE_URL: str
 

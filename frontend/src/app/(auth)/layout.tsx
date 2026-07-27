@@ -16,7 +16,7 @@ export default function AuthLayout({ children }: { children: React.ReactNode }) 
     }}>
       {/* Top bar */}
       <header style={{
-        padding: '20px 24px',
+        padding: '14px 16px',
         borderBottom: '1px solid var(--border-color)',
         display: 'flex', alignItems: 'center',
         background: 'rgba(13, 17, 23, 0.8)',
@@ -48,16 +48,20 @@ export default function AuthLayout({ children }: { children: React.ReactNode }) 
         padding: '40px 24px',
         position: 'relative',
       }}>
-        {/* Background blobs */}
+        {/* Background blobs — percentage-based so they don't overflow on mobile */}
         <div style={{
           position: 'fixed', top: '20%', left: '10%',
-          width: 400, height: 400, borderRadius: '50%',
+          width: 'clamp(180px, 30vw, 400px)',
+          height: 'clamp(180px, 30vw, 400px)',
+          borderRadius: '50%',
           background: 'radial-gradient(circle, rgba(124,58,237,0.08) 0%, transparent 70%)',
           pointerEvents: 'none',
         }} />
         <div style={{
           position: 'fixed', bottom: '20%', right: '10%',
-          width: 300, height: 300, borderRadius: '50%',
+          width: 'clamp(140px, 22vw, 300px)',
+          height: 'clamp(140px, 22vw, 300px)',
+          borderRadius: '50%',
           background: 'radial-gradient(circle, rgba(37,99,235,0.08) 0%, transparent 70%)',
           pointerEvents: 'none',
         }} />

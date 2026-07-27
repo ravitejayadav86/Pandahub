@@ -204,7 +204,7 @@ export default function DashboardPage() {
   )
 
   const renderSidebar = () => (
-    <div className="w-full md:w-64 flex flex-col gap-2 shrink-0 animate-fade-in-up">
+    <div className="hidden md:flex w-full md:w-64 flex-col gap-2 shrink-0 animate-fade-in-up">
       <div className="text-xs font-semibold text-slate-400 uppercase tracking-wider mb-2 pl-3">Menu</div>
       <Button variant="ghost" className="justify-start text-slate-700 font-medium bg-slate-100 dark:bg-slate-800 dark:text-slate-200">
         <LayoutDashboard className="w-4 h-4 mr-2" /> Home
@@ -389,13 +389,15 @@ export default function DashboardPage() {
           </div>
 
           <div className="mb-6 animate-fade-in-up">
-            <div className="flex items-center gap-3 flex-wrap mb-4">
-              <button className="px-4 py-2 rounded-full bg-white dark:bg-slate-800 border border-slate-200 dark:border-slate-700 shadow-sm text-sm font-medium flex items-center gap-2 hover:bg-slate-50 transition-all text-slate-700 dark:text-slate-200">
-                <CircleDot className="w-4 h-4 text-red-500" /> Create issue
-              </button>
-              <button className="px-4 py-2 rounded-full bg-white dark:bg-slate-800 border border-slate-200 dark:border-slate-700 shadow-sm text-sm font-medium flex items-center gap-2 hover:bg-slate-50 transition-all text-slate-700 dark:text-slate-200">
-                <GitMerge className="w-4 h-4 text-green-500" /> Pull requests
-              </button>
+            <div className="overflow-x-auto pb-1 -mx-1 px-1">
+              <div className="flex items-center gap-3 mb-4" style={{ minWidth: 'max-content' }}>
+                <button className="px-4 py-2 rounded-full bg-white dark:bg-slate-800 border border-slate-200 dark:border-slate-700 shadow-sm text-sm font-medium flex items-center gap-2 hover:bg-slate-50 transition-all text-slate-700 dark:text-slate-200 whitespace-nowrap">
+                  <CircleDot className="w-4 h-4 text-red-500" /> Create issue
+                </button>
+                <button className="px-4 py-2 rounded-full bg-white dark:bg-slate-800 border border-slate-200 dark:border-slate-700 shadow-sm text-sm font-medium flex items-center gap-2 hover:bg-slate-50 transition-all text-slate-700 dark:text-slate-200 whitespace-nowrap">
+                  <GitMerge className="w-4 h-4 text-green-500" /> Pull requests
+                </button>
+              </div>
             </div>
           </div>
 

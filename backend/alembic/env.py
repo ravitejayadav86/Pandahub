@@ -1,16 +1,4 @@
-"""
-Alembic environment script.
 
-Two notable decisions:
-1. The DB URL comes from `app.core.config.get_settings()`, never duplicated
-   in alembic.ini — one source of truth for the connection string.
-2. Migrations run SYNCHRONOUSLY even though the app uses an async engine.
-   Alembic's autogenerate/upgrade machinery is built around sync
-   connections; forcing async here would add complexity (nested event
-   loops) for zero benefit, since migrations are a one-shot CLI operation,
-   not a request-serving hot path. We swap `+asyncpg` for the sync
-   `psycopg2` driver only within this file.
-"""
 import sys
 from logging.config import fileConfig
 from pathlib import Path
@@ -36,7 +24,6 @@ config.set_main_option("sqlalchemy.url", sync_db_url)
 
 
 def run_migrations_offline() -> None:
-    """Generate SQL scripts without a live DB connection (`alembic upgrade --sql`)."""
     context.configure(
         url=sync_db_url,
         target_metadata=target_metadata,
@@ -49,7 +36,6 @@ def run_migrations_offline() -> None:
 
 
 def run_migrations_online() -> None:
-    """Standard path: connect to Postgres and apply migrations directly."""
     connectable = engine_from_config(
         config.get_section(config.config_ini_section, {}),
         prefix="sqlalchemy.",
@@ -60,7 +46,7 @@ def run_migrations_online() -> None:
         context.configure(
             connection=connection,
             target_metadata=target_metadata,
-            compare_type=True,       # detect column type changes, not just add/drop
+            compare_type=True,
             compare_server_default=True,
         )
         with context.begin_transaction():

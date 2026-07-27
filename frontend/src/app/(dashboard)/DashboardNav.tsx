@@ -17,6 +17,7 @@ export default function DashboardNav() {
   const { user, clearAuth } = useAuthStore();
   const [isProfileOpen, setIsProfileOpen] = useState(false);
   const [scrolled, setScrolled]           = useState(false);
+  const [mobileNavOpen, setMobileNavOpen] = useState(false);
   const profileRef = useRef<HTMLDivElement>(null);
 
   // Auth guard
@@ -51,6 +52,53 @@ export default function DashboardNav() {
   const initial = user?.username?.[0]?.toUpperCase() || 'U';
 
   return (
+    <>
+    {/* Mobile drawer */}
+    {mobileNavOpen && (
+      <>
+        <div
+          className="mobile-overlay md:hidden"
+          onClick={() => setMobileNavOpen(false)}
+          aria-hidden="true"
+        />
+        <div className="mobile-drawer-left mobile-drawer md:hidden" role="dialog" aria-modal="true" aria-label="Main navigation">
+          <div className="flex items-center justify-between px-4 py-3 border-b" style={{ borderColor: 'var(--glass-border)' }}>
+            <div className="flex items-center gap-2 font-bold text-[16px] tracking-tight" style={{ color: 'var(--text-primary)' }}>
+              <div
+                className="flex items-center justify-center text-[15px]"
+                style={{ width:28, height:28, borderRadius:8, background:'linear-gradient(135deg,#0A84FF,#6d28d9)', boxShadow:'0 3px 10px rgba(10,132,255,0.3)' }}
+              >🐼</div>
+              PandaHub
+            </div>
+            <button onClick={() => setMobileNavOpen(false)} className="btn-icon p-2" aria-label="Close menu" style={{ color: 'var(--text-secondary)' }}>
+              <span className="material-symbols-outlined text-[22px]">close</span>
+            </button>
+          </div>
+          <nav className="flex flex-col p-3 gap-1">
+            {NAV_LINKS.map(link => {
+              const isActive = pathname === link.href;
+              return (
+                <Link
+                  key={link.href}
+                  href={link.href}
+                  className={`sidebar-item ${isActive ? 'active' : ''}`}
+                  onClick={() => setMobileNavOpen(false)}
+                  style={{ fontSize: 14 }}
+                >
+                  <span className="material-symbols-outlined icon text-[19px]">{link.icon}</span>
+                  {link.label}
+                </Link>
+              );
+            })}
+            <div className="my-2 border-t" style={{ borderColor: 'var(--glass-border)' }} />
+            <Link href="/new" className="sidebar-item" onClick={() => setMobileNavOpen(false)} style={{ fontSize: 14 }}>
+              <span className="material-symbols-outlined icon text-[19px]">add_circle</span>
+              New repo
+            </Link>
+          </nav>
+        </div>
+      </>
+    )}
     <nav
       className="sticky top-0 z-50 transition-all duration-300"
       style={{
@@ -95,8 +143,8 @@ export default function DashboardNav() {
           </span>
         </Link>
 
-        {/* Centre nav links */}
-        <div className="flex items-center gap-1">
+        {/* Centre nav links — desktop only */}
+        <div className="hidden md:flex items-center gap-1">
           {NAV_LINKS.map(link => {
             const isActive = pathname === link.href;
             return (
@@ -114,10 +162,10 @@ export default function DashboardNav() {
         </div>
 
         {/* Right side */}
-        <div className="flex items-center gap-2">
-          {/* Notifications */}
+        <div className="flex items-center gap-1 sm:gap-2">
+          {/* Notifications — desktop only */}
           <button
-            className="btn-icon p-2"
+            className="hidden md:inline-flex btn-icon p-2"
             data-tooltip="Notifications"
             aria-label="Notifications"
             style={{ color: 'var(--text-secondary)' }}
@@ -125,10 +173,10 @@ export default function DashboardNav() {
             <span className="material-symbols-outlined text-[20px]">notifications</span>
           </button>
 
-          {/* New repo shortcut */}
+          {/* New repo shortcut — desktop only */}
           <Link
             href="/new"
-            className="btn-glass flex items-center gap-1.5 px-3 py-1.5 text-[13px]"
+            className="hidden md:flex btn-glass items-center gap-1.5 px-3 py-1.5 text-[13px]"
             style={{ color: 'var(--text-primary)', textDecoration: 'none' }}
           >
             <span className="material-symbols-outlined text-[16px]">add</span>
@@ -170,6 +218,7 @@ export default function DashboardNav() {
                     WebkitBackdropFilter: 'blur(20px)',
                     border: '1px solid rgba(15,23,42,0.09)',
                     boxShadow: '0 16px 50px rgba(15,23,42,0.14), 0 0 0 1px rgba(255,255,255,0.8) inset',
+                    maxWidth: 'calc(100vw - 24px)',
                   }}
                 >
                   {/* User info header */}
@@ -234,8 +283,19 @@ export default function DashboardNav() {
               )}
             </div>
           )}
+          {/* Hamburger — mobile only */}
+          <button
+            className="md:hidden btn-icon p-2"
+            aria-label="Open navigation"
+            aria-expanded={mobileNavOpen}
+            onClick={() => setMobileNavOpen(true)}
+            style={{ color: 'var(--text-secondary)' }}
+          >
+            <span className="material-symbols-outlined text-[24px]">menu</span>
+          </button>
         </div>
       </div>
     </nav>
+    </>
   );
 }

@@ -87,21 +87,21 @@ export default function StartupsPage() {
   return (
     <div style={{ minHeight: '100vh', background: 'var(--bg-primary)', fontFamily: 'Inter, sans-serif' }}>
       {/* Hero Header */}
-      <div style={{ background: 'linear-gradient(135deg, #0f172a 0%, #1e1b4b 50%, #0f172a 100%)', padding: '60px 24px 80px', position: 'relative', overflow: 'hidden' }}>
+      <div style={{ background: 'linear-gradient(135deg, #0f172a 0%, #1e1b4b 50%, #0f172a 100%)', padding: 'clamp(40px,8vw,80px) 20px clamp(48px,10vw,100px)', position: 'relative', overflow: 'hidden' }}>
         <div style={{ position: 'absolute', inset: 0, backgroundImage: 'radial-gradient(circle at 20% 50%, rgba(99,102,241,0.15) 0%, transparent 50%), radial-gradient(circle at 80% 50%, rgba(6,182,212,0.1) 0%, transparent 50%)', pointerEvents: 'none' }} />
         <div style={{ maxWidth: 800, margin: '0 auto', textAlign: 'center', position: 'relative', opacity: mounted ? 1 : 0, transition: 'opacity 0.5s' }}>
-          <div style={{ display: 'inline-flex', alignItems: 'center', gap: 8, background: 'rgba(99,102,241,0.2)', border: '1px solid rgba(99,102,241,0.3)', borderRadius: 999, padding: '6px 16px', marginBottom: 24 }}>
+          <div style={{ display: 'inline-flex', alignItems: 'center', gap: 8, background: 'rgba(99,102,241,0.2)', border: '1px solid rgba(99,102,241,0.3)', borderRadius: 999, padding: '6px 16px', marginBottom: 20 }}>
             <span className="material-symbols-outlined" style={{ fontSize: 16, color: '#818cf8' }}>rocket_launch</span>
             <span style={{ fontSize: 12, fontWeight: 600, color: '#818cf8', letterSpacing: '0.05em' }}>STARTUP HUB</span>
           </div>
-          <h1 style={{ fontSize: 48, fontWeight: 800, color: '#fff', margin: '0 0 16px', lineHeight: 1.1, letterSpacing: '-0.02em' }}>
+          <h1 style={{ fontSize: 'clamp(28px, 6vw, 48px)', fontWeight: 800, color: '#fff', margin: '0 0 16px', lineHeight: 1.1, letterSpacing: '-0.02em' }}>
             Find Your Next<br />
             <span style={{ background: 'linear-gradient(135deg, #818cf8, #06b6d4)', WebkitBackgroundClip: 'text', WebkitTextFillColor: 'transparent' }}>Big Venture</span>
           </h1>
-          <p style={{ fontSize: 18, color: 'rgba(255,255,255,0.6)', marginBottom: 36, lineHeight: 1.6 }}>
+          <p style={{ fontSize: 'clamp(14px, 3vw, 18px)', color: 'rgba(255,255,255,0.6)', marginBottom: 32, lineHeight: 1.6 }}>
             Discover early-stage startups, join as a collaborator, and build the next generation of developer tools.
           </p>
-          <div style={{ display: 'flex', gap: 12, justifyContent: 'center', flexWrap: 'wrap' }}>
+          <div style={{ display: 'flex', gap: 12, justifyContent: 'center', flexWrap: 'wrap', padding: '0 8px' }}>
             {user && (
               <button onClick={() => router.push('/startups/new')} style={{
                 padding: '14px 28px', borderRadius: 12, background: 'linear-gradient(135deg, #6366f1, #8b5cf6)',
@@ -125,17 +125,17 @@ export default function StartupsPage() {
       </div>
 
       {/* Stats Banner — derived from real data */}
-      <div style={{ background: '#fff', borderBottom: '1px solid var(--border-color)', padding: '0 24px' }}>
-        <div style={{ maxWidth: 1200, margin: '0 auto', display: 'flex', gap: 0 }}>
+      <div style={{ background: '#fff', borderBottom: '1px solid var(--border-color)', padding: '0 16px', overflowX: 'auto' }}>
+        <div style={{ maxWidth: 1200, margin: '0 auto', display: 'flex', gap: 0, minWidth: 'max-content' }}>
           {[
             { value: startups.length.toString(), label: 'Startups Listed' },
             { value: startups.reduce((a, s) => a + (s.open_roles_count || 0), 0).toString(), label: 'Open Roles' },
             { value: startups.filter(s => s.stage === 'idea' || s.stage === 'mvp').length.toString(), label: 'Early Stage' },
             { value: startups.reduce((a, s) => a + (s.member_count || 0), 0).toString(), label: 'Team Members' },
           ].map((stat, i) => (
-            <div key={stat.label} style={{ flex: 1, padding: '20px 24px', borderRight: i < 3 ? '1px solid var(--border-color)' : 'none', textAlign: 'center' }}>
-              <div style={{ fontSize: 24, fontWeight: 800, color: 'var(--text-primary)' }}>{stat.value}</div>
-              <div style={{ fontSize: 12, color: 'var(--text-muted)', fontWeight: 500 }}>{stat.label}</div>
+            <div key={stat.label} style={{ flex: '0 0 auto', width: 140, padding: '16px 20px', borderRight: i < 3 ? '1px solid var(--border-color)' : 'none', textAlign: 'center' }}>
+              <div style={{ fontSize: 22, fontWeight: 800, color: 'var(--text-primary)' }}>{stat.value}</div>
+              <div style={{ fontSize: 11, color: 'var(--text-muted)', fontWeight: 500 }}>{stat.label}</div>
             </div>
           ))}
         </div>
@@ -144,36 +144,40 @@ export default function StartupsPage() {
       {/* Main Content */}
       <div id="explore" style={{ maxWidth: 1200, margin: '0 auto', padding: '40px 24px' }}>
         {/* Search + Filter */}
-        <form onSubmit={handleSearch} style={{ display: 'flex', gap: 16, marginBottom: 32, flexWrap: 'wrap', alignItems: 'center' }}>
-          <div style={{ flex: 1, minWidth: 260, position: 'relative' }}>
-            <span className="material-symbols-outlined" style={{ position: 'absolute', left: 14, top: '50%', transform: 'translateY(-50%)', fontSize: 20, color: 'var(--text-muted)' }}>search</span>
-            <input
-              type="text"
-              placeholder="Search startups…"
-              value={search}
-              onChange={e => setSearch(e.target.value)}
-              style={{
-                width: '100%', height: 44, paddingLeft: 44, paddingRight: 16, border: '1px solid var(--border-color)',
-                borderRadius: 12, fontSize: 14, outline: 'none', background: '#fff', fontFamily: 'Inter, sans-serif',
-                boxSizing: 'border-box',
-              }}
-            />
+        <form onSubmit={handleSearch} style={{ display: 'flex', gap: 12, marginBottom: 32, flexDirection: 'column', alignItems: 'stretch' }}>
+          {/* Search input + submit in one row */}
+          <div style={{ display: 'flex', gap: 10, alignItems: 'center' }}>
+            <div style={{ flex: 1, position: 'relative' }}>
+              <span className="material-symbols-outlined" style={{ position: 'absolute', left: 12, top: '50%', transform: 'translateY(-50%)', fontSize: 20, color: 'var(--text-muted)' }}>search</span>
+              <input
+                type="text"
+                placeholder="Search startups…"
+                value={search}
+                onChange={e => setSearch(e.target.value)}
+                style={{
+                  width: '100%', height: 44, paddingLeft: 42, paddingRight: 12, border: '1px solid var(--border-color)',
+                  borderRadius: 12, fontSize: 14, outline: 'none', background: '#fff', fontFamily: 'Inter, sans-serif',
+                  boxSizing: 'border-box',
+                }}
+              />
+            </div>
+            <button type="submit" style={{
+              height: 44, padding: '0 20px', borderRadius: 12, background: 'linear-gradient(135deg, #6366f1, #8b5cf6)',
+              color: '#fff', fontWeight: 600, fontSize: 14, border: 'none', cursor: 'pointer', whiteSpace: 'nowrap', flexShrink: 0,
+            }}>Search</button>
           </div>
-          <div style={{ display: 'flex', gap: 8, flexWrap: 'wrap' }}>
+          {/* Stage filters — scrollable row */}
+          <div style={{ display: 'flex', gap: 6, flexWrap: 'wrap' }}>
             {STAGES.map(s => (
               <button key={s.key} type="button" onClick={() => setStageFilter(s.key)} style={{
-                padding: '8px 16px', borderRadius: 999, fontSize: 13, fontWeight: 600, cursor: 'pointer',
+                padding: '6px 12px', borderRadius: 999, fontSize: 12, fontWeight: 600, cursor: 'pointer',
                 border: stageFilter === s.key ? `2px solid ${s.color}` : '1.5px solid var(--border-color)',
                 background: stageFilter === s.key ? `${s.color}15` : '#fff',
                 color: stageFilter === s.key ? s.color : 'var(--text-secondary)',
-                transition: 'all 0.15s',
+                transition: 'all 0.15s', whiteSpace: 'nowrap',
               }}>{s.label}</button>
             ))}
           </div>
-          <button type="submit" style={{
-            padding: '10px 20px', borderRadius: 12, background: 'linear-gradient(135deg, #6366f1, #8b5cf6)',
-            color: '#fff', fontWeight: 600, fontSize: 14, border: 'none', cursor: 'pointer',
-          }}>Search</button>
         </form>
 
         {loading ? (

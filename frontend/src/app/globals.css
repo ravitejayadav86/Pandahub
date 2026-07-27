@@ -148,8 +148,19 @@
   @keyframes bounce-in {
     0%   { transform: scale(0.3);  opacity: 0;  }
     50%  { transform: scale(1.05); opacity: 1;  }
-    70%  { transform: scale(0.95);              }
-    100% { transform: scale(1);                 }
+    100% { transform: scale(1);    opacity: 1;  }
+  }
+
+  @keyframes bubble-press {
+    0%   { transform: scale(1); filter: brightness(1) saturate(1); box-shadow: 0 4px 12px rgba(0,0,0,0.15); }
+    100% { transform: scale(0.92); filter: brightness(0.9) saturate(1.2); box-shadow: inset 0 4px 16px rgba(0,0,0,0.2), 0 2px 4px rgba(0,0,0,0.1); }
+  }
+
+  @keyframes bubble-release {
+    0%   { transform: scale(0.92); }
+    40%  { transform: scale(1.08); }
+    70%  { transform: scale(0.98); }
+    100% { transform: scale(1); }
   }
 
   @keyframes wiggle {
@@ -221,59 +232,83 @@
   }
 
   /* ─────────────────────────────────────────────────────────
-     BUTTON VARIANTS
+     BUTTON VARIANTS — iOS "Liquid Glass"
   ───────────────────────────────────────────────────────── */
 
-  /* Primary glow button */
+  /* Primary liquid button */
   .btn-primary {
     position: relative;
     overflow: hidden;
-    background: var(--color-primary);
+    background: linear-gradient(180deg, rgba(10, 132, 255, 0.8) 0%, rgba(10, 132, 255, 0.95) 100%);
+    backdrop-filter: blur(24px) saturate(200%);
+    -webkit-backdrop-filter: blur(24px) saturate(200%);
     color: white;
     font-weight: 600;
-    border-radius: 10px;
-    transition: all 0.25s var(--ease-spring);
-    box-shadow: 0 4px 12px rgba(10, 132, 255, 0.25);
+    border-radius: 14px;
+    border: 1px solid rgba(255, 255, 255, 0.2);
+    border-top: 1px solid rgba(255, 255, 255, 0.4);
+    box-shadow: 
+      inset 0 1px 1px rgba(255, 255, 255, 0.6),
+      0 4px 16px rgba(10, 132, 255, 0.3);
+    transition: all 0.4s cubic-bezier(0.25, 1, 0.5, 1);
   }
   .btn-primary::before {
     content: '';
     position: absolute;
     inset: 0;
-    background: linear-gradient(135deg, rgba(255,255,255,0.15) 0%, transparent 60%);
-    opacity: 0;
-    transition: opacity 0.3s ease;
+    border-radius: inherit;
+    background: linear-gradient(135deg, rgba(255,255,255,0.25) 0%, transparent 60%);
+    opacity: 0.5;
+    transition: opacity 0.4s ease;
+    pointer-events: none;
   }
   .btn-primary:hover {
-    transform: translateY(-2px) scale(1.02);
-    box-shadow: 0 8px 24px rgba(10, 132, 255, 0.4);
+    transform: translateY(-2px) scale(1.01);
+    box-shadow: 
+      inset 0 1px 1px rgba(255, 255, 255, 0.7),
+      0 8px 24px rgba(10, 132, 255, 0.5);
+    background: linear-gradient(180deg, rgba(10, 132, 255, 0.9) 0%, rgba(10, 132, 255, 1) 100%);
   }
-  .btn-primary:hover::before { opacity: 1; }
+  .btn-primary:hover::before { opacity: 0.8; }
   .btn-primary:active {
-    transform: translateY(0) scale(0.97);
-    box-shadow: 0 2px 8px rgba(10, 132, 255, 0.2);
-    transition-duration: 0.1s;
+    animation: bubble-press 0.2s cubic-bezier(0.25, 1, 0.5, 1) forwards;
+  }
+  .btn-primary:not(:active) {
+    /* Triggers release animation only after an active state */
+    animation: bubble-release 0.4s cubic-bezier(0.25, 1, 0.5, 1);
   }
 
   /* Ghost / glass button */
   .btn-glass {
     position: relative;
     overflow: hidden;
-    background: rgba(15, 23, 42, 0.03);
-    border: 1px solid rgba(15, 23, 42, 0.1);
-    backdrop-filter: blur(12px);
-    border-radius: 10px;
-    font-weight: 500;
-    transition: all 0.25s var(--ease-spring);
+    background: rgba(255, 255, 255, 0.1);
+    backdrop-filter: blur(32px) saturate(200%);
+    -webkit-backdrop-filter: blur(32px) saturate(200%);
+    border: 1px solid rgba(255, 255, 255, 0.2);
+    border-top: 1px solid rgba(255, 255, 255, 0.4);
+    box-shadow: 
+      inset 0 1px 1px rgba(255, 255, 255, 0.5),
+      0 4px 12px rgba(0, 0, 0, 0.05);
+    border-radius: 12px;
+    font-weight: 600;
+    color: var(--text-primary);
+    transition: all 0.4s cubic-bezier(0.25, 1, 0.5, 1);
   }
   .btn-glass:hover {
-    background: rgba(15, 23, 42, 0.07);
-    border-color: rgba(15, 23, 42, 0.18);
-    transform: translateY(-1px) scale(1.01);
-    box-shadow: 0 6px 20px rgba(0,0,0,0.06);
+    background: rgba(255, 255, 255, 0.25);
+    border-color: rgba(255, 255, 255, 0.4);
+    border-top-color: rgba(255, 255, 255, 0.6);
+    transform: translateY(-1px) scale(1.02);
+    box-shadow: 
+      inset 0 1px 1px rgba(255, 255, 255, 0.6),
+      0 6px 20px rgba(0, 0, 0, 0.1);
   }
   .btn-glass:active {
-    transform: translateY(0) scale(0.98);
-    transition-duration: 0.1s;
+    animation: bubble-press 0.2s cubic-bezier(0.25, 1, 0.5, 1) forwards;
+  }
+  .btn-glass:not(:active) {
+    animation: bubble-release 0.4s cubic-bezier(0.25, 1, 0.5, 1);
   }
 
   /* Icon button */
@@ -281,37 +316,57 @@
     display: inline-flex;
     align-items: center;
     justify-content: center;
-    border-radius: 10px;
-    transition: all 0.2s var(--ease-spring);
+    border-radius: 12px;
+    transition: all 0.3s cubic-bezier(0.25, 1, 0.5, 1);
+    background: transparent;
   }
   .btn-icon:hover {
-    background: rgba(15, 23, 42, 0.06);
-    transform: scale(1.1);
+    background: rgba(255, 255, 255, 0.15);
+    backdrop-filter: blur(16px);
+    -webkit-backdrop-filter: blur(16px);
+    border: 1px solid rgba(255, 255, 255, 0.15);
+    box-shadow: inset 0 1px 1px rgba(255, 255, 255, 0.2);
+    transform: scale(1.08);
   }
   .btn-icon:active {
-    transform: scale(0.92);
-    transition-duration: 0.08s;
+    animation: bubble-press 0.2s cubic-bezier(0.25, 1, 0.5, 1) forwards;
+  }
+  .btn-icon:not(:active) {
+    animation: bubble-release 0.4s cubic-bezier(0.25, 1, 0.5, 1);
   }
 
   /* Danger button */
   .btn-danger {
-    background: var(--color-error);
+    position: relative;
+    overflow: hidden;
+    background: linear-gradient(180deg, rgba(239, 68, 68, 0.8) 0%, rgba(239, 68, 68, 0.95) 100%);
+    backdrop-filter: blur(24px) saturate(200%);
+    -webkit-backdrop-filter: blur(24px) saturate(200%);
     color: white;
-    border-radius: 10px;
+    border-radius: 14px;
     font-weight: 600;
-    transition: all 0.25s var(--ease-spring);
-    box-shadow: 0 4px 12px rgba(239, 68, 68, 0.25);
+    border: 1px solid rgba(255, 255, 255, 0.2);
+    border-top: 1px solid rgba(255, 255, 255, 0.4);
+    box-shadow: 
+      inset 0 1px 1px rgba(255, 255, 255, 0.5),
+      0 4px 12px rgba(239, 68, 68, 0.3);
+    transition: all 0.4s cubic-bezier(0.25, 1, 0.5, 1);
   }
   .btn-danger:hover {
-    transform: translateY(-2px);
-    box-shadow: 0 8px 20px rgba(239, 68, 68, 0.4);
+    transform: translateY(-2px) scale(1.01);
+    box-shadow: 
+      inset 0 1px 1px rgba(255, 255, 255, 0.7),
+      0 8px 20px rgba(239, 68, 68, 0.5);
+    background: linear-gradient(180deg, rgba(239, 68, 68, 0.9) 0%, rgba(239, 68, 68, 1) 100%);
   }
   .btn-danger:active {
-    transform: scale(0.97);
-    transition-duration: 0.1s;
+    animation: bubble-press 0.2s cubic-bezier(0.25, 1, 0.5, 1) forwards;
+  }
+  .btn-danger:not(:active) {
+    animation: bubble-release 0.4s cubic-bezier(0.25, 1, 0.5, 1);
   }
 
-  /* Ripple on click */
+  /* Ripple on click - Soft Liquid Blob */
   .btn-ripple {
     position: relative;
     overflow: hidden;
@@ -321,14 +376,16 @@
     position: absolute;
     inset: 0;
     background: radial-gradient(circle at var(--mouse-x, 50%) var(--mouse-y, 50%),
-      rgba(255,255,255,0.3) 0%, transparent 60%);
+      rgba(255,255,255,0.45) 0%, rgba(255,255,255,0.1) 40%, transparent 80%);
     opacity: 0;
-    transform: scale(0);
-    transition: transform 0.5s var(--ease-smooth), opacity 0.4s ease;
+    transform: scale(0.2);
+    transition: transform 0.6s cubic-bezier(0.22, 1, 0.36, 1), opacity 0.4s ease;
+    pointer-events: none;
+    border-radius: inherit;
   }
   .btn-ripple:active::after {
     opacity: 1;
-    transform: scale(3);
+    transform: scale(3.5);
     transition: none;
   }
 
@@ -691,4 +748,88 @@
   /* Preserve 3D for tilt cards */
   .perspective-1000 { perspective: 1000px; }
   .preserve-3d      { transform-style: preserve-3d; }
+
+  /* ─────────────────────────────────────────────────────────
+     SAFE-AREA INSETS (notch / home-bar / rounded corners)
+  ───────────────────────────────────────────────────────── */
+  .pb-safe { padding-bottom: env(safe-area-inset-bottom, 0px); }
+  .pt-safe { padding-top:    env(safe-area-inset-top,    0px); }
+  .pl-safe { padding-left:   env(safe-area-inset-left,   0px); }
+  .pr-safe { padding-right:  env(safe-area-inset-right,  0px); }
+  .px-safe {
+    padding-left:  env(safe-area-inset-left,  0px);
+    padding-right: env(safe-area-inset-right, 0px);
+  }
+  .mb-safe { margin-bottom: env(safe-area-inset-bottom, 0px); }
+
+  /* ─────────────────────────────────────────────────────────
+     MOBILE DRAWER / OVERLAY
+  ───────────────────────────────────────────────────────── */
+  .mobile-overlay {
+    position: fixed;
+    inset: 0;
+    background: rgba(15, 23, 42, 0.45);
+    backdrop-filter: blur(4px);
+    -webkit-backdrop-filter: blur(4px);
+    z-index: 80;
+    animation: fadeInScale 0.2s var(--ease-smooth) forwards;
+  }
+
+  .mobile-drawer {
+    position: fixed;
+    top: 0;
+    right: 0;
+    bottom: 0;
+    width: min(320px, 85vw);
+    background: var(--glass-bg);
+    backdrop-filter: blur(24px) saturate(1.8);
+    -webkit-backdrop-filter: blur(24px) saturate(1.8);
+    border-left: 1px solid var(--glass-border);
+    box-shadow: -8px 0 48px rgba(15, 23, 42, 0.12);
+    z-index: 90;
+    display: flex;
+    flex-direction: column;
+    animation: slideInRight 0.28s var(--ease-smooth) forwards;
+    overflow-y: auto;
+    -webkit-overflow-scrolling: touch;
+  }
+
+  .mobile-drawer-left {
+    right: auto;
+    left: 0;
+    border-left: none;
+    border-right: 1px solid var(--glass-border);
+    animation: slideInLeft 0.28s var(--ease-smooth) forwards;
+  }
+
+  /* ─────────────────────────────────────────────────────────
+     TOUCH DEVICE — hide decorative scrollbars
+  ───────────────────────────────────────────────────────── */
+  @media (hover: none) and (pointer: coarse) {
+    ::-webkit-scrollbar { display: none; }
+    * { -ms-overflow-style: none; scrollbar-width: none; }
+
+    /* Increase tap targets */
+    .btn-icon { min-width: 44px; min-height: 44px; }
+    .sidebar-item { min-height: 44px; }
+  }
+
+  /* ─────────────────────────────────────────────────────────
+     REDUCED MOTION — respect user OS preference
+  ───────────────────────────────────────────────────────── */
+  @media (prefers-reduced-motion: reduce) {
+    *, *::before, *::after {
+      animation-duration: 0.01ms !important;
+      animation-iteration-count: 1 !important;
+      transition-duration: 0.01ms !important;
+      scroll-behavior: auto !important;
+    }
+  }
+
+  /* ─────────────────────────────────────────────────────────
+     WINDOWS / CHROMIUM — thin scrollbar fallback
+  ───────────────────────────────────────────────────────── */
+  @supports (scrollbar-width: thin) {
+    * { scrollbar-width: thin; scrollbar-color: rgba(15,23,42,0.18) transparent; }
+  }
 }

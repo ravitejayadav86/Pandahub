@@ -7,8 +7,10 @@ the API boundary rather than surfacing as an opaque database
 IntegrityError deep in the service layer.
 """
 import re
+import uuid
+from datetime import datetime
 
-from pydantic import BaseModel, EmailStr, Field, field_validator
+from pydantic import BaseModel, ConfigDict, EmailStr, Field, field_validator
 
 USERNAME_PATTERN = re.compile(r"^[a-zA-Z0-9](?:[a-zA-Z0-9-]{0,37}[a-zA-Z0-9])?$")
 
@@ -90,3 +92,42 @@ class PasswordResetConfirm(BaseModel):
 
 class ResendVerificationRequest(BaseModel):
     email: EmailStr
+
+
+# ---------------------------------------------------------------------------
+# Personal Access Tokens (used by `panda` CLI and git-over-HTTPS -- see
+# git_engine/auth.py, which validates these via HTTP Basic Auth).
+# ---------------------------------------------------------------------------
+class PersonalAccessTokenCreate(BaseModel):
+    name: str = Field(min_length=1, max_length=255)
+    # "repo" is REQUIRED for git push/pull over HTTPS -- see
+    # git_engine.auth._GIT_REQUIRED_SCOPE. Defaulting to it here so a token
+    # created without specifying scopes still works for the most common use case.
+    scopes: list[str] = Field(default_factory=lambda: ["repo"])
+    expires_in_days: int | None = Field(default=None, ge=1, le=3650)
+
+
+class PersonalAccessTokenCreateResponse(BaseModel):
+    """Returned ONLY at creation time -- the raw token is never retrievable
+    again afterward (only its hash is stored), matching standard PAT UX
+    (GitHub, GitLab, etc.)."""
+    id: uuid.UUID
+    name: str
+    token: str
+    scopes: list[str]
+    expires_at: datetime | None
+    created_at: datetime
+
+
+class PersonalAccessTokenOut(BaseModel):
+    """Used for listing existing tokens -- deliberately excludes the raw
+    token and even the hash, since neither should ever be exposed after creation."""
+    model_config = ConfigDict(from_attributes=True)
+
+    id: uuid.UUID
+    name: str
+    scopes: list[str]
+    last_used_at: datetime | None
+    expires_at: datetime | None
+    revoked: bool
+    created_at: datetime

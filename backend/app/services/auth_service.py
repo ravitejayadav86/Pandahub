@@ -37,7 +37,7 @@ from app.core.security import (
     encrypt_secret,
     decrypt_secret,
 )
-from app.models.user import User, RefreshToken, EmailVerificationToken, PasswordResetToken
+from app.models.user import User, RefreshToken, EmailVerificationToken, PasswordResetToken, PersonalAccessToken
 from app.schemas.auth_schema import UserRegister
 from app.worker.tasks.email_tasks import send_verification_email_task, send_password_reset_email_task
 
@@ -392,3 +392,53 @@ async def handle_oauth_login(
     await db.commit()
     await db.refresh(user)
     return user
+
+
+# ---------------------------------------------------------------------------
+# Personal Access Tokens (used by panda CLI and git-over-HTTPS -- see
+# git_engine/auth.py, which validates these via HTTP Basic Auth).
+# ---------------------------------------------------------------------------
+async def create_personal_access_token(db: AsyncSession, user: User, name: str, scopes: list[str], expires_in_days: int | None):
+    """Returns (pat_model, raw_token) -- raw_token is ONLY available here,
+    at creation time; only its hash is ever persisted, matching standard
+    PAT UX (GitHub, GitLab, etc.) where a lost token can't be recovered,
+    only revoked and replaced."""
+    raw_token = generate_opaque_token()
+    expires_at = None
+    if expires_in_days is not None:
+        expires_at = datetime.now(timezone.utc) + timedelta(days=expires_in_days)
+
+    pat = PersonalAccessToken(
+        user_id=user.id,
+        name=name,
+        token_hash=hash_token(raw_token),
+        scopes=scopes,
+        expires_at=expires_at,
+    )
+    db.add(pat)
+    await db.commit()
+    await db.refresh(pat)
+    return pat, raw_token
+
+
+async def list_personal_access_tokens(db: AsyncSession, user: User) -> list[PersonalAccessToken]:
+    result = await db.execute(
+        select(PersonalAccessToken)
+        .where(PersonalAccessToken.user_id == user.id, PersonalAccessToken.revoked.is_(False))
+        .order_by(PersonalAccessToken.created_at.desc())
+    )
+    return list(result.scalars().all())
+
+
+async def revoke_personal_access_token(db: AsyncSession, user: User, pat_id: uuid.UUID) -> None:
+    result = await db.execute(
+        select(PersonalAccessToken).where(
+            PersonalAccessToken.id == pat_id,
+            PersonalAccessToken.user_id == user.id,
+        )
+    )
+    pat = result.scalar_one_or_none()
+    if pat is None:
+        raise AuthError("Personal access token not found", status.HTTP_404_NOT_FOUND)
+    pat.revoked = True
+    await db.commit()

@@ -16,15 +16,15 @@ RUN pip install --no-cache-dir -r requirements.txt
 COPY . .
 
 RUN addgroup --system appgroup \
- && adduser --system --ingroup appgroup appuser \
- && chown -R appuser:appgroup /app
+    && adduser --system --ingroup appgroup appuser \
+    && chown -R appuser:appgroup /app
 USER appuser
 
 ENV PORT=8000
 
 CMD alembic upgrade head && \
     uvicorn app.main:app \
-        --host 0.0.0.0 \
-        --port $PORT \
-        --workers 2 \
-        --log-level info
+    --host 0.0.0.0 \
+    --port $PORT \
+    --workers 2 \
+    --log-level info

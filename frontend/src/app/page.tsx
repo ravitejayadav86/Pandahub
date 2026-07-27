@@ -89,21 +89,27 @@ const TYPE_PHRASES = ["next generation.", "AI era.", "future of code."];
 
 function MobileBottomNav() {
   return (
-    <div className="md:hidden fixed bottom-0 w-full z-50 glass-panel border-t border-glass-border pb-safe">
-      <nav className="flex justify-around items-center px-2 py-3">
-        <Link href="/explore" className="flex flex-col items-center gap-1 text-primary">
+    <div
+      className="md:hidden fixed bottom-0 w-full z-50 glass-panel border-t"
+      style={{
+        borderColor: 'var(--glass-border)',
+        paddingBottom: 'calc(12px + env(safe-area-inset-bottom, 0px))',
+      }}
+    >
+      <nav className="flex justify-around items-center px-2 pt-3">
+        <Link href="/explore" className="flex flex-col items-center gap-1" style={{ color: 'var(--color-primary)' }}>
           <span className="material-symbols-outlined text-[24px]" style={{fontVariationSettings: '"FILL" 1'}}>home</span>
           <span className="text-[10px] font-medium">Home</span>
         </Link>
-        <Link href="/explore" className="flex flex-col items-center gap-1 text-on-surface-variant hover:text-on-surface transition-colors">
+        <Link href="/explore" className="flex flex-col items-center gap-1 hover:opacity-80 transition-opacity" style={{ color: 'var(--text-secondary)' }}>
           <span className="material-symbols-outlined text-[24px]">category</span>
           <span className="text-[10px] font-medium">Product</span>
         </Link>
-        <Link href="/explore" className="flex flex-col items-center gap-1 text-on-surface-variant hover:text-on-surface transition-colors">
+        <Link href="/explore" className="flex flex-col items-center gap-1 hover:opacity-80 transition-opacity" style={{ color: 'var(--text-secondary)' }}>
           <span className="material-symbols-outlined text-[24px]">code_blocks</span>
           <span className="text-[10px] font-medium">Open Source</span>
         </Link>
-        <a href="/login" className="flex flex-col items-center gap-1 text-on-surface-variant hover:text-on-surface transition-colors">
+        <a href="/login" className="flex flex-col items-center gap-1 hover:opacity-80 transition-opacity" style={{ color: 'var(--text-secondary)' }}>
           <span className="material-symbols-outlined text-[24px]">person</span>
           <span className="text-[10px] font-medium">Account</span>
         </a>
@@ -117,6 +123,7 @@ export default function HomePage() {
   const [charIndex, setCharIndex] = useState(0);
   const [isDeleting, setIsDeleting] = useState(false);
   const [text, setText] = useState("");
+  const [mobileMenuOpen, setMobileMenuOpen] = useState(false);
 
   useEffect(() => {
     const currentPhrase = TYPE_PHRASES[phraseIndex];
@@ -150,9 +157,65 @@ export default function HomePage() {
       {/* Live Animated Space Background */}
       <SpaceBackground />
 
+      {/* Mobile Nav Drawer */}
+      {mobileMenuOpen && (
+        <>
+          <div
+            className="mobile-overlay md:hidden"
+            onClick={() => setMobileMenuOpen(false)}
+            aria-hidden="true"
+          />
+          <div className="mobile-drawer md:hidden" role="dialog" aria-modal="true" aria-label="Navigation menu">
+            {/* Drawer header */}
+            <div className="flex items-center justify-between px-5 py-4 border-b" style={{ borderColor: 'var(--glass-border)' }}>
+              <div className="flex items-center gap-2 text-lg font-bold tracking-tighter" style={{ color: 'var(--text-primary)' }}>
+                <span className="material-symbols-outlined" style={{ color: 'var(--color-primary)', fontVariationSettings: '"FILL" 1' }}>cloud_sync</span>
+                PandaHub
+              </div>
+              <button
+                onClick={() => setMobileMenuOpen(false)}
+                className="btn-icon p-2"
+                aria-label="Close menu"
+                style={{ color: 'var(--text-secondary)' }}
+              >
+                <span className="material-symbols-outlined text-[22px]">close</span>
+              </button>
+            </div>
+            {/* Drawer links */}
+            <nav className="flex flex-col p-4 gap-1">
+              {[
+                { href: '/explore', label: 'Product',     icon: 'category' },
+                { href: '/explore', label: 'Solutions',   icon: 'hub' },
+                { href: '/explore', label: 'Open Source', icon: 'code_blocks' },
+                { href: '/explore', label: 'Pricing',     icon: 'sell' },
+              ].map(({ href, label, icon }) => (
+                <Link
+                  key={label}
+                  href={href}
+                  className="sidebar-item"
+                  onClick={() => setMobileMenuOpen(false)}
+                >
+                  <span className="material-symbols-outlined icon text-[20px]">{icon}</span>
+                  {label}
+                </Link>
+              ))}
+              <div className="my-3 border-t" style={{ borderColor: 'var(--glass-border)' }} />
+              <a
+                href="/login"
+                className="btn-primary btn-ripple flex items-center justify-center gap-2 px-4 py-3 rounded-xl font-semibold text-sm"
+                onClick={() => setMobileMenuOpen(false)}
+              >
+                <span className="material-symbols-outlined text-[18px]">login</span>
+                Sign In
+              </a>
+            </nav>
+          </div>
+        </>
+      )}
+
       {/* Header */}
       <header className="fixed top-0 w-full z-50 backdrop-blur-xl border-b border-border-color bg-glass-bg transition-colors duration-300">
-        <div className="flex justify-between items-center w-full px-6 py-4 max-w-7xl mx-auto">
+        <div className="flex justify-between items-center w-full px-4 sm:px-6 py-3 sm:py-4 max-w-7xl mx-auto">
           <div className="flex items-center gap-2 text-xl font-bold tracking-tighter text-on-surface cursor-pointer">
             <span className="material-symbols-outlined text-primary" style={{fontVariationSettings: '"FILL" 1'}}>cloud_sync</span>
             <span>PandaHub</span>
@@ -165,16 +228,26 @@ export default function HomePage() {
             <Link href="/explore" className="text-on-surface-variant hover:text-on-surface transition-colors duration-200 px-3 py-1 rounded-lg hover:bg-black/5">Pricing</Link>
           </nav>
 
-          <div className="flex items-center gap-3">
+          <div className="flex items-center gap-2 sm:gap-3">
             <a href="/login" className="hidden md:block text-on-surface hover:text-primary transition-colors text-sm font-semibold px-4 py-2 rounded-lg btn-glass btn-ripple">Sign In</a>
-            <a href="/login" className="bg-primary text-white px-5 py-2 rounded-lg font-bold text-sm tracking-wide btn-glow btn-ripple inline-block">Get Started</a>
+            <a href="/login" className="bg-primary text-white px-4 sm:px-5 py-2 rounded-lg font-bold text-sm tracking-wide btn-glow btn-ripple inline-block">Get Started</a>
+            {/* Hamburger — mobile only */}
+            <button
+              className="md:hidden btn-icon p-2"
+              aria-label="Open navigation menu"
+              aria-expanded={mobileMenuOpen}
+              onClick={() => setMobileMenuOpen(true)}
+              style={{ color: 'var(--text-secondary)' }}
+            >
+              <span className="material-symbols-outlined text-[24px]">menu</span>
+            </button>
           </div>
         </div>
       </header>
 
       {/* Hero */}
-      <section className="relative z-10 flex flex-col items-center justify-center text-center min-h-screen px-4 sm:px-6 pt-24 pb-12 max-w-4xl mx-auto animate-fade-in-up">
-        <h1 className="text-4xl sm:text-5xl md:text-7xl font-extrabold tracking-tighter text-on-surface mb-4 leading-tight font-display">
+      <section className="relative z-10 flex flex-col items-center justify-center text-center min-h-screen px-4 sm:px-6 pt-24 pb-20 md:pb-12 max-w-4xl mx-auto animate-fade-in-up">
+        <h1 className="text-[clamp(2rem,8vw,4.5rem)] sm:text-5xl md:text-7xl font-extrabold tracking-tighter text-on-surface mb-4 leading-tight font-display">
           Code hosting for the
           <br />
           <span className="text-transparent bg-clip-text bg-gradient-to-r from-[#0A84FF] via-[#BF5AF2] to-[#30D158] border-r-4 border-[#0A84FF] pr-2 mt-1 inline-block">

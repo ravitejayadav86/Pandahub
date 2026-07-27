@@ -1,7 +1,7 @@
 "use client";
 
-import { useState } from 'react';
-import { useRouter } from 'next/navigation';
+import { useState, useEffect, Suspense } from 'react';
+import { useRouter, useSearchParams } from 'next/navigation';
 import { useAuthStore } from '@/store/authStore';
 import api, { BASE_URL } from '@/lib/api';
 
@@ -17,7 +17,7 @@ import Settings from '../../Settings';
 
 const SpaceBackground = dynamic(() => import('../../SpaceBackground'), { ssr: false });
 
-export default function GeneratedPage() {
+function LoginPageContent() {
   const [isLogin, setIsLogin] = useState(true);
   const [username, setUsername] = useState('');
   const [email, setEmail] = useState('');
@@ -29,7 +29,17 @@ export default function GeneratedPage() {
   const [totpCode, setTotpCode] = useState('');
   
   const router = useRouter();
+  const searchParams = useSearchParams();
   const fetchMe = useAuthStore(state => state.fetchMe);
+
+  // Show OAuth errors passed back from the backend callback redirect
+  // e.g. /login?error=Google+login+cancelled
+  useEffect(() => {
+    const oauthError = searchParams.get('error');
+    if (oauthError) {
+      setError(decodeURIComponent(oauthError.replace(/\+/g, ' ')));
+    }
+  }, [searchParams]);
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
@@ -278,5 +288,17 @@ export default function GeneratedPage() {
           {/* Settings toggle */}
       <Settings />
     </main>
+  );
+}
+
+export default function GeneratedPage() {
+  return (
+    <Suspense fallback={
+      <div className="min-h-screen flex items-center justify-center bg-background">
+        <div className="w-12 h-12 border-4 border-primary border-t-transparent rounded-full animate-spin" />
+      </div>
+    }>
+      <LoginPageContent />
+    </Suspense>
   );
 }

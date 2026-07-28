@@ -2,6 +2,7 @@
 
 import React, { useState, useEffect } from 'react'
 import Link from 'next/link'
+import { useRouter } from 'next/navigation'
 import { LayoutDashboard, GitMerge, CircleDot, Rocket, Bookmark, Clock, Plus, X, AlertCircle } from 'lucide-react'
 
 import { DashboardNav } from './DashboardNav'
@@ -60,6 +61,7 @@ function activityDescription(type: string): string {
 
 export default function DashboardPage() {
   const { user, clearAuth } = useAuthStore()
+  const router = useRouter()
   const [isEntering, setIsEntering] = useState(true)
   const [isMenuOpen, setIsMenuOpen] = useState(false)
 
@@ -184,17 +186,17 @@ export default function DashboardPage() {
             <div>
               <h3 className="text-[11px] font-bold text-slate-500 uppercase tracking-wider mb-2 px-1">Work</h3>
               <div className="space-y-1">
-                <Link href="#" className="flex items-center gap-3 px-3 py-2 rounded-lg hover:bg-slate-50 dark:hover:bg-slate-800 text-slate-700 dark:text-slate-300 font-medium text-sm transition-colors">
+                <button onClick={() => { setIsMenuOpen(false); router.push(repos[0] ? `/${user?.username}/${repos[0].name}/issues` : '/new') }} className="w-full flex items-center gap-3 px-3 py-2 rounded-lg hover:bg-slate-50 dark:hover:bg-slate-800 text-slate-700 dark:text-slate-300 font-medium text-sm transition-colors">
                   <CircleDot className="w-4 h-4" /> Issues
-                </Link>
-                <Link href="#" className="flex items-center gap-3 px-3 py-2 rounded-lg hover:bg-slate-50 dark:hover:bg-slate-800 text-slate-700 dark:text-slate-300 font-medium text-sm transition-colors">
+                </button>
+                <button onClick={() => { setIsMenuOpen(false); router.push(repos[0] ? `/${user?.username}/${repos[0].name}/pulls` : '/new') }} className="w-full flex items-center gap-3 px-3 py-2 rounded-lg hover:bg-slate-50 dark:hover:bg-slate-800 text-slate-700 dark:text-slate-300 font-medium text-sm transition-colors">
                   <GitMerge className="w-4 h-4" /> Pull requests
-                </Link>
+                </button>
               </div>
             </div>
           </div>
           <div className="p-4 border-t border-slate-100 dark:border-slate-800 bg-slate-50 dark:bg-slate-900">
-            <button onClick={clearAuth} className="w-full flex items-center gap-3 px-3 py-2 rounded-lg hover:bg-red-50 dark:hover:bg-red-900/20 text-red-600 dark:text-red-400 font-medium text-sm transition-colors">
+            <button onClick={() => { clearAuth(); router.push('/'); }} className="w-full flex items-center gap-3 px-3 py-2 rounded-lg hover:bg-red-50 dark:hover:bg-red-900/20 text-red-600 dark:text-red-400 font-medium text-sm transition-colors">
               Sign out
             </button>
           </div>
@@ -206,16 +208,16 @@ export default function DashboardPage() {
   const renderSidebar = () => (
     <div className="hidden md:flex w-full md:w-64 flex-col gap-2 shrink-0 animate-fade-in-up">
       <div className="text-xs font-semibold text-slate-400 uppercase tracking-wider mb-2 pl-3">Menu</div>
-      <Button variant="ghost" className="justify-start text-slate-700 font-medium bg-slate-100 dark:bg-slate-800 dark:text-slate-200">
+      <Button variant="ghost" className="justify-start text-slate-700 font-medium bg-slate-100 dark:bg-slate-800 dark:text-slate-200" onClick={() => router.push('/dashboard')}>
         <LayoutDashboard className="w-4 h-4 mr-2" /> Home
       </Button>
-      <Button variant="ghost" className="justify-start text-slate-500 hover:text-slate-700">
+      <Button variant="ghost" className="justify-start text-slate-500 hover:text-slate-700" onClick={() => router.push(repos[0] ? `/${user?.username}/${repos[0].name}/issues` : '/new')}>
         <CircleDot className="w-4 h-4 mr-2" /> Issues
       </Button>
-      <Button variant="ghost" className="justify-start text-slate-500 hover:text-slate-700">
+      <Button variant="ghost" className="justify-start text-slate-500 hover:text-slate-700" onClick={() => router.push(repos[0] ? `/${user?.username}/${repos[0].name}/pulls` : '/new')}>
         <GitMerge className="w-4 h-4 mr-2" /> Pull Requests
       </Button>
-      <Button variant="ghost" className="justify-start text-slate-500 hover:text-slate-700" onClick={() => window.location.href = '/startups'}>
+      <Button variant="ghost" className="justify-start text-slate-500 hover:text-slate-700" onClick={() => router.push('/startups')}>
         <Rocket className="w-4 h-4 mr-2" /> Startup Hub
       </Button>
     </div>
@@ -363,7 +365,7 @@ export default function DashboardPage() {
           </div>
           <h3 className="font-semibold text-slate-900 dark:text-white">Upgrade to Pro</h3>
           <p className="text-xs text-slate-600 dark:text-slate-400 mb-2">Get advanced AI code reviews and private startup metrics.</p>
-          <Button variant="primary" className="w-full text-xs h-8">View Plans</Button>
+          <Button variant="primary" className="w-full text-xs h-8" onClick={() => router.push('/settings')}>View Plans</Button>
         </CardContent>
       </Card>
     </div>
@@ -391,11 +393,23 @@ export default function DashboardPage() {
           <div className="mb-6 animate-fade-in-up">
             <div className="overflow-x-auto pb-1 -mx-1 px-1">
               <div className="flex items-center gap-3 mb-4" style={{ minWidth: 'max-content' }}>
-                <button className="px-4 py-2 rounded-full bg-white dark:bg-slate-800 border border-slate-200 dark:border-slate-700 shadow-sm text-sm font-medium flex items-center gap-2 hover:bg-slate-50 transition-all text-slate-700 dark:text-slate-200 whitespace-nowrap">
+                <button
+                  onClick={() => router.push(repos[0] ? `/${user?.username}/${repos[0].name}/issues` : '/new')}
+                  className="px-4 py-2 rounded-full bg-white dark:bg-slate-800 border border-slate-200 dark:border-slate-700 shadow-sm text-sm font-medium flex items-center gap-2 hover:bg-slate-50 transition-all text-slate-700 dark:text-slate-200 whitespace-nowrap"
+                >
                   <CircleDot className="w-4 h-4 text-red-500" /> Create issue
                 </button>
-                <button className="px-4 py-2 rounded-full bg-white dark:bg-slate-800 border border-slate-200 dark:border-slate-700 shadow-sm text-sm font-medium flex items-center gap-2 hover:bg-slate-50 transition-all text-slate-700 dark:text-slate-200 whitespace-nowrap">
+                <button
+                  onClick={() => router.push(repos[0] ? `/${user?.username}/${repos[0].name}/pulls` : '/new')}
+                  className="px-4 py-2 rounded-full bg-white dark:bg-slate-800 border border-slate-200 dark:border-slate-700 shadow-sm text-sm font-medium flex items-center gap-2 hover:bg-slate-50 transition-all text-slate-700 dark:text-slate-200 whitespace-nowrap"
+                >
                   <GitMerge className="w-4 h-4 text-green-500" /> Pull requests
+                </button>
+                <button
+                  onClick={() => router.push('/new')}
+                  className="px-4 py-2 rounded-full bg-white dark:bg-slate-800 border border-slate-200 dark:border-slate-700 shadow-sm text-sm font-medium flex items-center gap-2 hover:bg-slate-50 transition-all text-slate-700 dark:text-slate-200 whitespace-nowrap"
+                >
+                  <Plus className="w-4 h-4 text-blue-500" /> New repository
                 </button>
               </div>
             </div>

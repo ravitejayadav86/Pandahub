@@ -247,9 +247,9 @@ export default function DashboardNav() {
                   {/* Menu items */}
                   <div className="p-1.5">
                     {[
-                      { icon: 'person',      label: 'Your profile',      href: '/dashboard' },
+                      { icon: 'person',      label: 'Your profile',      href: `/${user?.username}` },
                       { icon: 'code_blocks', label: 'Repositories',      href: '/dashboard' },
-                      { icon: 'star',        label: 'Stars',             href: '/dashboard' },
+                      { icon: 'star',        label: 'Stars',             href: '/explore' },
                       { icon: 'settings',    label: 'Settings',          href: '/settings'  },
                     ].map(item => (
                       <Link

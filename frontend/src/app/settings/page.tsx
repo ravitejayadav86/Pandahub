@@ -64,6 +64,14 @@ export default function SettingsPage() {
   const [tokenLoading, setTokenLoading] = useState(false);
   const [tokenError, setTokenError] = useState('');
 
+  // ── Notification prefs ─────────────────────────────────────────────────────
+  type NotifKey = 'commits' | 'issues' | 'pr_reviews' | 'pr_merges' | 'mentions' | 'stars' | 'followers';
+  const DEFAULT_NOTIF: Record<NotifKey, boolean> = {
+    commits: true, issues: true, pr_reviews: true,
+    pr_merges: false, mentions: true, stars: false, followers: true,
+  };
+  const [notifPrefs, setNotifPrefs] = useState<Record<NotifKey, boolean>>(DEFAULT_NOTIF);
+
   // ── Danger zone ───────────────────────────────────────────────────────────
   const [deleteConfirm, setDeleteConfirm] = useState('');
   const [showDeleteModal, setShowDeleteModal] = useState(false);
@@ -71,6 +79,11 @@ export default function SettingsPage() {
   // ── Init ──────────────────────────────────────────────────────────────────
   useEffect(() => {
     setMounted(true);
+    // Load notification prefs from localStorage
+    try {
+      const saved = localStorage.getItem('pandahub_notif_prefs');
+      if (saved) setNotifPrefs(JSON.parse(saved));
+    } catch { /* ignore */ }
     if (user) {
       setProfile({
         username: user.username || '',
@@ -696,29 +709,41 @@ export default function SettingsPage() {
             <div>
               <div className={sectionHeaderCls}>
                 <h2 className="text-xl font-bold">Notifications</h2>
-                <p className="text-sm text-on-surface-variant mt-1">Choose what you are notified about.</p>
+                <p className="text-sm text-on-surface-variant mt-1">Choose what you are notified about. Preferences are saved locally.</p>
               </div>
               <div className="px-8 py-7 flex flex-col divide-y divide-outline-variant/20">
-                {[
-                  { label: 'Push commits to your repository', detail: 'When someone pushes to a repo you own',   on: true  },
-                  { label: 'New issues',                      detail: 'When someone opens a new issue',          on: true  },
-                  { label: 'Pull request reviews',            detail: 'Review requests and approvals',           on: true  },
-                  { label: 'Pull request merges',             detail: 'When a PR is merged or closed',          on: false },
-                  { label: 'Mentions',                        detail: 'When someone @mentions you',             on: true  },
-                  { label: 'Stars',                           detail: 'When someone stars your repository',     on: false },
-                  { label: 'New followers',                   detail: 'When someone follows your profile',      on: true  },
-                ].map((item) => (
-                  <div key={item.label} className="flex items-center justify-between py-4">
-                    <div>
-                      <div className="text-sm font-semibold">{item.label}</div>
-                      <div className="text-xs text-on-surface-variant mt-0.5">{item.detail}</div>
+                {([
+                  { key: 'commits'    as NotifKey, label: 'Push commits to your repository', detail: 'When someone pushes to a repo you own' },
+                  { key: 'issues'     as NotifKey, label: 'New issues',                      detail: 'When someone opens a new issue' },
+                  { key: 'pr_reviews' as NotifKey, label: 'Pull request reviews',            detail: 'Review requests and approvals' },
+                  { key: 'pr_merges'  as NotifKey, label: 'Pull request merges',             detail: 'When a PR is merged or closed' },
+                  { key: 'mentions'   as NotifKey, label: 'Mentions',                        detail: 'When someone @mentions you' },
+                  { key: 'stars'      as NotifKey, label: 'Stars',                           detail: 'When someone stars your repository' },
+                  { key: 'followers'  as NotifKey, label: 'New followers',                   detail: 'When someone follows your profile' },
+                ] as { key: NotifKey; label: string; detail: string }[]).map((item) => {
+                  const on = notifPrefs[item.key];
+                  return (
+                    <div key={item.key} className="flex items-center justify-between py-4">
+                      <div>
+                        <div className="text-sm font-semibold">{item.label}</div>
+                        <div className="text-xs text-on-surface-variant mt-0.5">{item.detail}</div>
+                      </div>
+                      <button
+                        id={`notif-toggle-${item.key}`}
+                        role="switch"
+                        aria-checked={on}
+                        onClick={() => {
+                          const next = { ...notifPrefs, [item.key]: !on };
+                          setNotifPrefs(next);
+                          localStorage.setItem('pandahub_notif_prefs', JSON.stringify(next));
+                        }}
+                        className={`w-11 h-6 rounded-full relative transition-colors shrink-0 focus:outline-none focus:ring-2 focus:ring-primary/50 cursor-pointer ${on ? 'bg-primary' : 'bg-surface-container-high'}`}
+                      >
+                        <div className={`w-[18px] h-[18px] rounded-full bg-white absolute top-[3px] transition-all shadow ${on ? 'left-[23px]' : 'left-[3px]'}`} />
+                      </button>
                     </div>
-                    {/* Static toggle — functional toggle would need DB-backed prefs */}
-                    <div className={`w-11 h-6 rounded-full relative transition-colors shrink-0 ${item.on ? 'bg-primary' : 'bg-surface-container-high'}`}>
-                      <div className={`w-[18px] h-[18px] rounded-full bg-white absolute top-[3px] transition-all shadow ${item.on ? 'left-[23px]' : 'left-[3px]'}`} />
-                    </div>
-                  </div>
-                ))}
+                  );
+                })}
               </div>
             </div>
           )}

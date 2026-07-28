@@ -227,8 +227,6 @@ export default function UserProfilePage() {
               </div>
             )}
           </div>
-
-          </div>
         </div>
 
         {/* ── Main Content Area ── */}
@@ -284,8 +282,6 @@ export default function UserProfilePage() {
                     </div>
                   )}
                 </div>
-              </div>
-
               </div>
             </div>
           )}

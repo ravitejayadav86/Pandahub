@@ -3,15 +3,24 @@ export interface User {
   username: string;
   email?: string;
   full_name?: string;
+  first_name?: string;
+  last_name?: string;
   bio?: string;
   avatar_url?: string;
-  website?: string;
+  website?: string;        // legacy alias kept for compatibility
+  website_url?: string;    // backend field name
   location?: string;
-  company?: string;
+  company?: string;        // used locally in profile form
   is_active: boolean;
   is_verified: boolean;
   two_factor_enabled?: boolean;
   created_at: string;
+  // Education / onboarding
+  institution?: string;
+  degree?: string;
+  field_of_study?: string;
+  graduation_year?: number;
+  needs_onboarding?: boolean;
 }
 
 export interface Repository {

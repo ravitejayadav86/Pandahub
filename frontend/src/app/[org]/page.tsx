@@ -38,34 +38,6 @@ interface Repository {
 
 type TabType = 'overview' | 'repositories' | 'projects' | 'packages' | 'stars'
 
-// ── Helpers ────────────────────────────────────────────────────────────────
-const generateHeatmap = () => {
-  const weeks = []
-  for (let w = 0; w < 52; w++) {
-    const days = []
-    for (let d = 0; d < 7; d++) {
-      // randomly assign a level 0-4
-      const r = Math.random()
-      let level = 0
-      if (r > 0.95) level = 4
-      else if (r > 0.85) level = 3
-      else if (r > 0.6) level = 2
-      else if (r > 0.4) level = 1
-      days.push(level)
-    }
-    weeks.push(days)
-  }
-  return weeks
-}
-
-const HEATMAP_COLORS = [
-  'bg-slate-100 dark:bg-slate-800', 
-  'bg-[#9be9a8] dark:bg-[#0e4429]',
-  'bg-[#40c463] dark:bg-[#006d32]',
-  'bg-[#30a14e] dark:bg-[#26a641]',
-  'bg-[#216e39] dark:bg-[#39d353]'
-]
-
 // ── Component ──────────────────────────────────────────────────────────────
 export default function UserProfilePage() {
   const params = useParams()
@@ -79,9 +51,6 @@ export default function UserProfilePage() {
 
   const [activeTab, setActiveTab] = useState<TabType>('overview')
   const [repoSearch, setRepoSearch] = useState('')
-
-  // Mock data for highly featured UI
-  const heatmap = useState(generateHeatmap)[0]
   
   useEffect(() => {
     if (!org) return
@@ -259,27 +228,6 @@ export default function UserProfilePage() {
             )}
           </div>
 
-          <hr className="my-5 border-slate-200 dark:border-slate-700" />
-          
-          {/* Mock Achievements */}
-          <h3 className="text-base font-semibold text-slate-900 dark:text-slate-100 mb-3">Achievements</h3>
-          <div className="flex gap-2">
-            <div className="w-16 h-16 rounded-full bg-gradient-to-tr from-purple-500 to-indigo-500 flex items-center justify-center text-white" title="Arctic Code Vault Contributor">
-              <Hexagon className="w-8 h-8 fill-current" />
-            </div>
-            <div className="w-16 h-16 rounded-full border border-slate-200 dark:border-slate-700 flex items-center justify-center text-slate-400 dark:text-slate-500" title="Pull Shark">
-              <Trophy className="w-8 h-8" />
-            </div>
-          </div>
-
-          <hr className="my-5 border-slate-200 dark:border-slate-700" />
-          
-          {/* Mock Organizations */}
-          <h3 className="text-base font-semibold text-slate-900 dark:text-slate-100 mb-3">Organizations</h3>
-          <div className="flex gap-2">
-            <div className="w-9 h-9 rounded-md bg-slate-800 text-white flex items-center justify-center text-xl cursor-pointer hover:ring-2 ring-slate-400" title="PandaHub Core">
-              🐼
-            </div>
           </div>
         </div>
 
@@ -338,82 +286,6 @@ export default function UserProfilePage() {
                 </div>
               </div>
 
-              {/* Heatmap */}
-              <div>
-                <div className="flex items-center justify-between mb-2 text-sm">
-                  <span className="text-slate-900 dark:text-slate-200">1,245 contributions in the last year</span>
-                  <a href="#" className="text-slate-500 hover:text-blue-500">Contribution settings</a>
-                </div>
-                <div className="border border-slate-200 dark:border-slate-700 rounded-lg p-5 bg-white dark:bg-[#0d1117] shadow-sm overflow-x-auto">
-                  <div className="flex gap-1 min-w-max">
-                    {heatmap.map((week, wIdx) => (
-                      <div key={wIdx} className="flex flex-col gap-1">
-                        {week.map((level, dIdx) => (
-                          <div 
-                            key={`${wIdx}-${dIdx}`} 
-                            className={`w-[11px] h-[11px] rounded-[2px] ${HEATMAP_COLORS[level]}`}
-                            title={`${level * 3 + Math.floor(Math.random()*5)} contributions on this day`}
-                          />
-                        ))}
-                      </div>
-                    ))}
-                  </div>
-                  <div className="flex items-center justify-between mt-4 text-[11px] text-slate-500">
-                    <a href="#" className="hover:text-blue-500">Learn how we count contributions</a>
-                    <div className="flex items-center gap-1">
-                      <span>Less</span>
-                      {HEATMAP_COLORS.map((c, i) => (
-                        <div key={i} className={`w-[11px] h-[11px] rounded-[2px] ${c}`} />
-                      ))}
-                      <span>More</span>
-                    </div>
-                  </div>
-                </div>
-              </div>
-              
-              {/* Activity Timeline */}
-              <div className="relative">
-                <h3 className="text-sm font-semibold text-slate-900 dark:text-slate-200 mb-4">Contribution activity</h3>
-                <div className="absolute left-4 top-10 bottom-0 w-0.5 bg-slate-200 dark:bg-slate-800 -z-10" />
-                
-                <div className="space-y-6">
-                  <div className="flex gap-4">
-                    <div className="mt-1 bg-white dark:bg-[#0d1117] p-1.5 rounded-full z-10">
-                      <GitMerge className="w-4 h-4 text-slate-500" />
-                    </div>
-                    <div>
-                      <div className="text-sm font-semibold text-slate-900 dark:text-slate-200 mb-2">
-                        Created 3 commits in 2 repositories
-                      </div>
-                      <div className="space-y-1">
-                        <div className="flex items-center justify-between text-[13px] text-slate-600 dark:text-slate-400">
-                          <Link href="#" className="text-[#0969da] dark:text-[#58a6ff] hover:underline font-semibold">{profile.username}/pandahub-core</Link>
-                          <span>2 commits</span>
-                        </div>
-                        <div className="flex items-center justify-between text-[13px] text-slate-600 dark:text-slate-400">
-                          <Link href="#" className="text-[#0969da] dark:text-[#58a6ff] hover:underline font-semibold">{profile.username}/react-dashboard</Link>
-                          <span>1 commit</span>
-                        </div>
-                      </div>
-                    </div>
-                  </div>
-                  
-                  <div className="flex gap-4">
-                    <div className="mt-1 bg-white dark:bg-[#0d1117] p-1.5 rounded-full z-10">
-                      <BookMarked className="w-4 h-4 text-slate-500" />
-                    </div>
-                    <div>
-                      <div className="text-sm font-semibold text-slate-900 dark:text-slate-200 mb-2">
-                        Created a repository
-                      </div>
-                      <Link href="#" className="text-[13px] text-[#0969da] dark:text-[#58a6ff] hover:underline font-semibold">{profile.username}/awesome-pandas</Link>
-                    </div>
-                  </div>
-                </div>
-                
-                <button className="mt-8 w-full py-2 border border-slate-200 dark:border-slate-700 text-sm font-semibold text-blue-600 rounded-lg hover:bg-slate-50 dark:hover:bg-slate-800 transition-colors">
-                  Show more activity
-                </button>
               </div>
             </div>
           )}
@@ -497,12 +369,6 @@ export default function UserProfilePage() {
                         <button className="flex items-center gap-1 px-3 py-1 text-sm font-semibold border border-slate-300 dark:border-slate-600 rounded-md bg-slate-50 dark:bg-[#21262d] hover:bg-slate-100 dark:hover:bg-[#30363d] shadow-sm text-slate-700 dark:text-slate-300">
                           <Star className="w-4 h-4 text-slate-400" /> Star
                         </button>
-                        <div className="h-[30px] w-[150px] bg-slate-50 dark:bg-[#161b22] border border-slate-200 dark:border-slate-800 rounded flex items-end justify-between px-1 pb-1" title="Activity graph">
-                           {/* Mock activity graph line */}
-                           <svg viewBox="0 0 150 30" className="w-full h-full text-green-500 stroke-current" fill="none" strokeWidth="2">
-                             <path d="M0 25 Q10 25, 20 20 T40 15 T60 18 T80 5 T100 12 T120 2 T150 15" strokeLinecap="round" strokeLinejoin="round"/>
-                           </svg>
-                        </div>
                       </div>
                     </div>
                   ))

@@ -2,6 +2,7 @@
 
 import React from 'react'
 import Link from 'next/link'
+import { useRouter } from 'next/navigation'
 import { Input } from '@/components/ui/Input'
 import { Button } from '@/components/ui/Button'
 import { Avatar } from '@/components/ui/Avatar'
@@ -14,6 +15,7 @@ interface DashboardNavProps {
 
 export function DashboardNav({ onMenuClick }: DashboardNavProps) {
   const { user } = useAuthStore()
+  const router = useRouter()
 
   return (
     <header className="sticky top-0 z-50 h-[64px] bg-white/80 dark:bg-slate-900/80 backdrop-blur-xl border-b border-slate-200 dark:border-slate-800 flex items-center justify-between px-4 md:px-6">
@@ -49,18 +51,18 @@ export function DashboardNav({ onMenuClick }: DashboardNavProps) {
         </div>
         
         <div className="flex items-center gap-2 border-l border-slate-200 dark:border-slate-800 pl-4 ml-2">
-          <Button variant="ghost" className="w-9 h-9 p-0 rounded-full">
+          <Button variant="ghost" className="w-9 h-9 p-0 rounded-full" onClick={() => router.push('/new')}>
             <Plus className="w-5 h-5 text-slate-500" />
           </Button>
-          <Button variant="ghost" className="w-9 h-9 p-0 rounded-full relative">
+          <Button variant="ghost" className="w-9 h-9 p-0 rounded-full relative" onClick={() => alert('Notifications coming soon!')}>
             <Bell className="w-5 h-5 text-slate-500" />
             <span className="absolute top-1.5 right-1.5 w-2 h-2 bg-blue-500 rounded-full border-2 border-white dark:border-slate-900" />
           </Button>
-          <Button variant="ghost" className="w-9 h-9 p-0 rounded-full">
+          <Button variant="ghost" className="w-9 h-9 p-0 rounded-full" onClick={() => router.push('/settings')}>
             <Settings className="w-5 h-5 text-slate-500" />
           </Button>
           
-          <div className="ml-2 cursor-pointer card-lift">
+          <div className="ml-2 cursor-pointer card-lift" onClick={() => router.push(`/${user?.username}`)}>
             <Avatar 
               size="md" 
               src={user?.avatar_url} 

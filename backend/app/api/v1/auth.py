@@ -6,6 +6,8 @@ only translate between HTTP (request parsing, status codes) and the
 service layer. This keeps the routes thin and testable independent of
 FastAPI's request/response machinery.
 """
+import uuid
+
 from fastapi import APIRouter, Depends, UploadFile, File, status
 from sqlalchemy.ext.asyncio import AsyncSession
 
@@ -27,6 +29,9 @@ from app.schemas.auth_schema import (
     ResendVerificationRequest,
     PasswordResetRequest,
     PasswordResetConfirm,
+    PersonalAccessTokenCreate,
+    PersonalAccessTokenCreateResponse,
+    PersonalAccessTokenOut,
 )
 from app.schemas.user_schema import UserOut, UserProfileUpdate, ChangePasswordRequest
 from app.services import auth_service
@@ -537,3 +542,36 @@ async def github_callback(code: str, db: AsyncSession = Depends(get_db)):
     # Redirect to frontend callback page
     frontend_callback = f"{settings.FRONTEND_URL}/oauth/callback?access_token={panda_access}&refresh_token={panda_refresh}"
     return RedirectResponse(frontend_callback)
+
+
+# ---------------------------------------------------------------------------
+# Personal Access Tokens (panda CLI, git-over-HTTPS -- see git_engine/auth.py)
+# ---------------------------------------------------------------------------
+@router.post("/tokens", response_model=PersonalAccessTokenCreateResponse, status_code=status.HTTP_201_CREATED)
+async def create_token(
+    payload: PersonalAccessTokenCreate,
+    db: AsyncSession = Depends(get_db),
+    current_user: User = Depends(get_current_active_user),
+):
+    pat, raw_token = await auth_service.create_personal_access_token(
+        db, current_user, payload.name, payload.scopes, payload.expires_in_days
+    )
+    return PersonalAccessTokenCreateResponse(
+        id=pat.id, name=pat.name, token=raw_token,
+        scopes=pat.scopes, expires_at=pat.expires_at, created_at=pat.created_at,
+    )
+
+@router.get("/tokens", response_model=list[PersonalAccessTokenOut])
+async def list_tokens(
+    db: AsyncSession = Depends(get_db),
+    current_user: User = Depends(get_current_active_user),
+):
+    return await auth_service.list_personal_access_tokens(db, current_user)
+
+@router.delete("/tokens/{token_id}", status_code=status.HTTP_204_NO_CONTENT)
+async def revoke_token(
+    token_id: uuid.UUID,
+    db: AsyncSession = Depends(get_db),
+    current_user: User = Depends(get_current_active_user),
+):
+    await auth_service.revoke_personal_access_token(db, current_user, token_id)

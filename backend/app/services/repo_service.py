@@ -253,7 +253,10 @@ async def create_repository(
     # Flush (not commit) to surface constraint violations before going to disk.
     await db.flush()
 
-    # Initialise the bare repo on disk Ã¢â‚¬â€ run in executor to avoid blocking
+    # Ensure the root git directory exists (docker volume may not create it).
+    Path(settings.GIT_REPOS_ROOT).mkdir(parents=True, exist_ok=True)
+
+    # Initialise the bare repo on disk — run in executor to avoid blocking
     # the event loop (pygit2 is synchronous / GIL-holding).
     try:
         loop = asyncio.get_event_loop()
@@ -271,11 +274,15 @@ async def create_repository(
         )
         # Rollback the flush so the DB row is not committed.
         await db.rollback()
-        raise
+        from fastapi import HTTPException
+        raise HTTPException(
+            status_code=500,
+            detail=f"Failed to initialise git repository on disk: {exc}",
+        ) from exc
 
     # If auto_init, cache the initial branch row.
     if payload.auto_init:
-        # We need the HEAD SHA Ã¢â‚¬â€ open the repo synchronously (cheap, already created).
+        # We need the HEAD SHA — open the repo synchronously (cheap, already created).
         def _get_head_sha() -> str:
             r = pygit2.Repository(disk_path)
             return str(r.head.target)

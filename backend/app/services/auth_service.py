@@ -322,7 +322,9 @@ async def handle_oauth_login(
     email: str,
     name: str | None = None,
     avatar_url: str | None = None,
-) -> User:
+) -> tuple["User", bool]:
+    """Return ``(user, is_new_user)``.  ``is_new_user`` is ``True`` only when
+    a brand-new account was created (not when an existing user logs in again)."""
     from app.models.user import OAuthAccount
     from app.models.enums import OAuthProvider
 
@@ -349,13 +351,15 @@ async def handle_oauth_login(
         user = user_result.scalar_one()
         if not user.is_active:
             raise AuthError("Account is disabled", status.HTTP_403_FORBIDDEN)
-        return user
+        return user, False
 
     # 2. Check if a user with this email already exists (account linking).
     user_result = await db.execute(select(User).where(User.email == email))
     user = user_result.scalar_one_or_none()
 
-    if not user:
+    is_new_user = user is None
+
+    if is_new_user:
         # 3. No existing account -- create a new user.
         # Derive a username from the email local-part, stripping non-alphanumeric chars.
         base_username = re.sub(r'[^a-z0-9]', '', (email.split("@")[0] if email else "user").lower())
@@ -377,12 +381,13 @@ async def handle_oauth_login(
             avatar_url=avatar_url,
             is_verified=True,  # OAuth provider has already verified the email.
             hashed_password=None,  # OAuth-only account; no password.
+            needs_onboarding=True,  # Route new users through the onboarding flow.
         )
         db.add(user)
         await db.flush()  # populate user.id before we reference it below
 
     # Link the OAuth identity to this user (new row regardless of whether the
-    # user account is brand-new or a pre-existing email-match).
+    # user account is brand-new or a pre-existing email-match).\
     new_oauth = OAuthAccount(
         user_id=user.id,
         provider=provider_enum,
@@ -391,7 +396,7 @@ async def handle_oauth_login(
     db.add(new_oauth)
     await db.commit()
     await db.refresh(user)
-    return user
+    return user, is_new_user
 
 
 # ---------------------------------------------------------------------------

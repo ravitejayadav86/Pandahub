@@ -8,7 +8,7 @@ FastAPI's request/response machinery.
 """
 import uuid
 
-from fastapi import APIRouter, Depends, UploadFile, File, status
+from fastapi import APIRouter, Depends, UploadFile, File, HTTPException, status
 from sqlalchemy.ext.asyncio import AsyncSession
 
 from app.api.dependencies import get_current_active_user
@@ -180,7 +180,18 @@ async def update_me(
     db: AsyncSession = Depends(get_db),
     current_user: User = Depends(get_current_active_user),
 ):
+    from sqlalchemy import select as sa_select
     update_data = payload.model_dump(exclude_unset=True)
+
+    # If username is being changed, verify it is unique.
+    new_username = update_data.get("username")
+    if new_username and new_username != current_user.username:
+        existing = await db.execute(
+            sa_select(User.id).where(User.username == new_username)
+        )
+        if existing.scalar_one_or_none() is not None:
+            raise HTTPException(status_code=409, detail="Username already taken")
+
     for field, value in update_data.items():
         setattr(current_user, field, value)
     await db.commit()
@@ -369,7 +380,6 @@ async def get_user_profile(
 @router.get("/google/login", summary="Initiate Google OAuth login")
 async def google_login():
     from fastapi.responses import RedirectResponse
-    from fastapi import HTTPException
     from app.core.config import get_settings
     settings = get_settings()
     client_id = settings.GOOGLE_OAUTH_CLIENT_ID
@@ -392,7 +402,6 @@ async def google_login():
 @router.get("/google/callback", summary="Google OAuth callback")
 async def google_callback(code: str | None = None, error: str | None = None, db: AsyncSession = Depends(get_db)):
     from fastapi.responses import RedirectResponse
-    from fastapi import HTTPException
     from app.core.config import get_settings
     import httpx
 
@@ -437,8 +446,8 @@ async def google_callback(code: str | None = None, error: str | None = None, db:
 
         user_info = user_response.json()
 
-    # Handle user login/creation
-    user = await auth_service.handle_oauth_login(
+    # Handle user login/creation — returns (user, is_new_user)
+    user, is_new_user = await auth_service.handle_oauth_login(
         db=db,
         provider="google",
         provider_account_id=user_info["id"],
@@ -450,21 +459,29 @@ async def google_callback(code: str | None = None, error: str | None = None, db:
     # Generate our JWT tokens
     panda_access, panda_refresh = await auth_service.issue_token_pair(db, user)
 
-    # Redirect to frontend callback page
-    frontend_callback = f"{settings.FRONTEND_URL}/oauth/callback?access_token={panda_access}&refresh_token={panda_refresh}"
+    # New users → onboarding page; returning users → dashboard via oauth callback
+    if is_new_user:
+        frontend_callback = (
+            f"{settings.FRONTEND_URL}/oauth/callback"
+            f"?access_token={panda_access}&refresh_token={panda_refresh}&onboarding=true"
+        )
+    else:
+        frontend_callback = (
+            f"{settings.FRONTEND_URL}/oauth/callback"
+            f"?access_token={panda_access}&refresh_token={panda_refresh}"
+        )
     return RedirectResponse(frontend_callback)
 
 
 @router.get("/github/login", summary="Initiate GitHub OAuth login")
 async def github_login():
     from fastapi.responses import RedirectResponse
-    from fastapi import HTTPException
     from app.core.config import get_settings
     settings = get_settings()
     client_id = settings.GITHUB_OAUTH_CLIENT_ID
     if not client_id:
         raise HTTPException(status_code=500, detail="GitHub OAuth not configured")
-    
+
     redirect_uri = f"{settings.BACKEND_URL}/api/v1/auth/github/callback"
     url = f"https://github.com/login/oauth/authorize?client_id={client_id}&redirect_uri={redirect_uri}&scope=user:email"
     return RedirectResponse(url)
@@ -473,14 +490,13 @@ async def github_login():
 @router.get("/github/callback", summary="GitHub OAuth callback")
 async def github_callback(code: str, db: AsyncSession = Depends(get_db)):
     from fastapi.responses import RedirectResponse
-    from fastapi import HTTPException
     from app.core.config import get_settings
     import httpx
-    
+
     settings = get_settings()
     client_id = settings.GITHUB_OAUTH_CLIENT_ID
     client_secret = settings.GITHUB_OAUTH_CLIENT_SECRET
-    
+
     async with httpx.AsyncClient() as client:
         # Exchange code for token
         token_response = await client.post(
@@ -494,12 +510,12 @@ async def github_callback(code: str, db: AsyncSession = Depends(get_db)):
         )
         if token_response.status_code != 200:
             raise HTTPException(status_code=400, detail="Failed to exchange token with GitHub")
-            
+
         tokens = token_response.json()
         if "access_token" not in tokens:
             raise HTTPException(status_code=400, detail="Failed to get access token from GitHub")
         access_token = tokens["access_token"]
-        
+
         # Get user info
         user_response = await client.get(
             "https://api.github.com/user",
@@ -507,9 +523,9 @@ async def github_callback(code: str, db: AsyncSession = Depends(get_db)):
         )
         if user_response.status_code != 200:
             raise HTTPException(status_code=400, detail="Failed to fetch user info from GitHub")
-            
+
         user_info = user_response.json()
-        
+
         # Get user email
         email_response = await client.get(
             "https://api.github.com/user/emails",
@@ -517,17 +533,17 @@ async def github_callback(code: str, db: AsyncSession = Depends(get_db)):
         )
         if email_response.status_code != 200:
             raise HTTPException(status_code=400, detail="Failed to fetch user emails from GitHub")
-            
+
         emails = email_response.json()
         primary_email = next((e["email"] for e in emails if e["primary"]), None)
         if not primary_email and emails:
             primary_email = emails[0]["email"]
-            
+
         if not primary_email:
             raise HTTPException(status_code=400, detail="No email found on GitHub account")
-        
-    # Handle user login/creation
-    user = await auth_service.handle_oauth_login(
+
+    # Handle user login/creation — returns (user, is_new_user)
+    user, is_new_user = await auth_service.handle_oauth_login(
         db=db,
         provider="github",
         provider_account_id=str(user_info["id"]),
@@ -535,10 +551,10 @@ async def github_callback(code: str, db: AsyncSession = Depends(get_db)):
         name=user_info.get("name") or user_info.get("login"),
         avatar_url=user_info.get("avatar_url")
     )
-    
+
     # Generate our JWT tokens
     panda_access, panda_refresh = await auth_service.issue_token_pair(db, user)
-    
+
     # Redirect to frontend callback page
     frontend_callback = f"{settings.FRONTEND_URL}/oauth/callback?access_token={panda_access}&refresh_token={panda_refresh}"
     return RedirectResponse(frontend_callback)

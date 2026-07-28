@@ -12,14 +12,19 @@ function OAuthCallbackContent() {
   useEffect(() => {
     const accessToken = searchParams.get("access_token");
     const refreshToken = searchParams.get("refresh_token");
+    const needsOnboarding = searchParams.get("onboarding") === "true";
 
     if (accessToken && refreshToken) {
       localStorage.setItem("access_token", accessToken);
       localStorage.setItem("refresh_token", refreshToken);
 
-      // Fetch user profile and redirect to dashboard
+      // Fetch user profile then route accordingly
       fetchMe().then(() => {
-        router.push("/dashboard");
+        if (needsOnboarding) {
+          router.push("/onboarding");
+        } else {
+          router.push("/dashboard");
+        }
       }).catch((err) => {
         console.error("Failed to fetch user profile after OAuth login:", err);
         router.push("/login?error=OAuth failed");
@@ -51,4 +56,3 @@ export default function OAuthCallbackPage() {
     </Suspense>
   );
 }
-

@@ -12,7 +12,7 @@ import uuid
 from datetime import datetime
 from typing import Optional
 
-from sqlalchemy import String, Boolean, DateTime, ForeignKey, ARRAY
+from sqlalchemy import String, Boolean, DateTime, ForeignKey, ARRAY, Integer
 from sqlalchemy.dialects.postgresql import UUID
 from sqlalchemy.orm import Mapped, mapped_column, relationship
 
@@ -30,10 +30,21 @@ class User(Base, UUIDPKMixin, TimestampMixin):
     hashed_password: Mapped[Optional[str]] = mapped_column(String(255), nullable=True)
 
     full_name: Mapped[Optional[str]] = mapped_column(String(255), nullable=True)
+    first_name: Mapped[Optional[str]] = mapped_column(String(100), nullable=True)
+    last_name: Mapped[Optional[str]] = mapped_column(String(100), nullable=True)
     bio: Mapped[Optional[str]] = mapped_column(String(500), nullable=True)
     avatar_url: Mapped[Optional[str]] = mapped_column(String(500), nullable=True)
     location: Mapped[Optional[str]] = mapped_column(String(255), nullable=True)
     website_url: Mapped[Optional[str]] = mapped_column(String(500), nullable=True)
+
+    # Education / onboarding fields
+    institution: Mapped[Optional[str]] = mapped_column(String(255), nullable=True)
+    degree: Mapped[Optional[str]] = mapped_column(String(100), nullable=True)
+    field_of_study: Mapped[Optional[str]] = mapped_column(String(255), nullable=True)
+    graduation_year: Mapped[Optional[int]] = mapped_column(Integer, nullable=True)
+
+    # Set True for brand-new OAuth users so the frontend routes them to onboarding.
+    needs_onboarding: Mapped[bool] = mapped_column(Boolean, default=False, nullable=False)
 
     is_active: Mapped[bool] = mapped_column(Boolean, default=True, nullable=False)
     is_verified: Mapped[bool] = mapped_column(Boolean, default=False, nullable=False)

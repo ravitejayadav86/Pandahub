@@ -64,8 +64,13 @@ def _build_disk_path(repo_id: uuid.UUID) -> str:
 
     Using the UUID (not the name) means renaming the repository in the
     database requires zero filesystem operations.
+
+    GIT_REPOS_ROOT is resolved to an absolute path so that relative paths
+    (e.g. ``./storage/repositories`` for local dev) work regardless of the
+    working directory the process is started from.
     """
-    return str(Path(settings.GIT_REPOS_ROOT) / f"{repo_id}.git")
+    root = Path(settings.GIT_REPOS_ROOT).resolve()
+    return str(root / f"{repo_id}.git")
 
 
 async def _ensure_name_available(

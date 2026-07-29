@@ -71,8 +71,15 @@ async def get_current_active_user(user: User = Depends(get_current_user)) -> Use
 
 async def get_current_verified_user(user: User = Depends(get_current_active_user)) -> User:
     """Use this dependency on actions that require a confirmed email
-    (creating repos, opening issues) -- registration alone is not enough."""
-    if not user.is_verified:
+    (creating repos, opening issues) -- registration alone is not enough.
+
+    In development mode the email verification gate is skipped because
+    SMTP is usually not configured locally and the verification email
+    would never arrive, making it impossible to create repos at all.
+    """
+    from app.core.config import get_settings as _get_settings
+    _settings = _get_settings()
+    if _settings.ENVIRONMENT != "development" and not user.is_verified:
         raise HTTPException(
             status_code=status.HTTP_403_FORBIDDEN,
             detail="Email verification required",

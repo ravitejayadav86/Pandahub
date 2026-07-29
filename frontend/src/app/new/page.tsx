@@ -26,7 +26,14 @@ export default function NewRepoPage() {
       const { data } = await api.post<Repository>('/repos', form);
       router.push(`/${user?.username}/${data.name}`);
     } catch (err: any) {
-      setError(err?.response?.data?.detail || 'Failed to create repository');
+      const detail = err?.response?.data?.detail;
+      // Pydantic 422 errors return detail as an array of {msg, loc} objects;
+      // other errors return it as a plain string.
+      if (Array.isArray(detail)) {
+        setError(detail.map((d: any) => d.msg || JSON.stringify(d)).join(' · '));
+      } else {
+        setError(detail || 'Failed to create repository');
+      }
     } finally {
       setLoading(false);
     }

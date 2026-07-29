@@ -54,6 +54,13 @@ _WEBHOOK_TIMEOUT_S = 10
 # Synchronous DB session helper
 # ---------------------------------------------------------------------------
 
+# Module-level cached sync engine — created once per Celery worker process,
+# not once per task invocation.  Creating a new engine (and pool) per task
+# would exhaust DB connections under any meaningful load.
+_sync_engine = None
+_sync_session_factory = None
+
+
 def _get_sync_session():
     """
     Return a synchronous SQLAlchemy session for use inside Celery tasks.
@@ -61,19 +68,25 @@ def _get_sync_session():
     We use ``psycopg`` (sync driver) here.  The async ``asyncpg`` driver
     is only safe inside an asyncio event loop, which Celery workers don't
     have by default.
+
+    The engine is created once per worker process (module-level singleton)
+    so the connection pool is shared across tasks, not recreated every call.
     """
+    global _sync_engine, _sync_session_factory
     from sqlalchemy import create_engine
     from sqlalchemy.orm import sessionmaker
 
-    # Convert async URL (postgresql+asyncpg://...) → sync URL (postgresql+psycopg://...)
-    sync_url = settings.DATABASE_URL.replace(
-        "postgresql+asyncpg://", "postgresql+psycopg://"
-    ).replace(
-        "postgresql://", "postgresql+psycopg://"
-    )
-    engine = create_engine(sync_url, pool_pre_ping=True)
-    Session = sessionmaker(bind=engine, expire_on_commit=False)
-    return Session()
+    if _sync_engine is None:
+        # Convert async URL (postgresql+asyncpg://...) → sync URL (postgresql+psycopg://...)
+        sync_url = settings.DATABASE_URL.replace(
+            "postgresql+asyncpg://", "postgresql+psycopg://"
+        ).replace(
+            "postgresql://", "postgresql+psycopg://"
+        )
+        _sync_engine = create_engine(sync_url, pool_pre_ping=True, pool_size=5, max_overflow=10)
+        _sync_session_factory = sessionmaker(bind=_sync_engine, expire_on_commit=False)
+
+    return _sync_session_factory()
 
 
 # ---------------------------------------------------------------------------
@@ -323,11 +336,8 @@ def _sign_payload(payload_bytes: bytes, secret_hash: str) -> str:
     ``secret_hash`` — updating the Webhook model to store an encrypted
     secret instead is a small migration tracked for Module 9.
     """
-    return "sha256=" + hmac.new(
-        secret_hash.encode(),
-        payload_bytes,
-        hashlib.sha256,
-    ).hexdigest()
+    mac = hmac.HMAC(secret_hash.encode(), payload_bytes, hashlib.sha256)
+    return "sha256=" + mac.hexdigest()
 
 
 def _deliver_webhook(webhook, payload: dict) -> bool:

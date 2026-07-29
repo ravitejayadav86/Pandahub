@@ -119,9 +119,11 @@ def _build_env(
         "CONTENT_TYPE": request.headers.get("Content-Type", ""),
         "PATH_INFO": _repo_path_info(repo, path_suffix),
 
-        # git http-backend specific
-        "GIT_PROJECT_ROOT": settings.GIT_REPOS_ROOT,
-        # Export ALL repos Ã¢â‚¬â€ we've already done auth/permission gating above.
+        # git http-backend specific.
+        # Resolve to absolute path so the subprocess can find repos regardless
+        # of its working directory (critical when GIT_REPOS_ROOT is relative).
+        "GIT_PROJECT_ROOT": str(Path(settings.GIT_REPOS_ROOT).resolve()),
+        # Export ALL repos — we've already done auth/permission gating above.
         # Without this, git http-backend checks for a git-daemon-export-ok file.
         "GIT_HTTP_EXPORT_ALL": "1",
 
@@ -298,7 +300,7 @@ async def info_refs(
     owner: str,
     repo_name: str,
     service: str = Query(..., alias="service"),
-    request: Request = None,
+    request: Request = None,  # FastAPI always injects this; None default is for routing compat
     db: AsyncSession = Depends(get_db),
 ) -> Response:
     """
@@ -356,7 +358,7 @@ async def info_refs(
 async def upload_pack(
     owner: str,
     repo_name: str,
-    request: Request = None,
+    request: Request = None,  # FastAPI always injects this
     db: AsyncSession = Depends(get_db),
 ) -> StreamingResponse:
     """
@@ -400,7 +402,7 @@ async def upload_pack(
 async def receive_pack(
     owner: str,
     repo_name: str,
-    request: Request = None,
+    request: Request = None,  # FastAPI always injects this
     db: AsyncSession = Depends(get_db),
 ) -> StreamingResponse:
     """
@@ -477,13 +479,17 @@ async def receive_pack(
             key, _, val = line.partition(":")
             response_headers[key.strip()] = val.strip()
 
-    # Fire the post-receive hook asynchronously (don't block the git client)
+    # Fire the post-receive hook in a thread pool executor so Celery broker
+    # I/O (synchronous) doesn't block the async uvicorn event loop.
     if return_code == 0:
-        _fire_post_receive_hook(
-            repo_id=str(repo.id),
-            disk_path=repo.disk_path,
-            pusher_username=user.username,
-            stderr_output=stderr_data.decode("utf-8", errors="replace"),
+        import asyncio as _asyncio
+        _asyncio.get_running_loop().run_in_executor(
+            None,
+            _fire_post_receive_hook,
+            str(repo.id),
+            repo.disk_path,
+            user.username,
+            stderr_data.decode("utf-8", errors="replace"),
         )
 
     logger.info(

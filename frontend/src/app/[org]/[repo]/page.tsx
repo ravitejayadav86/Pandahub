@@ -17,6 +17,19 @@ interface UserProfile {
   following_count: number;
 }
 
+interface RepoMeta {
+  id: string;
+  name: string;
+  description?: string;
+  visibility: 'public' | 'private' | 'internal';
+  star_count: number;
+  fork_count: number;
+  watcher_count: number;
+  default_branch: string;
+  is_fork: boolean;
+  pushed_at?: string;
+}
+
 export default function RepoDashboardPage() {
   const { user, clearAuth } = useAuthStore();
   const router = useRouter();
@@ -33,10 +46,22 @@ export default function RepoDashboardPage() {
   const [profile, setProfile] = useState<UserProfile | null>(null);
   const [profileLoading, setProfileLoading] = useState(true);
 
+  // Repo metadata from API
+  const [repoMeta, setRepoMeta] = useState<RepoMeta | null>(null);
+  const [starring, setStarring] = useState(false);
+
   useEffect(() => {
     setMounted(true);
     document.documentElement.classList.remove('dark');
   }, []);
+
+  // Fetch repo metadata
+  useEffect(() => {
+    if (!owner || !repoName) return;
+    api.get<RepoMeta>(`/${owner}/${repoName}`)
+      .then(({ data }) => setRepoMeta(data))
+      .catch(() => setRepoMeta(null));
+  }, [owner, repoName]);
 
   // Fetch public profile for the repo owner
   useEffect(() => {
@@ -183,7 +208,15 @@ export default function RepoDashboardPage() {
                 </>
               ) : 'PandaHub'}
             </h2>
-            <span className="px-2 py-0.5 rounded-md bg-slate-100 text-slate-600 text-xs font-bold border border-slate-200">Public</span>
+            <span className={`px-2 py-0.5 rounded-md text-xs font-bold border ${
+              repoMeta?.visibility === 'private'
+                ? 'bg-amber-50 text-amber-700 border-amber-200'
+                : repoMeta?.visibility === 'internal'
+                ? 'bg-blue-50 text-blue-700 border-blue-200'
+                : 'bg-slate-100 text-slate-600 border-slate-200'
+            }`}>
+              {repoMeta?.visibility ? repoMeta.visibility.charAt(0).toUpperCase() + repoMeta.visibility.slice(1) : '—'}
+            </span>
 
             {/* Tabs */}
             <div className="flex items-center h-full pt-1 gap-6">
@@ -410,11 +443,62 @@ export default function RepoDashboardPage() {
 
               <div className="space-y-4">
                 {[
-                  { label: 'Clone', icon: 'content_copy', action: () => navigator.clipboard.writeText(`https://pandahub.dev/${owner}/${repoName}.git`), color: 'text-blue-500' },
-                  { label: 'Download ZIP', icon: 'download', action: () => alert('ZIP download coming soon'), color: 'text-green-600' },
-                  { label: 'Watch', icon: 'visibility', action: () => alert('Watch feature coming soon'), color: 'text-amber-500' },
-                  { label: 'Star', icon: 'star', action: () => alert('Star feature coming soon'), color: 'text-yellow-500' },
-                  { label: 'Fork', icon: 'fork_right', action: () => alert('Fork feature coming soon'), color: 'text-purple-500' },
+                  {
+                    label: 'Clone',
+                    icon: 'content_copy',
+                    action: () => navigator.clipboard.writeText(
+                      `${window.location.protocol}//${window.location.host}/git/${owner}/${repoName}.git`
+                    ),
+                    color: 'text-blue-500',
+                  },
+                  {
+                    label: 'Download ZIP',
+                    icon: 'download',
+                    action: () => alert('ZIP download coming soon'),
+                    color: 'text-green-600',
+                  },
+                  {
+                    label: 'Watch',
+                    icon: 'visibility',
+                    action: () => alert('Watch feature coming soon'),
+                    color: 'text-amber-500',
+                  },
+                  {
+                    label: starring
+                      ? 'Unstar'
+                      : `Star${repoMeta ? ` (${repoMeta.star_count})` : ''}`,
+                    icon: 'star',
+                    action: async () => {
+                      if (!user) { router.push('/login'); return; }
+                      try {
+                        setStarring(true);
+                        if (repoMeta && repoMeta.star_count > 0) {
+                          await api.delete(`/${owner}/${repoName}/star`);
+                          setRepoMeta(m => m ? { ...m, star_count: Math.max(0, m.star_count - 1) } : m);
+                        } else {
+                          const { data } = await api.post(`/${owner}/${repoName}/star`);
+                          setRepoMeta(m => m ? { ...m, star_count: (data as any).star_count } : m);
+                        }
+                      } finally {
+                        setStarring(false);
+                      }
+                    },
+                    color: 'text-yellow-500',
+                  },
+                  {
+                    label: `Fork${repoMeta ? ` (${repoMeta.fork_count})` : ''}`,
+                    icon: 'fork_right',
+                    action: async () => {
+                      if (!user) { router.push('/login'); return; }
+                      try {
+                        const { data } = await api.post<{ name: string }>(`/${owner}/${repoName}/fork`);
+                        router.push(`/${user.username}/${data.name}`);
+                      } catch (e: any) {
+                        alert(e?.response?.data?.detail || 'Fork failed');
+                      }
+                    },
+                    color: 'text-purple-500',
+                  },
                 ].map(item => (
                   <button
                     key={item.label}

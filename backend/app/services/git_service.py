@@ -3,7 +3,7 @@ Git browsing service — pygit2 wrapper for all read-only git operations.
 
 All pygit2 calls are synchronous and GIL-holding (libgit2 releases the
 GIL inconsistently), so every public function runs its inner work via
-``asyncio.get_event_loop().run_in_executor(None, ...)`` to avoid blocking
+``asyncio.get_running_loop().run_in_executor(None, ...)`` to avoid blocking
 the FastAPI/uvicorn event loop.
 
 Supported operations (all read-only — writes belong to the smart-HTTP
@@ -323,7 +323,7 @@ def _get_readme_sync(disk_path: str, ref: str) -> Optional[ReadmeOut]:
 
 async def list_branches(disk_path: str) -> list[BranchInfo]:
     """Return all local branches from the bare git repository."""
-    loop = asyncio.get_event_loop()
+    loop = asyncio.get_running_loop()
     return await loop.run_in_executor(None, _list_branches_sync, disk_path)
 
 
@@ -340,7 +340,7 @@ async def get_tree(disk_path: str, ref: str, path: str = "") -> TreeOut:
         NotFoundError: if the ref or path does not exist.
         AppError:      if the path points to a file, not a directory.
     """
-    loop = asyncio.get_event_loop()
+    loop = asyncio.get_running_loop()
     return await loop.run_in_executor(None, _get_tree_sync, disk_path, ref, path)
 
 
@@ -354,7 +354,7 @@ async def get_blob(disk_path: str, ref: str, path: str) -> BlobOut:
         NotFoundError: if the ref or path does not exist.
         AppError:      if the path points to a directory, not a file.
     """
-    loop = asyncio.get_event_loop()
+    loop = asyncio.get_running_loop()
     return await loop.run_in_executor(None, _get_blob_sync, disk_path, ref, path)
 
 
@@ -371,7 +371,7 @@ async def get_commits(
         A ``(items, total)`` tuple.  ``total`` is the full count before
         pagination so the client can render page numbers.
     """
-    loop = asyncio.get_event_loop()
+    loop = asyncio.get_running_loop()
     return await loop.run_in_executor(
         None, _get_commits_sync, disk_path, ref, page, per_page
     )
@@ -384,5 +384,5 @@ async def get_readme(disk_path: str, ref: str) -> Optional[ReadmeOut]:
     Searches for ``README.md``, ``readme.md``, ``README.rst``, etc. in
     priority order.  Returns ``None`` if no README-like file is found.
     """
-    loop = asyncio.get_event_loop()
+    loop = asyncio.get_running_loop()
     return await loop.run_in_executor(None, _get_readme_sync, disk_path, ref)

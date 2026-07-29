@@ -120,16 +120,25 @@ def _init_bare_repo(disk_path: str, default_branch: str, auto_init: bool) -> Non
     repo.set_head(f"refs/heads/{default_branch}")
 
     if auto_init:
-        # Create an empty initial commit so the repo is clone-able immediately.
+        # Create an initial commit with a basic README.md so the repo is clone-able.
         sig = pygit2.Signature("PandaHub", "noreply@pandahub.dev")
-        tree_id = repo.TreeBuilder().write()
+        
+        # Create a blob with the README content
+        readme_content = f"# {Path(disk_path).stem}\n\nThis repository was automatically initialized."
+        blob_id = repo.create_blob(readme_content.encode("utf-8"))
+        
+        # Build the tree with the README
+        tb = repo.TreeBuilder()
+        tb.insert("README.md", blob_id, pygit2.GIT_FILEMODE_BLOB)
+        tree_id = tb.write()
+        
         repo.create_commit(
             f"refs/heads/{default_branch}",
             sig,
             sig,
             "Initial commit",
             tree_id,
-            [],  # no parents Ã¢â‚¬â€ this IS the root commit
+            [],  # no parents — this IS the root commit
         )
 
 
@@ -264,7 +273,7 @@ async def create_repository(
     # Initialise the bare repo on disk — run in executor to avoid blocking
     # the event loop (pygit2 is synchronous / GIL-holding).
     try:
-        loop = asyncio.get_event_loop()
+        loop = asyncio.get_running_loop()
         await loop.run_in_executor(
             None,
             _init_bare_repo,
@@ -292,7 +301,7 @@ async def create_repository(
             r = pygit2.Repository(disk_path)
             return str(r.head.target)
 
-        head_sha = await asyncio.get_event_loop().run_in_executor(None, _get_head_sha)
+        head_sha = await asyncio.get_running_loop().run_in_executor(None, _get_head_sha)
 
         branch_row = Branch(
             repository_id=repo_id,
@@ -349,7 +358,7 @@ async def delete_repository(
     # Remove the bare repo directory from disk.
     if os.path.exists(disk_path):
         try:
-            loop = asyncio.get_event_loop()
+            loop = asyncio.get_running_loop()
             await loop.run_in_executor(None, shutil.rmtree, disk_path)
         except Exception as exc:
             # Log the failure but don't re-raise: the DB row is already gone,
@@ -410,7 +419,7 @@ async def fork_repository(
     await db.flush()
 
     try:
-        loop = asyncio.get_event_loop()
+        loop = asyncio.get_running_loop()
         await loop.run_in_executor(
             None, _clone_bare_repo, source_repo.disk_path, disk_path
         )

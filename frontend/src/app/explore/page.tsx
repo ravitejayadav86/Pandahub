@@ -2,30 +2,37 @@
 import { useEffect, useState } from 'react';
 import Link from 'next/link';
 import api from '@/lib/api';
-import { Repository } from '@/types';
+import { Repository, User } from '@/types';
 
 export default function ExplorePage() {
   const [repos, setRepos] = useState<Repository[]>([]);
+  const [users, setUsers] = useState<Partial<User>[]>([]);
   const [query, setQuery] = useState('');
   const [sort, setSort] = useState<'updated' | 'stars' | 'forks'>('updated');
   const [loading, setLoading] = useState(true);
 
-  const loadRepos = async () => {
+  const loadData = async () => {
     setLoading(true);
     try {
-      const { data } = await api.get<Repository[]>(`/explore/repos`, {
-        params: { q: query || undefined, sort, limit: 24 },
-      });
-      setRepos(data);
+      const [reposRes, usersRes] = await Promise.all([
+        api.get<Repository[]>(`/explore/repos`, {
+          params: { q: query || undefined, sort, limit: 24 },
+        }),
+        api.get<Partial<User>[]>(`/auth/explore/users`, {
+          params: { q: query || undefined, limit: 12 },
+        })
+      ]);
+      setRepos(reposRes.data);
+      setUsers(usersRes.data);
     } catch {}
     setLoading(false);
   };
 
-  useEffect(() => { loadRepos(); }, [sort]);
+  useEffect(() => { loadData(); }, [sort]);
 
   const handleSearch = (e: React.FormEvent) => {
     e.preventDefault();
-    loadRepos();
+    loadData();
   };
 
   return (
@@ -48,13 +55,13 @@ export default function ExplorePage() {
           </Link>
           <h1 style={{ fontSize: '1.8rem', fontWeight: 800, marginBottom: 8 }}>Explore</h1>
           <p style={{ color: 'var(--text-secondary)', marginBottom: 24 }}>
-            Discover public repositories from the community.
+            Discover public repositories and users from the community.
           </p>
           {/* Search */}
           <form onSubmit={handleSearch} style={{ display: 'flex', gap: 10, maxWidth: 560 }}>
             <input
               type="text"
-              placeholder="Search repositories…"
+              placeholder="Search repositories and users…"
               value={query}
               onChange={(e) => setQuery(e.target.value)}
               style={{
@@ -79,7 +86,7 @@ export default function ExplorePage() {
       <div className="container" style={{ padding: '24px 1.5rem' }}>
         {/* Sort controls */}
         <div style={{ display: 'flex', gap: 8, marginBottom: 24, alignItems: 'center' }}>
-          <span style={{ color: 'var(--text-secondary)', fontSize: 13 }}>Sort by:</span>
+          <span style={{ color: 'var(--text-secondary)', fontSize: 13 }}>Sort Repos by:</span>
           {(['updated', 'stars', 'forks'] as const).map((s) => (
             <button
               key={s}
@@ -97,7 +104,6 @@ export default function ExplorePage() {
           ))}
         </div>
 
-        {/* Repos grid */}
         {loading ? (
           <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fill, minmax(320px, 1fr))', gap: 16 }}>
             {[1, 2, 3, 4, 5, 6].map((i) => (
@@ -107,20 +113,80 @@ export default function ExplorePage() {
               </div>
             ))}
           </div>
-        ) : repos.length === 0 ? (
+        ) : (repos.length === 0 && users.length === 0) ? (
           <div style={{ textAlign: 'center', padding: '80px', color: 'var(--text-secondary)' }}>
             <div style={{ fontSize: 48, marginBottom: 12 }}>🔍</div>
-            <p>No repositories found. Try a different search.</p>
+            <p>No repositories or users found. Try a different search.</p>
           </div>
         ) : (
-          <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fill, minmax(320px, 1fr))', gap: 16 }}>
-            {repos.map((repo) => (
-              <ExploreRepoCard key={repo.id} repo={repo} />
-            ))}
+          <div style={{ display: 'flex', flexDirection: 'column', gap: 48 }}>
+            
+            {/* Users section */}
+            {users.length > 0 && (
+              <div>
+                <h2 style={{ fontSize: 18, fontWeight: 700, marginBottom: 16, color: 'var(--text-primary)' }}>Users</h2>
+                <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fill, minmax(280px, 1fr))', gap: 16 }}>
+                  {users.map((user) => (
+                    <ExploreUserCard key={user.id} user={user} />
+                  ))}
+                </div>
+              </div>
+            )}
+
+            {/* Repos section */}
+            {repos.length > 0 && (
+              <div>
+                <h2 style={{ fontSize: 18, fontWeight: 700, marginBottom: 16, color: 'var(--text-primary)' }}>Repositories</h2>
+                <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fill, minmax(320px, 1fr))', gap: 16 }}>
+                  {repos.map((repo) => (
+                    <ExploreRepoCard key={repo.id} repo={repo} />
+                  ))}
+                </div>
+              </div>
+            )}
+
           </div>
         )}
       </div>
     </div>
+  );
+}
+
+function ExploreUserCard({ user }: { user: Partial<User> }) {
+  const [hovered, setHovered] = useState(false);
+  return (
+    <Link
+      href={`/${user.username}`}
+      className="glass-card animate-fade-in"
+      style={{
+        display: 'flex', alignItems: 'center', gap: 16, padding: '16px',
+        textDecoration: 'none', color: 'inherit',
+        transition: 'all var(--transition-normal)',
+        transform: hovered ? 'translateY(-3px)' : 'translateY(0)',
+        boxShadow: hovered ? '0 8px 24px rgba(0,0,0,0.4)' : 'var(--shadow-sm)',
+        borderColor: hovered ? 'rgba(124,58,237,0.3)' : 'var(--border-color)',
+      }}
+      onMouseEnter={() => setHovered(true)}
+      onMouseLeave={() => setHovered(false)}
+    >
+      <div style={{
+        width: 48, height: 48, borderRadius: '50%',
+        background: 'var(--gradient-brand)',
+        display: 'flex', alignItems: 'center', justifyContent: 'center',
+        fontSize: 18, fontWeight: 700, color: '#fff', flexShrink: 0,
+        overflow: 'hidden'
+      }}>
+        {user.avatar_url ? (
+          <img src={user.avatar_url} alt="" style={{ width: '100%', height: '100%', objectFit: 'cover' }} />
+        ) : (
+          user.username?.[0]?.toUpperCase() || 'U'
+        )}
+      </div>
+      <div style={{ display: 'flex', flexDirection: 'column' }}>
+        <span style={{ fontWeight: 700, color: 'var(--text-primary)' }}>{user.full_name || user.username}</span>
+        <span style={{ fontSize: 13, color: 'var(--text-secondary)' }}>@{user.username}</span>
+      </div>
+    </Link>
   );
 }
 

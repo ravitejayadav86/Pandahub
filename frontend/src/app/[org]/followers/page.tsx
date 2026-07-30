@@ -25,13 +25,7 @@ interface UserProfile {
   repo_count: number
 }
 
-// ── Mock Data ─────────────────────────────────────────────────────────────
-const MOCK_FOLLOWERS = [
-  { id: '1', username: 'johndoe', full_name: 'John Doe', avatar_url: 'https://i.pravatar.cc/150?u=johndoe', bio: 'Software Engineer', location: 'San Francisco, CA' },
-  { id: '2', username: 'janedoe', full_name: 'Jane Doe', avatar_url: 'https://i.pravatar.cc/150?u=janedoe', bio: 'Frontend Developer', location: 'New York, NY' },
-  { id: '3', username: 'bobsmith', full_name: 'Bob Smith', avatar_url: 'https://i.pravatar.cc/150?u=bobsmith', bio: 'Open source enthusiast', location: 'London, UK' },
-  { id: '4', username: 'alice', full_name: 'Alice', avatar_url: 'https://i.pravatar.cc/150?u=alice', bio: 'Tech Lead @company', location: 'Berlin, DE' },
-]
+// Removed MOCK_FOLLOWERS
 
 export default function FollowersPage() {
   const params = useParams()
@@ -41,7 +35,8 @@ export default function FollowersPage() {
   const [profile, setProfile] = useState<UserProfile | null>(null)
   const [loading, setLoading] = useState(true)
   const [error, setError] = useState(false)
-  
+  const [followers, setFollowers] = useState<any[]>([])
+
   useEffect(() => {
     if (!org) return
 
@@ -50,6 +45,9 @@ export default function FollowersPage() {
       try {
         const { data: profileData } = await api.get<UserProfile>(`/auth/users/${org}`)
         setProfile(profileData)
+        
+        const { data: followersData } = await api.get<any[]>(`/auth/users/${org}/followers`)
+        setFollowers(followersData)
       } catch (err) {
         setError(true)
       } finally {
@@ -169,11 +167,11 @@ export default function FollowersPage() {
           <div className="flex items-center gap-1 text-sm text-slate-600 dark:text-slate-400 mb-4">
             <Users className="w-4 h-4" />
             <Link href={`/${profile.username}/followers`} className="text-slate-900 dark:text-slate-200 hover:text-blue-600 flex items-center gap-1 font-semibold">
-              <span className="font-semibold text-slate-900 dark:text-slate-200">12</span> followers
+              <span className="font-semibold text-slate-900 dark:text-slate-200">{profile.follower_count}</span> followers
             </Link>
             <span className="mx-1">·</span>
             <Link href={`/${profile.username}/following`} className="hover:text-blue-600 flex items-center gap-1">
-              <span className="font-semibold text-slate-900 dark:text-slate-200">4</span> following
+              <span className="font-semibold text-slate-900 dark:text-slate-200">{profile.following_count}</span> following
             </Link>
           </div>
 
@@ -210,19 +208,27 @@ export default function FollowersPage() {
           <div className="flex items-center justify-between mb-4 pb-2 border-b border-slate-200 dark:border-slate-800">
              <div className="flex gap-4">
                  <Link href={`/${profile.username}/followers`} className="font-semibold text-slate-900 dark:text-slate-200 border-b-2 border-[#fd8c73] pb-2 px-2">
-                     Followers <span className="bg-slate-100 dark:bg-slate-800 text-slate-700 dark:text-slate-300 text-xs font-medium px-2 py-0.5 rounded-full ml-1">12</span>
+                     Followers <span className="bg-slate-100 dark:bg-slate-800 text-slate-700 dark:text-slate-300 text-xs font-medium px-2 py-0.5 rounded-full ml-1">{profile.follower_count}</span>
                  </Link>
                  <Link href={`/${profile.username}/following`} className="text-slate-600 dark:text-slate-400 hover:text-slate-900 dark:hover:text-slate-200 pb-2 px-2">
-                     Following <span className="bg-slate-100 dark:bg-slate-800 text-slate-700 dark:text-slate-300 text-xs font-medium px-2 py-0.5 rounded-full ml-1">4</span>
+                     Following <span className="bg-slate-100 dark:bg-slate-800 text-slate-700 dark:text-slate-300 text-xs font-medium px-2 py-0.5 rounded-full ml-1">{profile.following_count}</span>
                  </Link>
              </div>
           </div>
           
           <div className="space-y-4">
-            {MOCK_FOLLOWERS.map(follower => (
+            {followers.length === 0 ? (
+               <div className="text-slate-500 py-8">No followers yet.</div>
+            ) : followers.map(follower => (
                <div key={follower.id} className="flex items-start gap-4 py-4 border-b border-slate-200 dark:border-slate-800 last:border-b-0">
                   <Link href={`/${follower.username}`}>
-                    <img src={follower.avatar_url} alt={follower.username} className="w-12 h-12 rounded-full object-cover border border-slate-200 dark:border-slate-700" />
+                    {follower.avatar_url ? (
+                      <img src={follower.avatar_url} alt={follower.username} className="w-12 h-12 rounded-full object-cover border border-slate-200 dark:border-slate-700" />
+                    ) : (
+                      <div className="w-12 h-12 rounded-full bg-slate-200 dark:bg-slate-800 flex items-center justify-center font-bold">
+                        {follower.username.charAt(0).toUpperCase()}
+                      </div>
+                    )}
                   </Link>
                   <div className="flex-1">
                      <div className="flex items-center gap-1 mb-1">
@@ -236,17 +242,6 @@ export default function FollowersPage() {
                      {follower.bio && (
                         <p className="text-sm text-slate-700 dark:text-slate-300 mb-2">{follower.bio}</p>
                      )}
-                     {follower.location && (
-                        <div className="flex items-center gap-1 text-xs text-slate-500">
-                           <MapPin className="w-3 h-3" />
-                           {follower.location}
-                        </div>
-                     )}
-                  </div>
-                  <div className="flex-shrink-0">
-                     <button className="px-4 py-1 text-sm font-semibold border border-slate-300 dark:border-slate-600 rounded-md bg-slate-50 dark:bg-[#21262d] hover:bg-slate-100 dark:hover:bg-[#30363d] shadow-sm text-slate-700 dark:text-slate-300 transition-colors">
-                        Unfollow
-                     </button>
                   </div>
                </div>
             ))}

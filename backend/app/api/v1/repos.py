@@ -473,3 +473,118 @@ async def remove_collaborator(
     ),
 ) -> None:
     await repo_service.remove_collaborator(db, repository, collaborator_id)
+
+
+# ---------------------------------------------------------------------------
+# Security Alerts (secret scanning, vulnerability scanning, code analysis)
+# ---------------------------------------------------------------------------
+
+@router.get(
+    "/{owner}/{repo}/security/alerts",
+    summary="List security alerts for a repository",
+)
+async def list_security_alerts(
+    alert_type: Optional[str] = Query(None, description="Filter by type: secret, vulnerability, code_quality"),
+    severity: Optional[str] = Query(None, description="Filter by severity: critical, high, medium, low"),
+    state: str = Query("open", description="Alert state: open, dismissed, all"),
+    repository: Repository = Depends(get_repository),
+    db: AsyncSession = Depends(get_db),
+    current_user: User = Depends(get_current_active_user),
+    _perm: PermissionLevel = Depends(
+        require_repo_permission(PermissionLevel.READ, allow_anonymous=False)
+    ),
+):
+    from app.models.security_alert import SecurityAlert
+    from sqlalchemy import select
+
+    stmt = select(SecurityAlert).where(SecurityAlert.repo_id == repository.id)
+
+    if alert_type:
+        stmt = stmt.where(SecurityAlert.alert_type == alert_type)
+    if severity:
+        stmt = stmt.where(SecurityAlert.severity == severity)
+    if state == "open":
+        stmt = stmt.where(SecurityAlert.dismissed_at.is_(None))
+    elif state == "dismissed":
+        stmt = stmt.where(SecurityAlert.dismissed_at.isnot(None))
+
+    stmt = stmt.order_by(SecurityAlert.created_at.desc()).limit(200)
+    result = await db.execute(stmt)
+    alerts = result.scalars().all()
+
+    return [
+        {
+            "id": str(a.id),
+            "alert_type": a.alert_type,
+            "severity": a.severity,
+            "rule_id": a.rule_id,
+            "title": a.title,
+            "description": a.description,
+            "file_path": a.file_path,
+            "line_number": a.line_number,
+            "commit_sha": a.commit_sha,
+            "raw_finding": a.raw_finding,
+            "is_open": a.is_open,
+            "dismissed_at": a.dismissed_at.isoformat() if a.dismissed_at else None,
+            "dismiss_reason": a.dismiss_reason,
+            "created_at": a.created_at.isoformat(),
+        }
+        for a in alerts
+    ]
+
+
+@router.patch(
+    "/{owner}/{repo}/security/alerts/{alert_id}/dismiss",
+    summary="Dismiss a security alert",
+)
+async def dismiss_security_alert(
+    alert_id: uuid.UUID,
+    repository: Repository = Depends(get_repository),
+    db: AsyncSession = Depends(get_db),
+    current_user: User = Depends(get_current_active_user),
+    _perm: PermissionLevel = Depends(
+        require_repo_permission(PermissionLevel.WRITE, allow_anonymous=False)
+    ),
+):
+    from app.models.security_alert import SecurityAlert
+    from sqlalchemy import select
+    from datetime import datetime, timezone
+    from pydantic import BaseModel
+
+    result = await db.execute(
+        select(SecurityAlert).where(
+            SecurityAlert.id == alert_id,
+            SecurityAlert.repo_id == repository.id,
+        )
+    )
+    alert = result.scalar_one_or_none()
+    if not alert:
+        raise NotFoundError("Security alert not found.")
+
+    alert.dismissed_at = datetime.now(timezone.utc)
+    alert.dismissed_by_id = current_user.id
+    await db.commit()
+    return {"status": "ok", "message": "Alert dismissed."}
+
+
+@router.post(
+    "/{owner}/{repo}/security/scan",
+    summary="Trigger a manual security scan",
+    status_code=status.HTTP_202_ACCEPTED,
+)
+async def trigger_security_scan(
+    repository: Repository = Depends(get_repository),
+    db: AsyncSession = Depends(get_db),
+    current_user: User = Depends(get_current_active_user),
+    _perm: PermissionLevel = Depends(
+        require_repo_permission(PermissionLevel.WRITE, allow_anonymous=False)
+    ),
+):
+    """Enqueue a full security scan (dependency + code analysis) for this repo."""
+    from app.worker.celery_app import celery_app
+    celery_app.send_task(
+        "app.worker.tasks.scan_repository_security",
+        kwargs={"repo_id": str(repository.id)},
+        queue="ai_ops",
+    )
+    return {"status": "queued", "message": "Security scan enqueued. Results will appear in the Security tab."}

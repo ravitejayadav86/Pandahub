@@ -56,14 +56,41 @@ class User(Base, UUIDPKMixin, TimestampMixin):
 
     last_login_at: Mapped[Optional[datetime]] = mapped_column(DateTime(timezone=True), nullable=True)
 
+    # Added for E2EE messaging
+    public_key: Mapped[Optional[str]] = mapped_column(String(4000), nullable=True)
+
     # ---- Relationships ----
     oauth_accounts: Mapped[list["OAuthAccount"]] = relationship(back_populates="user", cascade="all, delete-orphan")
     refresh_tokens: Mapped[list["RefreshToken"]] = relationship(back_populates="user", cascade="all, delete-orphan")
     personal_access_tokens: Mapped[list["PersonalAccessToken"]] = relationship(back_populates="user", cascade="all, delete-orphan")
     ssh_keys: Mapped[list["SSHKey"]] = relationship(back_populates="user", cascade="all, delete-orphan")
 
+    followers: Mapped[list["UserFollow"]] = relationship(
+        "UserFollow",
+        foreign_keys="[UserFollow.following_id]",
+        back_populates="following_user",
+        cascade="all, delete-orphan"
+    )
+    following: Mapped[list["UserFollow"]] = relationship(
+        "UserFollow",
+        foreign_keys="[UserFollow.follower_id]",
+        back_populates="follower_user",
+        cascade="all, delete-orphan"
+    )
+
     def __repr__(self) -> str:
         return f"<User {self.username}>"
+
+
+class UserFollow(Base):
+    __tablename__ = "user_follows"
+
+    follower_id: Mapped[uuid.UUID] = mapped_column(UUID(as_uuid=True), ForeignKey("users.id", ondelete="CASCADE"), primary_key=True)
+    following_id: Mapped[uuid.UUID] = mapped_column(UUID(as_uuid=True), ForeignKey("users.id", ondelete="CASCADE"), primary_key=True)
+    created_at: Mapped[datetime] = mapped_column(DateTime(timezone=True), server_default="now()", nullable=False)
+
+    follower_user: Mapped["User"] = relationship("User", foreign_keys=[follower_id], back_populates="following")
+    following_user: Mapped["User"] = relationship("User", foreign_keys=[following_id], back_populates="followers")
 
 
 class OAuthAccount(Base, UUIDPKMixin):

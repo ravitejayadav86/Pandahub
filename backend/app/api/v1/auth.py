@@ -342,6 +342,7 @@ async def get_user_profile(
     from sqlalchemy import select, func
     from app.models.repo import Repository
     from app.models.enums import RepositoryVisibility
+    from app.models.user import UserFollow
     from app.core.exceptions import NotFoundError
 
     result = await db.execute(select(User).where(User.username == username))
@@ -357,6 +358,16 @@ async def get_user_profile(
     )
     repo_count = repo_count_result.scalar_one()
 
+    follower_count_result = await db.execute(
+        select(func.count()).where(UserFollow.following_id == user.id)
+    )
+    follower_count = follower_count_result.scalar_one()
+
+    following_count_result = await db.execute(
+        select(func.count()).where(UserFollow.follower_id == user.id)
+    )
+    following_count = following_count_result.scalar_one()
+
     return {
         "id": str(user.id),
         "username": user.username,
@@ -367,11 +378,213 @@ async def get_user_profile(
         "website_url": user.website_url,
         "is_verified": user.is_verified,
         "created_at": user.created_at.isoformat() if user.created_at else None,
+        "public_key": user.public_key,
         "repo_count": repo_count,
-        "follower_count": 0,
-        "following_count": 0,
+        "follower_count": follower_count,
+        "following_count": following_count,
     }
 
+
+# ---------------------------------------------------------------------------
+# Followers
+# ---------------------------------------------------------------------------
+
+@router.post("/users/{username}/follow", summary="Follow a user")
+async def follow_user(
+    username: str,
+    db: AsyncSession = Depends(get_db),
+    current_user: User = Depends(get_current_active_user),
+):
+    from sqlalchemy import select
+    from app.models.user import UserFollow
+    from app.core.exceptions import NotFoundError, BadRequestError
+
+    if username == current_user.username:
+        raise BadRequestError("You cannot follow yourself.")
+
+    result = await db.execute(select(User).where(User.username == username))
+    target_user = result.scalar_one_or_none()
+    if not target_user:
+        raise NotFoundError("User not found.")
+
+    # Check if already following
+    follow_check = await db.execute(
+        select(UserFollow).where(
+            UserFollow.follower_id == current_user.id,
+            UserFollow.following_id == target_user.id
+        )
+    )
+    if follow_check.scalar_one_or_none():
+        return {"status": "ok", "message": "Already following."}
+
+    new_follow = UserFollow(
+        follower_id=current_user.id,
+        following_id=target_user.id
+    )
+    db.add(new_follow)
+    await db.commit()
+    return {"status": "ok", "message": f"Successfully followed {username}."}
+
+@router.delete("/users/{username}/follow", summary="Unfollow a user")
+async def unfollow_user(
+    username: str,
+    db: AsyncSession = Depends(get_db),
+    current_user: User = Depends(get_current_active_user),
+):
+    from sqlalchemy import select
+    from app.models.user import UserFollow
+    from app.core.exceptions import NotFoundError
+
+    result = await db.execute(select(User).where(User.username == username))
+    target_user = result.scalar_one_or_none()
+    if not target_user:
+        raise NotFoundError("User not found.")
+
+    follow_check = await db.execute(
+        select(UserFollow).where(
+            UserFollow.follower_id == current_user.id,
+            UserFollow.following_id == target_user.id
+        )
+    )
+    follow_obj = follow_check.scalar_one_or_none()
+    if follow_obj:
+        await db.delete(follow_obj)
+        await db.commit()
+    
+    return {"status": "ok", "message": f"Successfully unfollowed {username}."}
+
+@router.get("/users/{username}/followers", summary="Get users following this user")
+async def get_followers(
+    username: str,
+    db: AsyncSession = Depends(get_db),
+):
+    from sqlalchemy import select
+    from app.models.user import UserFollow
+    from app.core.exceptions import NotFoundError
+
+    result = await db.execute(select(User).where(User.username == username))
+    target_user = result.scalar_one_or_none()
+    if not target_user:
+        raise NotFoundError("User not found.")
+
+    stmt = select(User).join(UserFollow, UserFollow.follower_id == User.id).where(UserFollow.following_id == target_user.id)
+    followers_result = await db.execute(stmt)
+    followers = followers_result.scalars().all()
+
+    return [
+        {
+            "id": str(u.id),
+            "username": u.username,
+            "full_name": u.full_name,
+            "avatar_url": u.avatar_url,
+            "bio": u.bio,
+        }
+        for u in followers
+    ]
+
+@router.get("/users/{username}/following", summary="Get users this user is following")
+async def get_following(
+    username: str,
+    db: AsyncSession = Depends(get_db),
+):
+    from sqlalchemy import select
+    from app.models.user import UserFollow
+    from app.core.exceptions import NotFoundError
+
+    result = await db.execute(select(User).where(User.username == username))
+    target_user = result.scalar_one_or_none()
+    if not target_user:
+        raise NotFoundError("User not found.")
+
+    stmt = select(User).join(UserFollow, UserFollow.following_id == User.id).where(UserFollow.follower_id == target_user.id)
+    following_result = await db.execute(stmt)
+    following = following_result.scalars().all()
+
+    return [
+        {
+            "id": str(u.id),
+            "username": u.username,
+            "full_name": u.full_name,
+            "avatar_url": u.avatar_url,
+            "bio": u.bio,
+        }
+        for u in following
+    ]
+
+# ---------------------------------------------------------------------------
+# Users Search
+# ---------------------------------------------------------------------------
+
+@router.get("/users", summary="List and search users (admin)")
+async def list_users(
+    q: str | None = None,
+    limit: int = 50,
+    db: AsyncSession = Depends(get_db),
+    current_user: User = Depends(get_current_active_user),
+):
+    from sqlalchemy import select, or_
+    stmt = select(User).order_by(User.created_at.desc())
+    if q:
+        search = f"%{q}%"
+        stmt = stmt.where(
+            or_(
+                User.username.ilike(search),
+                User.email.ilike(search),
+                User.full_name.ilike(search)
+            )
+        )
+    stmt = stmt.limit(limit)
+    result = await db.execute(stmt)
+    users = result.scalars().all()
+    
+    return [
+        {
+            "id": str(u.id),
+            "username": u.username,
+            "email": u.email,
+            "full_name": u.full_name,
+            "avatar_url": u.avatar_url,
+            "is_verified": u.is_verified,
+            "is_active": u.is_active,
+            "created_at": u.created_at.isoformat() if u.created_at else None,
+        }
+        for u in users
+    ]
+
+@router.get("/explore/users", summary="Public user search")
+async def explore_users(
+    q: str | None = None,
+    limit: int = 24,
+    db: AsyncSession = Depends(get_db),
+):
+    from sqlalchemy import select, or_
+    stmt = select(User).where(User.is_active == True).order_by(User.created_at.desc())
+    if q:
+        search = f"%{q}%"
+        stmt = stmt.where(
+            or_(
+                User.username.ilike(search),
+                User.full_name.ilike(search)
+            )
+        )
+    stmt = stmt.limit(limit)
+    result = await db.execute(stmt)
+    users = result.scalars().all()
+    
+    # Do not expose sensitive info like email here
+    return [
+        {
+            "id": str(u.id),
+            "username": u.username,
+            "full_name": u.full_name,
+            "avatar_url": u.avatar_url,
+            "bio": u.bio,
+            "location": u.location,
+            "is_verified": u.is_verified,
+            "created_at": u.created_at.isoformat() if u.created_at else None,
+        }
+        for u in users
+    ]
 
 # ---------------------------------------------------------------------------
 # OAuth

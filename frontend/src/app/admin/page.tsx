@@ -28,30 +28,36 @@ export default function AdminPage() {
 
   useEffect(() => { setMounted(true); }, []);
 
-  useEffect(() => { loadData(); }, []);
+  useEffect(() => {
+    const timeoutId = setTimeout(() => {
+      loadData(search);
+    }, 300);
+    return () => clearTimeout(timeoutId);
+  }, [search]);
 
-  const loadData = async () => {
+  const loadData = async (query: string = '') => {
     setLoading(true);
     try {
-      const usersRes = await api.get<AdminUser[]>('/auth/users');
+      const usersRes = await api.get<AdminUser[]>('/auth/users', { params: { q: query || undefined } });
       setUsers(usersRes.data);
-      setStats({
-        total_users: usersRes.data.length,
-        active_users: usersRes.data.filter((u: AdminUser) => u.is_active).length,
-        total_repos: 0,
-        total_issues: 0,
-      });
+      // Stats should ideally be from a separate stats endpoint if we paginate/search,
+      // but we'll leave it as is for simplicity if query is empty.
+      if (!query) {
+        setStats({
+          total_users: usersRes.data.length,
+          active_users: usersRes.data.filter((u: AdminUser) => u.is_active).length,
+          total_repos: 0,
+          total_issues: 0,
+        });
+      }
     } catch {
       setUsers([]);
-      setStats({ total_users: 0, active_users: 0, total_repos: 0, total_issues: 0 });
+      if (!query) setStats({ total_users: 0, active_users: 0, total_repos: 0, total_issues: 0 });
     }
     setLoading(false);
   };
 
-  const filtered = users.filter(u =>
-    u.username.toLowerCase().includes(search.toLowerCase()) ||
-    (u.email || '').toLowerCase().includes(search.toLowerCase())
-  );
+  const filtered = users;
 
   const statCards = [
     { label: 'Total Users',   value: stats?.total_users ?? 0,   icon: 'group',        color: '#6366f1' },

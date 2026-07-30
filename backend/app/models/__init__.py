@@ -9,6 +9,7 @@ from app.models.base import Base  # noqa: F401
 
 from app.models.user import (  # noqa: F401
     User,
+    UserFollow,
     OAuthAccount,
     RefreshToken,
     PersonalAccessToken,
@@ -49,6 +50,8 @@ from app.models.pull_request import (  # noqa: F401
 from app.models.discussion import Discussion, DiscussionComment  # noqa: F401
 from app.models.notification import Notification  # noqa: F401
 from app.models.audit import AuditLog  # noqa: F401
+from app.models.message import Message  # noqa: F401
+from app.models.security_alert import SecurityAlert  # noqa: F401
 from app.models.startup import (  # noqa: F401
     Startup,
     StartupMember,
@@ -60,7 +63,7 @@ from app.models.startup import (  # noqa: F401
 
 __all__ = [
     "Base",
-    "User", "OAuthAccount", "RefreshToken", "PersonalAccessToken", "SSHKey",
+    "User", "UserFollow", "OAuthAccount", "RefreshToken", "PersonalAccessToken", "SSHKey",
     "EmailVerificationToken", "PasswordResetToken",
     "Organization", "OrganizationMember", "Team", "TeamMember", "TeamRepository",
     "Repository", "RepositoryCollaborator", "Branch", "RepositoryStar", "RepositoryWatcher", "Webhook",
@@ -69,6 +72,8 @@ __all__ = [
     "Discussion", "DiscussionComment",
     "Notification",
     "AuditLog",
+    "Message",
+    "SecurityAlert",
     "Startup", "StartupMember", "StartupOpenRole", "StartupCollaborationRequest",
     "StartupProject", "StartupInvestor",
 ]

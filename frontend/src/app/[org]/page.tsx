@@ -10,6 +10,7 @@ import {
 } from 'lucide-react'
 import { useAuthStore } from '@/store/authStore'
 import Navbar from '@/components/shared/Navbar'
+import ChatBox from '@/components/shared/ChatBox'
 
 // ── Types ──────────────────────────────────────────────────────────────────
 interface UserProfile {
@@ -23,6 +24,9 @@ interface UserProfile {
   is_verified: boolean
   created_at: string | null
   repo_count: number
+  follower_count: number
+  following_count: number
+  public_key?: string | null
 }
 
 interface Repository {
@@ -46,11 +50,13 @@ export default function UserProfilePage() {
 
   const [profile, setProfile] = useState<UserProfile | null>(null)
   const [repos, setRepos] = useState<Repository[]>([])
+  const [isFollowing, setIsFollowing] = useState(false)
   const [loading, setLoading] = useState(true)
   const [error, setError] = useState(false)
 
   const [activeTab, setActiveTab] = useState<TabType>('overview')
   const [repoSearch, setRepoSearch] = useState('')
+  const [isChatOpen, setIsChatOpen] = useState(false)
   
   useEffect(() => {
     if (!org) return
@@ -60,6 +66,16 @@ export default function UserProfilePage() {
       try {
         const { data: profileData } = await api.get<UserProfile>(`/auth/users/${org}`)
         setProfile(profileData)
+
+        // Check follow status if logged in and not owner
+        if (currentUser && currentUser.username !== org) {
+          try {
+            const { data: followers } = await api.get<any[]>(`/auth/users/${org}/followers`)
+            setIsFollowing(followers.some(f => f.username === currentUser.username))
+          } catch (e) {
+            console.error("Failed to load followers", e)
+          }
+        }
 
         if (currentUser && currentUser.username === org) {
           const { data: reposData } = await api.get<Repository[]>('/auth/me/repos')
@@ -77,6 +93,23 @@ export default function UserProfilePage() {
     }
     fetchData()
   }, [org, currentUser])
+
+  const handleFollowToggle = async () => {
+    if (!currentUser) return // Or redirect to login
+    try {
+      if (isFollowing) {
+        await api.delete(`/auth/users/${org}/follow`)
+        setIsFollowing(false)
+        setProfile(prev => prev ? { ...prev, follower_count: Math.max(0, prev.follower_count - 1) } : prev)
+      } else {
+        await api.post(`/auth/users/${org}/follow`)
+        setIsFollowing(true)
+        setProfile(prev => prev ? { ...prev, follower_count: prev.follower_count + 1 } : prev)
+      }
+    } catch (e) {
+      console.error("Failed to toggle follow", e)
+    }
+  }
 
   if (loading) {
     return (
@@ -189,21 +222,29 @@ export default function UserProfilePage() {
               Edit profile
             </Link>
           ) : (
-            <button className="block w-full py-1.5 text-center text-sm font-semibold text-slate-700 dark:text-slate-300 bg-slate-50 dark:bg-[#21262d] hover:bg-slate-100 dark:hover:bg-[#30363d] border border-slate-300 dark:border-slate-600 rounded-md mb-4 transition-colors">
-              Follow
-            </button>
+            <div className="flex gap-2 mb-4">
+              <button onClick={handleFollowToggle} className="flex-1 py-1.5 text-center text-sm font-semibold text-slate-700 dark:text-slate-300 bg-slate-50 dark:bg-[#21262d] hover:bg-slate-100 dark:hover:bg-[#30363d] border border-slate-300 dark:border-slate-600 rounded-md transition-colors">
+                {isFollowing ? 'Unfollow' : 'Follow'}
+              </button>
+              <button onClick={() => setIsChatOpen(true)} className="flex-1 py-1.5 text-center text-sm font-semibold text-white bg-blue-600 hover:bg-blue-700 rounded-md transition-colors border border-blue-700 shadow-sm">
+                Message
+              </button>
+            </div>
           )}
 
-          <div className="flex items-center gap-1 text-sm text-slate-600 dark:text-slate-400 mb-4">
-            <Users className="w-4 h-4" />
-            <Link href={`/${profile.username}/followers`} className="hover:text-blue-600 flex items-center gap-1">
-              <span className="font-semibold text-slate-900 dark:text-slate-200">12</span> followers
+          <div className="flex items-center gap-4 text-sm mb-4">
+            <Link href={`/${profile.username}/followers`} className="hover:text-blue-500 transition-colors flex items-center gap-1.5">
+              <Users className="w-4 h-4 text-slate-400" />
+              <span className="font-semibold text-slate-900 dark:text-slate-100">{profile.follower_count}</span>
+              <span className="text-slate-500">followers</span>
             </Link>
-            <span className="mx-1">·</span>
-            <Link href={`/${profile.username}/following`} className="hover:text-blue-600 flex items-center gap-1">
-              <span className="font-semibold text-slate-900 dark:text-slate-200">4</span> following
+            <Link href={`/${profile.username}/following`} className="hover:text-blue-500 transition-colors flex items-center gap-1.5">
+              <span className="font-semibold text-slate-900 dark:text-slate-100">{profile.following_count}</span>
+              <span className="text-slate-500">following</span>
             </Link>
           </div>
+
+
 
           {profile.bio && (
             <p className="text-[15px] text-slate-700 dark:text-slate-300 mb-4 leading-relaxed">{profile.bio}</p>
@@ -390,6 +431,13 @@ export default function UserProfilePage() {
 
         </div>
       </main>
+
+      {isChatOpen && (
+        <ChatBox 
+          recipientUsername={profile.username} 
+          onClose={() => setIsChatOpen(false)} 
+        />
+      )}
     </div>
   )
 }

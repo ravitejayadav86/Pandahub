@@ -1,18 +1,51 @@
 'use client';
-import { useState } from 'react';
+import { useEffect, useState } from 'react';
 import Link from 'next/link';
 import { useRouter } from 'next/navigation';
 import { useAuthStore } from '@/store/authStore';
+import api from '@/lib/api';
+import { generateKeyPair, exportPublicKey, savePrivateKey, loadPrivateKey } from '@/lib/crypto';
 
 export default function Navbar() {
   const { user, clearAuth } = useAuthStore();
   const router = useRouter();
   const [profileOpen, setProfileOpen] = useState(false);
 
+  // Auto-initialize E2EE keys for every logged-in user silently in the background.
+  // This ensures that when anyone tries to message this user, their public key is
+  // already on the server — eliminating the "E2EE Not Set Up" chicken-and-egg problem.
+  useEffect(() => {
+    if (!user) return;
+
+    const ensureE2EEKeys = async () => {
+      try {
+        // First check if the server already has a public key for this user
+        const { data: profile } = await api.get(`/auth/users/${user.username}`);
+        if (profile.public_key) return; // Already set up, nothing to do
+
+        // Try loading an existing private key from IndexedDB first
+        let privKey = await loadPrivateKey();
+        if (!privKey) {
+          // Generate a fresh key pair
+          const keyPair = await generateKeyPair();
+          privKey = keyPair.privateKey;
+          await savePrivateKey(privKey);
+          const pubKeyBase64 = await exportPublicKey(keyPair.publicKey);
+          await api.post('/messages/keys', { public_key: pubKeyBase64 });
+        }
+      } catch {
+        // Silently ignore — this is a background optimization, not critical path
+      }
+    };
+
+    ensureE2EEKeys();
+  }, [user]);
+
   const handleSignOut = () => {
     clearAuth();
     router.push('/login');
   };
+
 
   return (
     <header style={{

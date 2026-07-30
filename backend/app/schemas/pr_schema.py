@@ -138,7 +138,7 @@ class PRCommentOut(BaseModel):
 # ---------------------------------------------------------------------------
 
 class AIReviewResultOut(BaseModel):
-    model_config = ConfigDict(from_attributes=True)
+    model_config = ConfigDict(from_attributes=True, protected_namespaces=())
 
     id: uuid.UUID
     summary: str

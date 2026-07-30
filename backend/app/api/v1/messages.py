@@ -6,7 +6,7 @@ from sqlalchemy import select, or_, and_
 from app.db.session import get_db
 from app.models.user import User
 from app.models.message import Message
-from app.api.deps import get_current_active_user
+from app.api.dependencies import get_current_active_user
 from app.websockets.manager import ws_manager
 from pydantic import BaseModel
 from datetime import datetime

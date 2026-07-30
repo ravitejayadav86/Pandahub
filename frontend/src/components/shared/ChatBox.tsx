@@ -1,7 +1,7 @@
 'use client'
 
-import React, { useEffect, useState, useRef } from 'react'
-import { X, Send } from 'lucide-react'
+import React, { useEffect, useState, useRef, useCallback } from 'react'
+import { X, Send, Lock, AlertCircle, RefreshCw } from 'lucide-react'
 import api from '@/lib/api'
 import { useAuthStore } from '@/store/authStore'
 import { 
@@ -28,85 +28,86 @@ interface ChatBoxProps {
   onClose: () => void
 }
 
+type ChatState = 'loading' | 'ready' | 'no_recipient_key' | 'error'
+
 export default function ChatBox({ recipientUsername, onClose }: ChatBoxProps) {
   const { user: currentUser } = useAuthStore()
   const [messages, setMessages] = useState<{ id: string; text: string; isMine: boolean }[]>([])
   const [input, setInput] = useState('')
-  const [loading, setLoading] = useState(true)
-  const [error, setError] = useState<string | null>(null)
+  const [chatState, setChatState] = useState<ChatState>('loading')
+  const [errorMsg, setErrorMsg] = useState<string | null>(null)
   const messagesEndRef = useRef<HTMLDivElement>(null)
   
   const [ourPrivateKey, setOurPrivateKey] = useState<CryptoKey | null>(null)
   const [theirPublicKey, setTheirPublicKey] = useState<string | null>(null)
 
-  useEffect(() => {
-    const initE2EE = async () => {
-      if (!currentUser) return
+  const initE2EE = useCallback(async () => {
+    if (!currentUser) return
+    setChatState('loading')
+    setErrorMsg(null)
+    
+    try {
+      // 1. Get recipient profile + public key
+      const { data: profile } = await api.get(`/auth/users/${recipientUsername}`)
       
-      try {
-        // 1. Get recipient public key
-        const { data: profile } = await api.get(`/auth/users/${recipientUsername}`)
-        if (!profile.public_key) {
-          setError(`${recipientUsername} hasn't set up E2EE keys yet.`)
-          setLoading(false)
-          return
-        }
-        setTheirPublicKey(profile.public_key)
-
-        // 2. Load our private key (or generate if none)
-        let privKey = await loadPrivateKey()
-        if (!privKey) {
-          const keyPair = await generateKeyPair()
-          privKey = keyPair.privateKey
-          await savePrivateKey(privKey)
-          const pubKeyBase64 = await exportPublicKey(keyPair.publicKey)
-          // Save to server
-          await api.post('/messages/keys', { public_key: pubKeyBase64 })
-        }
-        setOurPrivateKey(privKey)
-
-        // 3. Fetch chat history
-        const { data: history } = await api.get<MessageData[]>(`/messages/${recipientUsername}`)
-        
-        // Decrypt history
-        const decryptedMsgs = await Promise.all(history.map(async (msg) => {
-          let text = "[Unable to decrypt]"
-          try {
-            // We only need to decrypt if we have the private key and their public key.
-            // If we sent it, it's encrypted with their public key. 
-            // Wait, if we sent it, we encrypted it with THEIR public key, using OUR private key.
-            // Wait, ECDH generates the same shared secret regardless of direction (ourPriv + theirPub == theirPriv + ourPub).
-            // So we can decrypt both sent and received messages with the exact same shared key!
-            text = await decryptMessage(msg.encrypted_content, msg.nonce, privKey!, profile.public_key)
-          } catch (e) {
-            console.error("Decryption failed for msg", msg.id)
-          }
-          return {
-            id: msg.id,
-            text,
-            isMine: msg.sender_username === currentUser.username
-          }
-        }))
-
-        setMessages(decryptedMsgs)
-        setLoading(false)
-        messagesEndRef.current?.scrollIntoView({ behavior: 'smooth' })
-
-      } catch (err) {
-        console.error("Chat init failed", err)
-        setError("Failed to initialize chat.")
-        setLoading(false)
+      if (!profile.public_key) {
+        // Recipient hasn't set up E2EE — show friendly message
+        setChatState('no_recipient_key')
+        return
       }
+      setTheirPublicKey(profile.public_key)
+
+      // 2. Load our private key from IndexedDB, or generate a fresh pair
+      let privKey = await loadPrivateKey()
+      if (!privKey) {
+        const keyPair = await generateKeyPair()
+        privKey = keyPair.privateKey
+        await savePrivateKey(privKey)
+        const pubKeyBase64 = await exportPublicKey(keyPair.publicKey)
+        // Persist our public key to the server
+        await api.post('/messages/keys', { public_key: pubKeyBase64 })
+      }
+      setOurPrivateKey(privKey)
+
+      // 3. Fetch chat history and decrypt
+      const { data: history } = await api.get<MessageData[]>(`/messages/${recipientUsername}`)
+      
+      const decryptedMsgs = await Promise.all(history.map(async (msg) => {
+        let text = '🔒 [Unable to decrypt]'
+        try {
+          text = await decryptMessage(msg.encrypted_content, msg.nonce, privKey!, profile.public_key)
+        } catch {
+          // silently keep placeholder
+        }
+        return {
+          id: msg.id,
+          text,
+          isMine: msg.sender_username === currentUser.username
+        }
+      }))
+
+      setMessages(decryptedMsgs)
+      setChatState('ready')
+      setTimeout(() => messagesEndRef.current?.scrollIntoView({ behavior: 'smooth' }), 100)
+
+    } catch (err: any) {
+      console.error('Chat init failed', err)
+      const detail = err?.response?.data?.detail || 'Failed to initialize chat.'
+      setErrorMsg(detail)
+      setChatState('error')
     }
-    initE2EE()
   }, [recipientUsername, currentUser])
+
+  useEffect(() => {
+    initE2EE()
+  }, [initE2EE])
 
   const handleSend = async (e: React.FormEvent) => {
     e.preventDefault()
-    if (!input.trim() || !ourPrivateKey || !theirPublicKey) return
+    if (!input.trim() || !ourPrivateKey || !theirPublicKey || chatState !== 'ready') return
 
     const messageText = input.trim()
-    setInput('') // optimistic clear
+    setInput('')
 
     try {
       const { ciphertext, iv } = await encryptMessage(messageText, ourPrivateKey, theirPublicKey)
@@ -122,58 +123,104 @@ export default function ChatBox({ recipientUsername, onClose }: ChatBoxProps) {
         isMine: true
       }])
       setTimeout(() => messagesEndRef.current?.scrollIntoView({ behavior: 'smooth' }), 100)
-    } catch (err) {
-      console.error("Send failed", err)
-      setError("Failed to send message.")
+    } catch (err: any) {
+      console.error('Send failed', err)
+      const detail = err?.response?.data?.detail || 'Failed to send message.'
+      setErrorMsg(detail)
     }
   }
 
   return (
-    <div className="fixed bottom-4 right-4 w-80 h-96 bg-white dark:bg-[#0d1117] border border-slate-200 dark:border-slate-700 rounded-lg shadow-xl flex flex-col z-50 overflow-hidden font-sans">
+    <div className="fixed bottom-4 right-4 w-80 h-[420px] bg-white dark:bg-[#0d1117] border border-slate-200 dark:border-slate-700 rounded-xl shadow-2xl flex flex-col z-50 overflow-hidden font-sans">
       {/* Header */}
-      <div className="px-4 py-3 bg-blue-600 text-white flex justify-between items-center shrink-0">
-        <h3 className="font-semibold text-sm">Chat with {recipientUsername}</h3>
-        <button onClick={onClose} className="hover:bg-blue-700 p-1 rounded-md transition-colors">
+      <div className="px-4 py-3 bg-gradient-to-r from-blue-600 to-blue-500 text-white flex justify-between items-center shrink-0">
+        <div className="flex items-center gap-2">
+          <Lock className="w-3.5 h-3.5 opacity-80" />
+          <h3 className="font-semibold text-sm">Chat with {recipientUsername}</h3>
+        </div>
+        <button onClick={onClose} className="hover:bg-blue-700 p-1 rounded-md transition-colors" aria-label="Close chat">
           <X className="w-4 h-4" />
         </button>
       </div>
 
-      {/* Message List */}
+      {/* Body */}
       <div className="flex-1 overflow-y-auto p-4 bg-slate-50 dark:bg-[#090c10] flex flex-col gap-3">
-        {loading ? (
-          <div className="flex-1 flex justify-center items-center">
-            <div className="w-5 h-5 border-2 border-blue-500 border-t-transparent rounded-full animate-spin" />
+        {chatState === 'loading' && (
+          <div className="flex-1 flex flex-col justify-center items-center gap-3 h-full">
+            <div className="w-6 h-6 border-2 border-blue-500 border-t-transparent rounded-full animate-spin" />
+            <p className="text-xs text-slate-400">Setting up secure channel…</p>
           </div>
-        ) : error ? (
-          <div className="text-red-500 text-sm text-center p-4">{error}</div>
-        ) : messages.length === 0 ? (
-          <div className="text-slate-500 text-sm text-center p-4">No messages yet. Send an encrypted greeting!</div>
-        ) : (
-          messages.map(msg => (
-            <div key={msg.id} className={`flex ${msg.isMine ? 'justify-end' : 'justify-start'}`}>
-              <div className={`max-w-[80%] rounded-2xl px-3 py-2 text-sm shadow-sm ${msg.isMine ? 'bg-blue-600 text-white rounded-br-none' : 'bg-white dark:bg-slate-800 text-slate-800 dark:text-slate-200 border border-slate-200 dark:border-slate-700 rounded-bl-none'}`}>
-                {msg.text}
-              </div>
-            </div>
-          ))
         )}
+
+        {chatState === 'no_recipient_key' && (
+          <div className="flex flex-col items-center justify-center h-full gap-3 text-center px-4">
+            <div className="w-12 h-12 rounded-full bg-amber-100 dark:bg-amber-900/30 flex items-center justify-center">
+              <Lock className="w-6 h-6 text-amber-500" />
+            </div>
+            <p className="text-sm font-semibold text-slate-700 dark:text-slate-300">
+              E2EE Not Set Up
+            </p>
+            <p className="text-xs text-slate-500 dark:text-slate-400">
+              <strong>{recipientUsername}</strong> hasn't set up end-to-end encryption keys yet. Ask them to open a chat first to auto-initialize their keys.
+            </p>
+          </div>
+        )}
+
+        {chatState === 'error' && (
+          <div className="flex flex-col items-center justify-center h-full gap-3 text-center px-4">
+            <div className="w-12 h-12 rounded-full bg-red-100 dark:bg-red-900/30 flex items-center justify-center">
+              <AlertCircle className="w-6 h-6 text-red-500" />
+            </div>
+            <p className="text-sm text-red-500 font-semibold">Connection failed</p>
+            <p className="text-xs text-slate-500">{errorMsg}</p>
+            <button
+              onClick={initE2EE}
+              className="flex items-center gap-1.5 text-xs text-blue-500 hover:text-blue-400 transition-colors mt-1"
+            >
+              <RefreshCw className="w-3.5 h-3.5" />
+              Retry
+            </button>
+          </div>
+        )}
+
+        {chatState === 'ready' && messages.length === 0 && (
+          <div className="flex flex-col items-center justify-center h-full gap-2 text-center px-4">
+            <Lock className="w-8 h-8 text-slate-300 dark:text-slate-600" />
+            <p className="text-sm text-slate-400 dark:text-slate-500">
+              No messages yet. Your conversation is end-to-end encrypted.
+            </p>
+          </div>
+        )}
+
+        {chatState === 'ready' && messages.map(msg => (
+          <div key={msg.id} className={`flex ${msg.isMine ? 'justify-end' : 'justify-start'}`}>
+            <div className={`max-w-[80%] rounded-2xl px-3 py-2 text-sm shadow-sm ${
+              msg.isMine 
+                ? 'bg-blue-600 text-white rounded-br-none' 
+                : 'bg-white dark:bg-slate-800 text-slate-800 dark:text-slate-200 border border-slate-200 dark:border-slate-700 rounded-bl-none'
+            }`}>
+              {msg.text}
+            </div>
+          </div>
+        ))}
         <div ref={messagesEndRef} />
       </div>
 
-      {/* Input Form */}
+      {/* Input */}
       <form onSubmit={handleSend} className="p-3 bg-white dark:bg-[#0d1117] border-t border-slate-200 dark:border-slate-700 flex gap-2 shrink-0">
         <input 
           type="text" 
           value={input}
           onChange={(e) => setInput(e.target.value)}
-          placeholder="E2EE message..."
-          className="flex-1 bg-slate-100 dark:bg-[#21262d] border border-slate-300 dark:border-slate-600 rounded-full px-4 py-1.5 text-sm outline-none focus:border-blue-500 dark:focus:border-blue-500 transition-colors dark:text-slate-200"
-          disabled={loading || !!error}
+          placeholder={chatState === 'ready' ? 'Send encrypted message…' : 'Chat unavailable'}
+          className="flex-1 bg-slate-100 dark:bg-[#21262d] border border-slate-300 dark:border-slate-600 rounded-full px-4 py-1.5 text-sm outline-none focus:border-blue-500 transition-colors dark:text-slate-200"
+          disabled={chatState !== 'ready'}
         />
         <button 
           type="submit" 
-          disabled={!input.trim() || loading || !!error}
-          className="bg-blue-600 hover:bg-blue-700 disabled:opacity-50 text-white rounded-full p-2 flex items-center justify-center transition-colors"
+          disabled={!input.trim() || chatState !== 'ready'}
+          className="bg-blue-600 hover:bg-blue-700 disabled:opacity-40 disabled:cursor-not-allowed text-white rounded-full p-2 flex items-center justify-center transition-colors"
+          aria-label="Send message"
         >
           <Send className="w-4 h-4" />
         </button>

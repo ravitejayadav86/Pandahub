@@ -1,7 +1,7 @@
 'use client'
 
 import React, { useEffect, useState } from 'react'
-import { useParams } from 'next/navigation'
+import { useParams, useRouter } from 'next/navigation'
 import Link from 'next/link'
 import api from '@/lib/api'
 import { 
@@ -52,11 +52,14 @@ export default function UserProfilePage() {
   const [repos, setRepos] = useState<Repository[]>([])
   const [isFollowing, setIsFollowing] = useState(false)
   const [loading, setLoading] = useState(true)
+  const [followLoading, setFollowLoading] = useState(false)
   const [error, setError] = useState(false)
 
   const [activeTab, setActiveTab] = useState<TabType>('overview')
   const [repoSearch, setRepoSearch] = useState('')
   const [isChatOpen, setIsChatOpen] = useState(false)
+
+  const router = useRouter()
   
   useEffect(() => {
     if (!org) return
@@ -95,7 +98,12 @@ export default function UserProfilePage() {
   }, [org, currentUser])
 
   const handleFollowToggle = async () => {
-    if (!currentUser) return // Or redirect to login
+    if (!currentUser) {
+      router.push('/login')
+      return
+    }
+    if (followLoading) return
+    setFollowLoading(true)
     try {
       if (isFollowing) {
         await api.delete(`/auth/users/${org}/follow`)
@@ -107,8 +115,18 @@ export default function UserProfilePage() {
         setProfile(prev => prev ? { ...prev, follower_count: prev.follower_count + 1 } : prev)
       }
     } catch (e) {
-      console.error("Failed to toggle follow", e)
+      console.error('Failed to toggle follow', e)
+    } finally {
+      setFollowLoading(false)
     }
+  }
+
+  const handleOpenChat = () => {
+    if (!currentUser) {
+      router.push('/login')
+      return
+    }
+    setIsChatOpen(true)
   }
 
   if (loading) {
@@ -223,10 +241,18 @@ export default function UserProfilePage() {
             </Link>
           ) : (
             <div className="flex gap-2 mb-4">
-              <button onClick={handleFollowToggle} className="flex-1 py-1.5 text-center text-sm font-semibold text-slate-700 dark:text-slate-300 bg-slate-50 dark:bg-[#21262d] hover:bg-slate-100 dark:hover:bg-[#30363d] border border-slate-300 dark:border-slate-600 rounded-md transition-colors">
+              <button
+                onClick={handleFollowToggle}
+                disabled={followLoading}
+                className="flex-1 py-1.5 text-center text-sm font-semibold text-slate-700 dark:text-slate-300 bg-slate-50 dark:bg-[#21262d] hover:bg-slate-100 dark:hover:bg-[#30363d] border border-slate-300 dark:border-slate-600 rounded-md transition-colors disabled:opacity-60 flex items-center justify-center gap-1.5"
+              >
+                {followLoading && <span className="w-3 h-3 border-2 border-slate-400 border-t-transparent rounded-full animate-spin" />}
                 {isFollowing ? 'Unfollow' : 'Follow'}
               </button>
-              <button onClick={() => setIsChatOpen(true)} className="flex-1 py-1.5 text-center text-sm font-semibold text-white bg-blue-600 hover:bg-blue-700 rounded-md transition-colors border border-blue-700 shadow-sm">
+              <button
+                onClick={handleOpenChat}
+                className="flex-1 py-1.5 text-center text-sm font-semibold text-white bg-blue-600 hover:bg-blue-700 rounded-md transition-colors border border-blue-700 shadow-sm"
+              >
                 Message
               </button>
             </div>
@@ -432,7 +458,7 @@ export default function UserProfilePage() {
         </div>
       </main>
 
-      {isChatOpen && (
+      {isChatOpen && currentUser && (
         <ChatBox 
           recipientUsername={profile.username} 
           onClose={() => setIsChatOpen(false)} 

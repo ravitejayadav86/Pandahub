@@ -263,13 +263,25 @@ def post_receive_hook(
         raise post_receive_hook.retry(exc=exc)
 
     # ------------------------------------------------------------------
-    # 5. [Module 11 hook point] AI review dispatch
+    # 5. [Module 11 hook point] AI review dispatch & Security Scanning
     # ------------------------------------------------------------------
+    # Trigger AI Review
     # When Module 11 (AI) is built, add:
     #   from app.worker.tasks.ai_tasks import trigger_ai_review_for_push
     #   trigger_ai_review_for_push.delay(repo_id=repo_id, pushed_refs=[...])
-    # The hook is intentionally a no-op here so Module 8 doesn't depend on
-    # Module 11 being implemented.
+    
+    # Trigger Security Scanning
+    try:
+        from app.worker.tasks.security_tasks import scan_repository_security
+        for update in updates:
+            if not update.is_delete:
+                scan_repository_security.delay(
+                    repo_id=repo_id,
+                    old_sha=update.old_sha,
+                    new_sha=update.new_sha
+                )
+    except Exception as exc:
+        logger.error("Failed to enqueue security scan", extra={"repo_id": repo_id, "error": str(exc)})
 
     logger.info(
         "post_receive_hook completed",

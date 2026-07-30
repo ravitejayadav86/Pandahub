@@ -112,7 +112,7 @@ export default function RepoDashboardPage() {
     { id: "actions",   label: "Actions",        icon: "play_circle",  href: "#", comingSoon: true },
     { id: "projects",  label: "Projects",       icon: "kanban",       href: "#", comingSoon: true },
     { id: "wiki",      label: "Wiki",           icon: "menu_book",    href: "#", comingSoon: true },
-    { id: "security",  label: "Security",       icon: "security",     href: "#", comingSoon: true },
+    { id: "security",  label: "Security",       icon: "security",     href: `${repoBase}/security` },
     { id: "insights",  label: "Insights",       icon: "insights",     href: "#", comingSoon: true },
   ];
 

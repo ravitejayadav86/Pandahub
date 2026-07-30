@@ -125,6 +125,7 @@ services:
     env_file: .env
     environment:
       NEXT_PUBLIC_API_URL: ${BACKEND_URL}
+      INTERNAL_API_URL: http://backend:8000
     volumes:
       - ./frontend:/app
       - /app/node_modules

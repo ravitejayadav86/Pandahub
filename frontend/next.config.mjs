@@ -10,8 +10,9 @@
 // build time instead of failing confusingly on every request at runtime.
 const isLocalDev = process.env.NODE_ENV !== "production";
 const apiUrl = process.env.NEXT_PUBLIC_API_URL || (isLocalDev ? "http://localhost:8000" : null);
+const proxyUrl = process.env.INTERNAL_API_URL || apiUrl;
 
-if (!apiUrl) {
+if (!proxyUrl) {
   console.warn(
     "\n⚠️  NEXT_PUBLIC_API_URL is not set in a production build.\n" +
     "   /api/* requests will NOT be proxied to a backend.\n" +
@@ -27,11 +28,11 @@ const nextConfig = {
   // know about container networking (talks to same-origin). Only added
   // when we actually have a valid target -- see warning above for why.
   async rewrites() {
-    if (!apiUrl) return [];
+    if (!proxyUrl) return [];
     return [
       {
         source: "/api/:path*",
-        destination: `${apiUrl}/api/:path*`,
+        destination: `${proxyUrl}/api/:path*`,
       },
     ];
   },

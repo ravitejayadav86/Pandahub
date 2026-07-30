@@ -194,11 +194,15 @@ export default function UserProfilePage() {
             </button>
           )}
 
-          <div className="flex items-center gap-1 text-sm text-slate-600 dark:text-slate-400 mb-4 hover:text-blue-600 cursor-pointer">
+          <div className="flex items-center gap-1 text-sm text-slate-600 dark:text-slate-400 mb-4">
             <Users className="w-4 h-4" />
-            <span className="font-semibold text-slate-900 dark:text-slate-200">12</span> followers
+            <Link href={`/${profile.username}/followers`} className="hover:text-blue-600 flex items-center gap-1">
+              <span className="font-semibold text-slate-900 dark:text-slate-200">12</span> followers
+            </Link>
             <span className="mx-1">·</span>
-            <span className="font-semibold text-slate-900 dark:text-slate-200">4</span> following
+            <Link href={`/${profile.username}/following`} className="hover:text-blue-600 flex items-center gap-1">
+              <span className="font-semibold text-slate-900 dark:text-slate-200">4</span> following
+            </Link>
           </div>
 
           {profile.bio && (

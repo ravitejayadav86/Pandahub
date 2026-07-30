@@ -46,3 +46,8 @@ Thumbs.db
 docker-compose.override.yml
 
 frontend/tsconfig.tsbuildinfo
+
+test-clone/
+
+user_inputs.txt
+test-clone/

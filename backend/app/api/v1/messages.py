@@ -7,7 +7,7 @@ from app.db.session import get_db
 from app.models.user import User
 from app.models.message import Message
 from app.api.dependencies import get_current_active_user
-from app.websockets.manager import ws_manager
+from app.websockets.manager import connection_manager
 from pydantic import BaseModel
 from datetime import datetime
 
@@ -121,8 +121,8 @@ async def send_message(
         }
     }
     
-    # In PandaHub, ws_manager has a broadcast_to_user method
-    if hasattr(ws_manager, 'broadcast_to_user'):
-        await ws_manager.broadcast_to_user(str(target_user.id), payload)
+    # In PandaHub, connection_manager has a publish method
+    if hasattr(connection_manager, 'publish'):
+        await connection_manager.publish(str(target_user.id), payload["type"], payload["data"])
 
     return {"status": "ok", "message": "Sent", "id": str(new_msg.id)}

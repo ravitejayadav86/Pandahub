@@ -23,6 +23,8 @@ interface UserProfile {
   is_verified: boolean
   created_at: string | null
   repo_count: number
+  follower_count: number
+  following_count: number
 }
 
 // Removed MOCK_FOLLOWERS
@@ -167,11 +169,11 @@ export default function FollowersPage() {
           <div className="flex items-center gap-1 text-sm text-slate-600 dark:text-slate-400 mb-4">
             <Users className="w-4 h-4" />
             <Link href={`/${profile.username}/followers`} className="text-slate-900 dark:text-slate-200 hover:text-blue-600 flex items-center gap-1 font-semibold">
-              <span className="font-semibold text-slate-900 dark:text-slate-200">{profile.follower_count}</span> followers
+              <span className="font-semibold text-slate-900 dark:text-slate-200">{profile.follower_count ?? 0}</span> followers
             </Link>
             <span className="mx-1">·</span>
             <Link href={`/${profile.username}/following`} className="hover:text-blue-600 flex items-center gap-1">
-              <span className="font-semibold text-slate-900 dark:text-slate-200">{profile.following_count}</span> following
+              <span className="font-semibold text-slate-900 dark:text-slate-200">{profile.following_count ?? 0}</span> following
             </Link>
           </div>
 
@@ -208,10 +210,10 @@ export default function FollowersPage() {
           <div className="flex items-center justify-between mb-4 pb-2 border-b border-slate-200 dark:border-slate-800">
              <div className="flex gap-4">
                  <Link href={`/${profile.username}/followers`} className="font-semibold text-slate-900 dark:text-slate-200 border-b-2 border-[#fd8c73] pb-2 px-2">
-                     Followers <span className="bg-slate-100 dark:bg-slate-800 text-slate-700 dark:text-slate-300 text-xs font-medium px-2 py-0.5 rounded-full ml-1">{profile.follower_count}</span>
+                     Followers <span className="bg-slate-100 dark:bg-slate-800 text-slate-700 dark:text-slate-300 text-xs font-medium px-2 py-0.5 rounded-full ml-1">{profile.follower_count ?? 0}</span>
                  </Link>
                  <Link href={`/${profile.username}/following`} className="text-slate-600 dark:text-slate-400 hover:text-slate-900 dark:hover:text-slate-200 pb-2 px-2">
-                     Following <span className="bg-slate-100 dark:bg-slate-800 text-slate-700 dark:text-slate-300 text-xs font-medium px-2 py-0.5 rounded-full ml-1">{profile.following_count}</span>
+                     Following <span className="bg-slate-100 dark:bg-slate-800 text-slate-700 dark:text-slate-300 text-xs font-medium px-2 py-0.5 rounded-full ml-1">{profile.following_count ?? 0}</span>
                  </Link>
              </div>
           </div>

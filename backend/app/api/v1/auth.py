@@ -558,7 +558,7 @@ async def explore_users(
     db: AsyncSession = Depends(get_db),
 ):
     from sqlalchemy import select, or_
-    stmt = select(User).where(User.is_active == True).order_by(User.created_at.desc())
+    stmt = select(User).where(User.is_active).order_by(User.created_at.desc())
     if q:
         search = f"%{q}%"
         stmt = stmt.where(

@@ -549,7 +549,6 @@ async def dismiss_security_alert(
     from app.models.security_alert import SecurityAlert
     from sqlalchemy import select
     from datetime import datetime, timezone
-    from pydantic import BaseModel
 
     result = await db.execute(
         select(SecurityAlert).where(

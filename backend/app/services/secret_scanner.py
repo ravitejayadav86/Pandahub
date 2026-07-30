@@ -12,9 +12,7 @@ bounded) rather than broad — better to miss an obscure format than to flood
 the UI with noise.
 """
 import re
-import uuid
-from dataclasses import dataclass, field
-from typing import Optional
+from dataclasses import dataclass
 
 SECRET_PATTERNS = [
     {

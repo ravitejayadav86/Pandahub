@@ -17,12 +17,9 @@ as a Celery background task rather than blocking git push operations.
 """
 import json
 import re
-import uuid
 from dataclasses import dataclass
 from pathlib import Path
-from typing import Optional
 import httpx
-import asyncio
 
 OSV_BATCH_URL = "https://api.osv.dev/v1/querybatch"
 OSV_TIMEOUT = 30  # seconds

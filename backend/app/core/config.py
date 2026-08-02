@@ -82,6 +82,15 @@ class Settings(BaseSettings):
     MINIO_BUCKET_LFS: str = "pandahub-lfs"
     MINIO_BUCKET_ARTIFACTS: str = "pandahub-artifacts"
     MINIO_USE_SSL: bool = False
+ 
+# ---- Backblaze B2 (S3-compatible) — durable git repo storage ----
+    B2_ENDPOINT_URL: str = "s3.us-east-005.backblazeb2.com"       # e.g. https://s3.us-west-004.backblazeb2.com
+    B2_KEY_ID: str = "e442fdb12f5a"
+    B2_APPLICATION_KEY: str = "005ed0e67207309db59cdc918ae3dce80599adccde"
+    B2_BUCKET_NAME: str = "pandahub"
+    B2_REGION: str = "us-east-005"  # matches your B2 bucket's region
+
+
 
     # ---- Git storage ----
     GIT_REPOS_ROOT: str = "/data/repositories"

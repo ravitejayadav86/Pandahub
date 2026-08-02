@@ -3,10 +3,10 @@ Backblaze B2 repository storage service.
 
 Responsibilities
 ----------------
-• Back up and restore bare git repositories as gzipped tarballs on B2.
-• Provide presigned download URLs for clone/fetch operations that bypass
+- Back up and restore bare git repositories as gzipped tarballs on B2.
+- Provide presigned download URLs for clone/fetch operations that bypass
   the application server (direct client ? B2 transfer).
-• Enforce the single-bucket, namespaced key layout:
+- Enforce the single-bucket, namespaced key layout:
 
       repos/{owner}/{repo_name}.tar.gz
 
@@ -18,7 +18,7 @@ Why a separate module from storage_service.py
 storage_service.py owns the MinIO buckets (avatars / LFS / artifacts).
 Those are all *internal* objects managed exclusively by the application.
 B2 is a *durable* offsite tier meant for cold-backup and eventual
-direct-client delivery of large repo archives — different credentials,
+direct-client delivery of large repo archives -- different credentials,
 different endpoint, different access pattern.  Keeping them separate
 prevents credential coupling and makes it trivial to rotate one without
 touching the other.
@@ -174,7 +174,7 @@ def restore_repo(dest_path: str | Path, owner: str, repo_name: str) -> None:
     Download a repository archive from B2 and extract it to *dest_path*.
 
     The target directory is created if it does not exist.  Existing
-    contents are overwritten — callers should ensure *dest_path* is either
+    contents are overwritten -- callers should ensure *dest_path* is either
     empty or a disposable staging area before calling this.
 
     Args:

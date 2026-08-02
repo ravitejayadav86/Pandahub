@@ -22,8 +22,74 @@ interface PATToken {
   created_at: string;
 }
 
+// ─── Small helper components ──────────────────────────────────────────────────
+
+function SettingSection({
+  title, description, children,
+}: {
+  title: string; description?: string; children: React.ReactNode;
+}) {
+  return (
+    <section className="gh-section">
+      <div className="gh-section-header">
+        <h2 className="gh-section-title">{title}</h2>
+        {description && <p className="gh-section-desc">{description}</p>}
+      </div>
+      <div className="gh-section-body">{children}</div>
+    </section>
+  );
+}
+
+function FormGroup({
+  label, hint, children, htmlFor,
+}: {
+  label: string; hint?: string; children: React.ReactNode; htmlFor?: string;
+}) {
+  return (
+    <div className="gh-form-group">
+      <label className="gh-label" htmlFor={htmlFor}>{label}</label>
+      {children}
+      {hint && <p className="gh-hint">{hint}</p>}
+    </div>
+  );
+}
+
+function ErrorBanner({ msg }: { msg: string }) {
+  return (
+    <div className="gh-error-banner">
+      <svg width="16" height="16" viewBox="0 0 16 16" fill="currentColor">
+        <path d="M6.457 1.047c.659-1.234 2.427-1.234 3.086 0l6.082 11.378A1.75 1.75 0 0 1 14.082 15H1.918a1.75 1.75 0 0 1-1.543-2.575Zm1.763.707a.25.25 0 0 0-.44 0L1.698 13.132a.25.25 0 0 0 .22.368h12.164a.25.25 0 0 0 .22-.368Zm.53 3.996v2.5a.75.75 0 0 1-1.5 0v-2.5a.75.75 0 0 1 1.5 0ZM9 11a1 1 0 1 1-2 0 1 1 0 0 1 2 0Z" />
+      </svg>
+      {msg}
+    </div>
+  );
+}
+
+function SaveSuccess() {
+  return (
+    <span className="gh-save-ok">
+      <svg width="13" height="13" viewBox="0 0 16 16" fill="currentColor">
+        <path d="M13.78 4.22a.75.75 0 0 1 0 1.06l-7.25 7.25a.75.75 0 0 1-1.06 0L2.22 9.28a.75.75 0 0 1 1.06-1.06L6 10.94l6.72-6.72a.75.75 0 0 1 1.06 0Z" />
+      </svg>
+      Saved successfully
+    </span>
+  );
+}
+
+function InfoRow({ label, value, icon }: { label: string; value: string; icon: string }) {
+  return (
+    <div className="gh-info-row">
+      <span className="material-symbols-outlined" style={{ fontSize: 16 }}>{icon}</span>
+      <span className="gh-info-label">{label}</span>
+      <span className="gh-info-value">{value}</span>
+    </div>
+  );
+}
+
+// ─── Page ────────────────────────────────────────────────────────────────────
+
 export default function SettingsPage() {
-  const { user, setUser, fetchMe, clearAuth } = useAuthStore();
+  const { user, setUser, clearAuth } = useAuthStore();
   const router = useRouter();
   const [activeSection, setActiveSection] = useState<Section>('profile');
   const [saving, setSaving] = useState(false);
@@ -32,18 +98,18 @@ export default function SettingsPage() {
   const [error, setError] = useState('');
   const avatarInputRef = useRef<HTMLInputElement>(null);
 
-  // ── Profile form ──────────────────────────────────────────────────────────
+  // ── Profile ───────────────────────────────────────────────────────────────
   const [profile, setProfile] = useState({
     username: '', first_name: '', last_name: '', full_name: '',
     bio: '', website_url: '', location: '',
   });
 
-  // ── Education form ────────────────────────────────────────────────────────
+  // ── Education ─────────────────────────────────────────────────────────────
   const [education, setEducation] = useState({
     institution: '', degree: '', field_of_study: '', graduation_year: '',
   });
 
-  // ── Password form ─────────────────────────────────────────────────────────
+  // ── Password ──────────────────────────────────────────────────────────────
   const [passwords, setPasswords] = useState({
     current_password: '', new_password: '', confirm_password: '',
   });
@@ -64,7 +130,7 @@ export default function SettingsPage() {
   const [tokenLoading, setTokenLoading] = useState(false);
   const [tokenError, setTokenError] = useState('');
 
-  // ── Notification prefs ─────────────────────────────────────────────────────
+  // ── Notifications ─────────────────────────────────────────────────────────
   type NotifKey = 'commits' | 'issues' | 'pr_reviews' | 'pr_merges' | 'mentions' | 'stars' | 'followers';
   const DEFAULT_NOTIF: Record<NotifKey, boolean> = {
     commits: true, issues: true, pr_reviews: true,
@@ -72,17 +138,16 @@ export default function SettingsPage() {
   };
   const [notifPrefs, setNotifPrefs] = useState<Record<NotifKey, boolean>>(DEFAULT_NOTIF);
 
-  // ── Danger zone ───────────────────────────────────────────────────────────
+  // ── Danger ────────────────────────────────────────────────────────────────
   const [deleteConfirm, setDeleteConfirm] = useState('');
   const [showDeleteModal, setShowDeleteModal] = useState(false);
 
   // ── Init ──────────────────────────────────────────────────────────────────
   useEffect(() => {
     setMounted(true);
-    // Load notification prefs from localStorage
     try {
-      const saved = localStorage.getItem('pandahub_notif_prefs');
-      if (saved) setNotifPrefs(JSON.parse(saved));
+      const s = localStorage.getItem('pandahub_notif_prefs');
+      if (s) setNotifPrefs(JSON.parse(s));
     } catch { /* ignore */ }
     if (user) {
       setProfile({
@@ -103,7 +168,6 @@ export default function SettingsPage() {
     }
   }, [user]);
 
-  // Load PAT tokens when switching to tokens section
   useEffect(() => {
     if (activeSection === 'tokens') loadTokens();
   }, [activeSection]);
@@ -115,14 +179,11 @@ export default function SettingsPage() {
     } catch { /* silent */ }
   };
 
-  // ── Helpers ───────────────────────────────────────────────────────────────
   const showSaved = () => { setSaved(true); setTimeout(() => setSaved(false), 3000); };
 
-  // ── Handlers ─────────────────────────────────────────────────────────────
+  // ── Handlers ──────────────────────────────────────────────────────────────
   const saveProfile = async (e: React.FormEvent) => {
-    e.preventDefault();
-    setError('');
-    setSaving(true);
+    e.preventDefault(); setError(''); setSaving(true);
     try {
       const full_name = `${profile.first_name} ${profile.last_name}`.trim() || profile.full_name;
       const { data } = await api.patch<User>('/auth/me', {
@@ -134,18 +195,13 @@ export default function SettingsPage() {
         website_url: profile.website_url || undefined,
         location: profile.location || undefined,
       });
-      setUser(data);
-      showSaved();
-    } catch (err: any) {
-      setError(err?.response?.data?.detail || 'Failed to save profile.');
-    }
+      setUser(data); showSaved();
+    } catch (err: any) { setError(err?.response?.data?.detail || 'Failed to save profile.'); }
     setSaving(false);
   };
 
   const saveEducation = async (e: React.FormEvent) => {
-    e.preventDefault();
-    setError('');
-    setSaving(true);
+    e.preventDefault(); setError(''); setSaving(true);
     try {
       const { data } = await api.patch<User>('/auth/me', {
         institution: education.institution || undefined,
@@ -153,19 +209,16 @@ export default function SettingsPage() {
         field_of_study: education.field_of_study || undefined,
         graduation_year: education.graduation_year ? Number(education.graduation_year) : undefined,
       });
-      setUser(data);
-      showSaved();
-    } catch (err: any) {
-      setError(err?.response?.data?.detail || 'Failed to save education info.');
-    }
+      setUser(data); showSaved();
+    } catch (err: any) { setError(err?.response?.data?.detail || 'Failed to save education info.'); }
     setSaving(false);
   };
 
   const uploadAvatar = async (file: File) => {
-    const formData = new FormData();
-    formData.append('file', file);
+    const fd = new FormData();
+    fd.append('file', file);
     try {
-      const { data } = await api.post<User>('/auth/me/avatar', formData, {
+      const { data } = await api.post<User>('/auth/me/avatar', fd, {
         headers: { 'Content-Type': 'multipart/form-data' },
       });
       setUser(data);
@@ -174,12 +227,8 @@ export default function SettingsPage() {
 
   const changePassword = async (e: React.FormEvent) => {
     e.preventDefault();
-    if (passwords.new_password !== passwords.confirm_password) {
-      setError('New passwords do not match.');
-      return;
-    }
-    setError('');
-    setSaving(true);
+    if (passwords.new_password !== passwords.confirm_password) { setError('New passwords do not match.'); return; }
+    setError(''); setSaving(true);
     try {
       await api.post('/auth/change-password', {
         current_password: passwords.current_password,
@@ -187,19 +236,16 @@ export default function SettingsPage() {
       });
       setPasswords({ current_password: '', new_password: '', confirm_password: '' });
       showSaved();
-    } catch (err: any) {
-      setError(err?.response?.data?.detail || 'Failed to update password.');
-    }
+    } catch (err: any) { setError(err?.response?.data?.detail || 'Failed to update password.'); }
     setSaving(false);
   };
 
-  // 2FA
   const setupTwoFactor = async () => {
     setIsTwoFaLoading(true); setTwoFaError('');
     try {
       const { data } = await api.post('/auth/2fa/setup');
       setTwoFaSetup(data);
-    } catch (err: any) { setTwoFaError(err.response?.data?.detail || 'Failed to setup 2FA'); }
+    } catch (err: any) { setTwoFaError(err.response?.data?.detail || 'Failed to set up 2FA'); }
     setIsTwoFaLoading(false);
   };
 
@@ -226,7 +272,6 @@ export default function SettingsPage() {
     setIsTwoFaLoading(false);
   };
 
-  // PAT tokens
   const createToken = async (e: React.FormEvent) => {
     e.preventDefault();
     setTokenError(''); setCreatedToken(''); setTokenLoading(true);
@@ -250,93 +295,288 @@ export default function SettingsPage() {
     } catch { /* silent */ }
   };
 
-  // ── Styles ────────────────────────────────────────────────────────────────
-  const inputCls = 'block w-full px-4 py-3 bg-surface-container-low/50 input-glass border border-outline-variant/30 rounded-xl text-on-surface placeholder:text-outline focus:ring-0 text-sm font-medium glow-accent-focus transition-colors';
-  const sectionHeaderCls = 'px-8 py-6 border-b border-outline-variant/20';
-  const sectionBodyCls = 'px-8 py-7 flex flex-col gap-6';
+  const yearOptions = Array.from({ length: 50 }, (_, i) => String(new Date().getFullYear() + 5 - i));
 
   const SECTIONS: { id: Section; label: string; icon: string; danger?: boolean }[] = [
-    { id: 'profile',       label: 'Profile',           icon: 'person' },
-    { id: 'education',     label: 'Education',         icon: 'school' },
-    { id: 'account',       label: 'Account & Security', icon: 'manage_accounts' },
-    { id: 'tokens',        label: 'Access Tokens',     icon: 'key' },
-    { id: 'notifications', label: 'Notifications',     icon: 'notifications' },
-    { id: 'danger',        label: 'Danger Zone',       icon: 'warning', danger: true },
+    { id: 'profile',       label: 'Public profile',     icon: 'person' },
+    { id: 'education',     label: 'Education',          icon: 'school' },
+    { id: 'account',       label: 'Account & security', icon: 'manage_accounts' },
+    { id: 'tokens',        label: 'Developer settings', icon: 'key' },
+    { id: 'notifications', label: 'Notifications',      icon: 'notifications' },
+    { id: 'danger',        label: 'Danger zone',        icon: 'warning', danger: true },
   ];
 
-  const yearOptions = Array.from({ length: 50 }, (_, i) => String(new Date().getFullYear() + 5 - i));
+  const inp = 'gh-inp';
 
   // ── Render ────────────────────────────────────────────────────────────────
   return (
-    <main className="min-h-screen bg-background text-on-surface font-body relative">
-      {/* Ambient background */}
-      <div className="fixed top-[-20%] left-[-10%] w-[50%] h-[50%] rounded-full bg-primary-container/5 blur-[120px] pointer-events-none" />
-      <div className="fixed bottom-[-20%] right-[-10%] w-[40%] h-[40%] rounded-full bg-secondary-container/10 blur-[100px] pointer-events-none" />
+    <>
+      {/* ── scoped styles ─────────────────────────────────────────────────── */}
+      <style>{`
+        /* root */
+        .gh-root { min-height:100vh; background:#0d1117; color:#e6edf3;
+          font-family:-apple-system,BlinkMacSystemFont,'Segoe UI','Noto Sans',Helvetica,Arial,sans-serif;
+          font-size:14px; }
 
-      <Navbar />
+        /* layout */
+        .gh-layout { max-width:1012px; margin:0 auto; padding:24px 16px 80px;
+          display:grid; grid-template-columns:220px 1fr; gap:24px; align-items:start; }
+        @media(max-width:768px){ .gh-layout{grid-template-columns:1fr;} .gh-sidebar{display:flex;flex-wrap:wrap;gap:4px;} }
 
-      <div
-        className="max-w-6xl mx-auto px-6 py-10 grid gap-8"
-        style={{ gridTemplateColumns: '220px 1fr', opacity: mounted ? 1 : 0, transition: 'opacity 0.4s' }}
-      >
-        {/* ── Sidebar ──────────────────────────────────────────────────────── */}
-        <nav className="sticky top-24 h-fit">
-          <p className="text-[11px] font-bold tracking-widest text-on-surface-variant uppercase mb-3 pl-3">Settings</p>
-          <div className="flex flex-col gap-1">
-            {SECTIONS.map((s) => {
-              const active = activeSection === s.id;
-              return (
-                <button
-                  key={s.id}
-                  onClick={() => { setActiveSection(s.id); setError(''); }}
-                  className={`flex items-center gap-3 w-full px-3 py-2.5 rounded-xl text-sm font-medium transition-all duration-200 text-left
-                    ${active
-                      ? s.danger ? 'bg-error/10 text-error' : 'bg-primary text-white shadow-[0_4px_14px_rgba(10,132,255,0.3)]'
-                      : s.danger ? 'text-error hover:bg-error/5' : 'text-on-surface-variant hover:text-on-surface hover:bg-surface-container-low/60'
-                    }`}
+        /* sidebar */
+        .gh-sidebar { position:sticky; top:80px; }
+        .gh-sidebar-heading { font-size:12px; font-weight:600; color:#7d8590; text-transform:uppercase;
+          letter-spacing:.05em; padding:6px 8px; margin-bottom:4px; }
+        .gh-nav-btn { display:flex; align-items:center; gap:8px; padding:7px 10px; border-radius:6px;
+          font-size:13.5px; font-weight:400; color:#cdd9e5; cursor:pointer; transition:background .1s,color .1s;
+          width:100%; text-align:left; border:none; background:none; font-family:inherit; }
+        .gh-nav-btn:hover { background:#161b22; color:#e6edf3; }
+        .gh-nav-btn.active { background:rgba(31,111,235,.13); color:#58a6ff; font-weight:600; }
+        .gh-nav-btn.danger { color:#f85149; }
+        .gh-nav-btn.danger:hover { background:rgba(248,81,73,.08); }
+        .gh-nav-btn.danger.active { background:rgba(248,81,73,.1); color:#f85149; font-weight:600; }
+        .gh-nav-btn .material-symbols-outlined { font-size:16px; flex-shrink:0; }
+        .gh-nav-divider { height:1px; background:#21262d; margin:8px 0; }
+
+        /* panel */
+        .gh-panel { background:#0d1117; border:1px solid #21262d; border-radius:6px; overflow:hidden; }
+
+        /* section */
+        .gh-section-header { padding:16px 24px; border-bottom:1px solid #21262d; }
+        .gh-section-title { font-size:16px; font-weight:600; color:#e6edf3; margin:0 0 4px; }
+        .gh-section-desc { font-size:13px; color:#7d8590; margin:0; }
+        .gh-section-body { padding:24px; display:flex; flex-direction:column; gap:18px; }
+
+        /* form */
+        .gh-form-group { display:flex; flex-direction:column; gap:6px; }
+        .gh-label { font-size:13.5px; font-weight:600; color:#e6edf3; }
+        .gh-hint { font-size:12px; color:#7d8590; margin:0; }
+
+        /* inputs */
+        .gh-inp { background:#010409; border:1px solid #30363d; border-radius:6px;
+          color:#e6edf3; font-size:14px; padding:5px 12px; height:32px; width:100%;
+          outline:none; transition:border-color .15s,box-shadow .15s; font-family:inherit; }
+        .gh-inp:focus { border-color:#1f6feb; box-shadow:0 0 0 3px rgba(31,111,235,.3); }
+        .gh-inp::placeholder { color:#484f58; }
+        .gh-textarea { background:#010409; border:1px solid #30363d; border-radius:6px;
+          color:#e6edf3; font-size:14px; padding:8px 12px; width:100%; outline:none;
+          resize:vertical; font-family:inherit; transition:border-color .15s,box-shadow .15s; }
+        .gh-textarea:focus { border-color:#1f6feb; box-shadow:0 0 0 3px rgba(31,111,235,.3); }
+        .gh-textarea::placeholder { color:#484f58; }
+        .gh-select { background:#21262d; border:1px solid #30363d; border-radius:6px;
+          color:#e6edf3; font-size:14px; padding:5px 28px 5px 12px; height:32px; width:100%;
+          outline:none; cursor:pointer; font-family:inherit; appearance:none;
+          background-image:url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='10' height='6'%3E%3Cpath fill='%237d8590' d='M0 0l5 6 5-6'/%3E%3C/svg%3E");
+          background-repeat:no-repeat; background-position:right 10px center; }
+        .gh-select:focus { border-color:#1f6feb; box-shadow:0 0 0 3px rgba(31,111,235,.3); }
+
+        /* prefix input */
+        .gh-prefix-wrap { position:relative; }
+        .gh-prefix { position:absolute; left:12px; top:50%; transform:translateY(-50%);
+          color:#7d8590; font-size:14px; pointer-events:none; user-select:none; white-space:nowrap; }
+
+        /* buttons */
+        .gh-btn { display:inline-flex; align-items:center; justify-content:center; gap:6px;
+          padding:5px 16px; height:32px; font-size:13.5px; font-weight:600; border-radius:6px;
+          cursor:pointer; transition:background .15s,border-color .15s; border:1px solid;
+          font-family:inherit; white-space:nowrap; outline:none; }
+        .gh-btn:disabled { opacity:.6; cursor:not-allowed; }
+        .gh-btn-primary { background:#238636; border-color:rgba(240,246,252,.1); color:#fff; }
+        .gh-btn-primary:hover:not(:disabled) { background:#2ea043; }
+        .gh-btn-default { background:#21262d; border-color:rgba(240,246,252,.1); color:#cdd9e5; }
+        .gh-btn-default:hover:not(:disabled) { background:#30363d; }
+        .gh-btn-danger { background:#da3633; border-color:rgba(240,246,252,.1); color:#fff; }
+        .gh-btn-danger:hover:not(:disabled) { background:#f85149; }
+        .gh-btn-outline-danger { background:transparent; border-color:#f85149; color:#f85149; }
+        .gh-btn-outline-danger:hover:not(:disabled) { background:rgba(248,81,73,.1); }
+
+        /* form actions */
+        .gh-form-actions { display:flex; align-items:center; gap:12px;
+          padding-top:16px; border-top:1px solid #21262d; }
+
+        /* form grid */
+        .gh-grid2 { display:grid; grid-template-columns:1fr 1fr; gap:16px; }
+        @media(max-width:600px){ .gh-grid2{grid-template-columns:1fr;} }
+
+        /* divider */
+        .gh-hr { height:1px; background:#21262d; border:none; margin:4px 0; }
+
+        /* avatar */
+        .gh-avatar-row { display:flex; align-items:flex-start; gap:20px;
+          padding-bottom:20px; border-bottom:1px solid #21262d; }
+        .gh-avatar { width:80px; height:80px; border-radius:50%; border:1px solid #30363d;
+          overflow:hidden; flex-shrink:0; cursor:pointer; background:#161b22;
+          display:flex; align-items:center; justify-content:center;
+          font-size:30px; font-weight:700; color:#e6edf3; transition:border-color .15s; }
+        .gh-avatar:hover { border-color:#58a6ff; }
+        .gh-avatar img { width:100%; height:100%; object-fit:cover; }
+        .gh-avatar-name { font-weight:600; font-size:15px; margin-bottom:4px; }
+        .gh-avatar-link { color:#58a6ff; font-size:13px; cursor:pointer; font-weight:500; }
+        .gh-avatar-link:hover { text-decoration:underline; }
+        .gh-avatar-sub { color:#7d8590; font-size:12px; margin-top:4px; }
+
+        /* info row */
+        .gh-info-row { display:flex; align-items:center; gap:10px; padding:8px 0;
+          border-bottom:1px solid #21262d; color:#7d8590; font-size:13px; }
+        .gh-info-row:last-child { border-bottom:none; }
+        .gh-info-label { flex:1; }
+        .gh-info-value { color:#e6edf3; font-weight:500; }
+
+        /* error */
+        .gh-error-banner { display:flex; align-items:center; gap:8px; padding:10px 14px;
+          background:rgba(248,81,73,.08); border:1px solid rgba(248,81,73,.4);
+          border-radius:6px; color:#f85149; font-size:13px; font-weight:500; }
+
+        /* save ok */
+        .gh-save-ok { display:inline-flex; align-items:center; gap:5px;
+          color:#3fb950; font-size:13px; font-weight:600;
+          animation:ghFadeIn .2s ease; }
+        @keyframes ghFadeIn { from{opacity:0;transform:translateY(4px)} to{opacity:1;transform:none} }
+
+        /* box */
+        .gh-box { border:1px solid #21262d; border-radius:6px; overflow:hidden; }
+        .gh-box-hdr { background:#161b22; padding:10px 16px; font-weight:600;
+          font-size:13px; border-bottom:1px solid #21262d; display:flex; align-items:center; gap:8px; }
+        .gh-box-body { padding:16px; display:flex; flex-direction:column; gap:14px; }
+
+        /* scope pills */
+        .gh-pill { display:inline-flex; align-items:center; gap:5px; padding:3px 10px;
+          border-radius:999px; border:1px solid; font-size:12px; font-weight:600;
+          cursor:pointer; transition:all .15s; user-select:none; }
+        .gh-pill.on { background:rgba(31,111,235,.1); border-color:#388bfd; color:#58a6ff; }
+        .gh-pill.off { background:transparent; border-color:#30363d; color:#7d8590; }
+        .gh-pill.off:hover { border-color:#484f58; color:#cdd9e5; }
+
+        /* token created */
+        .gh-token-created { display:flex; flex-direction:column; gap:8px; padding:12px;
+          background:rgba(63,185,80,.08); border:1px solid rgba(63,185,80,.4);
+          border-radius:6px; margin-top:4px; }
+        .gh-token-created-lbl { color:#3fb950; font-size:12px; font-weight:600; }
+        .gh-token-row { display:flex; align-items:center; gap:8px; }
+        .gh-token-code { font-family:'SFMono-Regular',Consolas,'Liberation Mono',Menlo,monospace;
+          font-size:12px; background:#161b22; border:1px solid #30363d; border-radius:6px;
+          padding:6px 10px; flex:1; overflow-x:auto; word-break:break-all; color:#e6edf3; }
+        .gh-copy-btn { padding:5px 8px; background:#21262d; border:1px solid #30363d;
+          border-radius:6px; color:#cdd9e5; cursor:pointer; display:flex; align-items:center;
+          transition:background .15s; flex-shrink:0; }
+        .gh-copy-btn:hover { background:#30363d; }
+
+        /* token list item */
+        .gh-tok-item { display:flex; align-items:center; justify-content:space-between;
+          gap:16px; padding:12px 16px; border-bottom:1px solid #21262d; }
+        .gh-tok-item:last-child { border-bottom:none; }
+        .gh-tok-name { font-weight:600; font-size:13.5px; }
+        .gh-tok-meta { font-size:12px; color:#7d8590; margin-top:2px; }
+
+        /* toggle */
+        .gh-toggle-row { display:flex; align-items:center; justify-content:space-between;
+          gap:16px; padding:14px 0; border-bottom:1px solid #21262d; }
+        .gh-toggle-row:last-child { border-bottom:none; }
+        .gh-toggle-lbl { font-size:13.5px; font-weight:600; color:#e6edf3; }
+        .gh-toggle-desc { font-size:12px; color:#7d8590; margin-top:2px; }
+        .gh-toggle { width:44px; height:24px; border-radius:999px; border:none;
+          cursor:pointer; flex-shrink:0; position:relative; transition:background .2s; outline:none; }
+        .gh-toggle.on { background:#238636; }
+        .gh-toggle.off { background:#30363d; }
+        .gh-toggle-thumb { position:absolute; top:3px; width:18px; height:18px;
+          border-radius:50%; background:#fff; transition:left .2s; box-shadow:0 1px 3px rgba(0,0,0,.4); }
+        .on .gh-toggle-thumb { left:23px; }
+        .off .gh-toggle-thumb { left:3px; }
+
+        /* danger box */
+        .gh-danger-box { border:1px solid rgba(248,81,73,.35); border-radius:6px; overflow:hidden; }
+        .gh-danger-box-hdr { background:rgba(248,81,73,.1); padding:12px 16px;
+          font-size:13px; font-weight:600; color:#f85149; border-bottom:1px solid rgba(248,81,73,.2); }
+        .gh-danger-item { display:flex; align-items:center; justify-content:space-between;
+          gap:16px; padding:16px; border-bottom:1px solid rgba(248,81,73,.15); }
+        .gh-danger-item:last-child { border-bottom:none; }
+        .gh-danger-ttl { font-weight:600; color:#e6edf3; font-size:13.5px; margin-bottom:2px; }
+        .gh-danger-sub { font-size:12px; color:#7d8590; }
+
+        /* 2FA OK badge */
+        .gh-2fa-ok { display:flex; align-items:center; gap:6px; color:#3fb950;
+          font-size:13px; font-weight:600; padding:6px 0; margin-bottom:12px; }
+
+        /* modal */
+        .gh-overlay { position:fixed; inset:0; background:rgba(1,4,9,.8);
+          display:flex; align-items:center; justify-content:center; z-index:999; padding:16px; }
+        .gh-modal { background:#161b22; border:1px solid #30363d; border-radius:6px;
+          padding:24px; max-width:440px; width:100%; box-shadow:0 8px 24px rgba(1,4,9,.5); }
+        .gh-modal-title { font-size:16px; font-weight:600; color:#e6edf3; margin:0 0 8px; }
+        .gh-modal-body { font-size:13.5px; color:#7d8590; line-height:1.6; margin:0 0 16px; }
+        .gh-modal-actions { display:flex; gap:10px; }
+        .gh-modal-actions > * { flex:1; height:34px; font-size:13.5px; }
+      `}</style>
+
+      <div className="gh-root">
+        <Navbar />
+
+        <div
+          className="gh-layout"
+          style={{ opacity: mounted ? 1 : 0, transition: 'opacity 0.3s' }}
+        >
+          {/* ===== SIDEBAR ===== */}
+          <nav className="gh-sidebar">
+            <div className="gh-sidebar-heading">User settings</div>
+
+            {SECTIONS.filter((s) => !s.danger).map((s) => (
+              <button
+                key={s.id}
+                onClick={() => { setActiveSection(s.id); setError(''); }}
+                className={`gh-nav-btn${activeSection === s.id ? ' active' : ''}`}
+              >
+                <span
+                  className="material-symbols-outlined"
+                  style={{ fontVariationSettings: activeSection === s.id ? '"FILL" 1' : '"FILL" 0' }}
                 >
-                  <span className="material-symbols-outlined text-[18px]" style={{ fontVariationSettings: active ? '"FILL" 1' : '"FILL" 0' }}>
-                    {s.icon}
-                  </span>
-                  {s.label}
-                </button>
-              );
-            })}
-          </div>
-        </nav>
+                  {s.icon}
+                </span>
+                {s.label}
+              </button>
+            ))}
 
-        {/* ── Content panel ────────────────────────────────────────────────── */}
-        <div className="glass-panel card-glow rounded-3xl border border-white/10 shadow-[0_8px_40px_rgb(0,0,0,0.08)] overflow-hidden">
+            <div className="gh-nav-divider" />
 
-          {/* ───────────── PROFILE ───────────── */}
-          {activeSection === 'profile' && (
-            <div>
-              <div className={sectionHeaderCls}>
-                <h2 className="text-xl font-bold">Public Profile</h2>
-                <p className="text-sm text-on-surface-variant mt-1">This information is displayed on your public profile page.</p>
-              </div>
-              <form onSubmit={saveProfile} className={sectionBodyCls}>
-                {/* Avatar row */}
-                <div className="flex items-center gap-5">
-                  <div
-                    className="w-20 h-20 rounded-2xl bg-gradient-to-br from-primary to-secondary flex items-center justify-center shrink-0 overflow-hidden cursor-pointer ring-2 ring-primary/20 hover:ring-primary/50 transition-all"
-                    onClick={() => avatarInputRef.current?.click()}
-                  >
-                    {user?.avatar_url
-                      ? <img src={user.avatar_url} alt="" className="w-full h-full object-cover" />
-                      : <span className="text-3xl font-extrabold text-white">{user?.username?.charAt(0).toUpperCase()}</span>
-                    }
-                  </div>
-                  <div>
-                    <p className="font-semibold text-sm mb-1">{user?.username}</p>
-                    <button
-                      type="button"
-                      onClick={() => avatarInputRef.current?.click()}
-                      className="text-sm text-primary font-semibold hover:underline"
-                    >
-                      Upload new avatar
-                    </button>
-                    <p className="text-xs text-on-surface-variant mt-0.5">JPG, PNG, GIF · Max 2 MB</p>
+            {SECTIONS.filter((s) => s.danger).map((s) => (
+              <button
+                key={s.id}
+                onClick={() => { setActiveSection(s.id); setError(''); }}
+                className={`gh-nav-btn danger${activeSection === s.id ? ' active' : ''}`}
+              >
+                <span className="material-symbols-outlined">{s.icon}</span>
+                {s.label}
+              </button>
+            ))}
+          </nav>
+
+          {/* ===== CONTENT ===== */}
+          <div style={{ display: 'flex', flexDirection: 'column', gap: 16 }}>
+
+            {/* ─── PROFILE ─────────────────────────────────────────────────── */}
+            {activeSection === 'profile' && (
+              <div className="gh-panel">
+                <SettingSection
+                  title="Public profile"
+                  description="Your profile information is visible to everyone."
+                >
+                  {/* Avatar row */}
+                  <div className="gh-avatar-row">
+                    <div className="gh-avatar" onClick={() => avatarInputRef.current?.click()} title="Upload avatar">
+                      {user?.avatar_url
+                        ? <img src={user.avatar_url} alt="" />
+                        : <span>{user?.username?.charAt(0).toUpperCase()}</span>
+                      }
+                    </div>
+                    <div>
+                      <div className="gh-avatar-name">{user?.username}</div>
+                      <span
+                        className="gh-avatar-link"
+                        onClick={() => avatarInputRef.current?.click()}
+                      >
+                        Upload a photo...
+                      </span>
+                      <div className="gh-avatar-sub">JPG, PNG, GIF or WEBP &middot; Max 5&nbsp;MB</div>
+                    </div>
                     <input
                       ref={avatarInputRef}
                       type="file"
@@ -345,488 +585,473 @@ export default function SettingsPage() {
                       onChange={(e) => { if (e.target.files?.[0]) uploadAvatar(e.target.files[0]); }}
                     />
                   </div>
-                </div>
 
-                {/* Username */}
-                <div className="space-y-1.5">
-                  <label className="block text-sm font-bold" htmlFor="set-username">Username</label>
-                  <div className="relative">
-                    <span className="absolute left-4 top-1/2 -translate-y-1/2 text-on-surface-variant text-sm select-none">pandahub.dev/</span>
-                    <input
-                      id="set-username"
-                      type="text"
-                      value={profile.username}
-                      onChange={(e) => setProfile({ ...profile, username: e.target.value.toLowerCase().replace(/[^a-z0-9-_]/g, '') })}
-                      className={`${inputCls} pl-[8.5rem]`}
-                    />
-                  </div>
-                  <p className="text-xs text-on-surface-variant">Changing your username will break existing clone URLs.</p>
-                </div>
-
-                {/* First / Last name */}
-                <div className="grid sm:grid-cols-2 gap-4">
-                  <div className="space-y-1.5">
-                    <label className="block text-sm font-bold" htmlFor="set-firstname">First Name</label>
-                    <input id="set-firstname" type="text" value={profile.first_name} onChange={(e) => setProfile({ ...profile, first_name: e.target.value })} placeholder="Ada" className={inputCls} />
-                  </div>
-                  <div className="space-y-1.5">
-                    <label className="block text-sm font-bold" htmlFor="set-lastname">Last Name</label>
-                    <input id="set-lastname" type="text" value={profile.last_name} onChange={(e) => setProfile({ ...profile, last_name: e.target.value })} placeholder="Lovelace" className={inputCls} />
-                  </div>
-                </div>
-
-                {/* Bio */}
-                <div className="space-y-1.5">
-                  <label className="block text-sm font-bold" htmlFor="set-bio">Bio</label>
-                  <textarea
-                    id="set-bio"
-                    rows={3}
-                    value={profile.bio}
-                    onChange={(e) => setProfile({ ...profile, bio: e.target.value })}
-                    placeholder="Tell the world a bit about yourself…"
-                    className={`${inputCls} resize-none`}
-                    maxLength={500}
-                  />
-                  <p className="text-xs text-on-surface-variant text-right">{profile.bio.length}/500</p>
-                </div>
-
-                {/* Website + Location */}
-                <div className="grid sm:grid-cols-2 gap-4">
-                  <div className="space-y-1.5">
-                    <label className="block text-sm font-bold" htmlFor="set-website">Website</label>
-                    <input id="set-website" type="url" value={profile.website_url} onChange={(e) => setProfile({ ...profile, website_url: e.target.value })} placeholder="https://yoursite.com" className={inputCls} />
-                  </div>
-                  <div className="space-y-1.5">
-                    <label className="block text-sm font-bold" htmlFor="set-location">Location</label>
-                    <input id="set-location" type="text" value={profile.location} onChange={(e) => setProfile({ ...profile, location: e.target.value })} placeholder="City, Country" className={inputCls} />
-                  </div>
-                </div>
-
-                {error && <ErrorBanner msg={error} />}
-
-                <div className="flex items-center gap-3 pt-2">
-                  <button type="submit" disabled={saving} id="save-profile-btn" className="btn-primary btn-ripple px-7 py-3 text-sm disabled:opacity-50">
-                    {saving ? 'Saving…' : 'Save profile'}
-                  </button>
-                  {saved && <span className="text-sm text-green-500 font-semibold animate-fade-in-up">✓ Saved!</span>}
-                </div>
-              </form>
-            </div>
-          )}
-
-          {/* ───────────── EDUCATION ───────────── */}
-          {activeSection === 'education' && (
-            <div>
-              <div className={sectionHeaderCls}>
-                <h2 className="text-xl font-bold">Education</h2>
-                <p className="text-sm text-on-surface-variant mt-1">Your academic background — shown on your public profile.</p>
-              </div>
-              <form onSubmit={saveEducation} className={sectionBodyCls}>
-                <div className="space-y-1.5">
-                  <label className="block text-sm font-bold" htmlFor="set-institution">Institution / University</label>
-                  <input
-                    id="set-institution"
-                    type="text"
-                    value={education.institution}
-                    onChange={(e) => setEducation({ ...education, institution: e.target.value })}
-                    placeholder="e.g. IIT Bombay, Stanford University"
-                    className={inputCls}
-                  />
-                </div>
-
-                <div className="grid sm:grid-cols-2 gap-4">
-                  <div className="space-y-1.5">
-                    <label className="block text-sm font-bold" htmlFor="set-degree">Degree</label>
-                    <select
-                      id="set-degree"
-                      value={education.degree}
-                      onChange={(e) => setEducation({ ...education, degree: e.target.value })}
-                      className={`${inputCls} appearance-none cursor-pointer`}
+                  <form onSubmit={saveProfile} style={{ display: 'flex', flexDirection: 'column', gap: 16 }}>
+                    {/* Username */}
+                    <FormGroup
+                      label="Username"
+                      htmlFor="set-username"
+                      hint="Changing your username will break existing clone URLs."
                     >
-                      <option value="">Select degree…</option>
-                      {DEGREES.map((d) => <option key={d} value={d}>{d}</option>)}
-                    </select>
-                  </div>
-                  <div className="space-y-1.5">
-                    <label className="block text-sm font-bold" htmlFor="set-grad-year">Graduation Year</label>
-                    <select
-                      id="set-grad-year"
-                      value={education.graduation_year}
-                      onChange={(e) => setEducation({ ...education, graduation_year: e.target.value })}
-                      className={`${inputCls} appearance-none cursor-pointer`}
-                    >
-                      <option value="">Select year…</option>
-                      {yearOptions.map((y) => <option key={y} value={y}>{y}</option>)}
-                    </select>
-                  </div>
-                </div>
-
-                <div className="space-y-1.5">
-                  <label className="block text-sm font-bold" htmlFor="set-field">Field of Study</label>
-                  <input
-                    id="set-field"
-                    type="text"
-                    value={education.field_of_study}
-                    onChange={(e) => setEducation({ ...education, field_of_study: e.target.value })}
-                    placeholder="e.g. Computer Science, Data Science, MBA"
-                    className={inputCls}
-                  />
-                </div>
-
-                {error && <ErrorBanner msg={error} />}
-
-                <div className="flex items-center gap-3 pt-2">
-                  <button type="submit" disabled={saving} id="save-education-btn" className="btn-primary btn-ripple px-7 py-3 text-sm disabled:opacity-50">
-                    {saving ? 'Saving…' : 'Save education'}
-                  </button>
-                  {saved && <span className="text-sm text-green-500 font-semibold animate-fade-in-up">✓ Saved!</span>}
-                </div>
-              </form>
-            </div>
-          )}
-
-          {/* ───────────── ACCOUNT & SECURITY ───────────── */}
-          {activeSection === 'account' && (
-            <div>
-              <div className={sectionHeaderCls}>
-                <h2 className="text-xl font-bold">Account &amp; Security</h2>
-                <p className="text-sm text-on-surface-variant mt-1">Manage your credentials and two-factor authentication.</p>
-              </div>
-              <div className={sectionBodyCls}>
-                {/* Email (read-only) */}
-                <InfoRow label="Email" value={user?.email || '—'} icon="mail" />
-                <InfoRow label="Member since" value={user?.created_at ? new Date(user.created_at).toLocaleDateString('en-US', { year: 'numeric', month: 'long', day: 'numeric' }) : '—'} icon="calendar_today" />
-                <InfoRow label="Verified" value={user?.is_verified ? 'Yes ✓' : 'No — check your email'} icon="verified_user" />
-
-                <hr className="border-outline-variant/20" />
-
-                {/* Change password */}
-                <div>
-                  <h3 className="text-base font-bold mb-4">Change Password</h3>
-                  <form onSubmit={changePassword} className="flex flex-col gap-4">
-                    {[
-                      { key: 'current_password', label: 'Current password',  placeholder: 'Enter current password' },
-                      { key: 'new_password',      label: 'New password',      placeholder: 'Minimum 8 characters' },
-                      { key: 'confirm_password',  label: 'Confirm password',  placeholder: 'Repeat new password' },
-                    ].map((f) => (
-                      <div key={f.key} className="space-y-1.5">
-                        <label className="block text-sm font-bold" htmlFor={`pwd-${f.key}`}>{f.label}</label>
+                      <div className="gh-prefix-wrap">
+                        <span className="gh-prefix">pandahub.dev/</span>
                         <input
-                          id={`pwd-${f.key}`}
-                          type="password"
-                          value={passwords[f.key as keyof typeof passwords]}
-                          onChange={(e) => setPasswords({ ...passwords, [f.key]: e.target.value })}
-                          placeholder={f.placeholder}
-                          required
-                          className={inputCls}
+                          id="set-username"
+                          type="text"
+                          value={profile.username}
+                          onChange={(e) => setProfile({ ...profile, username: e.target.value.toLowerCase().replace(/[^a-z0-9-_]/g, '') })}
+                          className={inp}
+                          style={{ paddingLeft: '120px' }}
                         />
                       </div>
-                    ))}
+                    </FormGroup>
+
+                    {/* Name */}
+                    <div className="gh-grid2">
+                      <FormGroup label="First name" htmlFor="set-firstname">
+                        <input id="set-firstname" type="text" value={profile.first_name} onChange={(e) => setProfile({ ...profile, first_name: e.target.value })} placeholder="Ada" className={inp} />
+                      </FormGroup>
+                      <FormGroup label="Last name" htmlFor="set-lastname">
+                        <input id="set-lastname" type="text" value={profile.last_name} onChange={(e) => setProfile({ ...profile, last_name: e.target.value })} placeholder="Lovelace" className={inp} />
+                      </FormGroup>
+                    </div>
+
+                    {/* Bio */}
+                    <FormGroup label="Bio" htmlFor="set-bio">
+                      <textarea
+                        id="set-bio"
+                        rows={4}
+                        value={profile.bio}
+                        onChange={(e) => setProfile({ ...profile, bio: e.target.value })}
+                        placeholder="Tell us a little bit about yourself"
+                        className="gh-textarea"
+                        maxLength={500}
+                      />
+                      <p className="gh-hint" style={{ textAlign: 'right' }}>{profile.bio.length}/500</p>
+                    </FormGroup>
+
+                    {/* Website + Location */}
+                    <div className="gh-grid2">
+                      <FormGroup label="Website" htmlFor="set-website">
+                        <input id="set-website" type="url" value={profile.website_url} onChange={(e) => setProfile({ ...profile, website_url: e.target.value })} placeholder="https://" className={inp} />
+                      </FormGroup>
+                      <FormGroup label="Location" htmlFor="set-location">
+                        <input id="set-location" type="text" value={profile.location} onChange={(e) => setProfile({ ...profile, location: e.target.value })} placeholder="City, Country" className={inp} />
+                      </FormGroup>
+                    </div>
+
                     {error && <ErrorBanner msg={error} />}
-                    <div className="flex items-center gap-3">
-                      <button type="submit" disabled={saving} className="btn-primary btn-ripple px-7 py-3 text-sm disabled:opacity-50">
-                        {saving ? 'Updating…' : 'Update password'}
+                    <div className="gh-form-actions">
+                      <button type="submit" disabled={saving} id="save-profile-btn" className="gh-btn gh-btn-primary">
+                        {saving ? 'Saving...' : 'Update profile'}
                       </button>
-                      {saved && <span className="text-sm text-green-500 font-semibold">✓ Updated!</span>}
+                      {saved && <SaveSuccess />}
                     </div>
                   </form>
+                </SettingSection>
+              </div>
+            )}
+
+            {/* ─── EDUCATION ───────────────────────────────────────────────── */}
+            {activeSection === 'education' && (
+              <div className="gh-panel">
+                <SettingSection
+                  title="Education"
+                  description="Your academic background — shown on your public profile."
+                >
+                  <form onSubmit={saveEducation} style={{ display: 'flex', flexDirection: 'column', gap: 16 }}>
+                    <FormGroup label="Institution / University" htmlFor="set-institution">
+                      <input
+                        id="set-institution"
+                        type="text"
+                        value={education.institution}
+                        onChange={(e) => setEducation({ ...education, institution: e.target.value })}
+                        placeholder="e.g. IIT Bombay, Stanford University"
+                        className={inp}
+                      />
+                    </FormGroup>
+
+                    <div className="gh-grid2">
+                      <FormGroup label="Degree" htmlFor="set-degree">
+                        <select id="set-degree" value={education.degree} onChange={(e) => setEducation({ ...education, degree: e.target.value })} className="gh-select">
+                          <option value="">Select degree...</option>
+                          {DEGREES.map((d) => <option key={d} value={d}>{d}</option>)}
+                        </select>
+                      </FormGroup>
+                      <FormGroup label="Graduation year" htmlFor="set-grad-year">
+                        <select id="set-grad-year" value={education.graduation_year} onChange={(e) => setEducation({ ...education, graduation_year: e.target.value })} className="gh-select">
+                          <option value="">Select year...</option>
+                          {yearOptions.map((y) => <option key={y} value={y}>{y}</option>)}
+                        </select>
+                      </FormGroup>
+                    </div>
+
+                    <FormGroup label="Field of study" htmlFor="set-field">
+                      <input
+                        id="set-field"
+                        type="text"
+                        value={education.field_of_study}
+                        onChange={(e) => setEducation({ ...education, field_of_study: e.target.value })}
+                        placeholder="e.g. Computer Science, Data Science"
+                        className={inp}
+                      />
+                    </FormGroup>
+
+                    {error && <ErrorBanner msg={error} />}
+                    <div className="gh-form-actions">
+                      <button type="submit" disabled={saving} id="save-education-btn" className="gh-btn gh-btn-primary">
+                        {saving ? 'Saving...' : 'Save education'}
+                      </button>
+                      {saved && <SaveSuccess />}
+                    </div>
+                  </form>
+                </SettingSection>
+              </div>
+            )}
+
+            {/* ─── ACCOUNT & SECURITY ──────────────────────────────────────── */}
+            {activeSection === 'account' && (
+              <>
+                {/* Account info */}
+                <div className="gh-panel">
+                  <SettingSection title="Account" description="Your account details.">
+                    <InfoRow label="Email address" value={user?.email || '—'} icon="mail" />
+                    <InfoRow
+                      label="Member since"
+                      value={user?.created_at ? new Date(user.created_at).toLocaleDateString('en-US', { year: 'numeric', month: 'long', day: 'numeric' }) : '—'}
+                      icon="calendar_today"
+                    />
+                    <InfoRow label="Email verified" value={user?.is_verified ? 'Verified ✓' : 'Not verified — check your inbox'} icon="verified_user" />
+                  </SettingSection>
                 </div>
 
-                <hr className="border-outline-variant/20" />
-
-                {/* 2FA */}
-                <div>
-                  <h3 className="text-base font-bold mb-2">Two-Factor Authentication</h3>
-                  {user?.two_factor_enabled ? (
-                    <div>
-                      <div className="flex items-center gap-2 mb-4 text-green-500 font-semibold text-sm">
-                        <span className="material-symbols-outlined text-[18px]" style={{ fontVariationSettings: '"FILL" 1' }}>check_circle</span>
-                        2FA is enabled
-                      </div>
-                      <form onSubmit={disableTwoFactor} className="p-5 bg-surface-container-low/40 rounded-2xl border border-outline-variant/20 flex flex-col gap-3">
-                        <p className="text-sm text-on-surface-variant">To disable 2FA, enter your password and a current 6-digit code.</p>
-                        {twoFaError && <ErrorBanner msg={twoFaError} />}
-                        <input type="password" value={disablePassword} onChange={(e) => setDisablePassword(e.target.value)} placeholder="Current password" required className={inputCls} />
-                        <input type="text" value={totpCode} onChange={(e) => setTotpCode(e.target.value.replace(/\D/g, '').slice(0, 6))} placeholder="6-digit code" required className={`${inputCls} tracking-widest font-mono`} maxLength={6} />
-                        <button type="submit" disabled={isTwoFaLoading || totpCode.length !== 6 || !disablePassword} className="self-start px-6 py-2.5 rounded-xl bg-error text-white font-bold text-sm disabled:opacity-50 transition-opacity">
-                          {isTwoFaLoading ? 'Disabling…' : 'Disable 2FA'}
+                {/* Change password */}
+                <div className="gh-panel">
+                  <SettingSection title="Change password" description="We will ask for this password whenever you sign in.">
+                    <form onSubmit={changePassword} style={{ display: 'flex', flexDirection: 'column', gap: 14 }}>
+                      {[
+                        { key: 'current_password', label: 'Current password',     placeholder: 'Your current password',  id: 'pwd-cur' },
+                        { key: 'new_password',      label: 'New password',         placeholder: 'Minimum 8 characters',   id: 'pwd-new' },
+                        { key: 'confirm_password',  label: 'Confirm new password', placeholder: 'Repeat new password',    id: 'pwd-cfm' },
+                      ].map((f) => (
+                        <FormGroup key={f.key} label={f.label} htmlFor={f.id}>
+                          <input
+                            id={f.id}
+                            type="password"
+                            value={passwords[f.key as keyof typeof passwords]}
+                            onChange={(e) => setPasswords({ ...passwords, [f.key]: e.target.value })}
+                            placeholder={f.placeholder}
+                            required
+                            className={inp}
+                          />
+                        </FormGroup>
+                      ))}
+                      {error && <ErrorBanner msg={error} />}
+                      <div className="gh-form-actions">
+                        <button type="submit" disabled={saving} className="gh-btn gh-btn-primary">
+                          {saving ? 'Updating...' : 'Update password'}
                         </button>
-                      </form>
-                    </div>
-                  ) : twoFaSetup ? (
-                    <form onSubmit={enableTwoFactor} className="p-5 bg-surface-container-low/40 rounded-2xl border border-outline-variant/20 flex flex-col gap-4">
-                      <p className="text-sm font-semibold">Scan this QR code with your authenticator app (e.g. Google Authenticator, Authy)</p>
-                      <div className="p-4 bg-white rounded-2xl inline-block border border-outline-variant/20">
-                        <QRCodeSVG value={twoFaSetup.provisioning_uri} size={150} />
-                      </div>
-                      {twoFaError && <ErrorBanner msg={twoFaError} />}
-                      <div className="space-y-1.5">
-                        <label className="block text-sm font-bold">Verify Code</label>
-                        <input type="text" value={totpCode} onChange={(e) => setTotpCode(e.target.value.replace(/\D/g, '').slice(0, 6))} placeholder="6-digit code" required className={`${inputCls} tracking-widest font-mono max-w-[200px]`} maxLength={6} />
-                      </div>
-                      <div className="flex gap-3">
-                        <button type="submit" disabled={isTwoFaLoading || totpCode.length !== 6} className="btn-primary btn-ripple px-6 py-2.5 text-sm disabled:opacity-50">
-                          {isTwoFaLoading ? 'Enabling…' : 'Enable 2FA'}
-                        </button>
-                        <button type="button" onClick={() => { setTwoFaSetup(null); setTotpCode(''); setTwoFaError(''); }} className="px-6 py-2.5 rounded-xl border border-outline-variant/30 text-sm font-semibold hover:bg-surface-container-low/50 transition-colors">
-                          Cancel
-                        </button>
+                        {saved && <SaveSuccess />}
                       </div>
                     </form>
-                  ) : (
-                    <div>
-                      <p className="text-sm text-on-surface-variant mb-4">
-                        Protect your account with an authenticator app. You&apos;ll be asked for a code each time you sign in.
-                      </p>
-                      <button onClick={setupTwoFactor} disabled={isTwoFaLoading} className="px-6 py-2.5 rounded-xl border border-outline-variant/30 text-sm font-semibold hover:bg-surface-container-low/50 transition-colors flex items-center gap-2">
-                        <span className="material-symbols-outlined text-[18px]">security</span>
-                        {isTwoFaLoading ? 'Loading…' : 'Set up two-factor authentication'}
-                      </button>
-                    </div>
-                  )}
+                  </SettingSection>
                 </div>
-              </div>
-            </div>
-          )}
 
-          {/* ───────────── ACCESS TOKENS ───────────── */}
-          {activeSection === 'tokens' && (
-            <div>
-              <div className={sectionHeaderCls}>
-                <h2 className="text-xl font-bold">Personal Access Tokens</h2>
-                <p className="text-sm text-on-surface-variant mt-1">
-                  Use tokens to authenticate with the <code className="bg-surface-container px-1.5 py-0.5 rounded text-primary text-xs">panda</code> CLI or git-over-HTTPS.
-                </p>
-              </div>
-              <div className={sectionBodyCls}>
-                {/* Create token form */}
-                <div className="p-5 bg-surface-container-low/40 rounded-2xl border border-outline-variant/20">
-                  <h3 className="text-sm font-bold mb-4 flex items-center gap-2">
-                    <span className="material-symbols-outlined text-[18px] text-primary">add_circle</span>
-                    Generate new token
-                  </h3>
-                  <form onSubmit={createToken} className="flex flex-col gap-4">
-                    <div className="space-y-1.5">
-                      <label className="block text-sm font-bold" htmlFor="token-name">Token name</label>
-                      <input id="token-name" type="text" value={newTokenName} onChange={(e) => setNewTokenName(e.target.value)} placeholder="e.g. laptop-dev, ci-pipeline" required className={inputCls} />
-                    </div>
-
-                    <div className="space-y-1.5">
-                      <label className="block text-sm font-bold">Scopes</label>
-                      <div className="flex flex-wrap gap-2">
-                        {['repo:read', 'repo:write', 'repo:admin', 'user:read'].map((scope) => (
-                          <label key={scope} className={`flex items-center gap-2 px-3 py-1.5 rounded-lg border text-xs font-semibold cursor-pointer transition-all ${newTokenScopes.includes(scope) ? 'border-primary bg-primary/10 text-primary' : 'border-outline-variant/30 text-on-surface-variant hover:border-outline-variant'}`}>
-                            <input
-                              type="checkbox"
-                              className="sr-only"
-                              checked={newTokenScopes.includes(scope)}
-                              onChange={(e) => setNewTokenScopes(e.target.checked ? [...newTokenScopes, scope] : newTokenScopes.filter((s) => s !== scope))}
-                            />
-                            {scope}
-                          </label>
-                        ))}
+                {/* 2FA */}
+                <div className="gh-panel">
+                  <SettingSection
+                    title="Two-factor authentication"
+                    description="Add an extra layer of security to your account by requiring more than just a password to sign in."
+                  >
+                    {user?.two_factor_enabled ? (
+                      <div>
+                        <div className="gh-2fa-ok">
+                          <svg width="14" height="14" viewBox="0 0 16 16" fill="currentColor">
+                            <path d="M13.78 4.22a.75.75 0 0 1 0 1.06l-7.25 7.25a.75.75 0 0 1-1.06 0L2.22 9.28a.75.75 0 0 1 1.06-1.06L6 10.94l6.72-6.72a.75.75 0 0 1 1.06 0Z" />
+                          </svg>
+                          Two-factor authentication is enabled
+                        </div>
+                        <p className="gh-hint" style={{ marginBottom: 14 }}>
+                          To disable 2FA, enter your current password and a code from your authenticator app.
+                        </p>
+                        <form onSubmit={disableTwoFactor} style={{ display: 'flex', flexDirection: 'column', gap: 12 }}>
+                          {twoFaError && <ErrorBanner msg={twoFaError} />}
+                          <FormGroup label="Confirm password" htmlFor="2fa-dis-pwd">
+                            <input id="2fa-dis-pwd" type="password" value={disablePassword} onChange={(e) => setDisablePassword(e.target.value)} placeholder="Your current password" required className={inp} />
+                          </FormGroup>
+                          <FormGroup label="Authentication code" htmlFor="2fa-dis-code">
+                            <input id="2fa-dis-code" type="text" value={totpCode} onChange={(e) => setTotpCode(e.target.value.replace(/\D/g, '').slice(0, 6))} placeholder="6-digit code" required className={inp} style={{ fontFamily: 'monospace', letterSpacing: '0.15em', maxWidth: 180 }} maxLength={6} />
+                          </FormGroup>
+                          <div>
+                            <button type="submit" disabled={isTwoFaLoading || totpCode.length !== 6 || !disablePassword} className="gh-btn gh-btn-outline-danger">
+                              {isTwoFaLoading ? 'Disabling...' : 'Disable two-factor authentication'}
+                            </button>
+                          </div>
+                        </form>
                       </div>
-                    </div>
-
-                    <div className="space-y-1.5">
-                      <label className="block text-sm font-bold" htmlFor="token-expires">Expiration</label>
-                      <select id="token-expires" value={newTokenDays} onChange={(e) => setNewTokenDays(e.target.value)} className={`${inputCls} appearance-none cursor-pointer max-w-xs`}>
-                        <option value="7">7 days</option>
-                        <option value="30">30 days</option>
-                        <option value="90">90 days</option>
-                        <option value="365">1 year</option>
-                        <option value="">No expiration</option>
-                      </select>
-                    </div>
-
-                    {tokenError && <ErrorBanner msg={tokenError} />}
-
-                    <button type="submit" disabled={tokenLoading || !newTokenName || newTokenScopes.length === 0} className="btn-primary btn-ripple self-start px-6 py-2.5 text-sm disabled:opacity-50">
-                      {tokenLoading ? 'Creating…' : 'Generate token'}
-                    </button>
-                  </form>
-
-                  {/* Newly created token — show once */}
-                  {createdToken && (
-                    <div className="mt-4 p-4 rounded-xl bg-green-500/10 border border-green-500/30">
-                      <p className="text-xs font-bold text-green-600 mb-2 flex items-center gap-1">
-                        <span className="material-symbols-outlined text-[16px]" style={{ fontVariationSettings: '"FILL" 1' }}>check_circle</span>
-                        Token created — copy it now, it won&apos;t be shown again
-                      </p>
-                      <div className="flex items-center gap-2">
-                        <code className="text-xs bg-surface-container px-3 py-2 rounded-lg flex-1 overflow-x-auto select-all font-mono break-all">{createdToken}</code>
-                        <button
-                          onClick={() => navigator.clipboard.writeText(createdToken)}
-                          className="shrink-0 p-2 rounded-lg hover:bg-surface-container-high transition-colors"
-                          title="Copy"
-                        >
-                          <span className="material-symbols-outlined text-[18px]">content_copy</span>
+                    ) : twoFaSetup ? (
+                      <form onSubmit={enableTwoFactor} style={{ display: 'flex', flexDirection: 'column', gap: 16 }}>
+                        <p className="gh-hint">
+                          Scan this QR code with your authenticator app (e.g. Google Authenticator, Authy), then enter the 6-digit code below to verify.
+                        </p>
+                        <div style={{ padding: 16, background: '#fff', borderRadius: 8, display: 'inline-block', border: '1px solid #30363d' }}>
+                          <QRCodeSVG value={twoFaSetup.provisioning_uri} size={148} />
+                        </div>
+                        {twoFaError && <ErrorBanner msg={twoFaError} />}
+                        <FormGroup label="Verify the code from the app" htmlFor="2fa-en-code">
+                          <input id="2fa-en-code" type="text" value={totpCode} onChange={(e) => setTotpCode(e.target.value.replace(/\D/g, '').slice(0, 6))} placeholder="XXXXXX" required className={inp} style={{ fontFamily: 'monospace', letterSpacing: '0.2em', maxWidth: 160 }} maxLength={6} />
+                        </FormGroup>
+                        <div style={{ display: 'flex', gap: 10 }}>
+                          <button type="submit" disabled={isTwoFaLoading || totpCode.length !== 6} className="gh-btn gh-btn-primary">
+                            {isTwoFaLoading ? 'Enabling...' : 'Enable two-factor authentication'}
+                          </button>
+                          <button type="button" onClick={() => { setTwoFaSetup(null); setTotpCode(''); setTwoFaError(''); }} className="gh-btn gh-btn-default">
+                            Cancel
+                          </button>
+                        </div>
+                      </form>
+                    ) : (
+                      <div>
+                        <p className="gh-hint" style={{ marginBottom: 14 }}>
+                          Protect your account with an authenticator app. You&apos;ll be prompted for a code each time you sign in.
+                        </p>
+                        <button onClick={setupTwoFactor} disabled={isTwoFaLoading} className="gh-btn gh-btn-default">
+                          <span className="material-symbols-outlined" style={{ fontSize: 16 }}>security</span>
+                          {isTwoFaLoading ? 'Loading...' : 'Set up two-factor authentication'}
                         </button>
                       </div>
+                    )}
+                  </SettingSection>
+                </div>
+              </>
+            )}
+
+            {/* ─── DEVELOPER SETTINGS ──────────────────────────────────────── */}
+            {activeSection === 'tokens' && (
+              <>
+                {/* Generate token */}
+                <div className="gh-panel">
+                  <SettingSection
+                    title="Personal access tokens"
+                    description="Use tokens to authenticate with the panda CLI or Git over HTTPS. Tokens work like passwords — keep them secret."
+                  >
+                    <div className="gh-box">
+                      <div className="gh-box-hdr">
+                        <svg width="14" height="14" viewBox="0 0 16 16" fill="#3fb950">
+                          <path d="M3.5 11.75a.25.25 0 0 1 .25-.25h7.5a.25.25 0 0 1 .25.25v2.5a.25.25 0 0 1-.25.25h-7.5a.25.25 0 0 1-.25-.25Zm.25-1.75a1.75 1.75 0 0 0-1.75 1.75v2.5c0 .966.784 1.75 1.75 1.75h7.5a1.75 1.75 0 0 0 1.75-1.75v-2.5A1.75 1.75 0 0 0 11.25 10H10V7.25a2.25 2.25 0 1 0-4.5 0V10Zm4.5-3.75V10h-1.5V6.25a.75.75 0 0 1 1.5 0Z" />
+                        </svg>
+                        Generate new token
+                      </div>
+                      <div className="gh-box-body">
+                        <form onSubmit={createToken} style={{ display: 'flex', flexDirection: 'column', gap: 14 }}>
+                          <FormGroup label="Token name" htmlFor="token-name" hint="What is this token for?">
+                            <input id="token-name" type="text" value={newTokenName} onChange={(e) => setNewTokenName(e.target.value)} placeholder="e.g. laptop-dev, ci-pipeline" required className={inp} />
+                          </FormGroup>
+
+                          <FormGroup label="Expiration" htmlFor="token-expires">
+                            <select id="token-expires" value={newTokenDays} onChange={(e) => setNewTokenDays(e.target.value)} className="gh-select" style={{ maxWidth: 220 }}>
+                              <option value="7">7 days</option>
+                              <option value="30">30 days</option>
+                              <option value="90">90 days</option>
+                              <option value="365">1 year</option>
+                              <option value="">No expiration</option>
+                            </select>
+                          </FormGroup>
+
+                          <FormGroup label="Scopes">
+                            <div style={{ display: 'flex', flexWrap: 'wrap', gap: 8 }}>
+                              {['repo:read', 'repo:write', 'repo:admin', 'user:read'].map((scope) => (
+                                <label
+                                  key={scope}
+                                  className={`gh-pill ${newTokenScopes.includes(scope) ? 'on' : 'off'}`}
+                                >
+                                  <input
+                                    type="checkbox"
+                                    style={{ display: 'none' }}
+                                    checked={newTokenScopes.includes(scope)}
+                                    onChange={(e) =>
+                                      setNewTokenScopes(
+                                        e.target.checked
+                                          ? [...newTokenScopes, scope]
+                                          : newTokenScopes.filter((s) => s !== scope),
+                                      )
+                                    }
+                                  />
+                                  {scope}
+                                </label>
+                              ))}
+                            </div>
+                          </FormGroup>
+
+                          {tokenError && <ErrorBanner msg={tokenError} />}
+
+                          <div>
+                            <button type="submit" disabled={tokenLoading || !newTokenName || newTokenScopes.length === 0} className="gh-btn gh-btn-primary">
+                              {tokenLoading ? 'Generating...' : 'Generate token'}
+                            </button>
+                          </div>
+                        </form>
+
+                        {createdToken && (
+                          <div className="gh-token-created">
+                            <div className="gh-token-created-lbl">
+                              Make sure to copy your personal access token now. You won&apos;t be able to see it again.
+                            </div>
+                            <div className="gh-token-row">
+                              <code className="gh-token-code">{createdToken}</code>
+                              <button className="gh-copy-btn" title="Copy to clipboard" onClick={() => navigator.clipboard.writeText(createdToken)}>
+                                <span className="material-symbols-outlined" style={{ fontSize: 16 }}>content_copy</span>
+                              </button>
+                            </div>
+                          </div>
+                        )}
+                      </div>
                     </div>
-                  )}
+                  </SettingSection>
                 </div>
 
-                {/* Token list */}
-                <div>
-                  <h3 className="text-sm font-bold mb-3 flex items-center gap-2">
-                    <span className="material-symbols-outlined text-[18px] text-on-surface-variant">list</span>
-                    Active tokens ({tokens.length})
-                  </h3>
-                  {tokens.length === 0
-                    ? <p className="text-sm text-on-surface-variant">No active tokens yet.</p>
-                    : (
-                      <div className="flex flex-col gap-2">
+                {/* Active tokens */}
+                <div className="gh-panel">
+                  <SettingSection title={`Active tokens (${tokens.length})`} description="Your existing personal access tokens.">
+                    {tokens.length === 0 ? (
+                      <p className="gh-hint">No personal access tokens yet.</p>
+                    ) : (
+                      <div className="gh-box">
                         {tokens.map((t) => (
-                          <div key={t.id} className="flex items-center justify-between p-4 rounded-xl bg-surface-container-low/40 border border-outline-variant/20">
+                          <div key={t.id} className="gh-tok-item">
                             <div>
-                              <div className="font-semibold text-sm">{t.name}</div>
-                              <div className="text-xs text-on-surface-variant mt-0.5">
-                                {t.scopes.join(', ')} ·{' '}
+                              <div className="gh-tok-name">{t.name}</div>
+                              <div className="gh-tok-meta">
+                                {t.scopes.join(', ')} &middot;{' '}
                                 {t.expires_at
                                   ? `Expires ${new Date(t.expires_at).toLocaleDateString()}`
                                   : 'Never expires'}
                               </div>
                             </div>
-                            <button
-                              onClick={() => revokeToken(t.id)}
-                              className="ml-4 text-xs font-bold text-error hover:underline px-3 py-1.5 rounded-lg hover:bg-error/10 transition-colors"
-                            >
+                            <button onClick={() => revokeToken(t.id)} className="gh-btn gh-btn-outline-danger" style={{ height: 28, padding: '0 12px', fontSize: 12 }}>
                               Revoke
                             </button>
                           </div>
                         ))}
                       </div>
-                    )
-                  }
+                    )}
+                  </SettingSection>
                 </div>
-              </div>
-            </div>
-          )}
+              </>
+            )}
 
-          {/* ───────────── NOTIFICATIONS ───────────── */}
-          {activeSection === 'notifications' && (
-            <div>
-              <div className={sectionHeaderCls}>
-                <h2 className="text-xl font-bold">Notifications</h2>
-                <p className="text-sm text-on-surface-variant mt-1">Choose what you are notified about. Preferences are saved locally.</p>
+            {/* ─── NOTIFICATIONS ───────────────────────────────────────────── */}
+            {activeSection === 'notifications' && (
+              <div className="gh-panel">
+                <SettingSection
+                  title="Notifications"
+                  description="Choose what you are notified about. Preferences are saved locally in your browser."
+                >
+                  <div>
+                    {([
+                      { key: 'commits'    as NotifKey, label: 'Push commits',          detail: 'When someone pushes to a repository you own or watch' },
+                      { key: 'issues'     as NotifKey, label: 'New issues',            detail: 'When someone opens a new issue in your repository' },
+                      { key: 'pr_reviews' as NotifKey, label: 'Pull request reviews', detail: 'Review requests and approvals on your pull requests' },
+                      { key: 'pr_merges'  as NotifKey, label: 'Pull request merges',  detail: 'When a pull request is merged or closed' },
+                      { key: 'mentions'   as NotifKey, label: 'Mentions',             detail: 'When someone @mentions you in a comment or review' },
+                      { key: 'stars'      as NotifKey, label: 'Stars',                detail: 'When someone stars one of your repositories' },
+                      { key: 'followers'  as NotifKey, label: 'New followers',        detail: 'When someone starts following your profile' },
+                    ] as { key: NotifKey; label: string; detail: string }[]).map((item) => {
+                      const on = notifPrefs[item.key];
+                      return (
+                        <div key={item.key} className="gh-toggle-row">
+                          <div>
+                            <div className="gh-toggle-lbl">{item.label}</div>
+                            <div className="gh-toggle-desc">{item.detail}</div>
+                          </div>
+                          <button
+                            id={`notif-toggle-${item.key}`}
+                            role="switch"
+                            aria-checked={on}
+                            className={`gh-toggle ${on ? 'on' : 'off'}`}
+                            onClick={() => {
+                              const next = { ...notifPrefs, [item.key]: !on };
+                              setNotifPrefs(next);
+                              localStorage.setItem('pandahub_notif_prefs', JSON.stringify(next));
+                            }}
+                          >
+                            <div className="gh-toggle-thumb" />
+                          </button>
+                        </div>
+                      );
+                    })}
+                  </div>
+                </SettingSection>
               </div>
-              <div className="px-8 py-7 flex flex-col divide-y divide-outline-variant/20">
-                {([
-                  { key: 'commits'    as NotifKey, label: 'Push commits to your repository', detail: 'When someone pushes to a repo you own' },
-                  { key: 'issues'     as NotifKey, label: 'New issues',                      detail: 'When someone opens a new issue' },
-                  { key: 'pr_reviews' as NotifKey, label: 'Pull request reviews',            detail: 'Review requests and approvals' },
-                  { key: 'pr_merges'  as NotifKey, label: 'Pull request merges',             detail: 'When a PR is merged or closed' },
-                  { key: 'mentions'   as NotifKey, label: 'Mentions',                        detail: 'When someone @mentions you' },
-                  { key: 'stars'      as NotifKey, label: 'Stars',                           detail: 'When someone stars your repository' },
-                  { key: 'followers'  as NotifKey, label: 'New followers',                   detail: 'When someone follows your profile' },
-                ] as { key: NotifKey; label: string; detail: string }[]).map((item) => {
-                  const on = notifPrefs[item.key];
-                  return (
-                    <div key={item.key} className="flex items-center justify-between py-4">
+            )}
+
+            {/* ─── DANGER ZONE ─────────────────────────────────────────────── */}
+            {activeSection === 'danger' && (
+              <div className="gh-panel">
+                <SettingSection
+                  title="Danger zone"
+                  description="These actions are permanent and cannot be undone."
+                >
+                  <div className="gh-danger-box">
+                    <div className="gh-danger-box-hdr">Irreversible and destructive actions</div>
+                    <div className="gh-danger-item">
                       <div>
-                        <div className="text-sm font-semibold">{item.label}</div>
-                        <div className="text-xs text-on-surface-variant mt-0.5">{item.detail}</div>
+                        <div className="gh-danger-ttl">Delete this account</div>
+                        <div className="gh-danger-sub">
+                          Once you delete your account, there is no going back. All your repositories and data will be permanently deleted.
+                        </div>
                       </div>
                       <button
-                        id={`notif-toggle-${item.key}`}
-                        role="switch"
-                        aria-checked={on}
-                        onClick={() => {
-                          const next = { ...notifPrefs, [item.key]: !on };
-                          setNotifPrefs(next);
-                          localStorage.setItem('pandahub_notif_prefs', JSON.stringify(next));
-                        }}
-                        className={`w-11 h-6 rounded-full relative transition-colors shrink-0 focus:outline-none focus:ring-2 focus:ring-primary/50 cursor-pointer ${on ? 'bg-primary' : 'bg-surface-container-high'}`}
+                        onClick={() => setShowDeleteModal(true)}
+                        className="gh-btn gh-btn-outline-danger"
+                        style={{ flexShrink: 0 }}
                       >
-                        <div className={`w-[18px] h-[18px] rounded-full bg-white absolute top-[3px] transition-all shadow ${on ? 'left-[23px]' : 'left-[3px]'}`} />
+                        Delete account
                       </button>
                     </div>
-                  );
-                })}
-              </div>
-            </div>
-          )}
-
-          {/* ───────────── DANGER ZONE ───────────── */}
-          {activeSection === 'danger' && (
-            <div>
-              <div className={sectionHeaderCls}>
-                <h2 className="text-xl font-bold text-error">Danger Zone</h2>
-                <p className="text-sm text-on-surface-variant mt-1">These actions are irreversible. Proceed with extreme caution.</p>
-              </div>
-              <div className={sectionBodyCls}>
-                <div className="p-5 rounded-2xl border border-error/30 flex items-center justify-between gap-6">
-                  <div>
-                    <h3 className="font-bold text-error mb-1">Delete account</h3>
-                    <p className="text-sm text-on-surface-variant">Permanently removes your account, all repositories, and all associated data.</p>
                   </div>
-                  <button
-                    onClick={() => setShowDeleteModal(true)}
-                    className="shrink-0 px-5 py-2.5 rounded-xl bg-error text-white font-bold text-sm hover:bg-error/90 transition-colors"
-                  >
-                    Delete account
-                  </button>
-                </div>
+                </SettingSection>
               </div>
-            </div>
-          )}
-        </div>
-      </div>
+            )}
 
-      {/* Delete confirmation modal */}
-      {showDeleteModal && (
-        <div className="fixed inset-0 bg-black/60 backdrop-blur-sm flex items-center justify-center z-50 p-4">
-          <div className="glass-panel rounded-3xl p-8 max-w-md w-full shadow-[0_30px_80px_rgba(0,0,0,0.3)] border border-white/10">
-            <h3 className="text-xl font-bold text-error mb-3">Delete your account?</h3>
-            <p className="text-sm text-on-surface-variant mb-5 leading-relaxed">
-              This will permanently delete your account and all associated data. Type{' '}
-              <strong className="text-on-surface">{user?.username}</strong> to confirm.
-            </p>
-            <input
-              type="text"
-              value={deleteConfirm}
-              onChange={(e) => setDeleteConfirm(e.target.value)}
-              placeholder={user?.username}
-              className={`${inputCls} mb-5`}
-            />
-            <div className="flex gap-3">
-              <button onClick={() => setShowDeleteModal(false)} className="flex-1 py-3 rounded-xl border border-outline-variant/30 font-semibold text-sm hover:bg-surface-container-low/50 transition-colors">
-                Cancel
-              </button>
-              <button
-                disabled={deleteConfirm !== user?.username}
-                onClick={() => { clearAuth(); router.push('/'); }}
-                className="flex-1 py-3 rounded-xl bg-error text-white font-bold text-sm disabled:opacity-40 disabled:cursor-not-allowed hover:bg-error/90 transition-colors"
-              >
-                Delete account
-              </button>
+          </div>{/* /content */}
+        </div>{/* /layout */}
+
+        {/* ─── DELETE CONFIRMATION MODAL ───────────────────────────────────── */}
+        {showDeleteModal && (
+          <div className="gh-overlay">
+            <div className="gh-modal">
+              <h3 className="gh-modal-title">Are you absolutely sure?</h3>
+              <p className="gh-modal-body">
+                This action <strong style={{ color: '#e6edf3' }}>cannot be undone</strong>. This will permanently delete your account,
+                all your repositories, issues, pull requests, and all associated data.
+                <br /><br />
+                Please type <strong style={{ color: '#e6edf3' }}>{user?.username}</strong> to confirm.
+              </p>
+              <input
+                type="text"
+                value={deleteConfirm}
+                onChange={(e) => setDeleteConfirm(e.target.value)}
+                placeholder={user?.username}
+                className={inp}
+                style={{ marginBottom: 16 }}
+              />
+              <div className="gh-modal-actions">
+                <button onClick={() => setShowDeleteModal(false)} className="gh-btn gh-btn-default">
+                  Cancel
+                </button>
+                <button
+                  disabled={deleteConfirm !== user?.username}
+                  onClick={() => { clearAuth(); router.push('/'); }}
+                  className="gh-btn gh-btn-danger"
+                >
+                  Delete this account
+                </button>
+              </div>
             </div>
           </div>
-        </div>
-      )}
-    </main>
-  );
-}
-
-// ─── Small helper components ──────────────────────────────────────────────────
-function ErrorBanner({ msg }: { msg: string }) {
-  return (
-    <div className="flex items-center gap-2 p-3 rounded-xl bg-error/10 border border-error/30 text-error text-sm font-medium">
-      <span className="material-symbols-outlined text-[18px]">error</span>
-      {msg}
-    </div>
-  );
-}
-
-function InfoRow({ label, value, icon }: { label: string; value: string; icon: string }) {
-  return (
-    <div className="flex items-center justify-between py-2">
-      <div className="flex items-center gap-2 text-sm text-on-surface-variant">
-        <span className="material-symbols-outlined text-[18px]">{icon}</span>
-        {label}
-      </div>
-      <span className="text-sm font-semibold text-on-surface">{value}</span>
-    </div>
+        )}
+      </div>{/* /gh-root */}
+    </>
   );
 }

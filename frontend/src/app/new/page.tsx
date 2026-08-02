@@ -5,6 +5,7 @@ import Link from 'next/link';
 import api from '@/lib/api';
 import { Repository } from '@/types';
 import { useAuthStore } from '@/store/authStore';
+import QuickSetup from '@/components/repo/QuickSetup';
 
 export default function NewRepoPage() {
   const router = useRouter();
@@ -17,6 +18,7 @@ export default function NewRepoPage() {
   });
   const [error, setError] = useState('');
   const [loading, setLoading] = useState(false);
+  const [createdRepo, setCreatedRepo] = useState<Repository | null>(null);
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
@@ -24,7 +26,7 @@ export default function NewRepoPage() {
     setLoading(true);
     try {
       const { data } = await api.post<Repository>('/repos', form);
-      router.push(`/${user?.username}/${data.name}`);
+      setCreatedRepo(data);
     } catch (err: any) {
       const detail = err?.response?.data?.detail;
       // Pydantic 422 errors return detail as an array of {msg, loc} objects;
@@ -38,6 +40,51 @@ export default function NewRepoPage() {
       setLoading(false);
     }
   };
+
+  // ── Post-creation quick setup screen ────────────────────────────────────
+  if (createdRepo) {
+    return (
+      <main className="min-h-screen text-on-surface bg-background font-body transition-colors duration-300 relative">
+        <div className="fixed top-[-20%] left-[-10%] w-[50%] h-[50%] rounded-full bg-primary-container/5 blur-[120px] pointer-events-none" />
+        <div className="fixed bottom-[-20%] right-[-10%] w-[40%] h-[40%] rounded-full bg-secondary-container/10 blur-[100px] pointer-events-none" />
+
+        <header className="bg-surface/80 backdrop-blur-2xl w-full h-16 sticky top-0 z-50 border-b border-outline-variant/20 shadow-sm flex items-center px-6 gap-3">
+          <Link href={`/${user?.username}/${createdRepo.name}`} className="flex items-center gap-2 text-on-surface-variant hover:text-on-surface transition-colors font-medium text-sm">
+            <span className="material-symbols-outlined text-[18px]">arrow_back</span>
+            {user?.username}/{createdRepo.name}
+          </Link>
+        </header>
+
+        <div className="max-w-3xl mx-auto px-6 py-10">
+          {/* Success banner */}
+          <div style={{
+            display: 'flex', alignItems: 'center', gap: 12,
+            background: 'rgba(63,185,80,0.08)', border: '1px solid rgba(63,185,80,0.35)',
+            borderRadius: 6, padding: '12px 18px', marginBottom: 24, color: '#3fb950',
+            fontFamily: "-apple-system,BlinkMacSystemFont,'Segoe UI',Helvetica,Arial,sans-serif",
+          }}>
+            <svg width="18" height="18" viewBox="0 0 16 16" fill="currentColor">
+              <path d="M13.78 4.22a.75.75 0 0 1 0 1.06l-7.25 7.25a.75.75 0 0 1-1.06 0L2.22 9.28a.75.75 0 0 1 1.06-1.06L6 10.94l6.72-6.72a.75.75 0 0 1 1.06 0Z" />
+            </svg>
+            <span style={{ fontWeight: 600, fontSize: 14 }}>
+              Repository <strong>{user?.username}/{createdRepo.name}</strong> created successfully!
+            </span>
+            <Link
+              href={`/${user?.username}/${createdRepo.name}`}
+              style={{
+                marginLeft: 'auto', color: '#58a6ff', fontSize: 13, fontWeight: 600,
+                textDecoration: 'none', whiteSpace: 'nowrap',
+              }}
+            >
+              Go to repository &rarr;
+            </Link>
+          </div>
+
+          <QuickSetup owner={user?.username ?? ''} repoName={createdRepo.name} />
+        </div>
+      </main>
+    );
+  }
 
   return (
     <main className="min-h-screen text-on-surface bg-background font-body transition-colors duration-300 relative">

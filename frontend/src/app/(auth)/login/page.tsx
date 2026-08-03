@@ -232,7 +232,7 @@ function LoginPageContent() {
 <div className="space-y-1">
 <div className="flex items-center justify-between ml-1">
 <label className="block text-xs font-medium text-on-surface-variant font-label tracking-wide" htmlFor="password">Password</label>
-{isLogin && <a className="text-xs font-medium text-primary hover:text-primary-fixed transition-colors" href="#">Forgot password?</a>}
+{isLogin && <a className="text-xs font-medium text-primary hover:text-primary-fixed transition-colors" href="/reset-password">Forgot password?</a>}
 </div>
 <div className="relative">
 <div className="absolute inset-y-0 left-0 pl-4 flex items-center pointer-events-none text-outline">

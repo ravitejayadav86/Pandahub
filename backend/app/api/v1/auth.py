@@ -132,7 +132,7 @@ async def change_password(
     db: AsyncSession = Depends(get_db),
     current_user: User = Depends(get_current_active_user),
 ):
-    await auth_service.change_password(db, current_user, payload.current_password, payload.new_password)
+    await auth_service.change_password(db, current_user, payload.new_password)
 
 
 # ---------------------------------------------------------------------------

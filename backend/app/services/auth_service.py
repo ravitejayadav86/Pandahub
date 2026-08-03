@@ -258,9 +258,12 @@ async def confirm_password_reset(db: AsyncSession, token: str, new_password: str
     await db.commit()
 
 
-async def change_password(db: AsyncSession, user: User, current_password: str, new_password: str) -> None:
-    if user.hashed_password is None or not verify_password(current_password, user.hashed_password):
-        raise AuthError("Current password is incorrect", status.HTTP_400_BAD_REQUEST)
+async def change_password(db: AsyncSession, user: User, new_password: str) -> None:
+    """Set a new password for *user* without requiring the current one.
+
+    All existing refresh tokens are revoked so any other active sessions
+    (e.g., stolen tokens) are immediately invalidated after a password change.
+    """
     user.hashed_password = hash_password(new_password)
     await db.execute(delete(RefreshToken).where(RefreshToken.user_id == user.id))
     await db.commit()

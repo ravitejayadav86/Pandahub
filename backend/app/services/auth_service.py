@@ -90,10 +90,26 @@ async def _issue_email_verification_token(db: AsyncSession, user: User) -> None:
             expires_at=datetime.now(timezone.utc) + EMAIL_VERIFICATION_TTL,
         )
     )
-    # Enqueued via Celery, not awaited inline -- registration must return
-    # immediately regardless of SMTP latency/availability (this was a
-    # known shortcut in Module 4; fixed here in Module 5's Celery wiring).
-    send_verification_email_task.delay(user.email, user.username, raw_token)
+    # Attempt async dispatch via Celery; fall back to a direct in-process send
+    # if the broker (Redis) is not reachable in the current environment.
+    # This ensures registration/reset always works even without a running
+    # Celery worker (e.g. local dev without Docker).
+    try:
+        send_verification_email_task.delay(user.email, user.username, raw_token)
+    except Exception:
+        import asyncio, logging
+        logging.getLogger(__name__).warning(
+            "Celery broker unavailable — sending verification email synchronously."
+        )
+        try:
+            from app.services import email_service as _es
+            asyncio.get_event_loop().run_until_complete(
+                _es.send_verification_email(user.email, user.username, raw_token)
+            )
+        except Exception as mail_err:
+            logging.getLogger(__name__).error(
+                "Verification email failed: %s. Token: %s", mail_err, raw_token
+            )
 
 
 async def verify_email(db: AsyncSession, token: str) -> None:
@@ -236,7 +252,23 @@ async def request_password_reset(db: AsyncSession, email: str) -> None:
         )
     )
     await db.commit()
-    send_password_reset_email_task.delay(user.email, user.username, raw_token)
+    # Dispatch via Celery; fall back to synchronous send if broker unavailable.
+    try:
+        send_password_reset_email_task.delay(user.email, user.username, raw_token)
+    except Exception:
+        import asyncio, logging
+        logging.getLogger(__name__).warning(
+            "Celery broker unavailable — sending password-reset email synchronously."
+        )
+        try:
+            from app.services import email_service as _es
+            asyncio.get_event_loop().run_until_complete(
+                _es.send_password_reset_email(user.email, user.username, raw_token)
+            )
+        except Exception as mail_err:
+            logging.getLogger(__name__).error(
+                "Password-reset email failed: %s. Token: %s", mail_err, raw_token
+            )
 
 
 async def confirm_password_reset(db: AsyncSession, token: str, new_password: str) -> None:

@@ -97,7 +97,8 @@ async def _issue_email_verification_token(db: AsyncSession, user: User) -> None:
     try:
         send_verification_email_task.delay(user.email, user.username, raw_token)
     except Exception:
-        import asyncio, logging
+        import asyncio
+        import logging
         logging.getLogger(__name__).warning(
             "Celery broker unavailable — sending verification email synchronously."
         )
@@ -256,7 +257,8 @@ async def request_password_reset(db: AsyncSession, email: str) -> None:
     try:
         send_password_reset_email_task.delay(user.email, user.username, raw_token)
     except Exception:
-        import asyncio, logging
+        import asyncio
+        import logging
         logging.getLogger(__name__).warning(
             "Celery broker unavailable — sending password-reset email synchronously."
         )

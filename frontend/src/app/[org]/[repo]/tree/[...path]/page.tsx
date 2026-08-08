@@ -1,4 +1,4 @@
-﻿'use client';
+'use client';
 import { useState, useEffect } from 'react';
 import { useParams, useRouter } from 'next/navigation';
 import Link from 'next/link';
@@ -14,13 +14,18 @@ export default function TreePage() {
   const owner = params.org;
   const repoName = params.repo;
   const pathSegments = params.path || [];
-  const currentPath = pathSegments.join('/');
   const router = useRouter();
 
   const { repo } = useRepo(owner, repoName);
   const { branches } = useBranches(owner, repoName);
-  const [selectedBranch, setSelectedBranch] = useState('');
-  const ref = selectedBranch || repo?.default_branch || 'main';
+
+  // The FIRST url segment after /tree/ is the branch/ref, everything
+  // after that is the file/folder path. handleNavigate below builds URLs
+  // in exactly this shape (/tree/{ref}/{path}), so parsing must match it.
+  const refFromUrl = pathSegments[0];
+  const restSegments = pathSegments.slice(1);
+  const currentPath = restSegments.join('/');
+  const ref = refFromUrl || repo?.default_branch || 'main';
 
   // Check if current path is a blob or tree
   const [viewType, setViewType] = useState<'tree' | 'blob'>('tree');
@@ -32,11 +37,15 @@ export default function TreePage() {
     router.push(`/${owner}/${repoName}/tree/${ref}/${path}`);
   };
 
+  const handleBranchChange = (newBranch: string) => {
+    router.push(`/${owner}/${repoName}/tree/${newBranch}${currentPath ? `/${currentPath}` : ''}`);
+  };
+
   const breadcrumbs = [
     { label: repoName, path: `/${owner}/${repoName}` },
-    ...pathSegments.map((seg, i) => ({
+    ...restSegments.map((seg, i) => ({
       label: seg,
-      path: `/${owner}/${repoName}/tree/${ref}/${pathSegments.slice(0, i + 1).join('/')}`,
+      path: `/${owner}/${repoName}/tree/${ref}/${restSegments.slice(0, i + 1).join('/')}`,
     })),
   ];
 
@@ -51,10 +60,10 @@ export default function TreePage() {
         {/* Branch + Path Bar */}
         <div style={{ display: 'flex', alignItems: 'center', gap: 12, marginBottom: 20, flexWrap: 'wrap' }}>
           <div style={{ position: 'relative' }}>
-            <select value={selectedBranch || ref} onChange={e => setSelectedBranch(e.target.value)}
+            <select value={ref} onChange={e => handleBranchChange(e.target.value)}
               style={{ padding: '7px 32px 7px 12px', borderRadius: 8, border: '1px solid var(--border-color)', fontSize: 13, fontWeight: 600, background: '#fff', cursor: 'pointer', outline: 'none', fontFamily: 'Inter, sans-serif', appearance: 'none' }}>
               {branches.map(b => <option key={b.name} value={b.name}>{b.name}</option>)}
-              {branches.length === 0 && <option>{ref}</option>}
+              {branches.length === 0 && <option value={ref}>{ref}</option>}
             </select>
             <span className="material-symbols-outlined" style={{ position: 'absolute', right: 8, top: '50%', transform: 'translateY(-50%)', fontSize: 14, color: 'var(--text-muted)', pointerEvents: 'none' }}>expand_more</span>
           </div>

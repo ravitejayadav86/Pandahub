@@ -12,7 +12,7 @@ import { useAuthStore } from '@/store/authStore'
 import Navbar from '@/components/shared/Navbar'
 import ChatBox from '@/components/shared/ChatBox'
 
-// ── Types ──────────────────────────────────────────────────────────────────
+// â”€â”€ Types â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
 interface UserProfile {
   id: string
   username: string
@@ -42,7 +42,7 @@ interface Repository {
 
 type TabType = 'overview' | 'repositories' | 'projects' | 'packages' | 'stars'
 
-// ── Component ──────────────────────────────────────────────────────────────
+// â”€â”€ Component â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
 export default function UserProfilePage() {
   const params = useParams()
   const org = params.org as string
@@ -161,7 +161,7 @@ export default function UserProfilePage() {
   const filteredRepos = repos.filter(r => r.name.toLowerCase().includes(repoSearch.toLowerCase()))
   const pinnedRepos = repos.sort((a, b) => b.star_count - a.star_count).slice(0, 6)
 
-  // ── Tabs rendering ───────────────────────────────────────────────────────
+  // â”€â”€ Tabs rendering â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
   const TABS = [
     { id: 'overview', label: 'Overview', icon: Book },
     { id: 'repositories', label: 'Repositories', icon: BookMarked, count: repos.length },
@@ -174,7 +174,7 @@ export default function UserProfilePage() {
     <div className="min-h-screen bg-white dark:bg-[#0d1117] flex flex-col font-sans text-[#24292f] dark:text-[#c9d1d9]">
       <Navbar />
       
-      {/* ── Sticky Tab Bar ── */}
+      {/* â”€â”€ Sticky Tab Bar â”€â”€ */}
       <div className="sticky top-[60px] z-40 bg-white dark:bg-[#0d1117] border-b border-slate-200 dark:border-slate-800 mt-6">
         <div className="max-w-[1280px] w-full mx-auto px-4 md:px-8 flex items-end">
           <div className="hidden md:block w-[296px] shrink-0 mr-6" /> {/* Spacer for sidebar */}
@@ -209,7 +209,7 @@ export default function UserProfilePage() {
 
       <main className="flex-1 max-w-[1280px] w-full mx-auto px-4 md:px-8 py-8 flex flex-col md:flex-row gap-8">
         
-        {/* ── Left Sidebar ── */}
+        {/* â”€â”€ Left Sidebar â”€â”€ */}
         <div className="w-full md:w-[296px] shrink-0 -mt-10 md:mt-0 relative z-10">
           <div className="relative w-full max-w-[296px] aspect-square rounded-full border border-slate-200 dark:border-slate-700 overflow-hidden bg-white dark:bg-slate-800 mb-4 shadow-sm z-10">
             {profile.avatar_url ? (
@@ -300,7 +300,7 @@ export default function UserProfilePage() {
           </div>
         </div>
 
-        {/* ── Main Content Area ── */}
+        {/* â”€â”€ Main Content Area â”€â”€ */}
         <div className="flex-1 min-w-0">
           
           {activeTab === 'overview' && (
@@ -315,7 +315,7 @@ export default function UserProfilePage() {
                   {pinnedRepos.length > 0 ? pinnedRepos.map(repo => (
                     <div key={repo.id} className="p-4 border border-slate-200 dark:border-slate-700 rounded-lg bg-white dark:bg-[#0d1117] flex flex-col shadow-sm">
                       <div className="flex items-center justify-between mb-2">
-                        <Link href={`/${profile.username}/${repo.name}`} className="font-semibold text-[15px] text-[#0969da] dark:text-[#58a6ff] hover:underline flex items-center gap-2">
+                        <Link href={`/${profile.username}/${repo.name}/tree`} className="font-semibold text-[15px] text-[#0969da] dark:text-[#58a6ff] hover:underline flex items-center gap-2">
                           <BookMarked className="w-4 h-4 text-slate-500" />
                           {repo.name}
                         </Link>
@@ -398,7 +398,7 @@ export default function UserProfilePage() {
                     <div key={repo.id} className="py-6 flex justify-between">
                       <div>
                         <div className="flex items-center gap-2 mb-1">
-                          <Link href={`/${profile.username}/${repo.name}`} className="text-xl font-semibold text-[#0969da] dark:text-[#58a6ff] hover:underline">
+                          <Link href={`/${profile.username}/${repo.name}/tree`} className="text-xl font-semibold text-[#0969da] dark:text-[#58a6ff] hover:underline">
                             {repo.name}
                           </Link>
                           <span className="text-xs font-medium text-slate-500 border border-slate-200 dark:border-slate-700 rounded-full px-2 py-0.5">

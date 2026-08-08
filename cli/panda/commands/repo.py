@@ -42,7 +42,7 @@ def repo_create(
     username = config.get_username() or "<username>"
     click.secho(f"Created {username}/{name}", fg="green")
     click.echo(
-        f"  Clone URL: https://pandahub-backend.onrender.com/git/{username}/{name}.git"
+        f"  Clone URL: https://pandahub.onrender.com/git/{username}/{name}.git"
     )
 
 

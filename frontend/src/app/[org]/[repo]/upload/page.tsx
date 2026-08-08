@@ -57,8 +57,7 @@ export default function UploadFilesPage() {
     const items = e.dataTransfer.items;
     if (items) {
       const droppedFiles: File[] = [];
-      for (let i = 0; i < items.length; i++) {
-        const item = items[i];
+      for (const item of items) {
         if (item.kind === 'file') {
           const f = item.getAsFile();
           if (f) droppedFiles.push(f);
@@ -122,7 +121,7 @@ export default function UploadFilesPage() {
 
   const repoBase = `/${owner}/${repoName}`;
 
-  // ── Success screen ─────────────────────────────────────────────────────────
+  // â”€â”€ Success screen â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
   if (result) {
     return (
       <main style={styles.root}>
@@ -164,7 +163,7 @@ export default function UploadFilesPage() {
     );
   }
 
-  // ── Upload form ────────────────────────────────────────────────────────────
+  // â”€â”€ Upload form â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
   return (
     <main style={styles.root}>
       <PageHeader owner={owner} repoName={repoName} repoBase={repoBase} />
@@ -255,7 +254,7 @@ export default function UploadFilesPage() {
                     style={{ background: 'none', border: 'none', cursor: 'pointer', color: '#7d8590', padding: '2px 4px', borderRadius: 4, lineHeight: 1 }}
                     title="Remove"
                   >
-                    ×
+                    Ã—
                   </button>
                 </div>
               ))}
@@ -337,7 +336,7 @@ export default function UploadFilesPage() {
   );
 }
 
-// ── Sub-components ────────────────────────────────────────────────────────────
+// â”€â”€ Sub-components â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
 
 function PageHeader({ owner, repoName, repoBase }: { owner: string; repoName: string; repoBase: string }) {
   return (
@@ -367,7 +366,7 @@ function PageHeader({ owner, repoName, repoBase }: { owner: string; repoName: st
   );
 }
 
-// ── Shared styles ─────────────────────────────────────────────────────────────
+// â”€â”€ Shared styles â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
 
 const styles = {
   root: {

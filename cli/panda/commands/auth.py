@@ -113,7 +113,7 @@ def token_create(name: str, scopes: str, expires_in_days: int | None):
     username = config.get_username() or "<username>"
     click.echo(
         f'  git remote add origin https://{username}:<TOKEN>@'
-        f'pandahub-backend.onrender.com/git/{username}/<repo-name>.git'
+        f'pandahub.onrender.com/git/{username}/<repo-name>.git'
     )
 
 

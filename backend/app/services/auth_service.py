@@ -97,16 +97,14 @@ async def _issue_email_verification_token(db: AsyncSession, user: User) -> None:
     try:
         send_verification_email_task.delay(user.email, user.username, raw_token)
     except Exception:
-        import asyncio
         import logging
         logging.getLogger(__name__).warning(
             "Celery broker unavailable — sending verification email synchronously."
         )
         try:
             from app.services import email_service as _es
-            asyncio.get_event_loop().run_until_complete(
-                _es.send_verification_email(user.email, user.username, raw_token)
-            )
+            print(f"DEV LOCAL LINK: http://localhost:3001/verify-email?token={raw_token}", flush=True)
+            await _es.send_verification_email(user.email, user.username, raw_token)
         except Exception as mail_err:
             logging.getLogger(__name__).error(
                 "Verification email failed: %s. Token: %s", mail_err, raw_token
@@ -257,16 +255,14 @@ async def request_password_reset(db: AsyncSession, email: str) -> None:
     try:
         send_password_reset_email_task.delay(user.email, user.username, raw_token)
     except Exception:
-        import asyncio
         import logging
         logging.getLogger(__name__).warning(
             "Celery broker unavailable — sending password-reset email synchronously."
         )
         try:
             from app.services import email_service as _es
-            asyncio.get_event_loop().run_until_complete(
-                _es.send_password_reset_email(user.email, user.username, raw_token)
-            )
+            print(f"DEV LOCAL LINK: http://localhost:3001/reset-password?token={raw_token}", flush=True)
+            await _es.send_password_reset_email(user.email, user.username, raw_token)
         except Exception as mail_err:
             logging.getLogger(__name__).error(
                 "Password-reset email failed: %s. Token: %s", mail_err, raw_token

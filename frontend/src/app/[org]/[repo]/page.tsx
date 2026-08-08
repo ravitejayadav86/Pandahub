@@ -49,6 +49,7 @@ export default function RepoDashboardPage() {
   // Repo metadata from API
   const [repoMeta, setRepoMeta] = useState<RepoMeta | null>(null);
   const [starring, setStarring] = useState(false);
+  const [showDeployModal, setShowDeployModal] = useState(false);
 
   useEffect(() => {
     setMounted(true);
@@ -243,13 +244,13 @@ export default function RepoDashboardPage() {
               <span className="material-symbols-outlined">history</span>
             </Link>
 
-            {/* "Deploy" — coming soon tooltip */}
+            {/* Deploy */}
             <button
-              title="Deployments (coming soon)"
-              className="px-4 py-2 bg-slate-50 border border-slate-200 rounded-lg text-sm font-semibold text-slate-400 cursor-not-allowed"
-              disabled
+              title="Deploy this repository"
+              onClick={() => setShowDeployModal(true)}
+              className="px-4 py-2 bg-slate-900 border border-slate-700 rounded-lg text-sm font-semibold text-white hover:bg-slate-800 transition-colors"
             >
-              Deploy
+              🚀 Deploy
             </button>
 
             {/* Profile Dropdown */}
@@ -370,10 +371,11 @@ export default function RepoDashboardPage() {
               <h3 className="font-bold mb-4">Quick Links</h3>
               <div className="flex flex-col gap-2">
                 {[
-                  { label: 'Issues',        href: `${repoBase}/issues`,  icon: 'adjust',   color: 'text-red-500' },
-                  { label: 'Pull Requests', href: `${repoBase}/pulls`,   icon: 'alt_route', color: 'text-green-600' },
-                  { label: 'Commits',       href: `${repoBase}/commits`, icon: 'commit',   color: 'text-blue-500' },
+                  { label: 'Issues',        href: `${repoBase}/issues`,  icon: 'adjust',      color: 'text-red-500' },
+                  { label: 'Pull Requests', href: `${repoBase}/pulls`,   icon: 'alt_route',   color: 'text-green-600' },
+                  { label: 'Commits',       href: `${repoBase}/commits`, icon: 'commit',      color: 'text-blue-500' },
                   { label: 'File Tree',     href: `${repoBase}/tree`,    icon: 'folder_open', color: 'text-amber-500' },
+                  { label: 'Upload files',  href: `${repoBase}/upload`,  icon: 'upload_file', color: 'text-violet-500' },
                 ].map(l => (
                   <Link
                     key={l.label}
@@ -515,6 +517,94 @@ export default function RepoDashboardPage() {
 
         </div>
       </main>
+
+      {/* ── Deploy Modal ── */}
+      {showDeployModal && (
+        <div
+          style={{
+            position: 'fixed', inset: 0, background: 'rgba(1,4,9,.85)',
+            display: 'flex', alignItems: 'center', justifyContent: 'center',
+            zIndex: 999, padding: 16, fontFamily: "-apple-system,BlinkMacSystemFont,'Segoe UI',Helvetica,Arial,sans-serif",
+          }}
+          onClick={(e) => { if (e.target === e.currentTarget) setShowDeployModal(false); }}
+        >
+          <div style={{
+            background: '#161b22', border: '1px solid #30363d', borderRadius: 6,
+            padding: 28, maxWidth: 520, width: '100%', boxShadow: '0 8px 24px rgba(1,4,9,.6)',
+          }}>
+            <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', marginBottom: 20 }}>
+              <h3 style={{ margin: 0, fontSize: 18, fontWeight: 700, color: '#e6edf3' }}>🚀 Deploy this repository</h3>
+              <button onClick={() => setShowDeployModal(false)} style={{ background: 'none', border: 'none', cursor: 'pointer', color: '#7d8590', fontSize: 20, lineHeight: 1 }}>×</button>
+            </div>
+            <p style={{ color: '#7d8590', fontSize: 13, margin: '0 0 20px' }}>
+              Choose a platform to deploy <strong style={{ color: '#e6edf3' }}>{owner}/{repoName}</strong>. These services will pull your code directly from the repository.
+            </p>
+
+            {[
+              {
+                name: 'Render',
+                desc: 'Web services, workers, databases — auto-deploy on push',
+                color: '#46E3B7',
+                bg: '#1a2e2a',
+                icon: '▲',
+                url: `https://render.com/deploy`,
+              },
+              {
+                name: 'Railway',
+                desc: 'Instant deployments with zero config',
+                color: '#7B68EE',
+                bg: '#1e1a2e',
+                icon: '🚂',
+                url: `https://railway.app/new`,
+              },
+              {
+                name: 'Vercel',
+                desc: 'Frontend & serverless — optimised for Next.js',
+                color: '#e6edf3',
+                bg: '#1c1c1c',
+                icon: '▼',
+                url: `https://vercel.com/new`,
+              },
+            ].map((p) => (
+              <a
+                key={p.name}
+                href={p.url}
+                target="_blank"
+                rel="noopener noreferrer"
+                style={{
+                  display: 'flex', alignItems: 'center', gap: 14, padding: '14px 16px',
+                  background: p.bg, border: '1px solid #30363d', borderRadius: 6,
+                  marginBottom: 10, textDecoration: 'none', transition: 'border-color .15s',
+                }}
+                onMouseEnter={(e) => (e.currentTarget.style.borderColor = p.color)}
+                onMouseLeave={(e) => (e.currentTarget.style.borderColor = '#30363d')}
+              >
+                <span style={{ fontSize: 24, width: 36, textAlign: 'center', flexShrink: 0 }}>{p.icon}</span>
+                <div style={{ flex: 1 }}>
+                  <div style={{ fontWeight: 700, fontSize: 14, color: p.color }}>{p.name}</div>
+                  <div style={{ fontSize: 12, color: '#7d8590', marginTop: 2 }}>{p.desc}</div>
+                </div>
+                <svg width="14" height="14" viewBox="0 0 16 16" fill="#7d8590">
+                  <path d="M3.75 2h3.5a.75.75 0 0 1 0 1.5h-3.5a.25.25 0 0 0-.25.25v8.5c0 .138.112.25.25.25h8.5a.25.25 0 0 0 .25-.25v-3.5a.75.75 0 0 1 1.5 0v3.5A1.75 1.75 0 0 1 12.25 14h-8.5A1.75 1.75 0 0 1 2 12.25v-8.5C2 2.784 2.784 2 3.75 2Zm6.854-1h4.146a.25.25 0 0 1 .25.25v4.146a.25.25 0 0 1-.427.177L13.03 4.03 9.28 7.78a.751.751 0 0 1-1.042-.018.751.751 0 0 1-.018-1.042l3.75-3.75-1.543-1.543A.25.25 0 0 1 10.604 1Z" />
+                </svg>
+              </a>
+            ))}
+
+            <div style={{
+              background: '#0d1117', border: '1px solid #21262d', borderRadius: 6,
+              padding: '12px 14px', marginTop: 16,
+            }}>
+              <p style={{ color: '#7d8590', fontSize: 12, margin: '0 0 6px', fontWeight: 600 }}>🐼 panda CLI</p>
+              <code style={{
+                fontFamily: "'SFMono-Regular',Consolas,'Liberation Mono',Menlo,monospace",
+                fontSize: 12, color: '#58a6ff',
+              }}>
+                panda deploy --repo {owner}/{repoName} --platform render
+              </code>
+            </div>
+          </div>
+        </div>
+      )}
     </div>
   );
 }

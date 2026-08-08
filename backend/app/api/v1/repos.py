@@ -37,7 +37,8 @@ from __future__ import annotations
 import uuid
 from typing import Annotated, Optional
 
-from fastapi import APIRouter, Depends, Query, status
+from fastapi import APIRouter, Depends, File, Form, Query, UploadFile, status
+from typing import List as _List
 from sqlalchemy import select
 from sqlalchemy.ext.asyncio import AsyncSession
 
@@ -350,6 +351,154 @@ async def get_readme(
     if readme is None:
         raise NotFoundError("No README file found in this repository.")
     return readme
+
+
+# ---------------------------------------------------------------------------
+# File upload (web-based commit)
+# ---------------------------------------------------------------------------
+
+class UploadCommitOut(RepositoryOut.__class__.__bases__[0] if False else object):
+    """Minimal response after a web file upload commit."""
+    pass
+
+
+from pydantic import BaseModel
+
+
+class FileUploadResult(BaseModel):
+    """Returned after a successful web upload commit."""
+    commit_sha: str
+    branch: str
+    files_committed: int
+
+
+@router.post(
+    "/{owner}/{repo}/git/upload",
+    response_model=FileUploadResult,
+    status_code=status.HTTP_201_CREATED,
+    summary="Upload files and create a commit",
+)
+async def upload_files(
+    repository: Repository = Depends(get_repository),
+    current_user: User = Depends(get_current_active_user),
+    _perm: PermissionLevel = Depends(
+        require_repo_permission(PermissionLevel.WRITE, allow_anonymous=False)
+    ),
+    files: _List[UploadFile] = File(..., description="Files to commit"),
+    branch: str = Form("main", description="Target branch name"),
+    message: str = Form("Upload files via PandaHub", description="Commit message"),
+    target_path: str = Form("", description="Directory path inside repo (e.g. 'src/utils')"),
+) -> FileUploadResult:
+    """
+    Accept one or more files via multipart upload and commit them to *branch*
+    using pygit2.
+
+    - The files are placed under *target_path* inside the repository tree.
+    - If *branch* does not exist, it is created from HEAD (or as an orphan
+      if the repository is empty).
+    - Returns the new commit SHA.
+    """
+    import pygit2  # noqa: PLC0415
+
+    disk_path = repository.disk_path
+    repo_git = pygit2.Repository(disk_path)
+
+    # ── Build a map of {git_path: bytes} from the upload ─────────────────
+    file_blobs: dict[str, bytes] = {}
+    for upload in files:
+        raw = await upload.read()
+        # Normalise the target path prefix
+        rel_name = upload.filename or "upload"
+        if target_path:
+            git_path = f"{target_path.strip('/')}/{rel_name}"
+        else:
+            git_path = rel_name
+        file_blobs[git_path] = raw
+
+    if not file_blobs:
+        from fastapi import HTTPException  # noqa: PLC0415
+        raise HTTPException(status_code=400, detail="No files provided.")
+
+    # ── Resolve parent commit (if any) ────────────────────────────────────
+    parent_commits: list = []
+    base_tree: pygit2.Tree | None = None
+
+    if not repo_git.is_empty:
+        try:
+            ref_obj = repo_git.lookup_reference(f"refs/heads/{branch}")
+            parent_commit = repo_git.get(ref_obj.target)
+            parent_commits = [parent_commit.id]
+            base_tree = parent_commit.tree
+        except KeyError:
+            # Branch does not exist yet — start from HEAD
+            try:
+                head_commit = repo_git.head.peel(pygit2.Commit)
+                parent_commits = [head_commit.id]
+                base_tree = head_commit.tree
+            except pygit2.GitError:
+                pass
+
+    # ── Build a new tree by layering blobs on top of the base tree ────────
+    tb = repo_git.TreeBuilder(base_tree) if base_tree else repo_git.TreeBuilder()
+
+    for git_path, content in file_blobs.items():
+        parts = git_path.split("/")
+        # For nested paths we recurse; for flat paths this is a direct insert
+        _insert_blob(repo_git, tb, parts, content)
+
+    new_tree_oid = tb.write()
+
+    # ── Create the commit ─────────────────────────────────────────────────
+    author_name = current_user.full_name or current_user.username
+    author_email = current_user.email
+    sig = pygit2.Signature(author_name, author_email)
+
+    commit_oid = repo_git.create_commit(
+        f"refs/heads/{branch}",
+        sig,
+        sig,
+        message,
+        new_tree_oid,
+        parent_commits,
+    )
+
+    return FileUploadResult(
+        commit_sha=str(commit_oid),
+        branch=branch,
+        files_committed=len(file_blobs),
+    )
+
+
+def _insert_blob(
+    repo: "pygit2.Repository",
+    tb: "pygit2.TreeBuilder",
+    parts: list[str],
+    content: bytes,
+) -> None:
+    """Recursively insert a blob for *parts* path into tree builder *tb*."""
+    import pygit2  # noqa: PLC0415
+
+    if len(parts) == 1:
+        blob_oid = repo.create_blob(content)
+        tb.insert(parts[0], blob_oid, pygit2.GIT_FILEMODE_BLOB)
+        return
+
+    # Has subdirectory — get or create a subtree builder
+    subtree_entry = None
+    try:
+        subtree_entry = tb.get(parts[0])
+    except KeyError:
+        pass
+
+    if subtree_entry and subtree_entry.type_str == "tree":
+        existing_tree = repo.get(subtree_entry.id)
+        sub_tb = repo.TreeBuilder(existing_tree)
+    else:
+        sub_tb = repo.TreeBuilder()
+
+    _insert_blob(repo, sub_tb, parts[1:], content)
+    sub_oid = sub_tb.write()
+    tb.insert(parts[0], sub_oid, pygit2.GIT_FILEMODE_TREE)
 
 
 # ---------------------------------------------------------------------------

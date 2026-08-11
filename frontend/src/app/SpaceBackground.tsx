@@ -41,7 +41,7 @@ const mouse = {
   radius: 250,
   isMoving: false,
 };
-let mouseTimeout: number;
+let mouseTimeout: ReturnType<typeof setTimeout>;
     let scrollY = 0;
 
     const getColors = (): string[] => {
@@ -58,7 +58,7 @@ let mouseTimeout: number;
         vx: 0,
         vy: 0,
         alpha: Math.random() * 0.5 + 0.2,
-        color: colors[Math.floor(Math.random() * colors.length)]
+        color: colors[Math.floor(Math.random() * colors.length)]!
       }));
     };
 

@@ -1,4 +1,4 @@
-﻿"""panda.commands.auth — login, logout, whoami, and PAT management."""
+"""panda.commands.auth â€” login, logout, whoami, and PAT management."""
 from __future__ import annotations
 
 import getpass
@@ -7,6 +7,7 @@ import click
 
 from panda.core import config
 from panda.core.api_client import ApiError, request
+from panda.core.gitutil import ensure_credential_helper
 
 
 @click.command()
@@ -45,7 +46,9 @@ def login(username: str | None):
             raise SystemExit(1)
 
     config.save_tokens(data["access_token"], data["refresh_token"], username)
+    ensure_credential_helper()
     click.secho(f"Logged in as {username}.", fg="green")
+    click.secho("Git is now configured to auto-authenticate with PandaHub.", fg="cyan")
 
 
 @click.command()
@@ -107,7 +110,7 @@ def token_create(name: str, scopes: str, expires_in_days: int | None):
         click.secho(f"Error: {exc.detail}", fg="red")
         raise SystemExit(1)
 
-    click.secho("Token created — copy it now, it won't be shown again:", fg="yellow")
+    click.secho("Token created â€” copy it now, it won't be shown again:", fg="yellow")
     click.echo(data["token"])
     click.echo("\nUse it like this:")
     username = config.get_username() or "<username>"

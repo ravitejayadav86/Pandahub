@@ -77,3 +77,12 @@ def clear_tokens() -> None:
 
 def is_logged_in() -> bool:
     return get_access_token() is not None
+
+def get_git_token() -> Optional[str]:
+    return load_config().get("git_token")
+
+
+def save_git_token(token: str) -> None:
+    config = load_config()
+    config["git_token"] = token
+    save_config(config)

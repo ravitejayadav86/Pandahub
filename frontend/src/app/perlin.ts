@@ -19,8 +19,8 @@ const PERMUTATION = [
 // Generate a permutation table of 512 entries
 const p = new Uint8Array(512);
 for (let i = 0; i < 256; i++) {
-  p[i] = PERMUTATION[i];
-  p[i + 256] = p[i];
+  p[i] = PERMUTATION[i]!;
+  p[i + 256] = p[i]!;
 }
 
 function fade(t: number): number {
@@ -48,10 +48,10 @@ export function sample(x: number, y: number, scale: number = 0.003): { dx: numbe
   const u = fade(xf);
   const v = fade(yf);
 
-  const aa = p[p[X] + Y];
-  const ab = p[p[X] + Y + 1];
-  const ba = p[p[X + 1] + Y];
-  const bb = p[p[X + 1] + Y + 1];
+  const aa = p[p[X]! + Y]!;
+  const ab = p[p[X]! + Y + 1]!;
+  const ba = p[p[X + 1]! + Y]!;
+  const bb = p[p[X + 1]! + Y + 1]!;
 
   const x1 = lerp(grad(aa, xf, yf), grad(ba, xf - 1, yf), u);
   const x2 = lerp(grad(ab, xf, yf - 1), grad(bb, xf - 1, yf - 1), u);

@@ -718,7 +718,6 @@ export default function HomePage() {
                 {/* Neo progress indicator */}
                 <div
                   className="w-full h-1 rounded-full overflow-hidden" style={{ background: "rgba(255,255,255,0.05)" }}
-                  style={{ background: 'var(--neo-bg)' }}
                 >
                   <div
                     className="h-full rounded-full animate-gradient"

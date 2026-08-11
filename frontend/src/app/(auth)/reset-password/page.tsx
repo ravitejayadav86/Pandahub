@@ -36,7 +36,7 @@ function RequestResetStep({
     <div className="p-8 sm:p-10">
       <div className="flex flex-col items-center mb-8">
         <div
-          className="skeu-icon-badge w-14 h-14 flex items-center justify-center mb-5"
+          className="rounded-xl glass-layer-2 border border-[var(--glass-border)] w-14 h-14 flex items-center justify-center mb-5"
           style={{ background: 'linear-gradient(145deg, #1a9aff 0%, #0055cc 100%)' }}
         >
           <span
@@ -91,7 +91,7 @@ function RequestResetStep({
         <button
           type="submit"
           disabled={loading}
-          className="skeu-btn-primary btn-ripple w-full flex justify-center items-center gap-2 py-4 rounded-xl font-bold text-sm mt-2 disabled:opacity-50 disabled:cursor-not-allowed"
+          className="btn-glass border border-[var(--glass-border)] btn-ripple w-full flex justify-center items-center gap-2 py-4 rounded-xl font-bold text-sm mt-2 disabled:opacity-50 disabled:cursor-not-allowed"
         >
           {loading ? (
             <>
@@ -127,7 +127,7 @@ function EmailSentStep({ email }: { email: string }) {
         className="w-20 h-20 rounded-full flex items-center justify-center mb-6"
         style={{
           background: 'rgba(34,197,94,0.12)',
-          boxShadow: '0 0 32px rgba(34,197,94,0.25), 8px 8px 18px var(--neo-shadow-d), -8px -8px 18px var(--neo-shadow-l)',
+          boxShadow: '0 0 32px rgba(34,197,94,0.25), 8px 8px 18px rgba(0,0,0,0.1), -8px -8px 18px rgba(255,255,255,0.05)',
         }}
       >
         <span
@@ -244,7 +244,7 @@ function SetNewPasswordStep({ token }: { token: string }) {
     <div className="p-8 sm:p-10">
       <div className="flex flex-col items-center mb-8">
         <div
-          className="skeu-icon-badge w-14 h-14 flex items-center justify-center mb-5"
+          className="rounded-xl glass-layer-2 border border-[var(--glass-border)] w-14 h-14 flex items-center justify-center mb-5"
           style={{ background: 'linear-gradient(145deg, #a855f7 0%, #6d28d9 100%)' }}
         >
           <span
@@ -312,7 +312,7 @@ function SetNewPasswordStep({ token }: { token: string }) {
                   <div
                     key={i}
                     className="h-1 flex-1 rounded-full transition-all duration-400"
-                    style={{ background: i <= strength ? strengthColor : 'var(--neo-shadow-d)' }}
+                    style={{ background: i <= strength ? strengthColor : 'rgba(0,0,0,0.1)' }}
                   />
                 ))}
               </div>
@@ -375,7 +375,7 @@ function SetNewPasswordStep({ token }: { token: string }) {
         <button
           type="submit"
           disabled={loading || password.length < 8 || password !== confirm}
-          className="skeu-btn-primary btn-ripple w-full flex justify-center items-center gap-2 py-4 rounded-xl font-bold text-sm mt-2 disabled:opacity-50 disabled:cursor-not-allowed"
+          className="btn-glass border border-[var(--glass-border)] btn-ripple w-full flex justify-center items-center gap-2 py-4 rounded-xl font-bold text-sm mt-2 disabled:opacity-50 disabled:cursor-not-allowed"
         >
           {loading ? (
             <>
@@ -441,7 +441,7 @@ function ResetPasswordContent() {
       <header className="fixed top-0 w-full z-50 flex justify-between items-center px-6 py-5 max-w-7xl mx-auto left-0 right-0">
         <a href="/" className="flex items-center gap-2.5 group">
           <div
-            className="skeu-icon-badge w-9 h-9 flex items-center justify-center transition-transform duration-300 group-hover:rotate-12"
+            className="rounded-xl glass-layer-2 border border-[var(--glass-border)] w-9 h-9 flex items-center justify-center transition-transform duration-300 group-hover:rotate-12"
             style={{ background: 'linear-gradient(145deg, #1a9aff 0%, #0055cc 100%)' }}
           >
             <span

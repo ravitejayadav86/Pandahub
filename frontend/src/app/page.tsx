@@ -79,70 +79,50 @@ function RevealOnScroll({ children, className = '', delay = 0 }: {
 }
 
 /* ═══════════════════════════════════════════════════════
-   SKEUOMORPHIC MACINTOSH WINDOW
+   MINIMALIST GLASS WINDOW
 ═══════════════════════════════════════════════════════ */
-function SkeuWindow({ children }: { children: React.ReactNode }) {
+function GlassWindow({ children }: { children: React.ReactNode }) {
   return (
     <div
-      className="rounded-2xl overflow-hidden"
+      className="rounded-2xl overflow-hidden glass-layer-2 relative"
       style={{
-        background: 'linear-gradient(160deg, #1c2232 0%, #141824 100%)',
-        boxShadow: `
-          inset 0 1px 0 rgba(255,255,255,0.14),
-          inset 0 -1px 0 rgba(0,0,0,0.4),
-          inset 1px 0 0 rgba(255,255,255,0.06),
-          0 32px 80px rgba(0,0,0,0.45),
-          0 12px 32px rgba(0,0,0,0.35),
-          0 4px 10px rgba(0,0,0,0.3)
-        `,
-        border: '1px solid rgba(255,255,255,0.08)',
+        border: '1px solid var(--glass-border)',
+        boxShadow: '0 8px 32px rgba(0,0,0,0.2)',
       }}
     >
-      {/* Titlebar — skeuomorphic metal */}
+      {/* Titlebar — Minimalist */}
       <div
-        className="flex items-center px-4 py-3 gap-3 relative overflow-hidden"
+        className="flex items-center px-4 py-3 gap-3 relative"
         style={{
-          background: 'linear-gradient(180deg, #2d3348 0%, #1e2438 50%, #181e2e 100%)',
-          borderBottom: '1px solid rgba(0,0,0,0.5)',
-          boxShadow: 'inset 0 1px 0 rgba(255,255,255,0.12)',
+          background: 'rgba(255,255,255,0.02)',
+          borderBottom: '1px solid var(--glass-border)',
         }}
       >
-        {/* Sheen stripe */}
-        <div
-          className="absolute inset-0 pointer-events-none"
-          style={{
-            background: 'linear-gradient(90deg, transparent 0%, rgba(255,255,255,0.03) 50%, transparent 100%)',
-          }}
-        />
-        {/* Traffic lights — skeuomorphic spheres */}
-        {[
-          { color: '#FF5F57', glow: '#ff3d33', shadow: '#c0392b' },
-          { color: '#FEBC2E', glow: '#f0a800', shadow: '#c88c00' },
-          { color: '#28C840', glow: '#18b030', shadow: '#128020' },
-        ].map(({ color, glow, shadow }) => (
-          <div
-            key={color}
-            className="w-3 h-3 rounded-full relative flex-shrink-0"
-            style={{
-              background: `radial-gradient(circle at 35% 35%, ${glow} 0%, ${color} 50%, ${shadow} 100%)`,
-              boxShadow: `0 1px 3px rgba(0,0,0,0.5), inset 0 1px 0 rgba(255,255,255,0.4), 0 0 6px ${color}55`,
-            }}
-          />
-        ))}
+        {/* Minimalist dots */}
+        <div className="flex gap-2">
+          {[
+            { color: 'rgba(255,255,255,0.2)' },
+            { color: 'rgba(255,255,255,0.2)' },
+            { color: 'rgba(255,255,255,0.2)' },
+          ].map(({ color }, i) => (
+            <div
+              key={i}
+              className="w-2.5 h-2.5 rounded-full"
+              style={{ background: color }}
+            />
+          ))}
+        </div>
         {/* Address bar */}
-        <div
-          className="flex-grow flex justify-center"
-        >
+        <div className="flex-grow flex justify-center">
           <div
-            className="px-5 py-1 rounded-md text-xs text-slate-400 font-mono flex items-center gap-2"
+            className="px-4 py-1 rounded-md text-[11px] text-slate-400 font-mono flex items-center gap-2 tracking-wider"
             style={{
-              background: 'rgba(0,0,0,0.35)',
-              boxShadow: 'inset 1px 1px 3px rgba(0,0,0,0.5), inset -1px -1px 2px rgba(255,255,255,0.05)',
-              border: '1px solid rgba(255,255,255,0.06)',
+              background: 'rgba(0,0,0,0.2)',
+              border: '1px solid rgba(255,255,255,0.05)',
             }}
           >
-            <span className="material-symbols-outlined" style={{ fontSize: 13, color: '#64D2FF' }}>account_tree</span>
-            architecture.txt — PandaHub
+            <span className="material-symbols-outlined text-[13px] opacity-70">account_tree</span>
+            architecture.txt
           </div>
         </div>
       </div>
@@ -152,7 +132,7 @@ function SkeuWindow({ children }: { children: React.ReactNode }) {
 }
 
 /* ═══════════════════════════════════════════════════════
-   SKEUOMORPHIC APP ICON
+   MINIMALIST APP ICON
 ═══════════════════════════════════════════════════════ */
 function AppIcon({ icon, color, gradient }: {
   icon: string;
@@ -161,16 +141,15 @@ function AppIcon({ icon, color, gradient }: {
 }) {
   return (
     <div
-      className="skeu-icon-badge w-14 h-14 flex items-center justify-center relative"
-      style={{ background: gradient }}
+      className="w-12 h-12 flex items-center justify-center rounded-xl glass-layer-2"
+      style={{ border: '1px solid var(--glass-border)' }}
     >
       <span
-        className="material-symbols-outlined relative z-10"
+        className="material-symbols-outlined"
         style={{
-          fontSize: 28,
-          color: 'white',
-          fontVariationSettings: '"FILL" 1',
-          filter: 'drop-shadow(0 2px 4px rgba(0,0,0,0.35))',
+          fontSize: 24,
+          color: color || 'white',
+          opacity: 0.9
         }}
       >
         {icon}
@@ -216,10 +195,7 @@ function MobileBottomNav({ active = 0 }: { active?: number }) {
               background: activeIdx === i
                 ? 'rgba(10,132,255,0.12)'
                 : 'transparent',
-              boxShadow: activeIdx === i
-                ? '4px 4px 10px var(--neo-shadow-d), -4px -4px 10px var(--neo-shadow-l)'
-                : 'none',
-              transform: activeIdx === i ? 'translateY(-1px)' : 'none',
+              boxShadow: 'none',
             }}
           >
             <span
@@ -391,10 +367,10 @@ export default function HomePage() {
             >
               <div className="flex items-center gap-2.5 text-lg font-black tracking-tight" style={{ color: 'var(--text-primary)' }}>
                 <div
-                  className="skeu-icon-badge w-8 h-8 flex items-center justify-center"
-                  style={{ background: 'linear-gradient(135deg, #1a9aff, #0055cc)' }}
+                  className="w-8 h-8 flex items-center justify-center rounded-lg glass-layer-2"
+                  style={{ border: '1px solid var(--glass-border)' }}
                 >
-                  <span className="material-symbols-outlined" style={{ fontSize: 16, color: 'white', fontVariationSettings: '"FILL" 1' }}>cloud_sync</span>
+                  <span className="material-symbols-outlined" style={{ fontSize: 16, color: 'var(--color-primary)' }}>cloud_sync</span>
                 </div>
                 PandaHub
               </div>
@@ -428,7 +404,7 @@ export default function HomePage() {
               <div className="my-3" style={{ borderTop: '1px solid var(--glass-border)' }} />
               <a
                 href="/login"
-                className="skeu-btn-primary btn-ripple flex items-center justify-center gap-2 px-5 py-3.5 rounded-2xl font-bold text-sm"
+                className="btn-glass flex items-center justify-center gap-2 px-5 py-3.5 rounded-2xl font-bold text-sm border"
                 onClick={() => setMobileMenuOpen(false)}
               >
                 <span className="material-symbols-outlined text-[18px]">login</span>
@@ -457,16 +433,8 @@ export default function HomePage() {
         <div className="flex justify-between items-center w-full px-4 sm:px-6 py-3 sm:py-4 max-w-7xl mx-auto">
           {/* Logo — Skeuomorphic badge */}
           <div className="flex items-center gap-2.5 cursor-pointer group">
-            <div
-              className="skeu-icon-badge w-9 h-9 flex items-center justify-center transition-transform duration-300 group-hover:rotate-12"
-              style={{ background: 'linear-gradient(145deg, #1a9aff 0%, #0055cc 100%)' }}
-            >
-              <span
-                className="material-symbols-outlined"
-                style={{ fontSize: 18, color: 'white', fontVariationSettings: '"FILL" 1', filter: 'drop-shadow(0 1px 3px rgba(0,0,0,0.4))' }}
-              >
-                cloud_sync
-              </span>
+            <div className="w-9 h-9 flex items-center justify-center rounded-lg glass-layer-2 transition-transform duration-300 group-hover:rotate-12" style={{ border: '1px solid var(--glass-border)' }}>
+              <span className="material-symbols-outlined" style={{ fontSize: 18, color: 'var(--color-primary)' }}>cloud_sync</span>
             </div>
             <span className="text-xl font-black tracking-tight" style={{ color: 'var(--text-primary)' }}>PandaHub</span>
           </div>
@@ -519,7 +487,7 @@ export default function HomePage() {
             </a>
             <a
               href="/login"
-              className="skeu-btn-primary btn-ripple px-4 sm:px-5 py-2 rounded-xl font-bold text-sm tracking-wide inline-flex items-center gap-2"
+              className="btn-glass border btn-ripple px-4 sm:px-5 py-2 rounded-xl font-bold text-sm tracking-wide inline-flex items-center gap-2"
             >
               Get Started
               <span className="material-symbols-outlined" style={{ fontSize: 16 }}>arrow_forward</span>
@@ -593,7 +561,7 @@ export default function HomePage() {
         <div className="animate-fade-in-up-delay-3 flex flex-col sm:flex-row gap-4 w-full sm:w-auto">
           <a
             href="/login"
-            className="skeu-btn-primary btn-ripple px-8 py-4 rounded-2xl font-bold text-base tracking-wide w-full sm:w-auto flex items-center justify-center gap-2 group min-h-[52px]"
+            className="btn-glass border btn-ripple px-8 py-4 rounded-2xl font-bold text-base tracking-wide w-full sm:w-auto flex items-center justify-center gap-2 group min-h-[52px]"
           >
             Get Started Free
             <span className="material-symbols-outlined transition-transform duration-300 group-hover:translate-x-1.5" style={{ fontSize: 20 }}>
@@ -630,7 +598,7 @@ export default function HomePage() {
           CODE WINDOW — Skeuomorphism
       ═══════════════════════════════════════════════ */}
       <RevealOnScroll className="w-full max-w-5xl mx-auto px-4 sm:px-6 mb-32 relative z-10">
-        <SkeuWindow>
+        <GlassWindow>
           <div
             className="p-5 sm:p-7 md:p-8 font-mono text-xs sm:text-sm overflow-x-auto"
             style={{
@@ -679,7 +647,7 @@ export default function HomePage() {
               </code>
             </pre>
           </div>
-        </SkeuWindow>
+        </GlassWindow>
       </RevealOnScroll>
 
       {/* ═══════════════════════════════════════════════
@@ -727,7 +695,7 @@ export default function HomePage() {
             },
           ].map(({ icon, title, subtitle, desc, gradient, glowColor }, i) => (
             <RevealOnScroll key={title} delay={i * 100} className="flex-none w-[84vw] md:w-auto snap-center">
-              <TiltCard className="neo-card p-7 flex flex-col gap-5 cursor-default h-full">
+              <TiltCard className="glass-layer-2 rounded-2xl border border-[var(--glass-border)] p-7 flex flex-col gap-5 cursor-default h-full">
                 {/* Skeuomorphic app icon */}
                 <AppIcon icon={icon} color="#fff" gradient={gradient} />
 
@@ -749,7 +717,7 @@ export default function HomePage() {
 
                 {/* Neo progress indicator */}
                 <div
-                  className="w-full h-1 rounded-full neo-inset overflow-hidden"
+                  className="w-full h-1 rounded-full overflow-hidden" style={{ background: "rgba(255,255,255,0.05)" }}
                   style={{ background: 'var(--neo-bg)' }}
                 >
                   <div
@@ -844,7 +812,7 @@ export default function HomePage() {
           {/* 2. Dual Storage — Neomorphism */}
           <RevealOnScroll delay={80} className="lg:col-span-4">
             <div
-              className="neo-card p-7 rounded-3xl flex flex-col h-full"
+              className="glass-layer-2 rounded-2xl border border-[var(--glass-border)] p-7 rounded-3xl flex flex-col h-full"
               style={{ background: 'var(--neo-bg)' }}
             >
               <div className="flex items-center gap-3 mb-4">
@@ -1019,7 +987,7 @@ export default function HomePage() {
             <div className="flex flex-col sm:flex-row gap-4 justify-center">
               <a
                 href="/login"
-                className="skeu-btn-primary btn-ripple px-8 py-4 rounded-2xl font-bold text-base tracking-wide inline-flex items-center justify-center gap-2 group"
+                className="btn-glass border btn-ripple px-8 py-4 rounded-2xl font-bold text-base tracking-wide inline-flex items-center justify-center gap-2 group"
               >
                 Start for Free
                 <span className="material-symbols-outlined transition-transform duration-300 group-hover:translate-x-1.5" style={{ fontSize: 20 }}>

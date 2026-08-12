@@ -65,12 +65,37 @@ app.include_router(pulls.router, prefix=settings.API_V1_PREFIX)
 app.include_router(orgs.router, prefix=settings.API_V1_PREFIX)
 app.include_router(startups.router, prefix=settings.API_V1_PREFIX)
 app.include_router(messages.router, prefix=f"{settings.API_V1_PREFIX}/messages", tags=["messages"])
-# Git transport routes are NOT under /api/v1 — they use the /git/ prefix
+# Git transport routes are NOT under /api/v1 â€” they use the /git/ prefix
 # that nginx routes separately (proxy_request_buffering off, long timeouts).
 # The .git URL convention is a well-known client expectation that must not
 # be nested under /api/v1.
 app.include_router(git.router)
 app.include_router(ws.router)
+
+
+@app.get("/_debug/git-check", include_in_schema=False)
+def _debug_git_check():
+    import shutil
+    import subprocess
+    import os
+
+    git_path = shutil.which("git")
+    backend_path = "/usr/lib/git-core/git-http-backend"
+
+    try:
+        git_version = subprocess.run(
+            ["git", "--version"], capture_output=True, text=True, timeout=5
+        ).stdout.strip()
+    except Exception as exc:
+        git_version = f"ERROR: {exc}"
+
+    return {
+        "git_which": git_path,
+        "git_version": git_version,
+        "http_backend_exists": os.path.exists(backend_path),
+        "http_backend_path": backend_path,
+        "PATH_env": os.environ.get("PATH", ""),
+    }
 
 
 @app.get("/health", tags=["system"])

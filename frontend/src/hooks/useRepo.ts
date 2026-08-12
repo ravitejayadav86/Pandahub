@@ -12,7 +12,7 @@ export function useRepo(owner: string, repoName: string) {
     setLoading(true);
     setError(null);
     try {
-      const { data } = await api.get<Repository>(`/repos/${owner}/${repoName}`);
+      const { data } = await api.get<Repository>(`/${owner}/${repoName}`);
       setRepo(data);
     } catch (e: any) {
       setError(e?.response?.data?.detail ?? 'Failed to load repository');
@@ -34,7 +34,7 @@ export function useBranches(owner: string, repoName: string) {
     if (!owner || !repoName) return;
     setLoading(true);
     try {
-      const { data } = await api.get<Branch[]>(`/repos/${owner}/${repoName}/branches`);
+      const { data } = await api.get<Branch[]>(`/${owner}/${repoName}/branches`);
       setBranches(data);
     } catch (e: any) {
       setError(e?.response?.data?.detail ?? 'Failed to load branches');
@@ -56,8 +56,8 @@ export function useTree(owner: string, repoName: string, ref: string, path?: str
     if (!owner || !repoName || !ref) return;
     setLoading(true);
     const url = path
-      ? `/repos/${owner}/${repoName}/git/tree/${ref}/${path}`
-      : `/repos/${owner}/${repoName}/git/tree/${ref}`;
+      ? `/${owner}/${repoName}/git/tree/${ref}/${path}`
+      : `/${owner}/${repoName}/git/tree/${ref}`;
     api.get<TreeEntry[]>(url)
       .then(({ data }) => setEntries(data))
       .catch((e: any) => setError(e?.response?.data?.detail ?? 'Failed to load tree'))
@@ -75,7 +75,7 @@ export function useBlob(owner: string, repoName: string, ref: string, path: stri
   useEffect(() => {
     if (!owner || !repoName || !ref || !path) return;
     setLoading(true);
-    api.get<BlobContent>(`/repos/${owner}/${repoName}/git/blob/${ref}/${path}`)
+    api.get<BlobContent>(`/${owner}/${repoName}/git/blob/${ref}/${path}`)
       .then(({ data }) => setBlob(data))
       .catch((e: any) => setError(e?.response?.data?.detail ?? 'Failed to load file'))
       .finally(() => setLoading(false));

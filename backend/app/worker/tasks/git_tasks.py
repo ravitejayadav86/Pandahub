@@ -283,6 +283,42 @@ def post_receive_hook(
     except Exception as exc:
         logger.error("Failed to enqueue security scan", extra={"repo_id": repo_id, "error": str(exc)})
 
+    # ------------------------------------------------------------------
+    # 6. Back up updated repo to B2 (non-fatal if it fails)
+    # ------------------------------------------------------------------
+    try:
+        from app.models.repo import Repository as RepoModel
+        from app.services.repo_storage import backup_repo
+        session2 = _get_sync_session()
+        try:
+            repo_row = session2.execute(
+                select(RepoModel).where(RepoModel.id == repo_uuid)
+            ).scalar_one_or_none()
+            if repo_row:
+                # Resolve owner slug (username or org name)
+                from app.models.user import User as UserModel
+                from app.models.organization import Organization
+                owner_row = session2.execute(
+                    select(UserModel.username).where(UserModel.id == repo_row.owner_user_id)
+                ).scalar_one_or_none() if repo_row.owner_user_id else None
+                if owner_row is None and repo_row.owner_organization_id:
+                    owner_row = session2.execute(
+                        select(Organization.name).where(Organization.id == repo_row.owner_organization_id)
+                    ).scalar_one_or_none()
+                if owner_row:
+                    backup_repo(disk_path, owner_row, repo_row.name)
+                    logger.info(
+                        "post-push B2 backup complete",
+                        extra={"repo_id": repo_id, "owner": owner_row},
+                    )
+        finally:
+            session2.close()
+    except Exception as exc:
+        logger.error(
+            "post-push B2 backup failed (non-fatal)",
+            extra={"repo_id": repo_id, "error": str(exc)},
+        )
+
     logger.info(
         "post_receive_hook completed",
         extra={

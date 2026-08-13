@@ -318,6 +318,24 @@ async def create_repository(
         "Repository created",
         extra={"repo_id": str(repo_id), "repo_name": repo.name, "disk_path": disk_path},
     )
+
+    # Back up the freshly initialised repo to B2 so it can be restored after
+    # an ephemeral-disk wipe (e.g. Render container restart).
+    owner_slug = actor.username  # already resolved above
+    try:
+        from app.services.repo_storage import backup_repo
+        await loop.run_in_executor(None, backup_repo, disk_path, owner_slug, payload.name)
+        logger.info(
+            "Initial B2 backup complete",
+            extra={"repo_id": str(repo_id), "owner": owner_slug, "repo": payload.name},
+        )
+    except Exception as exc:
+        # Non-fatal: repo already committed — just log and move on.
+        logger.error(
+            "Initial B2 backup failed (non-fatal)",
+            extra={"repo_id": str(repo_id), "error": str(exc)},
+        )
+
     return repo
 
 

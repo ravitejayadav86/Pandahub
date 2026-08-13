@@ -6,6 +6,9 @@ wildcarded ("*") in combination with credentials=True -- that combination
 is a known misconfiguration that defeats the purpose of CORS entirely.
 """
 from contextlib import asynccontextmanager
+import asyncio
+import os
+from pathlib import Path
 
 from fastapi import FastAPI
 from fastapi.middleware.cors import CORSMiddleware
@@ -29,12 +32,118 @@ logger = get_logger("app.startup")
 async def lifespan(app: FastAPI):
     # Startup
     ensure_buckets_exist()
+    await _restore_repos_on_startup()
     await connection_manager.start_listener()
     logger.info("PandaHub backend started", extra={"environment": settings.ENVIRONMENT})
     yield
     # Shutdown
     await connection_manager.stop_listener()
     logger.info("PandaHub backend shutting down")
+
+
+async def _restore_repos_on_startup() -> None:
+    """
+    Restore any bare git repositories that are missing from disk.
+
+    On Render (and other platforms with ephemeral filesystems), the
+    /data/repositories directory is wiped on every container restart.
+    This function queries all repositories from the DB and, for each
+    one whose disk_path does not exist:
+      - Restores from B2 if a backup exists.
+      - Re-initialises an empty bare repo if no backup exists yet
+        (so git-http-backend doesn't crash with FileNotFoundError).
+
+    All errors are caught per-repo and logged; one failure never blocks
+    the rest of startup.
+    """
+    from sqlalchemy import select
+    from app.db.session import AsyncSessionLocal
+    from app.models.repo import Repository
+    from app.services.repo_storage import restore_repo, repo_backup_exists
+    from app.services.repo_service import _init_bare_repo
+
+    logger.info("startup: checking for repos to restore from B2 ...")
+    loop = asyncio.get_running_loop()
+    restored = 0
+    reinited = 0
+    skipped = 0
+
+    try:
+        async with AsyncSessionLocal() as db:
+            result = await db.execute(select(Repository))
+            all_repos = result.scalars().all()
+    except Exception as exc:
+        logger.error("startup: failed to query repos from DB", extra={"error": str(exc)})
+        return
+
+    # Ensure the root directory exists first
+    Path(settings.GIT_REPOS_ROOT).mkdir(parents=True, exist_ok=True)
+
+    for repo in all_repos:
+        if os.path.exists(repo.disk_path):
+            skipped += 1
+            continue
+
+        # Need owner slug for B2 key lookup
+        try:
+            async with AsyncSessionLocal() as db:
+                from app.models.user import User
+                from app.models.organization import Organization
+                owner_slug = None
+                if repo.owner_user_id:
+                    row = await db.execute(
+                        select(User.username).where(User.id == repo.owner_user_id)
+                    )
+                    owner_slug = row.scalar_one_or_none()
+                elif repo.owner_organization_id:
+                    row = await db.execute(
+                        select(Organization.name).where(Organization.id == repo.owner_organization_id)
+                    )
+                    owner_slug = row.scalar_one_or_none()
+
+            if not owner_slug:
+                logger.warning(
+                    "startup: cannot resolve owner for repo, skipping",
+                    extra={"repo_id": str(repo.id)},
+                )
+                continue
+
+            has_backup = await loop.run_in_executor(
+                None, repo_backup_exists, owner_slug, repo.name
+            )
+
+            if has_backup:
+                logger.info(
+                    "startup: restoring repo from B2",
+                    extra={"owner": owner_slug, "repo": repo.name, "disk_path": repo.disk_path},
+                )
+                parent = str(Path(repo.disk_path).parent)
+                await loop.run_in_executor(None, restore_repo, parent, owner_slug, repo.name)
+                # restore_repo extracts to parent/{repo.name}; rename to disk_path if needed
+                extracted = Path(parent) / repo.name
+                if extracted.exists() and not Path(repo.disk_path).exists():
+                    extracted.rename(repo.disk_path)
+                restored += 1
+            else:
+                logger.info(
+                    "startup: no B2 backup found, re-initialising empty bare repo",
+                    extra={"owner": owner_slug, "repo": repo.name, "disk_path": repo.disk_path},
+                )
+                await loop.run_in_executor(
+                    None, _init_bare_repo, repo.disk_path, repo.default_branch, False
+                )
+                reinited += 1
+
+        except Exception as exc:
+            logger.error(
+                "startup: failed to restore repo",
+                extra={"repo_id": str(repo.id), "error": str(exc)},
+            )
+
+    logger.info(
+        "startup: repo restore complete",
+        extra={"restored": restored, "reinited": reinited, "skipped": skipped},
+    )
 
 
 app = FastAPI(

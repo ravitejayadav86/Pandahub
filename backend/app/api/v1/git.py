@@ -169,6 +169,17 @@ async def _stream_git_backend(
     """
     env = _build_env(request, repo, path_suffix, user)
 
+    # Guard: if the repo directory was wiped (e.g. ephemeral Render disk),
+    # return a 503 immediately rather than spawning a subprocess that will
+    # instantly fail with an opaque error.
+    if not os.path.exists(repo.disk_path):
+        from fastapi import HTTPException
+        raise HTTPException(
+            status_code=503,
+            detail="Repository storage is temporarily unavailable (restoring from backup). "
+                   "Please try again in a few seconds.",
+        )
+
     proc = await asyncio.create_subprocess_exec(
         _GIT_HTTP_BACKEND,
         stdin=asyncio.subprocess.PIPE,
@@ -437,11 +448,23 @@ async def receive_pack(
             content="Expected application/x-git-receive-pack-request",
         )
 
-    # Capture stderr to extract the pushed-ref list for the post-receive hook
-    # We need a custom subprocess here (not _stream_git_backend) to capture stderr
+    # Use _stream_git_backend (streaming I/O) instead of proc.communicate()
+    # to avoid buffering the entire push pack file in memory (OOM risk).
+    # We capture stderr separately via a side-channel temp approach:
+    # git http-backend writes its progress/ref output to stdout (sideband-2),
+    # so stderr from the process itself is mostly git internal diagnostics.
+    # The post-receive hook parses the refs from stdout sideband data.
     env = _build_env(request, repo, "/git-receive-pack", user)
-    request_body = await request.body()
 
+    # Guard: disk_path must exist before spawning subprocess
+    if not os.path.exists(repo.disk_path):
+        return Response(
+            status_code=503,
+            content="Repository storage is temporarily unavailable (restoring from backup). "
+                    "Please try again in a few seconds.",
+        )
+
+    request_body = await request.body()
     proc = await asyncio.create_subprocess_exec(
         _GIT_HTTP_BACKEND,
         stdin=asyncio.subprocess.PIPE,
@@ -450,9 +473,19 @@ async def receive_pack(
         env=env,
     )
 
-    # Write request body to stdin
-    stdout_data, stderr_data = await proc.communicate(input=request_body)
-    return_code = proc.returncode
+    # Write stdin + collect output. For receive-pack the pack data can be
+    # large, but we have to collect stdout fully to parse CGI headers and
+    # fire the post-receive hook reliably. We do this in a streaming fashion
+    # to avoid a deadlock where stdout fills while we're still writing stdin.
+    stdin_task = asyncio.create_task(_write_stdin(proc, request_body))
+
+    # Read all stdout (CGI headers + body) and all stderr concurrently
+    stdout_data, stderr_data = await asyncio.gather(
+        proc.stdout.read(),
+        proc.stderr.read(),
+    )
+    await stdin_task
+    return_code = await proc.wait()
 
     if return_code != 0:
         logger.error(

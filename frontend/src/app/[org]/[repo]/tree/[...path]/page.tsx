@@ -32,6 +32,9 @@ export default function TreePage() {
   const { entries, loading: treeLoading, error: treeError } = useTree(owner, repoName, ref, viewType === 'tree' ? currentPath : undefined);
   const { blob, loading: blobLoading, error: blobError } = useBlob(owner, repoName, ref, viewType === 'blob' ? currentPath : '');
 
+  // Detect empty repository (no commits yet) vs a real error
+  const isEmptyRepo = !treeLoading && !!treeError && (treeError.toLowerCase().includes('not found') || treeError.toLowerCase().includes('404') || treeError.toLowerCase().includes('ref'));
+
   const handleNavigate = (path: string, type: 'blob' | 'tree') => {
     setViewType(type);
     router.push(`/${owner}/${repoName}/tree/${ref}/${path}`);
@@ -82,7 +85,23 @@ export default function TreePage() {
         </div>
 
         {isLoading ? <LoadingSpinner label="Loading..." />
-          : error ? <EmptyState icon="error" title="Could not load" description={error} />
+          : isEmptyRepo ? (
+            <div style={{ textAlign: 'center', padding: '64px 24px' }}>
+              <span className="material-symbols-outlined" style={{ fontSize: 64, color: 'var(--text-muted)', display: 'block', marginBottom: 16 }}>source</span>
+              <h2 style={{ fontSize: 20, fontWeight: 700, marginBottom: 8, color: 'var(--text-primary)' }}>This repository is empty</h2>
+              <p style={{ color: 'var(--text-muted)', marginBottom: 24, fontSize: 14 }}>Get started by pushing your first commit.</p>
+              <div style={{ background: 'var(--bg-secondary)', borderRadius: 10, padding: '20px 24px', textAlign: 'left', maxWidth: 520, margin: '0 auto', fontFamily: 'monospace', fontSize: 13, lineHeight: 1.8, border: '1px solid var(--border-color)' }}>
+                <p style={{ margin: 0, color: 'var(--text-muted)' }}># …create a new repository on the command line</p>
+                <p style={{ margin: 0 }}>git init</p>
+                <p style={{ margin: 0 }}>git add .</p>
+                <p style={{ margin: 0 }}>git commit -m "first commit"</p>
+                <p style={{ margin: 0 }}>git remote add origin &lt;your-remote-url&gt;</p>
+                <p style={{ margin: 0 }}>git push -u origin main</p>
+              </div>
+            </div>
+          )
+          : treeError ? <EmptyState icon="error" title="Could not load tree" description={treeError} />
+          : blobError ? <EmptyState icon="error" title="Could not load file" description={blobError} />
           : viewType === 'blob' && blob ? <CodeViewer blob={blob} />
           : viewType === 'tree' ? (
             <FileTree entries={entries} owner={owner} repoName={repoName} ref={ref} currentPath={currentPath} onNavigate={handleNavigate} />

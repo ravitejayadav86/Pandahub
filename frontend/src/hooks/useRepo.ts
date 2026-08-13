@@ -34,8 +34,8 @@ export function useBranches(owner: string, repoName: string) {
     if (!owner || !repoName) return;
     setLoading(true);
     try {
-      const { data } = await api.get<Branch[]>(`/${owner}/${repoName}/branches`);
-      setBranches(data || []);
+      const { data } = await api.get<{ items: Branch[]; total: number }>(`/${owner}/${repoName}/branches`);
+      setBranches(data.items || []);
     } catch (e: any) {
       setError(e?.response?.data?.detail ?? 'Failed to load branches');
     } finally {
@@ -58,8 +58,8 @@ export function useTree(owner: string, repoName: string, ref: string, path?: str
     const url = path
       ? `/${owner}/${repoName}/git/tree/${ref}/${path}`
       : `/${owner}/${repoName}/git/tree/${ref}`;
-    api.get<TreeEntry[]>(url)
-      .then(({ data }) => setEntries(data))
+    api.get<{ ref: string; path: string; entries: TreeEntry[] }>(url)
+      .then(({ data }) => setEntries(data.entries || []))
       .catch((e: any) => setError(e?.response?.data?.detail ?? 'Failed to load tree'))
       .finally(() => setLoading(false));
   }, [owner, repoName, ref, path]);

@@ -2,6 +2,7 @@
 from __future__ import annotations
 
 import subprocess
+import sys
 
 GIT_HOST = "pandahub.onrender.com"
 
@@ -14,18 +15,25 @@ def ensure_credential_helper() -> None:
     """
     Register `panda` as git's credential helper for the PandaHub host.
 
-    After this, any plain `git clone/push/pull` against pandahub.onrender.com
-    automatically authenticates via `panda git-credential` - no token ever
-    needs to be typed or pasted by the user.
+    Uses the ABSOLUTE path to the currently-running panda.exe (sys.argv[0])
+    rather than relying on `panda` being resolvable via PATH. Git spawns its
+    own subprocess (a bundled sh.exe) to run credential helpers, and that
+    subprocess does NOT inherit PowerShell profile functions or aliases -
+    only real PATH entries. Since panda's own PATH entry has proven
+    unreliable across terminal sessions, we sidestep the problem entirely
+    by baking in the exact executable path.
 
     Best-effort: silently does nothing if git isn't installed.
     """
+    panda_exe = sys.argv[0].replace("\\", "/")
+    helper_cmd = f'!\'{panda_exe}\' git-credential'
+
     try:
         subprocess.run(
             [
                 "git", "config", "--global",
                 f"credential.https://{GIT_HOST}.helper",
-                "!panda git-credential",
+                helper_cmd,
             ],
             check=False,
             capture_output=True,

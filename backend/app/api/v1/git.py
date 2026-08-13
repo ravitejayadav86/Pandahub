@@ -1,5 +1,5 @@
 """
-Smart-HTTP Git transport Ã¢â‚¬â€ Module 8.
+Smart-HTTP Git transport ÃƒÂ¢Ã¢â€šÂ¬Ã¢â‚¬Â Module 8.
 
 Implements the git smart-HTTP protocol by delegating all pack-protocol I/O
 to the ``git http-backend`` CGI program that ships with git itself.  FastAPI:
@@ -12,8 +12,8 @@ to the ``git http-backend`` CGI program that ships with git itself.  FastAPI:
 URL layout (matches nginx ``/git/`` routing block):
 
   GET  /git/{owner}/{repo}.git/info/refs
-       ?service=git-upload-pack   Ã¢â€ â€™  clone/fetch handshake   (READ)
-       ?service=git-receive-pack  Ã¢â€ â€™  push handshake          (WRITE)
+       ?service=git-upload-pack   ÃƒÂ¢Ã¢â‚¬Â Ã¢â‚¬â„¢  clone/fetch handshake   (READ)
+       ?service=git-receive-pack  ÃƒÂ¢Ã¢â‚¬Â Ã¢â‚¬â„¢  push handshake          (WRITE)
 
   POST /git/{owner}/{repo}.git/git-upload-pack               (READ)
   POST /git/{owner}/{repo}.git/git-receive-pack              (WRITE)
@@ -62,7 +62,7 @@ logger = get_logger("app.api.v1.git")
 
 router = APIRouter(tags=["git-transport"])
 
-# git http-backend binary Ã¢â‚¬â€ present in the Docker image via ``apt-get install git``
+# git http-backend binary ÃƒÂ¢Ã¢â€šÂ¬Ã¢â‚¬Â present in the Docker image via ``apt-get install git``
 _GIT_HTTP_BACKEND = "/usr/lib/git-core/git-http-backend"
 
 # Content-Type header values used by the git smart-HTTP protocol
@@ -123,7 +123,7 @@ def _build_env(
         # Resolve to absolute path so the subprocess can find repos regardless
         # of its working directory (critical when GIT_REPOS_ROOT is relative).
         "GIT_PROJECT_ROOT": str(Path(settings.GIT_REPOS_ROOT).resolve()),
-        # Export ALL repos — we've already done auth/permission gating above.
+        # Export ALL repos â€” we've already done auth/permission gating above.
         # Without this, git http-backend checks for a git-daemon-export-ok file.
         "GIT_HTTP_EXPORT_ALL": "1",
 
@@ -258,14 +258,14 @@ async def _resolve_and_check(
     required_level: PermissionLevel,
 ) -> Repository:
     """
-    Resolve (owner, repo_name) Ã¢â€ â€™ Repository and verify the user has
+    Resolve (owner, repo_name) ÃƒÂ¢Ã¢â‚¬Â Ã¢â‚¬â„¢ Repository and verify the user has
     *required_level* access.  Raises appropriate HTTP-mapped errors.
 
     Returns the Repository ORM object.
     """
     repo = await get_repo_by_owner_and_name(db, owner, repo_name)
     if repo is None:
-        # Return 404 even for private repos Ã¢â‚¬â€ don't leak existence.
+        # Return 404 even for private repos ÃƒÂ¢Ã¢â€šÂ¬Ã¢â‚¬Â don't leak existence.
         raise NotFoundError(f"Repository '{owner}/{repo_name}' not found.")
 
     resolved = await resolve_permission(
@@ -275,7 +275,7 @@ async def _resolve_and_check(
     from app.permissions.resolver import _meets_minimum
     if not _meets_minimum(resolved, required_level):
         if user is None:
-            # Anonymous caller Ã¢â‚¬â€ trigger credential prompt
+            # Anonymous caller ÃƒÂ¢Ã¢â€šÂ¬Ã¢â‚¬Â trigger credential prompt
             raise UnauthorizedError(
                 f"Authentication required to access '{owner}/{repo_name}'."
             )
@@ -338,7 +338,7 @@ async def info_refs(
 
     # Override Content-Type to the git-specific advertisement type
     headers["Content-Type"] = _CT_INFO_REFS.format(service=service)
-    # Disable caching Ã¢â‚¬â€ git clients should always get fresh ref lists
+    # Disable caching ÃƒÂ¢Ã¢â€šÂ¬Ã¢â‚¬Â git clients should always get fresh ref lists
     headers["Cache-Control"] = "no-cache, max-age=0, must-revalidate"
     headers["Pragma"] = "no-cache"
 
@@ -408,7 +408,7 @@ async def receive_pack(
     """
     Accepts pushed pack data and writes it to the bare repository.
 
-    Permission: WRITE (always requires auth Ã¢â‚¬â€ anonymous push is never allowed).
+    Permission: WRITE (always requires auth ÃƒÂ¢Ã¢â€šÂ¬Ã¢â‚¬Â anonymous push is never allowed).
 
     After the push completes, fires the ``post_receive_hook`` Celery task
     which syncs the Branch cache, updates repo size, and fires webhooks.
@@ -416,7 +416,7 @@ async def receive_pack(
     user = await authenticate_git_request(request, db)
 
     if user is None:
-        # Push always requires auth Ã¢â‚¬â€ don't even try anonymous
+        # Push always requires auth ÃƒÂ¢Ã¢â€šÂ¬Ã¢â‚¬Â don't even try anonymous
         return _require_401()
 
     try:
@@ -524,7 +524,7 @@ def _fire_post_receive_hook(
     """
     try:
         from app.worker.tasks.git_tasks import post_receive_hook
-        post_receive_hook.delay(
+        post_receive_hook(
             repo_id=repo_id,
             disk_path=disk_path,
             pusher_username=pusher_username,

@@ -32,7 +32,10 @@ logger = get_logger("app.startup")
 async def lifespan(app: FastAPI):
     # Startup
     ensure_buckets_exist()
-    await _restore_repos_on_startup()
+    # Fire the repo restore as a background task so the app starts accepting
+    # health-check probes immediately. Render kills the process if /health
+    # doesn't respond within the first few seconds of startup.
+    asyncio.create_task(_restore_repos_on_startup())
     await connection_manager.start_listener()
     logger.info("PandaHub backend started", extra={"environment": settings.ENVIRONMENT})
     yield
@@ -162,6 +165,7 @@ app.add_middleware(
     allow_credentials=True,
     allow_methods=["*"],
     allow_headers=["*"],
+    expose_headers=["*"],
 )
 app.add_middleware(RequestContextMiddleware)
 

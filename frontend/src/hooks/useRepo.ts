@@ -35,7 +35,7 @@ export function useBranches(owner: string, repoName: string) {
     setLoading(true);
     try {
       const { data } = await api.get<Branch[]>(`/${owner}/${repoName}/branches`);
-      setBranches(data.items || []);
+      setBranches(data || []);
     } catch (e: any) {
       setError(e?.response?.data?.detail ?? 'Failed to load branches');
     } finally {

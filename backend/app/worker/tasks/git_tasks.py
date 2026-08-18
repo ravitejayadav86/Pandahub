@@ -32,6 +32,8 @@ from datetime import datetime, timezone
 
 import requests  # synchronous HTTP client for webhook delivery
 
+from app.services.repo_storage import backup_repo
+
 from app.core.config import get_settings
 from app.core.logging import get_logger
 from app.git_engine.writer import (
@@ -87,6 +89,65 @@ def _get_sync_session():
         _sync_session_factory = sessionmaker(bind=_sync_engine, expire_on_commit=False)
 
     return _sync_session_factory()
+# ---------------------------------------------------------------------------
+# Initial repository B2 backup
+# ---------------------------------------------------------------------------
+
+@celery_app.task(
+    name="app.worker.tasks.git_tasks.backup_repository",
+    queue="git_ops",
+    max_retries=3,
+    default_retry_delay=30,
+    acks_late=True,
+)
+def backup_repository(
+    repo_id: str,
+    disk_path: str,
+    owner: str,
+    repo_name: str,
+) -> dict:
+    """Back up a newly-created repository to durable B2 storage."""
+    logger.info(
+        "backup_repository started",
+        extra={
+            "repo_id": repo_id,
+            "owner": owner,
+            "repo": repo_name,
+        },
+    )
+
+    try:
+        key = backup_repo(disk_path, owner, repo_name)
+
+        logger.info(
+            "backup_repository completed",
+            extra={
+                "repo_id": repo_id,
+                "owner": owner,
+                "repo": repo_name,
+                "key": key,
+            },
+        )
+
+        return {
+            "repo_id": repo_id,
+            "owner": owner,
+            "repo": repo_name,
+            "key": key,
+            "status": "ok",
+        }
+
+    except Exception:
+        logger.exception(
+            "backup_repository failed",
+            extra={
+                "repo_id": repo_id,
+                "owner": owner,
+                "repo": repo_name,
+            },
+        )
+        raise
+
 
 
 # ---------------------------------------------------------------------------

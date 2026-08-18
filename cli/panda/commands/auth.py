@@ -7,7 +7,7 @@ import click
 
 from panda.core import config
 from panda.core.api_client import ApiError, request
-from panda.core.gitutil import ensure_credential_helper
+from panda.core.gitutil import GIT_HOST, ensure_credential_helper
 
 
 @click.command()
@@ -116,7 +116,7 @@ def token_create(name: str, scopes: str, expires_in_days: int | None):
     username = config.get_username() or "<username>"
     click.echo(
         f'  git remote add origin https://{username}:<TOKEN>@'
-        f'pandahub.onrender.com/git/{username}/<repo-name>.git'
+       f'https://{GIT_HOST}/git/{username}/<repo-name>.git'
     )
 
 

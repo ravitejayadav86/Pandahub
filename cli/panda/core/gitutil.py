@@ -4,7 +4,7 @@ from __future__ import annotations
 import subprocess
 import sys
 
-GIT_HOST = "pandahub.onrender.com"
+GIT_HOST = "pandahub-taupe.vercel.app"
 
 
 def build_repo_url(owner: str, repo_name: str) -> str:

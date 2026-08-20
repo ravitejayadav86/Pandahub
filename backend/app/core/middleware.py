@@ -1,4 +1,4 @@
-"""
+﻿"""
 Request-scoped middleware: assigns a request ID and logs every request's
 outcome (method, path, status, duration).
 
@@ -14,19 +14,17 @@ This is intentionally a **pure ASGI middleware** (not BaseHTTPMiddleware).
 Starlette's ``BaseHTTPMiddleware`` has a known bug: when a route handler
 raises an exception that propagates through ``call_next``, the exception
 escapes *outside* ``ExceptionMiddleware`` and reaches ``ServerErrorMiddleware``
-directly — BEFORE ``CORSMiddleware`` gets to add headers to the response.
+directly â€” BEFORE ``CORSMiddleware`` gets to add headers to the response.
 The result is 500 error responses with no ``Access-Control-Allow-Origin``
 header, causing the browser to block them as CORS violations even though
 the CORS config is correct.
 
 A pure ASGI middleware delegates exception handling entirely to the inner
-application (ExceptionMiddleware → our handlers) and never re-raises, so
-the exception → response conversion happens inside the CORS boundary.
+application (ExceptionMiddleware â†’ our handlers) and never re-raises, so
+the exception â†’ response conversion happens inside the CORS boundary.
 """
 import time
 import uuid
-from typing import Callable
-
 from starlette.types import ASGIApp, Receive, Scope, Send
 from starlette.datastructures import MutableHeaders
 
@@ -91,3 +89,5 @@ class RequestContextMiddleware:
             )
         finally:
             request_id_ctx.reset(token)
+
+

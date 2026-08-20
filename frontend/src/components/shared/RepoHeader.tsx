@@ -14,7 +14,6 @@ const TABS = [
   { id: 'issues',  label: 'Issues',        icon: 'bug_report' },
   { id: 'pulls',   label: 'Pull Requests', icon: 'alt_route' },
   { id: 'commits', label: 'Commits',       icon: 'commit' },
-  { id: 'settings',label: 'Settings',      icon: 'settings' },
 ];
 
 const TAB_HREF: Record<string, string> = {
@@ -22,7 +21,6 @@ const TAB_HREF: Record<string, string> = {
   issues: '/issues',
   pulls: '/pulls',
   commits: '/commits',
-  settings: '/settings',
 };
 
 export default function RepoHeader({ owner, repoName, repo, activeTab = 'code' }: RepoHeaderProps) {

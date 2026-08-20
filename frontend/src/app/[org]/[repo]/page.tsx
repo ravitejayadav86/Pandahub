@@ -1,4 +1,4 @@
-```tsx
+
 "use client";
 
 import { useEffect, useMemo, useRef, useState } from "react";
@@ -1257,7 +1257,7 @@ panda push`}
         </div>
       )}
 
-      {/* Deploy modal */}
+           {/* Deploy modal */}
       {showDeployModal && (
         <div
           className="fixed inset-0 z-[120] bg-slate-950/70 backdrop-blur-sm flex items-center justify-center p-4"
@@ -1338,4 +1338,3 @@ panda push`}
     </div>
   );
 }
-```

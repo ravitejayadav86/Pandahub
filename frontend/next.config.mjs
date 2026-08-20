@@ -1,19 +1,17 @@
-/** @type {import('next').NextConfig} */
+﻿/** @type {import('next').NextConfig} */
 
 const isLocalDev = process.env.NODE_ENV !== "production";
+
 const apiUrl =
   process.env.NEXT_PUBLIC_API_URL ||
   (isLocalDev ? "http://localhost:8000" : null);
 
-const proxyUrl = process.env.INTERNAL_API_URL || apiUrl;
-
-if (!proxyUrl) {
-  console.warn(
-    "\n⚠️ NEXT_PUBLIC_API_URL is not set in a production build.\n" +
-      "   /api/* and /git/* requests will NOT be proxied to a backend.\n" +
-      "   Set NEXT_PUBLIC_API_URL in your deployment platform and redeploy.\n"
-  );
-}
+const proxyUrl =
+  process.env.INTERNAL_API_URL ||
+  apiUrl ||
+  (process.env.NODE_ENV === "production"
+    ? "https://pandas-store-api.onrender.com"
+    : null);
 
 const nextConfig = {
   reactStrictMode: true,

@@ -1,4 +1,4 @@
-﻿'use client';
+'use client';
 import { useState } from 'react';
 import { useParams } from 'next/navigation';
 import Link from 'next/link';
@@ -17,7 +17,11 @@ export default function CommitsPage() {
 
   const { repo } = useRepo(owner, repoName);
   const { branches } = useBranches(owner, repoName);
-  const ref = selectedBranch || repo?.default_branch || 'main';
+  const ref =
+  selectedBranch ||
+  branches.find((b) => b.name === repo?.default_branch)?.name ||
+  branches[0]?.name ||
+  "";
   const { commits, loading, error, hasMore } = useCommits(owner, repoName, ref, page);
 
   return (

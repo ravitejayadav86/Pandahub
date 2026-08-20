@@ -1,4 +1,4 @@
-﻿'use client';
+'use client';
 import { useState } from 'react';
 import { useParams } from 'next/navigation';
 import { useRepo, useBranches } from '@/hooks/useRepo';
@@ -23,7 +23,10 @@ export default function PullsPage() {
   const { branches } = useBranches(owner, repoName);
   const { pulls, loading, error, refetch } = usePulls(owner, repoName, filter);
 
-  const defaultBase = repo?.default_branch || 'main';
+  const defaultBase =
+  branches.find((b) => b.name === repo?.default_branch)?.name ||
+  branches[0]?.name ||
+  "";
 
   const handleCreate = async (e: React.FormEvent) => {
     e.preventDefault();

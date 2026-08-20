@@ -1,4 +1,4 @@
-﻿"""
+"""
 Request-scoped middleware: assigns a request ID and logs every request's
 outcome (method, path, status, duration).
 
@@ -89,5 +89,3 @@ class RequestContextMiddleware:
             )
         finally:
             request_id_ctx.reset(token)
-
-

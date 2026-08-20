@@ -165,24 +165,37 @@ def commit(message: str, amend: bool):
 @click.command("push")
 @click.argument("remote", required=False)
 @click.argument("branch", required=False)
-@click.option("-u", "--set-upstream", is_flag=True, help="Set upstream.")
-def push(remote: str | None, branch: str | None, set_upstream: bool):
-    """Push commits to PandaHub."""
+@click.option(
+    "-u",
+    "--set-upstream",
+    is_flag=True,
+    help="Set upstream.",
+)
+def push(
+    remote: str | None,
+    branch: str | None,
+    set_upstream: bool,
+):
+    """Push commits to PandaHub.
+
+    Defaults to the 'pandahub' remote instead of Git's 'origin'.
+    """
     ensure_credential_helper()
+
+    # PandaHub is the default remote for `panda push`.
+    target_remote = remote or "pandahub"
 
     args = ["push"]
 
     if set_upstream:
         args.append("--set-upstream")
 
-    if remote:
-        args.append(remote)
+    args.append(target_remote)
 
     if branch:
         args.append(branch)
 
     _run_git(args)
-
 
 @click.command("pull")
 @click.argument("remote", required=False)
@@ -348,57 +361,15 @@ def restore(paths: tuple[str, ...]):
 @click.command("git-credential", hidden=True)
 @click.argument("action")
 def git_credential(action: str):
-    """Internal credential helper used automatically by Git."""
-    input_lines: dict[str, str] = {}
-
-    for line in sys.stdin:
-        line = line.strip()
-
-        if not line:
-            break
-
-        if "=" in line:
-            key, value = line.split("=", 1)
-            input_lines[key] = value
-
-    host = input_lines.get("host", "").strip()
-
-    if host != GIT_HOST:
-        return
-
+    """Git credential helper for PandaHub."""
     if action != "get":
         return
 
     username = config.get_username()
-
-    if not username:
-        return
-
     token = config.get_git_token()
 
-    if not token:
-        if not config.is_logged_in():
-            return
-
-        try:
-            data = request(
-                "POST",
-                "/auth/tokens",
-                json_body={
-                    "name": "panda-cli-git",
-                    "scopes": ["repo"],
-                    "expires_in_days": None,
-                },
-            )
-        except ApiError:
-            return
-
-        token = data.get("token")
-
-        if not token:
-            return
-
-        config.save_git_token(token)
+    if not username or not token:
+        return
 
     click.echo("protocol=https")
     click.echo(f"host={GIT_HOST}")

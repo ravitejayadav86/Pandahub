@@ -1,42 +1,108 @@
-"""panda.core.gitutil - Shared git-hosting helpers (host, URL building, credential helper setup)."""
+"""PandaHub Git hosting helpers."""
 from __future__ import annotations
 
+import os
 import subprocess
 import sys
+from pathlib import Path
 
 GIT_HOST = "pandahub-taupe.vercel.app"
 
 
 def build_repo_url(owner: str, repo_name: str) -> str:
+    """Build the HTTPS Git URL for a PandaHub repository."""
     return f"https://{GIT_HOST}/git/{owner}/{repo_name}.git"
+
+
+def _get_panda_command() -> str:
+    """
+    Return a command Git can execute for the PandaHub credential helper.
+
+    Prefer the actual running executable. On Windows, sys.executable is
+    the Python interpreter, so when the CLI is installed as a console
+    script we prefer sys.argv[0].
+    """
+    candidate = Path(sys.argv[0]).resolve()
+
+    if candidate.exists():
+        return str(candidate).replace("\\", "/")
+
+    return "panda"
 
 
 def ensure_credential_helper() -> None:
     """
-    Register `panda` as git's credential helper for the PandaHub host.
+    Configure Git to use PandaHub's credential helper.
 
-    Uses the ABSOLUTE path to the currently-running panda.exe (sys.argv[0])
-    rather than relying on `panda` being resolvable via PATH. Git spawns its
-    own subprocess (a bundled sh.exe) to run credential helpers, and that
-    subprocess does NOT inherit PowerShell profile functions or aliases -
-    only real PATH entries. Since panda's own PATH entry has proven
-    unreliable across terminal sessions, we sidestep the problem entirely
-    by baking in the exact executable path.
+    Git will invoke:
 
-    Best-effort: silently does nothing if git isn't installed.
+        panda git-credential get
+
+    whenever it needs credentials for pandahub-taupe.vercel.app.
     """
-    panda_exe = sys.argv[0].replace("\\", "/")
-    helper_cmd = f'!\'{panda_exe}\' git-credential'
+    panda_command = _get_panda_command()
 
+    # Git's `!` credential helper syntax executes a shell command.
+    #
+    # Use double quotes around the executable so paths containing spaces
+    # (for example under AppData or Program Files) continue to work.
+    helper_command = f'!"{panda_command}" git-credential'
+
+    try:
+        result = subprocess.run(
+            [
+                "git",
+                "config",
+                "--global",
+                f"credential.https://{GIT_HOST}.helper",
+                helper_command,
+            ],
+            capture_output=True,
+            text=True,
+            check=False,
+        )
+
+        if result.returncode != 0:
+            return
+
+    except (FileNotFoundError, OSError):
+        return
+
+
+def credential_helper_configured() -> bool:
+    """Return True when PandaHub's Git credential helper is configured."""
+    try:
+        result = subprocess.run(
+            [
+                "git",
+                "config",
+                "--global",
+                "--get",
+                f"credential.https://{GIT_HOST}.helper",
+            ],
+            capture_output=True,
+            text=True,
+            check=False,
+        )
+        return result.returncode == 0 and bool(result.stdout.strip())
+    except (FileNotFoundError, OSError):
+        return False
+
+
+def remove_credential_helper() -> None:
+    """Remove PandaHub's Git credential helper configuration."""
     try:
         subprocess.run(
             [
-                "git", "config", "--global",
+                "git",
+                "config",
+                "--global",
+                "--unset-all",
                 f"credential.https://{GIT_HOST}.helper",
-                helper_cmd,
             ],
-            check=False,
             capture_output=True,
+            text=True,
+            check=False,
         )
-    except FileNotFoundError:
+    except (FileNotFoundError, OSError):
         pass

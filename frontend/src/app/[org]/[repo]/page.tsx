@@ -1,11 +1,12 @@
+```tsx
 "use client";
 
-import { useState, useEffect, useRef } from "react";
-import { useParams, useRouter } from "next/navigation";
+import { useEffect, useMemo, useRef, useState } from "react";
 import Link from "next/link";
-import { useAuthStore } from '@/store/authStore';
-import { logout } from '@/lib/auth';
-import api from '@/lib/api';
+import { useParams, usePathname, useRouter } from "next/navigation";
+import { useAuthStore } from "@/store/authStore";
+import { logout } from "@/lib/auth";
+import api from "@/lib/api";
 
 interface UserProfile {
   username: string;
@@ -21,7 +22,7 @@ interface RepoMeta {
   id: string;
   name: string;
   description?: string;
-  visibility: 'public' | 'private' | 'internal';
+  visibility: "public" | "private" | "internal";
   star_count: number;
   fork_count: number;
   watcher_count: number;
@@ -30,577 +31,1306 @@ interface RepoMeta {
   pushed_at?: string;
 }
 
+interface BranchResponse {
+  items: Array<{
+    name: string;
+    is_default?: boolean;
+  }>;
+  total: number;
+}
+
+interface ApiErrorShape {
+  response?: {
+    status?: number;
+    data?: {
+      detail?: string;
+      message?: string;
+    };
+  };
+}
+
+function getErrorMessage(error: unknown, fallback: string) {
+  const typed = error as ApiErrorShape;
+
+  return (
+    typed?.response?.data?.detail ||
+    typed?.response?.data?.message ||
+    fallback
+  );
+}
+
 export default function RepoDashboardPage() {
-  const { user, clearAuth } = useAuthStore();
-  const router = useRouter();
   const params = useParams<{ org: string; repo: string }>();
-  const owner = params?.org ?? '';
-  const repoName = params?.repo ?? '';
+  const pathname = usePathname();
+  const router = useRouter();
 
-  const [tab, setTab] = useState("Overview");
+  const { user, clearAuth } = useAuthStore();
+
+  const owner = params?.org ?? "";
+  const repoName = params?.repo ?? "";
+  const repoBase = `/${owner}/${repoName}`;
+
   const [mounted, setMounted] = useState(false);
+  const [activeTab, setActiveTab] = useState("Overview");
   const [isProfileOpen, setIsProfileOpen] = useState(false);
-  const profileRef = useRef<HTMLDivElement>(null);
+  const [showDeployModal, setShowDeployModal] = useState(false);
 
-  // Real user profile data
+  const [repoMeta, setRepoMeta] = useState<RepoMeta | null>(null);
+  const [repoLoading, setRepoLoading] = useState(true);
+  const [repoError, setRepoError] = useState<string | null>(null);
+
   const [profile, setProfile] = useState<UserProfile | null>(null);
   const [profileLoading, setProfileLoading] = useState(true);
 
-  // Repo metadata from API
-  const [repoMeta, setRepoMeta] = useState<RepoMeta | null>(null);
+  const [branches, setBranches] = useState<BranchResponse | null>(null);
+  const [branchesLoading, setBranchesLoading] = useState(true);
+
   const [starring, setStarring] = useState(false);
-  const [showDeployModal, setShowDeployModal] = useState(false);
+  const [copied, setCopied] = useState(false);
+  const [notice, setNotice] = useState<string | null>(null);
+
+  const profileRef = useRef<HTMLDivElement>(null);
+
+  const isEmptyRepository = useMemo(() => {
+    if (!branches || branchesLoading) return false;
+    return branches.items.length === 0;
+  }, [branches, branchesLoading]);
+
+  const cloneUrl = useMemo(() => {
+    if (!owner || !repoName) return "";
+    return `${window.location.origin}/git/${owner}/${repoName}.git`;
+  }, [owner, repoName]);
 
   useEffect(() => {
     setMounted(true);
-    document.documentElement.classList.remove('dark');
+    document.documentElement.classList.remove("dark");
   }, []);
 
-  // Fetch repo metadata
   useEffect(() => {
-    if (!owner || !repoName) return;
-    api.get<RepoMeta>(`/${owner}/${repoName}`)
-      .then(({ data }) => setRepoMeta(data))
-      .catch(() => setRepoMeta(null));
-  }, [owner, repoName]);
-
-  // Fetch public profile for the repo owner
-  useEffect(() => {
-    if (!owner) return;
-    const fetchProfile = async () => {
-      setProfileLoading(true);
-      try {
-        const { data } = await api.get<UserProfile>(`/auth/users/${owner}`);
-        setProfile(data);
-      } catch {
-        setProfile(null);
-      }
-      setProfileLoading(false);
-    };
-    fetchProfile();
-  }, [owner]);
-
-  // Close dropdown when clicking outside
-  useEffect(() => {
-    const handler = (e: MouseEvent) => {
-      if (profileRef.current && !profileRef.current.contains(e.target as Node)) {
+    const handler = (event: MouseEvent) => {
+      if (
+        profileRef.current &&
+        !profileRef.current.contains(event.target as Node)
+      ) {
         setIsProfileOpen(false);
       }
     };
-    document.addEventListener('mousedown', handler);
-    return () => document.removeEventListener('mousedown', handler);
+
+    document.addEventListener("mousedown", handler);
+
+    return () => {
+      document.removeEventListener("mousedown", handler);
+    };
   }, []);
+
+  useEffect(() => {
+    if (!owner || !repoName) return;
+
+    let cancelled = false;
+
+    const loadRepository = async () => {
+      setRepoLoading(true);
+      setRepoError(null);
+
+      try {
+        const { data } = await api.get<RepoMeta>(
+          `/${encodeURIComponent(owner)}/${encodeURIComponent(repoName)}`
+        );
+
+        if (!cancelled) {
+          setRepoMeta(data);
+        }
+      } catch (error) {
+        if (!cancelled) {
+          setRepoMeta(null);
+          setRepoError(
+            getErrorMessage(error, "Unable to load this repository.")
+          );
+        }
+      } finally {
+        if (!cancelled) {
+          setRepoLoading(false);
+        }
+      }
+    };
+
+    loadRepository();
+
+    return () => {
+      cancelled = true;
+    };
+  }, [owner, repoName]);
+
+  useEffect(() => {
+    if (!owner) return;
+
+    let cancelled = false;
+
+    const loadProfile = async () => {
+      setProfileLoading(true);
+
+      try {
+        const { data } = await api.get<UserProfile>(
+          `/auth/users/${encodeURIComponent(owner)}`
+        );
+
+        if (!cancelled) {
+          setProfile(data);
+        }
+      } catch {
+        if (!cancelled) {
+          setProfile(null);
+        }
+      } finally {
+        if (!cancelled) {
+          setProfileLoading(false);
+        }
+      }
+    };
+
+    loadProfile();
+
+    return () => {
+      cancelled = true;
+    };
+  }, [owner]);
+
+  useEffect(() => {
+    if (!owner || !repoName) return;
+
+    let cancelled = false;
+
+    const loadBranches = async () => {
+      setBranchesLoading(true);
+
+      try {
+        const { data } = await api.get<BranchResponse>(
+          `/${encodeURIComponent(owner)}/${encodeURIComponent(
+            repoName
+          )}/branches`
+        );
+
+        if (!cancelled) {
+          setBranches(data);
+        }
+      } catch {
+        if (!cancelled) {
+          setBranches({
+            items: [],
+            total: 0,
+          });
+        }
+      } finally {
+        if (!cancelled) {
+          setBranchesLoading(false);
+        }
+      }
+    };
+
+    loadBranches();
+
+    return () => {
+      cancelled = true;
+    };
+  }, [owner, repoName]);
+
+  useEffect(() => {
+    if (!notice) return;
+
+    const timer = window.setTimeout(() => {
+      setNotice(null);
+    }, 2800);
+
+    return () => window.clearTimeout(timer);
+  }, [notice]);
 
   const handleLogout = () => {
     logout();
     clearAuth();
-    router.push('/');
+    router.push("/");
   };
 
-  // Stat display helper — shows skeleton dashes while loading
-  const stat = (value: number | undefined, loading: boolean) =>
-    loading ? <span style={{ color: '#cbd5e1' }}>—</span> : value ?? 0;
+  const handleCopyCloneUrl = async () => {
+    try {
+      await navigator.clipboard.writeText(cloneUrl);
+      setCopied(true);
+      setNotice("Clone URL copied.");
 
-  const repoBase = `/${owner}/${repoName}`;
+      window.setTimeout(() => {
+        setCopied(false);
+      }, 1800);
+    } catch {
+      setNotice("Could not copy the clone URL.");
+    }
+  };
 
-  // Sidebar nav items — all properly routed
+  const handleStar = async () => {
+    if (!user) {
+      router.push("/login");
+      return;
+    }
+
+    if (!repoMeta || starring) return;
+
+    setStarring(true);
+
+    try {
+      const wasStarred = repoMeta.star_count > 0;
+
+      if (wasStarred) {
+        await api.delete(`/${owner}/${repoName}/star`);
+
+        setRepoMeta((current) =>
+          current
+            ? {
+                ...current,
+                star_count: Math.max(0, current.star_count - 1),
+              }
+            : current
+        );
+
+        setNotice("Repository unstarred.");
+      } else {
+        const { data } = await api.post<{ star_count?: number }>(
+          `/${owner}/${repoName}/star`
+        );
+
+        setRepoMeta((current) =>
+          current
+            ? {
+                ...current,
+                star_count:
+                  typeof data?.star_count === "number"
+                    ? data.star_count
+                    : current.star_count + 1,
+              }
+            : current
+        );
+
+        setNotice("Repository starred.");
+      }
+    } catch (error) {
+      setNotice(getErrorMessage(error, "Unable to update star status."));
+    } finally {
+      setStarring(false);
+    }
+  };
+
+  const handleFork = async () => {
+    if (!user) {
+      router.push("/login");
+      return;
+    }
+
+    try {
+      const { data } = await api.post<{ name: string }>(
+        `/${owner}/${repoName}/fork`
+      );
+
+      if (data?.name) {
+        router.push(`/${user.username}/${data.name}`);
+        return;
+      }
+
+      setNotice("Fork created, but the destination was not returned.");
+    } catch (error) {
+      setNotice(getErrorMessage(error, "Fork failed."));
+    }
+  };
+
+  const isActive = (href: string) => {
+    if (href === repoBase) {
+      return pathname === repoBase;
+    }
+
+    return pathname === href || pathname.startsWith(`${href}/`);
+  };
+
   const sidebarItems = [
-    { id: "overview",  label: "Overview",       icon: "grid_view",    href: repoBase },
-    { id: "code",      label: "Code",           icon: "code",         href: repoBase },
-    { id: "commits",   label: "Commits",        icon: "commit",       href: `${repoBase}/commits` },
-    { id: "issues",    label: "Issues",         icon: "adjust",       href: `${repoBase}/issues` },
-    { id: "prs",       label: "Pull Requests",  icon: "alt_route",    href: `${repoBase}/pulls` },
-    { id: "actions",   label: "Actions",        icon: "play_circle",  href: "#", comingSoon: true },
-    { id: "projects",  label: "Projects",       icon: "kanban",       href: "#", comingSoon: true },
-    { id: "wiki",      label: "Wiki",           icon: "menu_book",    href: "#", comingSoon: true },
-    { id: "security",  label: "Security",       icon: "security",     href: `${repoBase}/security` },
-    { id: "insights",  label: "Insights",       icon: "insights",     href: "#", comingSoon: true },
+    {
+      label: "Overview",
+      icon: "grid_view",
+      href: repoBase,
+    },
+    {
+      label: "Code",
+      icon: "code",
+      href: repoBase,
+    },
+    {
+      label: "Commits",
+      icon: "commit",
+      href: `${repoBase}/commits`,
+    },
+    {
+      label: "Issues",
+      icon: "adjust",
+      href: `${repoBase}/issues`,
+    },
+    {
+      label: "Pull Requests",
+      icon: "alt_route",
+      href: `${repoBase}/pulls`,
+    },
+    {
+      label: "Security",
+      icon: "security",
+      href: `${repoBase}/security`,
+    },
   ];
 
+  const visibilityClass =
+    repoMeta?.visibility === "private"
+      ? "bg-amber-50 text-amber-700 border-amber-200"
+      : repoMeta?.visibility === "internal"
+        ? "bg-blue-50 text-blue-700 border-blue-200"
+        : "bg-slate-100 text-slate-600 border-slate-200";
+
+  const profileInitial =
+    (profile?.username || owner || user?.username || "U")
+      .charAt(0)
+      .toUpperCase();
+
   return (
-    <div className="min-h-screen bg-[#F8F9FB] text-slate-900 font-sans antialiased overflow-x-hidden flex">
-
-      {/* ── Sticky Sidebar ── */}
-      <aside className="self-start sticky top-0 h-screen w-[260px] shrink-0 bg-white border-r border-slate-200/60 z-50 flex flex-col overflow-y-auto overscroll-contain scroll-smooth hidden md:flex transition-all duration-300 hover:shadow-[4px_0_24px_rgba(0,0,0,0.02)]">
-        {/* Logo */}
-        <div className="h-[72px] flex items-center gap-3 px-6 border-b border-slate-100">
-          <Link href="/dashboard" className="flex items-center gap-3 no-underline">
-            <div className="w-10 h-10 rounded-xl overflow-hidden shadow-sm border border-slate-200/50">
-              <div className="w-full h-full bg-slate-900 flex items-center justify-center text-white">
-                <span className="material-symbols-outlined text-[20px]">public</span>
+    <div className="min-h-screen bg-[#f8fafc] text-slate-900 font-sans">
+      <div className="flex min-h-screen">
+        {/* Sidebar */}
+        <aside className="hidden md:flex w-[260px] shrink-0 flex-col border-r border-slate-200 bg-white sticky top-0 h-screen">
+          <div className="h-[72px] border-b border-slate-100 px-6 flex items-center">
+            <Link
+              href="/dashboard"
+              className="flex items-center gap-3 no-underline"
+            >
+              <div className="w-10 h-10 rounded-xl bg-slate-950 flex items-center justify-center shadow-sm">
+                <span className="material-symbols-outlined text-white">
+                  public
+                </span>
               </div>
-            </div>
-            <div>
-              <h1 className="text-base font-bold tracking-tight leading-tight">PandaHub</h1>
-              <p className="text-[11px] text-slate-500 font-medium">v27.4.0</p>
-            </div>
-          </Link>
-        </div>
 
-        {/* New Repo Button */}
-        <div className="px-5 py-6">
-          <Link href="/new" className="flex items-center justify-center gap-2 h-10 text-sm bg-slate-900 text-white rounded-xl font-semibold hover:bg-slate-700 transition-colors no-underline">
-            <span className="material-symbols-outlined text-[18px]">add</span>
-            New Repository
-          </Link>
-        </div>
-
-        {/* Nav Links */}
-        <nav className="flex-1 px-3 space-y-1">
-          {sidebarItems.map(item => {
-            const isActive = item.href === repoBase
-              ? tab === "Overview"
-              : typeof window !== 'undefined' && window.location.pathname === item.href;
-
-            if (item.comingSoon) {
-              return (
-                <div key={item.id} className="flex items-center gap-2 px-3 py-2.5 rounded-lg text-sm text-slate-400 cursor-default select-none">
-                  <span className="material-symbols-outlined text-[20px]">{item.icon}</span>
-                  <span className="flex-1">{item.label}</span>
-                  <span className="text-[9px] font-bold bg-slate-100 text-slate-400 px-1.5 py-0.5 rounded uppercase tracking-wider">Soon</span>
+              <div>
+                <div className="text-base font-extrabold tracking-tight">
+                  PandaHub
                 </div>
-              );
-            }
-
-            return (
-              <Link
-                key={item.id}
-                href={item.href}
-                className={`sidebar-item ${isActive ? 'active' : ''}`}
-                data-tooltip={item.label}
-              >
-                <span className="material-symbols-outlined icon text-[20px]">{item.icon}</span>
-                {item.label}
-              </Link>
-            );
-          })}
-        </nav>
-
-        {/* Bottom Links */}
-        <div className="px-3 pb-6 pt-4 border-t border-slate-100 space-y-1">
-          <Link href="/settings" className="sidebar-item">
-            <span className="material-symbols-outlined icon text-[20px]">settings</span>
-            Settings
-          </Link>
-          <a
-            href="https://github.com/ravitejayadav86/Pandahub/issues"
-            target="_blank"
-            rel="noopener noreferrer"
-            className="sidebar-item"
-          >
-            <span className="material-symbols-outlined icon text-[20px]">help_outline</span>
-            Support
-          </a>
-        </div>
-      </aside>
-
-      {/* ── Main Content Wrapper ── */}
-      <main className="flex-1 flex flex-col min-h-screen min-w-0">
-
-        {/* ── Top Header ── */}
-        <header className="h-[72px] bg-white border-b border-slate-200/60 sticky top-0 z-40 px-8 flex items-center justify-between">
-          <div className="flex items-center gap-8">
-            <h2 className="text-xl font-bold tracking-tight">
-              {owner && repoName ? (
-                <>
-                  <Link href={`/${owner}`} className="text-slate-500 hover:text-slate-900 transition-colors no-underline">{owner}</Link>
-                  <span className="text-slate-300 mx-1">/</span>
-                  <Link href={repoBase} className="hover:text-slate-700 transition-colors no-underline">{repoName}</Link>
-                </>
-              ) : 'PandaHub'}
-            </h2>
-            <span className={`px-2 py-0.5 rounded-md text-xs font-bold border ${
-              repoMeta?.visibility === 'private'
-                ? 'bg-amber-50 text-amber-700 border-amber-200'
-                : repoMeta?.visibility === 'internal'
-                ? 'bg-blue-50 text-blue-700 border-blue-200'
-                : 'bg-slate-100 text-slate-600 border-slate-200'
-            }`}>
-              {repoMeta?.visibility ? repoMeta.visibility.charAt(0).toUpperCase() + repoMeta.visibility.slice(1) : '—'}
-            </span>
-
-            {/* Tabs */}
-            <div className="flex items-center h-full pt-1 gap-6">
-              {["Overview", "Activity", "Stats"].map(t => (
-                <button
-                  key={t}
-                  onClick={() => setTab(t)}
-                  className={`relative h-full flex items-center text-sm font-medium transition-colors ${
-                    tab === t ? "text-blue-600" : "text-slate-500 hover:text-slate-900"
-                  }`}
-                >
-                  {t}
-                  {tab === t && (
-                    <span className="absolute bottom-[-1px] left-0 right-0 h-0.5 bg-blue-600 rounded-t-full" />
-                  )}
-                </button>
-              ))}
-            </div>
+                <div className="text-[11px] text-slate-500 font-medium">
+                  Repository platform
+                </div>
+              </div>
+            </Link>
           </div>
 
-          {/* Right Actions */}
-          <div className="flex items-center gap-4">
-            <Link href={`${repoBase}/commits`} title="View commit history" className="text-slate-400 hover:text-slate-700 transition-colors">
-              <span className="material-symbols-outlined">history</span>
+          <div className="p-5">
+            <Link
+              href="/new"
+              className="w-full h-10 rounded-xl bg-slate-950 hover:bg-slate-800 text-white flex items-center justify-center gap-2 text-sm font-semibold no-underline transition-colors"
+            >
+              <span className="material-symbols-outlined text-[18px]">
+                add
+              </span>
+              New Repository
+            </Link>
+          </div>
+
+          <nav className="px-3 flex-1">
+            <div className="px-3 pb-2 text-[10px] font-bold uppercase tracking-[0.18em] text-slate-400">
+              Repository
+            </div>
+
+            <div className="space-y-1">
+              {sidebarItems.map((item) => {
+                const active =
+                  item.label === "Code"
+                    ? pathname === repoBase
+                    : isActive(item.href);
+
+                return (
+                  <Link
+                    key={`${item.label}-${item.href}`}
+                    href={item.href}
+                    className={`flex items-center gap-3 px-3 py-2.5 rounded-xl text-sm font-medium no-underline transition-colors ${
+                      active
+                        ? "bg-slate-100 text-slate-950"
+                        : "text-slate-600 hover:bg-slate-50 hover:text-slate-950"
+                    }`}
+                  >
+                    <span className="material-symbols-outlined text-[19px]">
+                      {item.icon}
+                    </span>
+                    <span>{item.label}</span>
+                  </Link>
+                );
+              })}
+            </div>
+
+            <div className="mt-7 px-3 pb-2 text-[10px] font-bold uppercase tracking-[0.18em] text-slate-400">
+              Repository tools
+            </div>
+
+            <div className="space-y-1">
+              {[
+                {
+                  label: "File Tree",
+                  icon: "folder_open",
+                  href: `${repoBase}/tree`,
+                },
+                {
+                  label: "Upload Files",
+                  icon: "upload_file",
+                  href: `${repoBase}/upload`,
+                },
+              ].map((item) => (
+                <Link
+                  key={item.label}
+                  href={item.href}
+                  className="flex items-center gap-3 px-3 py-2.5 rounded-xl text-sm font-medium text-slate-600 hover:bg-slate-50 hover:text-slate-950 no-underline transition-colors"
+                >
+                  <span className="material-symbols-outlined text-[19px]">
+                    {item.icon}
+                  </span>
+                  {item.label}
+                </Link>
+              ))}
+            </div>
+          </nav>
+
+          <div className="border-t border-slate-100 p-3 space-y-1">
+            <Link
+              href="/settings"
+              className="flex items-center gap-3 px-3 py-2.5 rounded-xl text-sm font-medium text-slate-600 hover:bg-slate-50 hover:text-slate-950 no-underline"
+            >
+              <span className="material-symbols-outlined text-[19px]">
+                settings
+              </span>
+              Settings
             </Link>
 
-            {/* Deploy */}
-            <button
-              title="Deploy this repository"
-              onClick={() => setShowDeployModal(true)}
-              className="px-4 py-2 bg-slate-900 border border-slate-700 rounded-lg text-sm font-semibold text-white hover:bg-slate-800 transition-colors"
+            <Link
+              href="/explore"
+              className="flex items-center gap-3 px-3 py-2.5 rounded-xl text-sm font-medium text-slate-600 hover:bg-slate-50 hover:text-slate-950 no-underline"
             >
-              🚀 Deploy
-            </button>
+              <span className="material-symbols-outlined text-[19px]">
+                explore
+              </span>
+              Explore
+            </Link>
+          </div>
+        </aside>
 
-            {/* Profile Dropdown */}
-            <div className="relative profile-dropdown-container" ref={profileRef}>
-              <button
-                onClick={() => setIsProfileOpen(!isProfileOpen)}
-                className="w-8 h-8 rounded-full overflow-hidden border border-slate-200 cursor-pointer hover:ring-2 hover:ring-slate-200 transition-all focus:outline-none flex items-center justify-center bg-slate-100"
-              >
-                {user?.avatar_url ? (
-                  <img src={user.avatar_url} alt="User" className="w-full h-full object-cover" />
-                ) : (
-                  <span className="text-xs font-bold text-slate-500">{user?.username?.charAt(0).toUpperCase() || 'U'}</span>
-                )}
-              </button>
-
-              {isProfileOpen && (
-                <div className="absolute right-0 mt-2 w-56 bg-white rounded-xl shadow-[0_8px_30px_rgb(0,0,0,0.12)] border border-slate-100 py-2 z-50 animate-fade-in-up origin-top-right">
-                  <div className="px-4 py-2 border-b border-slate-100 mb-1">
-                    <p className="text-sm font-bold text-slate-900">{user?.username || 'user'}</p>
-                    <p className="text-xs text-slate-500 truncate">{user?.email || 'No email'}</p>
-                  </div>
-                  <div className="px-2 py-1">
-                    {[
-                      { href: `/${user?.username}`, icon: 'person',      label: 'Your profile' },
-                      { href: '/dashboard',         icon: 'code_blocks', label: 'Your repositories' },
-                      { href: '/explore',           icon: 'star',        label: 'Explore' },
-                    ].map(item => (
-                      <Link
-                        key={item.label}
-                        href={item.href}
-                        onClick={() => setIsProfileOpen(false)}
-                        className="flex items-center gap-2 px-3 py-2 text-sm text-slate-600 hover:bg-slate-50 hover:text-slate-900 rounded-lg transition-colors no-underline"
-                      >
-                        <span className="material-symbols-outlined text-[18px]">{item.icon}</span>
-                        {item.label}
-                      </Link>
-                    ))}
-                  </div>
-                  <div className="px-2 py-1 border-t border-slate-100 mt-1">
+        {/* Main */}
+        <main className="flex-1 min-w-0">
+          {/* Header */}
+          <header className="sticky top-0 z-40 border-b border-slate-200 bg-white/95 backdrop-blur">
+            <div className="min-h-[72px] px-5 lg:px-8 flex items-center justify-between gap-4">
+              <div className="min-w-0 flex items-center gap-3">
+                <div className="min-w-0">
+                  <div className="flex items-center gap-2 min-w-0">
                     <Link
-                      href="/settings"
-                      onClick={() => setIsProfileOpen(false)}
-                      className="flex items-center gap-2 px-3 py-2 text-sm text-slate-600 hover:bg-slate-50 hover:text-slate-900 rounded-lg transition-colors no-underline"
+                      href={`/${owner}`}
+                      className="text-sm font-semibold text-slate-500 hover:text-slate-950 no-underline truncate"
                     >
-                      <span className="material-symbols-outlined text-[18px]">settings</span>
-                      Settings
+                      {owner || "owner"}
                     </Link>
-                    <button
-                      onClick={handleLogout}
-                      className="w-full flex items-center gap-2 px-3 py-2 text-sm text-red-600 hover:bg-red-50 rounded-lg transition-colors"
+
+                    <span className="text-slate-300">/</span>
+
+                    <Link
+                      href={repoBase}
+                      className="text-sm sm:text-base font-bold text-slate-950 hover:text-blue-600 no-underline truncate"
                     >
-                      <span className="material-symbols-outlined text-[18px]">logout</span>
-                      Sign out
+                      {repoName || "repository"}
+                    </Link>
+
+                    <span
+                      className={`shrink-0 rounded-md border px-2 py-0.5 text-[10px] font-bold uppercase tracking-wide ${visibilityClass}`}
+                    >
+                      {repoMeta?.visibility || "—"}
+                    </span>
+                  </div>
+
+                  <p className="mt-1 text-xs text-slate-500 truncate max-w-[52vw]">
+                    {repoMeta?.description ||
+                      "Repository overview and developer activity"}
+                  </p>
+                </div>
+              </div>
+
+              <div className="flex items-center gap-2 shrink-0">
+                <Link
+                  href={`${repoBase}/commits`}
+                  title="Commit history"
+                  className="hidden sm:flex w-9 h-9 rounded-lg border border-slate-200 items-center justify-center text-slate-500 hover:text-slate-950 hover:bg-slate-50 no-underline"
+                >
+                  <span className="material-symbols-outlined text-[19px]">
+                    history
+                  </span>
+                </Link>
+
+                <button
+                  type="button"
+                  onClick={() => setShowDeployModal(true)}
+                  className="h-9 px-3 rounded-lg bg-slate-950 hover:bg-slate-800 text-white text-xs sm:text-sm font-semibold flex items-center gap-2"
+                >
+                  <span>🚀</span>
+                  <span className="hidden sm:inline">Deploy</span>
+                </button>
+
+                <div className="relative" ref={profileRef}>
+                  <button
+                    type="button"
+                    onClick={() => setIsProfileOpen((value) => !value)}
+                    className="w-9 h-9 rounded-full border border-slate-200 overflow-hidden bg-slate-100 flex items-center justify-center"
+                    aria-label="Open profile menu"
+                  >
+                    {user?.avatar_url ? (
+                      <img
+                        src={user.avatar_url}
+                        alt={user.username || "Profile"}
+                        className="w-full h-full object-cover"
+                      />
+                    ) : (
+                      <span className="text-xs font-bold text-slate-600">
+                        {(user?.username || "U").charAt(0).toUpperCase()}
+                      </span>
+                    )}
+                  </button>
+
+                  {isProfileOpen && (
+                    <div className="absolute right-0 mt-2 w-56 rounded-2xl border border-slate-200 bg-white shadow-2xl p-2">
+                      <div className="px-3 py-3 border-b border-slate-100">
+                        <div className="text-sm font-bold text-slate-950">
+                          {user?.username || "User"}
+                        </div>
+                        <div className="text-xs text-slate-500 truncate">
+                          {user?.email || "No email"}
+                        </div>
+                      </div>
+
+                      <div className="pt-2">
+                        {[
+                          {
+                            href: `/${user?.username || owner}`,
+                            icon: "person",
+                            label: "Profile",
+                          },
+                          {
+                            href: "/dashboard",
+                            icon: "code_blocks",
+                            label: "Repositories",
+                          },
+                          {
+                            href: "/settings",
+                            icon: "settings",
+                            label: "Settings",
+                          },
+                        ].map((item) => (
+                          <Link
+                            key={item.label}
+                            href={item.href}
+                            onClick={() => setIsProfileOpen(false)}
+                            className="flex items-center gap-2 px-3 py-2.5 rounded-xl text-sm text-slate-600 hover:text-slate-950 hover:bg-slate-50 no-underline"
+                          >
+                            <span className="material-symbols-outlined text-[18px]">
+                              {item.icon}
+                            </span>
+                            {item.label}
+                          </Link>
+                        ))}
+
+                        <button
+                          type="button"
+                          onClick={handleLogout}
+                          className="w-full flex items-center gap-2 px-3 py-2.5 rounded-xl text-sm text-red-600 hover:bg-red-50"
+                        >
+                          <span className="material-symbols-outlined text-[18px]">
+                            logout
+                          </span>
+                          Sign out
+                        </button>
+                      </div>
+                    </div>
+                  )}
+                </div>
+              </div>
+            </div>
+          </header>
+
+          {/* Content */}
+          <div
+            className={`mx-auto max-w-[1450px] px-5 lg:px-8 py-6 lg:py-8 transition-opacity duration-500 ${
+              mounted ? "opacity-100" : "opacity-0"
+            }`}
+          >
+            {/* Error banner */}
+            {repoError && (
+              <div className="mb-6 rounded-2xl border border-red-200 bg-red-50 px-4 py-3 flex items-start gap-3">
+                <span className="material-symbols-outlined text-red-500 mt-0.5">
+                  error
+                </span>
+                <div className="min-w-0">
+                  <div className="font-semibold text-red-800 text-sm">
+                    Unable to load repository
+                  </div>
+                  <div className="text-xs text-red-700 mt-1">
+                    {repoError}
+                  </div>
+                </div>
+              </div>
+            )}
+
+            {/* Repo summary */}
+            <section className="rounded-3xl border border-slate-200 bg-white shadow-sm overflow-hidden">
+              <div className="p-5 sm:p-7">
+                <div className="flex flex-col lg:flex-row lg:items-start lg:justify-between gap-5">
+                  <div className="min-w-0">
+                    <div className="flex flex-wrap items-center gap-2 mb-3">
+                      <span className="inline-flex items-center gap-1.5 rounded-full bg-slate-100 px-2.5 py-1 text-[11px] font-semibold text-slate-600">
+                        <span className="material-symbols-outlined text-[15px]">
+                          folder
+                        </span>
+                        Repository
+                      </span>
+
+                      {repoMeta?.is_fork && (
+                        <span className="inline-flex items-center gap-1.5 rounded-full bg-purple-50 px-2.5 py-1 text-[11px] font-semibold text-purple-700">
+                          <span className="material-symbols-outlined text-[15px]">
+                            fork_right
+                          </span>
+                          Fork
+                        </span>
+                      )}
+                    </div>
+
+                    <h1 className="text-2xl sm:text-3xl font-extrabold tracking-tight text-slate-950">
+                      {repoName || "Repository"}
+                    </h1>
+
+                    <p className="mt-2 max-w-3xl text-sm sm:text-base leading-6 text-slate-500">
+                      {repoLoading
+                        ? "Loading repository details…"
+                        : repoMeta?.description ||
+                          "No repository description has been added yet."}
+                    </p>
+
+                    <div className="mt-5 flex flex-wrap gap-2 text-xs text-slate-500">
+                      <span className="rounded-lg border border-slate-200 bg-slate-50 px-3 py-1.5 font-medium">
+                        Default branch:{" "}
+                        <span className="text-slate-900 font-semibold">
+                          {repoMeta?.default_branch || "main"}
+                        </span>
+                      </span>
+
+                      <span className="rounded-lg border border-slate-200 bg-slate-50 px-3 py-1.5 font-medium">
+                        {branchesLoading
+                          ? "Checking branches…"
+                          : `${branches?.total ?? 0} branch${
+                              (branches?.total ?? 0) === 1 ? "" : "es"
+                            }`}
+                      </span>
+                    </div>
+                  </div>
+
+                  <div className="flex flex-wrap gap-2">
+                    <button
+                      type="button"
+                      onClick={handleCopyCloneUrl}
+                      disabled={!cloneUrl}
+                      className="h-10 px-4 rounded-xl border border-slate-200 bg-white text-slate-700 hover:bg-slate-50 font-semibold text-sm flex items-center gap-2 disabled:opacity-50"
+                    >
+                      <span className="material-symbols-outlined text-[18px]">
+                        content_copy
+                      </span>
+                      {copied ? "Copied" : "Clone"}
+                    </button>
+
+                    <button
+                      type="button"
+                      onClick={handleStar}
+                      disabled={starring || repoLoading}
+                      className="h-10 px-4 rounded-xl border border-slate-200 bg-white text-slate-700 hover:bg-slate-50 font-semibold text-sm flex items-center gap-2 disabled:opacity-50"
+                    >
+                      <span className="material-symbols-outlined text-[18px]">
+                        star
+                      </span>
+                      {starring ? "Saving…" : `Star ${repoMeta?.star_count ?? 0}`}
+                    </button>
+
+                    <button
+                      type="button"
+                      onClick={handleFork}
+                      disabled={!repoMeta}
+                      className="h-10 px-4 rounded-xl bg-slate-950 hover:bg-slate-800 text-white font-semibold text-sm flex items-center gap-2 disabled:opacity-50"
+                    >
+                      <span className="material-symbols-outlined text-[18px]">
+                        fork_right
+                      </span>
+                      Fork
                     </button>
                   </div>
                 </div>
-              )}
-            </div>
-          </div>
-        </header>
-
-        {/* ── Dashboard Grid ── */}
-        <div className={`p-8 max-w-[1400px] mx-auto w-full grid grid-cols-1 xl:grid-cols-[280px_1fr_320px] gap-8 transition-all duration-700 ${mounted ? "opacity-100 translate-y-0" : "opacity-0 translate-y-4"}`}>
-
-          {/* ━━━ LEFT COLUMN: Profile ━━━ */}
-          <div className="space-y-6">
-
-            {/* Profile Card */}
-            <div className="bg-white rounded-3xl p-8 border border-slate-100 shadow-[0_8px_30px_rgb(0,0,0,0.04)] flex flex-col items-center text-center relative overflow-hidden group card-lift">
-              <div className="absolute inset-0 bg-gradient-to-b from-slate-50/50 to-white pointer-events-none" />
-
-              <div className="w-24 h-24 rounded-full p-1 bg-white shadow-sm border border-slate-100 mb-5 relative z-10 flex items-center justify-center overflow-hidden">
-                {profile?.avatar_url ? (
-                  <img src={profile.avatar_url} alt="Owner avatar" className="w-full h-full rounded-full object-cover" />
-                ) : user?.avatar_url ? (
-                  <img src={user.avatar_url} alt="User avatar" className="w-full h-full rounded-full object-cover" />
-                ) : (
-                  <div className="w-full h-full rounded-full bg-slate-100 flex items-center justify-center text-3xl font-bold text-slate-400">
-                    {(owner || user?.username)?.charAt(0).toUpperCase() || 'U'}
-                  </div>
-                )}
               </div>
 
-              <h2 className="text-2xl font-bold tracking-tight mb-1 relative z-10">
-                {profile?.full_name || owner || user?.username || 'user'}
-              </h2>
-              <p className="text-slate-500 text-sm mb-4 relative z-10">
-                {profile?.bio || user?.email || ''}
-              </p>
-
-              {/* Go to profile button */}
-              <Link
-                href={`/${owner}`}
-                className="text-xs font-semibold text-blue-600 hover:underline mb-6 relative z-10"
-              >
-                View profile →
-              </Link>
-
-              {/* Stats row — real data from API */}
-              <div className="flex w-full justify-between items-center px-2 relative z-10 pt-6 border-t border-slate-100">
-                <div className="flex flex-col">
-                  <span className="text-xl font-bold">{stat(profile?.repo_count, profileLoading)}</span>
-                  <span className="text-[10px] font-bold text-slate-400 tracking-wider uppercase mt-0.5">Repos</span>
-                </div>
-                <div className="flex flex-col">
-                  <span className="text-xl font-bold">{stat(profile?.follower_count, profileLoading)}</span>
-                  <span className="text-[10px] font-bold text-slate-400 tracking-wider uppercase mt-0.5">Followers</span>
-                </div>
-                <div className="flex flex-col">
-                  <span className="text-xl font-bold">{stat(profile?.following_count, profileLoading)}</span>
-                  <span className="text-[10px] font-bold text-slate-400 tracking-wider uppercase mt-0.5">Following</span>
-                </div>
-              </div>
-            </div>
-
-            {/* Quick Links Card */}
-            <div className="bg-white rounded-3xl p-6 border border-slate-100 shadow-[0_8px_30px_rgb(0,0,0,0.04)] card-lift">
-              <h3 className="font-bold mb-4">Quick Links</h3>
-              <div className="flex flex-col gap-2">
+              <div className="border-t border-slate-100 px-5 sm:px-7 h-14 flex items-center gap-5 overflow-x-auto">
                 {[
-                  { label: 'Issues',        href: `${repoBase}/issues`,  icon: 'adjust',      color: 'text-red-500' },
-                  { label: 'Pull Requests', href: `${repoBase}/pulls`,   icon: 'alt_route',   color: 'text-green-600' },
-                  { label: 'Commits',       href: `${repoBase}/commits`, icon: 'commit',      color: 'text-blue-500' },
-                  { label: 'File Tree',     href: `${repoBase}/tree`,    icon: 'folder_open', color: 'text-amber-500' },
-                  { label: 'Upload files',  href: `${repoBase}/upload`,  icon: 'upload_file', color: 'text-violet-500' },
-                ].map(l => (
-                  <Link
-                    key={l.label}
-                    href={l.href}
-                    className="flex items-center gap-3 px-3 py-2.5 rounded-xl hover:bg-slate-50 text-slate-700 hover:text-slate-900 transition-colors text-sm font-medium no-underline"
-                  >
-                    <span className={`material-symbols-outlined text-[18px] ${l.color}`}>{l.icon}</span>
-                    {l.label}
-                  </Link>
-                ))}
-              </div>
-            </div>
-          </div>
+                  { label: "Overview", href: repoBase },
+                  { label: "Commits", href: `${repoBase}/commits` },
+                  { label: "Issues", href: `${repoBase}/issues` },
+                  { label: "Pull Requests", href: `${repoBase}/pulls` },
+                  { label: "Security", href: `${repoBase}/security` },
+                ].map((item) => {
+                  const selected =
+                    item.label === "Overview"
+                      ? pathname === repoBase
+                      : pathname?.startsWith(item.href);
 
-          {/* ━━━ CENTER COLUMN: Overview Feed ━━━ */}
-          <div className="space-y-6">
-            {/* Feed Header */}
-            <div className="flex items-center justify-between px-2">
-              <h2 className="text-2xl font-bold tracking-tight">{tab}</h2>
-              <div className="flex items-center gap-2">
-                {["All", "Commits", "PRs"].map(f => (
-                  <button
-                    key={f}
-                    className="px-3 py-1.5 rounded-lg text-xs font-bold transition-colors bg-slate-100 text-slate-900 hover:bg-slate-200"
-                  >
-                    {f}
-                  </button>
-                ))}
+                  return (
+                    <Link
+                      key={item.label}
+                      href={item.href}
+                      className={`h-full flex items-center border-b-2 text-sm font-semibold no-underline whitespace-nowrap ${
+                        selected
+                          ? "border-blue-600 text-blue-600"
+                          : "border-transparent text-slate-500 hover:text-slate-950"
+                      }`}
+                    >
+                      {item.label}
+                    </Link>
+                  );
+                })}
               </div>
-            </div>
+            </section>
 
-            {/* Empty state with working CTA */}
-            <div className="space-y-6">
-              <div className="bg-white rounded-3xl p-8 border border-slate-100 shadow-[0_8px_30px_rgb(0,0,0,0.04)] text-center flex flex-col items-center card-lift">
-                <div className="w-16 h-16 rounded-full bg-slate-50 border border-slate-100 flex items-center justify-center mb-4">
-                  <span className="material-symbols-outlined text-slate-400 text-3xl">notifications_paused</span>
+            {/* Empty repository */}
+            {isEmptyRepository && (
+              <section className="mt-6 rounded-3xl border border-dashed border-slate-300 bg-white p-8 sm:p-12 text-center shadow-sm">
+                <div className="mx-auto w-16 h-16 rounded-2xl bg-slate-100 flex items-center justify-center">
+                  <span className="material-symbols-outlined text-[30px] text-slate-500">
+                    inventory_2
+                  </span>
                 </div>
-                <h3 className="text-lg font-bold text-slate-800 mb-2">No recent activity</h3>
-                <p className="text-sm text-slate-500 max-w-sm mb-6">
-                  There hasn&apos;t been any activity in this repository yet. Push some code or open an issue to get started!
+
+                <h2 className="mt-5 text-xl sm:text-2xl font-extrabold text-slate-950">
+                  This repository is empty
+                </h2>
+
+                <p className="mt-2 max-w-xl mx-auto text-sm leading-6 text-slate-500">
+                  No commits or branches exist yet. Create your first commit
+                  locally and push it to PandaHub to start browsing code.
                 </p>
-                <div className="flex items-center gap-3">
-                  <Link
-                    href={`${repoBase}/issues`}
-                    className="px-5 py-2.5 bg-slate-900 text-white font-semibold text-sm rounded-xl hover:bg-slate-800 transition-all shadow-sm no-underline"
+
+                <div className="mt-6 max-w-2xl mx-auto rounded-2xl bg-slate-950 p-5 text-left overflow-x-auto">
+                  <div className="text-[11px] uppercase tracking-wider text-slate-400 font-bold mb-3">
+                    Panda CLI
+                  </div>
+
+                  <pre className="text-xs sm:text-sm text-slate-200 leading-7">
+{`panda clone ${owner}/${repoName}
+cd ${repoName}
+panda add .
+panda commit -m "Initial commit"
+panda push -u pandahub main`}
+                  </pre>
+                </div>
+
+                <div className="mt-6 flex flex-wrap justify-center gap-3">
+                  <button
+                    type="button"
+                    onClick={handleCopyCloneUrl}
+                    className="h-10 px-4 rounded-xl bg-slate-950 text-white text-sm font-semibold hover:bg-slate-800"
                   >
-                    Open an Issue
-                  </Link>
+                    {copied ? "Clone URL copied" : "Copy clone URL"}
+                  </button>
+
                   <Link
-                    href={`${repoBase}/pulls`}
-                    className="px-5 py-2.5 bg-white border border-slate-200 text-slate-700 font-semibold text-sm rounded-xl hover:bg-slate-50 transition-all shadow-sm no-underline"
+                    href={`${repoBase}/upload`}
+                    className="h-10 px-4 rounded-xl border border-slate-200 bg-white text-slate-700 hover:bg-slate-50 text-sm font-semibold flex items-center no-underline"
                   >
-                    New Pull Request
+                    Upload files
                   </Link>
                 </div>
+              </section>
+            )}
+
+            {/* Main grid */}
+            {!isEmptyRepository && (
+              <div className="mt-6 grid grid-cols-1 xl:grid-cols-[260px_minmax(0,1fr)_300px] gap-6">
+                {/* Owner card */}
+                <div className="space-y-6">
+                  <section className="rounded-3xl border border-slate-200 bg-white shadow-sm p-6">
+                    <div className="flex items-center gap-4">
+                      <div className="w-14 h-14 rounded-2xl overflow-hidden bg-slate-100 border border-slate-200 flex items-center justify-center">
+                        {profile?.avatar_url ? (
+                          <img
+                            src={profile.avatar_url}
+                            alt={profile.username || owner}
+                            className="w-full h-full object-cover"
+                          />
+                        ) : user?.avatar_url && user.username === owner ? (
+                          <img
+                            src={user.avatar_url}
+                            alt={user.username}
+                            className="w-full h-full object-cover"
+                          />
+                        ) : (
+                          <span className="text-xl font-extrabold text-slate-500">
+                            {profileInitial}
+                          </span>
+                        )}
+                      </div>
+
+                      <div className="min-w-0">
+                        <div className="font-bold text-slate-950 truncate">
+                          {profile?.full_name || owner || "Owner"}
+                        </div>
+                        <div className="text-xs text-slate-500 truncate">
+                          @{profile?.username || owner}
+                        </div>
+                      </div>
+                    </div>
+
+                    <p className="mt-4 text-sm leading-6 text-slate-500">
+                      {profileLoading
+                        ? "Loading profile…"
+                        : profile?.bio || "No bio available."}
+                    </p>
+
+                    <Link
+                      href={`/${owner}`}
+                      className="mt-5 inline-flex text-sm font-semibold text-blue-600 hover:text-blue-700 no-underline"
+                    >
+                      View profile →
+                    </Link>
+
+                    <div className="mt-6 grid grid-cols-3 gap-2 border-t border-slate-100 pt-5">
+                      {[
+                        ["Repos", profile?.repo_count],
+                        ["Followers", profile?.follower_count],
+                        ["Following", profile?.following_count],
+                      ].map(([label, value]) => (
+                        <div key={String(label)} className="text-center">
+                          <div className="text-lg font-extrabold text-slate-950">
+                            {profileLoading ? "—" : value ?? 0}
+                          </div>
+                          <div className="mt-1 text-[9px] font-bold uppercase tracking-wider text-slate-400">
+                            {label}
+                          </div>
+                        </div>
+                      ))}
+                    </div>
+                  </section>
+
+                  <section className="rounded-3xl border border-slate-200 bg-white shadow-sm p-5">
+                    <div className="text-sm font-bold text-slate-950 mb-3">
+                      Quick access
+                    </div>
+
+                    <div className="space-y-1">
+                      {[
+                        {
+                          label: "Commits",
+                          href: `${repoBase}/commits`,
+                          icon: "commit",
+                        },
+                        {
+                          label: "Issues",
+                          href: `${repoBase}/issues`,
+                          icon: "adjust",
+                        },
+                        {
+                          label: "Pull Requests",
+                          href: `${repoBase}/pulls`,
+                          icon: "alt_route",
+                        },
+                        {
+                          label: "Security",
+                          href: `${repoBase}/security`,
+                          icon: "security",
+                        },
+                        {
+                          label: "Upload files",
+                          href: `${repoBase}/upload`,
+                          icon: "upload_file",
+                        },
+                      ].map((item) => (
+                        <Link
+                          key={item.label}
+                          href={item.href}
+                          className="flex items-center gap-3 px-3 py-2.5 rounded-xl text-sm font-medium text-slate-600 hover:bg-slate-50 hover:text-slate-950 no-underline"
+                        >
+                          <span className="material-symbols-outlined text-[18px]">
+                            {item.icon}
+                          </span>
+                          {item.label}
+                        </Link>
+                      ))}
+                    </div>
+                  </section>
+                </div>
+
+                {/* Center */}
+                <div className="space-y-6">
+                  <section className="rounded-3xl border border-slate-200 bg-white shadow-sm overflow-hidden">
+                    <div className="px-6 py-5 border-b border-slate-100 flex items-center justify-between gap-4">
+                      <div>
+                        <h2 className="text-lg font-extrabold text-slate-950">
+                          {activeTab}
+                        </h2>
+                        <p className="text-xs text-slate-500 mt-1">
+                          Repository activity and developer overview.
+                        </p>
+                      </div>
+
+                      <div className="flex rounded-xl border border-slate-200 p-1 bg-slate-50">
+                        {["Overview", "Activity", "Stats"].map((tabName) => (
+                          <button
+                            key={tabName}
+                            type="button"
+                            onClick={() => setActiveTab(tabName)}
+                            className={`px-3 py-1.5 rounded-lg text-xs font-semibold ${
+                              activeTab === tabName
+                                ? "bg-white text-slate-950 shadow-sm"
+                                : "text-slate-500 hover:text-slate-950"
+                            }`}
+                          >
+                            {tabName}
+                          </button>
+                        ))}
+                      </div>
+                    </div>
+
+                    <div className="p-6">
+                      {activeTab === "Overview" && (
+                        <div className="grid sm:grid-cols-2 gap-4">
+                          <Link
+                            href={repoBase}
+                            className="group rounded-2xl border border-slate-200 p-5 hover:border-slate-300 hover:bg-slate-50 no-underline"
+                          >
+                            <div className="w-10 h-10 rounded-xl bg-blue-50 flex items-center justify-center">
+                              <span className="material-symbols-outlined text-blue-600">
+                                code
+                              </span>
+                            </div>
+                            <h3 className="mt-4 font-bold text-slate-950">
+                              Browse code
+                            </h3>
+                            <p className="mt-1 text-xs leading-5 text-slate-500">
+                              View files and source code in this repository.
+                            </p>
+                          </Link>
+
+                          <Link
+                            href={`${repoBase}/commits`}
+                            className="group rounded-2xl border border-slate-200 p-5 hover:border-slate-300 hover:bg-slate-50 no-underline"
+                          >
+                            <div className="w-10 h-10 rounded-xl bg-emerald-50 flex items-center justify-center">
+                              <span className="material-symbols-outlined text-emerald-600">
+                                history
+                              </span>
+                            </div>
+                            <h3 className="mt-4 font-bold text-slate-950">
+                              Commit history
+                            </h3>
+                            <p className="mt-1 text-xs leading-5 text-slate-500">
+                              Inspect recent commits and development history.
+                            </p>
+                          </Link>
+
+                          <Link
+                            href={`${repoBase}/issues`}
+                            className="group rounded-2xl border border-slate-200 p-5 hover:border-slate-300 hover:bg-slate-50 no-underline"
+                          >
+                            <div className="w-10 h-10 rounded-xl bg-rose-50 flex items-center justify-center">
+                              <span className="material-symbols-outlined text-rose-600">
+                                adjust
+                              </span>
+                            </div>
+                            <h3 className="mt-4 font-bold text-slate-950">
+                              Issues
+                            </h3>
+                            <p className="mt-1 text-xs leading-5 text-slate-500">
+                              Track bugs, feature requests, and discussions.
+                            </p>
+                          </Link>
+
+                          <Link
+                            href={`${repoBase}/pulls`}
+                            className="group rounded-2xl border border-slate-200 p-5 hover:border-slate-300 hover:bg-slate-50 no-underline"
+                          >
+                            <div className="w-10 h-10 rounded-xl bg-violet-50 flex items-center justify-center">
+                              <span className="material-symbols-outlined text-violet-600">
+                                alt_route
+                              </span>
+                            </div>
+                            <h3 className="mt-4 font-bold text-slate-950">
+                              Pull requests
+                            </h3>
+                            <p className="mt-1 text-xs leading-5 text-slate-500">
+                              Review and merge changes from contributors.
+                            </p>
+                          </Link>
+                        </div>
+                      )}
+
+                      {activeTab === "Activity" && (
+                        <div className="rounded-2xl bg-slate-50 border border-slate-100 p-8 text-center">
+                          <div className="w-12 h-12 rounded-xl bg-white border border-slate-200 mx-auto flex items-center justify-center">
+                            <span className="material-symbols-outlined text-slate-500">
+                              timeline
+                            </span>
+                          </div>
+                          <h3 className="mt-4 font-bold text-slate-950">
+                            Activity is ready for your commits
+                          </h3>
+                          <p className="mt-1 text-sm text-slate-500 max-w-md mx-auto">
+                            Push changes, open issues, or create pull requests
+                            to populate the repository activity feed.
+                          </p>
+                        </div>
+                      )}
+
+                      {activeTab === "Stats" && (
+                        <div className="grid sm:grid-cols-3 gap-4">
+                          {[
+                            ["Stars", repoMeta?.star_count ?? 0, "star"],
+                            ["Forks", repoMeta?.fork_count ?? 0, "fork_right"],
+                            ["Watchers", repoMeta?.watcher_count ?? 0, "visibility"],
+                          ].map(([label, value, icon]) => (
+                            <div
+                              key={String(label)}
+                              className="rounded-2xl border border-slate-200 p-5"
+                            >
+                              <span className="material-symbols-outlined text-slate-500">
+                                {String(icon)}
+                              </span>
+                              <div className="mt-4 text-2xl font-extrabold text-slate-950">
+                                {value}
+                              </div>
+                              <div className="mt-1 text-xs font-semibold text-slate-500">
+                                {label}
+                              </div>
+                            </div>
+                          ))}
+                        </div>
+                      )}
+                    </div>
+                  </section>
+
+                  <section className="rounded-3xl border border-slate-200 bg-white shadow-sm p-6">
+                    <div className="flex items-center justify-between">
+                      <div>
+                        <h2 className="text-lg font-extrabold">
+                          Repository status
+                        </h2>
+                        <p className="text-xs text-slate-500 mt-1">
+                          Current repository state.
+                        </p>
+                      </div>
+
+                      <span className="inline-flex items-center gap-2 rounded-full bg-emerald-50 px-3 py-1 text-xs font-semibold text-emerald-700">
+                        <span className="w-2 h-2 rounded-full bg-emerald-500" />
+                        Available
+                      </span>
+                    </div>
+
+                    <div className="mt-5 grid sm:grid-cols-2 gap-4">
+                      <div className="rounded-2xl bg-slate-50 border border-slate-100 p-4">
+                        <div className="text-xs text-slate-500">
+                          Default branch
+                        </div>
+                        <div className="mt-1 font-bold text-slate-950">
+                          {repoMeta?.default_branch || "main"}
+                        </div>
+                      </div>
+
+                      <div className="rounded-2xl bg-slate-50 border border-slate-100 p-4">
+                        <div className="text-xs text-slate-500">
+                          Last push
+                        </div>
+                        <div className="mt-1 font-bold text-slate-950">
+                          {repoMeta?.pushed_at
+                            ? new Date(repoMeta.pushed_at).toLocaleString()
+                            : "No pushes yet"}
+                        </div>
+                      </div>
+                    </div>
+                  </section>
+                </div>
+
+                {/* Right */}
+                <div className="space-y-6">
+                  <section className="rounded-3xl border border-slate-200 bg-white shadow-sm p-5">
+                    <div className="text-sm font-extrabold text-slate-950">
+                      Repository actions
+                    </div>
+
+                    <div className="mt-4 space-y-2">
+                      <button
+                        type="button"
+                        onClick={handleCopyCloneUrl}
+                        className="w-full flex items-center gap-3 rounded-xl border border-slate-200 px-3 py-3 text-left hover:bg-slate-50"
+                      >
+                        <span className="material-symbols-outlined text-[19px] text-blue-600">
+                          content_copy
+                        </span>
+                        <span>
+                          <span className="block text-sm font-semibold">
+                            {copied ? "Clone URL copied" : "Copy clone URL"}
+                          </span>
+                          <span className="block text-[11px] text-slate-500">
+                            Use with Git or Panda CLI
+                          </span>
+                        </span>
+                      </button>
+
+                      <button
+                        type="button"
+                        onClick={handleStar}
+                        disabled={starring}
+                        className="w-full flex items-center gap-3 rounded-xl border border-slate-200 px-3 py-3 text-left hover:bg-slate-50 disabled:opacity-60"
+                      >
+                        <span className="material-symbols-outlined text-[19px] text-amber-500">
+                          star
+                        </span>
+                        <span>
+                          <span className="block text-sm font-semibold">
+                            {starring ? "Updating…" : "Star repository"}
+                          </span>
+                          <span className="block text-[11px] text-slate-500">
+                            {repoMeta?.star_count ?? 0} stars
+                          </span>
+                        </span>
+                      </button>
+
+                      <button
+                        type="button"
+                        onClick={handleFork}
+                        className="w-full flex items-center gap-3 rounded-xl border border-slate-200 px-3 py-3 text-left hover:bg-slate-50"
+                      >
+                        <span className="material-symbols-outlined text-[19px] text-violet-500">
+                          fork_right
+                        </span>
+                        <span>
+                          <span className="block text-sm font-semibold">
+                            Fork repository
+                          </span>
+                          <span className="block text-[11px] text-slate-500">
+                            {repoMeta?.fork_count ?? 0} forks
+                          </span>
+                        </span>
+                      </button>
+                    </div>
+                  </section>
+
+                  <section className="rounded-3xl border border-slate-200 bg-slate-950 p-5 text-white">
+                    <div className="flex items-center gap-2">
+                      <div className="w-8 h-8 rounded-lg bg-white/10 flex items-center justify-center">
+                        <span className="text-sm">🐼</span>
+                      </div>
+                      <div>
+                        <div className="text-sm font-bold">Panda CLI</div>
+                        <div className="text-[11px] text-slate-400">
+                          Git-compatible workflow
+                        </div>
+                      </div>
+                    </div>
+
+                    <div className="mt-4 rounded-xl border border-white/10 bg-black/20 p-4 overflow-x-auto">
+                      <code className="text-[11px] leading-6 text-slate-200 whitespace-pre">
+{`panda clone ${owner}/${repoName}
+cd ${repoName}
+panda status
+panda add .
+panda commit -m "update"
+panda push`}
+                      </code>
+                    </div>
+                  </section>
+                </div>
               </div>
-            </div>
+            )}
           </div>
+        </main>
+      </div>
 
-          {/* ━━━ RIGHT COLUMN: Trending ━━━ */}
-          <div className="space-y-6">
-            <div className="bg-white rounded-3xl p-6 border border-slate-100 shadow-[0_8px_30px_rgb(0,0,0,0.04)] card-lift">
-              <h3 className="text-lg font-bold mb-6 flex items-center gap-2">
-                <span className="material-symbols-outlined text-slate-700 text-[20px]">trending_up</span>
-                Repository Info
-              </h3>
-
-              <div className="space-y-4">
-                {[
-                  {
-                    label: 'Clone',
-                    icon: 'content_copy',
-                    action: () => navigator.clipboard.writeText(
-                      `${window.location.protocol}//${window.location.host}/git/${owner}/${repoName}.git`
-                    ),
-                    color: 'text-blue-500',
-                  },
-                  {
-                    label: 'Download ZIP',
-                    icon: 'download',
-                    action: () => alert('ZIP download coming soon'),
-                    color: 'text-green-600',
-                  },
-                  {
-                    label: 'Watch',
-                    icon: 'visibility',
-                    action: () => alert('Watch feature coming soon'),
-                    color: 'text-amber-500',
-                  },
-                  {
-                    label: starring
-                      ? 'Unstar'
-                      : `Star${repoMeta ? ` (${repoMeta.star_count})` : ''}`,
-                    icon: 'star',
-                    action: async () => {
-                      if (!user) { router.push('/login'); return; }
-                      try {
-                        setStarring(true);
-                        if (repoMeta && repoMeta.star_count > 0) {
-                          await api.delete(`/${owner}/${repoName}/star`);
-                          setRepoMeta(m => m ? { ...m, star_count: Math.max(0, m.star_count - 1) } : m);
-                        } else {
-                          const { data } = await api.post(`/${owner}/${repoName}/star`);
-                          setRepoMeta(m => m ? { ...m, star_count: (data as any).star_count } : m);
-                        }
-                      } finally {
-                        setStarring(false);
-                      }
-                    },
-                    color: 'text-yellow-500',
-                  },
-                  {
-                    label: `Fork${repoMeta ? ` (${repoMeta.fork_count})` : ''}`,
-                    icon: 'fork_right',
-                    action: async () => {
-                      if (!user) { router.push('/login'); return; }
-                      try {
-                        const { data } = await api.post<{ name: string }>(`/${owner}/${repoName}/fork`);
-                        router.push(`/${user.username}/${data.name}`);
-                      } catch (e: any) {
-                        alert(e?.response?.data?.detail || 'Fork failed');
-                      }
-                    },
-                    color: 'text-purple-500',
-                  },
-                ].map(item => (
-                  <button
-                    key={item.label}
-                    onClick={item.action}
-                    className="w-full flex items-center gap-3 px-3 py-2.5 rounded-xl hover:bg-slate-50 text-slate-700 hover:text-slate-900 transition-colors text-sm font-semibold text-left"
-                  >
-                    <span className={`material-symbols-outlined text-[18px] ${item.color}`}>{item.icon}</span>
-                    {item.label}
-                  </button>
-                ))}
-              </div>
-            </div>
-          </div>
-
+      {/* Toast */}
+      {notice && (
+        <div className="fixed bottom-5 right-5 z-[100] rounded-xl bg-slate-950 text-white px-4 py-3 shadow-2xl text-sm font-medium">
+          {notice}
         </div>
-      </main>
+      )}
 
-      {/* ── Deploy Modal ── */}
+      {/* Deploy modal */}
       {showDeployModal && (
         <div
-          style={{
-            position: 'fixed', inset: 0, background: 'rgba(1,4,9,.85)',
-            display: 'flex', alignItems: 'center', justifyContent: 'center',
-            zIndex: 999, padding: 16, fontFamily: "-apple-system,BlinkMacSystemFont,'Segoe UI',Helvetica,Arial,sans-serif",
+          className="fixed inset-0 z-[120] bg-slate-950/70 backdrop-blur-sm flex items-center justify-center p-4"
+          onClick={(event) => {
+            if (event.target === event.currentTarget) {
+              setShowDeployModal(false);
+            }
           }}
-          onClick={(e) => { if (e.target === e.currentTarget) setShowDeployModal(false); }}
         >
-          <div style={{
-            background: '#161b22', border: '1px solid #30363d', borderRadius: 6,
-            padding: 28, maxWidth: 520, width: '100%', boxShadow: '0 8px 24px rgba(1,4,9,.6)',
-          }}>
-            <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', marginBottom: 20 }}>
-              <h3 style={{ margin: 0, fontSize: 18, fontWeight: 700, color: '#e6edf3' }}>🚀 Deploy this repository</h3>
-              <button onClick={() => setShowDeployModal(false)} style={{ background: 'none', border: 'none', cursor: 'pointer', color: '#7d8590', fontSize: 20, lineHeight: 1 }}>×</button>
-            </div>
-            <p style={{ color: '#7d8590', fontSize: 13, margin: '0 0 20px' }}>
-              Choose a platform to deploy <strong style={{ color: '#e6edf3' }}>{owner}/{repoName}</strong>. These services will pull your code directly from the repository.
-            </p>
-
-            {[
-              {
-                name: 'Render',
-                desc: 'Web services, workers, databases — auto-deploy on push',
-                color: '#46E3B7',
-                bg: '#1a2e2a',
-                icon: '▲',
-                url: `https://render.com/deploy`,
-              },
-              {
-                name: 'Railway',
-                desc: 'Instant deployments with zero config',
-                color: '#7B68EE',
-                bg: '#1e1a2e',
-                icon: '🚂',
-                url: `https://railway.app/new`,
-              },
-              {
-                name: 'Vercel',
-                desc: 'Frontend & serverless — optimised for Next.js',
-                color: '#e6edf3',
-                bg: '#1c1c1c',
-                icon: '▼',
-                url: `https://vercel.com/new`,
-              },
-            ].map((p) => (
-              <a
-                key={p.name}
-                href={p.url}
-                target="_blank"
-                rel="noopener noreferrer"
-                style={{
-                  display: 'flex', alignItems: 'center', gap: 14, padding: '14px 16px',
-                  background: p.bg, border: '1px solid #30363d', borderRadius: 6,
-                  marginBottom: 10, textDecoration: 'none', transition: 'border-color .15s',
-                }}
-                onMouseEnter={(e) => (e.currentTarget.style.borderColor = p.color)}
-                onMouseLeave={(e) => (e.currentTarget.style.borderColor = '#30363d')}
-              >
-                <span style={{ fontSize: 24, width: 36, textAlign: 'center', flexShrink: 0 }}>{p.icon}</span>
-                <div style={{ flex: 1 }}>
-                  <div style={{ fontWeight: 700, fontSize: 14, color: p.color }}>{p.name}</div>
-                  <div style={{ fontSize: 12, color: '#7d8590', marginTop: 2 }}>{p.desc}</div>
+          <div className="w-full max-w-xl rounded-3xl bg-white border border-slate-200 shadow-2xl overflow-hidden">
+            <div className="px-6 py-5 border-b border-slate-100 flex items-center justify-between">
+              <div>
+                <div className="text-lg font-extrabold text-slate-950">
+                  Deploy repository
                 </div>
-                <svg width="14" height="14" viewBox="0 0 16 16" fill="#7d8590">
-                  <path d="M3.75 2h3.5a.75.75 0 0 1 0 1.5h-3.5a.25.25 0 0 0-.25.25v8.5c0 .138.112.25.25.25h8.5a.25.25 0 0 0 .25-.25v-3.5a.75.75 0 0 1 1.5 0v3.5A1.75 1.75 0 0 1 12.25 14h-8.5A1.75 1.75 0 0 1 2 12.25v-8.5C2 2.784 2.784 2 3.75 2Zm6.854-1h4.146a.25.25 0 0 1 .25.25v4.146a.25.25 0 0 1-.427.177L13.03 4.03 9.28 7.78a.751.751 0 0 1-1.042-.018.751.751 0 0 1-.018-1.042l3.75-3.75-1.543-1.543A.25.25 0 0 1 10.604 1Z" />
-                </svg>
-              </a>
-            ))}
+                <div className="text-xs text-slate-500 mt-1">
+                  Deploy {owner}/{repoName}
+                </div>
+              </div>
 
-            <div style={{
-              background: '#0d1117', border: '1px solid #21262d', borderRadius: 6,
-              padding: '12px 14px', marginTop: 16,
-            }}>
-              <p style={{ color: '#7d8590', fontSize: 12, margin: '0 0 6px', fontWeight: 600 }}>🐼 panda CLI</p>
-              <code style={{
-                fontFamily: "'SFMono-Regular',Consolas,'Liberation Mono',Menlo,monospace",
-                fontSize: 12, color: '#58a6ff',
-              }}>
-                panda deploy --repo {owner}/{repoName} --platform render
-              </code>
+              <button
+                type="button"
+                onClick={() => setShowDeployModal(false)}
+                className="w-9 h-9 rounded-lg hover:bg-slate-100 flex items-center justify-center text-slate-500"
+              >
+                <span className="material-symbols-outlined">close</span>
+              </button>
+            </div>
+
+            <div className="p-6 space-y-3">
+              {[
+                {
+                  name: "Render",
+                  description:
+                    "Web services, workers, databases, and background jobs.",
+                  href: "https://render.com/deploy",
+                },
+                {
+                  name: "Railway",
+                  description:
+                    "Fast application deployments with minimal configuration.",
+                  href: "https://railway.app/new",
+                },
+                {
+                  name: "Vercel",
+                  description:
+                    "Optimized deployment platform for Next.js frontends.",
+                  href: "https://vercel.com/new",
+                },
+              ].map((platform) => (
+                <a
+                  key={platform.name}
+                  href={platform.href}
+                  target="_blank"
+                  rel="noopener noreferrer"
+                  className="block rounded-2xl border border-slate-200 p-4 hover:border-slate-300 hover:bg-slate-50 no-underline transition-colors"
+                >
+                  <div className="flex items-center justify-between gap-4">
+                    <div>
+                      <div className="font-bold text-slate-950">
+                        {platform.name}
+                      </div>
+                      <div className="mt-1 text-xs leading-5 text-slate-500">
+                        {platform.description}
+                      </div>
+                    </div>
+
+                    <span className="material-symbols-outlined text-slate-400">
+                      open_in_new
+                    </span>
+                  </div>
+                </a>
+              ))}
             </div>
           </div>
         </div>
@@ -608,3 +1338,4 @@ export default function RepoDashboardPage() {
     </div>
   );
 }
+```

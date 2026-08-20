@@ -25,7 +25,7 @@ export default function TreePage() {
   const refFromUrl = pathSegments[0];
   const restSegments = pathSegments.slice(1);
   const currentPath = restSegments.join('/');
-  const ref = refFromUrl || repo?.default_branch || 'main';
+  const ref = refFromUrl || (branches.length > 0 ? (repo?.default_branch || branches[0]?.name || '') : '');
 
   // Check if current path is a blob or tree
   const [viewType, setViewType] = useState<'tree' | 'blob'>('tree');

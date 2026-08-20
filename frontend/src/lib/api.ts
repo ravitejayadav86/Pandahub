@@ -27,6 +27,35 @@ type QueueItem = {
 let isRefreshing = false;
 let failedQueue: QueueItem[] = [];
 
+/**
+ * Safely add/replace the Authorization header without replacing
+ * AxiosHeaders with a plain object.
+ */
+function setAuthHeader(
+  config: AxiosRequestConfig,
+  token: string,
+): void {
+  if (config.headers instanceof AxiosHeaders) {
+    config.headers.set("Authorization", `Bearer ${token}`);
+    return;
+  }
+
+  const headers = new AxiosHeaders();
+
+  if (config.headers) {
+    Object.entries(config.headers as Record<string, unknown>).forEach(
+      ([key, value]) => {
+        if (value !== undefined && value !== null) {
+          headers.set(key, String(value));
+        }
+      },
+    );
+  }
+
+  headers.set("Authorization", `Bearer ${token}`);
+  config.headers = headers;
+}
+
 function processQueue(error: unknown, token: string | null) {
   const queue = [...failedQueue];
   failedQueue = [];
@@ -40,34 +69,16 @@ function processQueue(error: unknown, token: string | null) {
   }
 }
 
-function applyAuthorization(
-  config: AxiosRequestConfig,
-  token: string,
-): AxiosRequestConfig {
-  const headers =
-    config.headers instanceof AxiosHeaders
-      ? config.headers
-      : AxiosHeaders.from(config.headers);
-
-  headers.set("Authorization", `Bearer ${token}`);
-  config.headers = headers;
-
-  return config;
-}
-
+/**
+ * Attach the current access token to outgoing browser requests.
+ */
 api.interceptors.request.use(
   (config) => {
     if (typeof window !== "undefined") {
       const token = localStorage.getItem("access_token");
 
       if (token) {
-        const headers =
-          config.headers instanceof AxiosHeaders
-            ? config.headers
-            : AxiosHeaders.from(config.headers);
-
-        headers.set("Authorization", `Bearer ${token}`);
-        config.headers = headers;
+        setAuthHeader(config, token);
       }
     }
 
@@ -76,6 +87,9 @@ api.interceptors.request.use(
   (error) => Promise.reject(error),
 );
 
+/**
+ * Refresh an expired access token once, then retry the original request.
+ */
 api.interceptors.response.use(
   (response: AxiosResponse) => response,
 
@@ -92,7 +106,7 @@ api.interceptors.response.use(
       return new Promise<string>((resolve, reject) => {
         failedQueue.push({ resolve, reject });
       }).then((token) => {
-        applyAuthorization(original, token);
+        setAuthHeader(original, token);
         return api(original);
       });
     }
@@ -127,7 +141,7 @@ api.interceptors.response.use(
 
       processQueue(null, data.access_token);
 
-      applyAuthorization(original, data.access_token);
+      setAuthHeader(original, data.access_token);
 
       return api(original);
     } catch (refreshError) {

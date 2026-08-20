@@ -1,4 +1,4 @@
-import { useState, useEffect, useCallback } from "react";
+﻿import { useState, useEffect, useCallback } from "react";
 import api from "@/lib/api";
 import {
   Repository,
@@ -7,17 +7,6 @@ import {
   TreeEntry,
   BlobContent,
 } from "@/types";
-
-interface BranchResponse {
-  items?: Branch[];
-  total?: number;
-}
-
-interface TreeResponse {
-  ref: string;
-  path: string;
-  entries?: TreeEntry[];
-}
 
 function getApiError(error: any, fallback: string): string {
   return (
@@ -47,7 +36,6 @@ export function useRepo(owner: string, repoName: string) {
       const { data } = await api.get<Repository>(
         `/${encodeURIComponent(owner)}/${encodeURIComponent(repoName)}`
       );
-
       setRepo(data);
     } catch (error) {
       setRepo(null);
@@ -86,15 +74,14 @@ export function useBranches(owner: string, repoName: string) {
     setError(null);
 
     try {
-      const { data } = await api.get<BranchResponse>(
-        `/${encodeURIComponent(owner)}/${encodeURIComponent(
-          repoName
-        )}/branches`
+      const { data } = await api.get<{
+        items?: Branch[];
+        total?: number;
+      }>(
+        `/${encodeURIComponent(owner)}/${encodeURIComponent(repoName)}/branches`
       );
 
-      const items = Array.isArray(data?.items) ? data.items : [];
-
-      setBranches(items);
+      setBranches(Array.isArray(data.items) ? data.items : []);
     } catch (error) {
       setBranches([]);
       setError(getApiError(error, "Failed to load branches"));
@@ -115,21 +102,14 @@ export function useBranches(owner: string, repoName: string) {
   };
 }
 
-/**
- * Load a repository tree.
- *
- * IMPORTANT:
- * `ref` is nullable so empty repositories do not accidentally fall back
- * to "main". An empty repository has no branch and therefore no tree.
- */
 export function useTree(
   owner: string,
   repoName: string,
-  ref: string | null | undefined,
+  ref: string,
   path = ""
 ) {
   const [entries, setEntries] = useState<TreeEntry[]>([]);
-  const [loading, setLoading] = useState(Boolean(owner && repoName && ref));
+  const [loading, setLoading] = useState(false);
   const [error, setError] = useState<string | null>(null);
 
   const fetchTree = useCallback(async () => {
@@ -143,35 +123,54 @@ export function useTree(
     setLoading(true);
     setError(null);
 
-    const encodedRef = encodeURIComponent(ref);
-
-    const encodedPath = path
-      .split("/")
-      .filter(Boolean)
-      .map((segment) => encodeURIComponent(segment))
-      .join("/");
-
-    const url = encodedPath
-      ? `/${encodeURIComponent(owner)}/${encodeURIComponent(
-          repoName
-        )}/git/tree/${encodedRef}/${encodedPath}`
-      : `/${encodeURIComponent(owner)}/${encodeURIComponent(
-          repoName
-        )}/git/tree/${encodedRef}`;
-
     try {
-      const { data } = await api.get<TreeResponse>(url);
+      // Verify that the requested ref actually exists before calling
+      // /git/tree/{ref}. This is critical for empty repositories.
+      const { data: branchData } = await api.get<{
+        items?: Branch[];
+      }>(
+        `/${encodeURIComponent(owner)}/${encodeURIComponent(repoName)}/branches`
+      );
 
-      setEntries(Array.isArray(data?.entries) ? data.entries : []);
-    } catch (error: any) {
-      // A missing ref/path is expected for an empty repository.
-      if (error?.response?.status === 404) {
+      const branches = Array.isArray(branchData.items)
+        ? branchData.items
+        : [];
+
+      const requestedRefExists = branches.some(
+        (branch) => branch.name === ref
+      );
+
+      if (!requestedRefExists) {
         setEntries([]);
         setError(null);
-      } else {
-        setEntries([]);
-        setError(getApiError(error, "Failed to load repository tree"));
+        return;
       }
+
+      const encodedRef = encodeURIComponent(ref);
+      const encodedPath = path
+        .split("/")
+        .filter(Boolean)
+        .map(encodeURIComponent)
+        .join("/");
+
+      const url = encodedPath
+        ? `/${encodeURIComponent(owner)}/${encodeURIComponent(
+            repoName
+          )}/git/tree/${encodedRef}/${encodedPath}`
+        : `/${encodeURIComponent(owner)}/${encodeURIComponent(
+            repoName
+          )}/git/tree/${encodedRef}`;
+
+      const { data } = await api.get<{
+        ref: string;
+        path: string;
+        entries?: TreeEntry[];
+      }>(url);
+
+      setEntries(Array.isArray(data.entries) ? data.entries : []);
+    } catch (error) {
+      setEntries([]);
+      setError(getApiError(error, "Failed to load repository tree"));
     } finally {
       setLoading(false);
     }
@@ -192,11 +191,11 @@ export function useTree(
 export function useBlob(
   owner: string,
   repoName: string,
-  ref: string | null | undefined,
+  ref: string,
   path: string
 ) {
   const [blob, setBlob] = useState<BlobContent | null>(null);
-  const [loading, setLoading] = useState(Boolean(owner && repoName && ref && path));
+  const [loading, setLoading] = useState(false);
   const [error, setError] = useState<string | null>(null);
 
   const fetchBlob = useCallback(async () => {
@@ -210,15 +209,14 @@ export function useBlob(
     setLoading(true);
     setError(null);
 
-    const encodedRef = encodeURIComponent(ref);
-
-    const encodedPath = path
-      .split("/")
-      .filter(Boolean)
-      .map((segment) => encodeURIComponent(segment))
-      .join("/");
-
     try {
+      const encodedRef = encodeURIComponent(ref);
+      const encodedPath = path
+        .split("/")
+        .filter(Boolean)
+        .map(encodeURIComponent)
+        .join("/");
+
       const { data } = await api.get<BlobContent>(
         `/${encodeURIComponent(owner)}/${encodeURIComponent(
           repoName

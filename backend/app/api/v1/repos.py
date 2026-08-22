@@ -264,27 +264,61 @@ async def list_branches_live(
     response_model=TreeOut,
     summary="List root directory tree at ref",
 )
-async def get_root_tree(
-    ref: str,
+async def get_root_tree(    ref: str,
     repository: Repository = Depends(get_repository),
     _perm: PermissionLevel = Depends(require_repo_permission(PermissionLevel.READ)),
 ) -> TreeOut:
-    return await git_service.get_tree(repository.disk_path, ref, path="")
+    try:
+        live_branches = await git_service.list_branches(repository.disk_path)
+    except Exception:
+        live_branches = []
 
+    # Empty repository or nonexistent ref.
+    if not live_branches or not any(
+        branch.get("name") == ref for branch in live_branches
+    ):
+        return TreeOut(
+            ref=ref,
+            path="",
+            entries=[],
+        )
+
+    return await git_service.get_tree(
+        repository.disk_path,
+        ref,
+        path="",
+    )
 
 @router.get(
     "/{owner}/{repo}/git/tree/{ref}/{path:path}",
     response_model=TreeOut,
     summary="List directory tree at ref + path",
 )
-async def get_subtree(
-    ref: str,
+async def get_subtree(    ref: str,
     path: str,
     repository: Repository = Depends(get_repository),
     _perm: PermissionLevel = Depends(require_repo_permission(PermissionLevel.READ)),
 ) -> TreeOut:
-    return await git_service.get_tree(repository.disk_path, ref, path=path)
+    try:
+        live_branches = await git_service.list_branches(repository.disk_path)
+    except Exception:
+        live_branches = []
 
+    # Empty repository or nonexistent ref.
+    if not live_branches or not any(
+        branch.get("name") == ref for branch in live_branches
+    ):
+        return TreeOut(
+            ref=ref,
+            path=path,
+            entries=[],
+        )
+
+    return await git_service.get_tree(
+        repository.disk_path,
+        ref,
+        path=path,
+    )
 
 # ---------------------------------------------------------------------------
 # Blob (file content)

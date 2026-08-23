@@ -1,4 +1,4 @@
-﻿import { useState, useEffect, useCallback } from "react";
+import { useState, useEffect, useCallback } from "react";
 import api from "@/lib/api";
 import {
   Repository,
@@ -10,6 +10,7 @@ import {
 
 function getApiError(error: any, fallback: string): string {
   return (
+    error?.response?.data?.error?.message ||
     error?.response?.data?.detail ||
     error?.response?.data?.message ||
     fallback

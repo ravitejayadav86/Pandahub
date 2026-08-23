@@ -5,8 +5,20 @@ import os
 import subprocess
 import sys
 from pathlib import Path
+from urllib.parse import urlparse
 
-GIT_HOST = "pandahub-taupe.vercel.app"
+# Derive the Git host from the same env var as the API client so they stay
+# in sync: PANDAHUB_API_URL=http://localhost:8000/api/v1  →  localhost:8000
+def _derive_git_host() -> str:
+    api_url = os.environ.get("PANDAHUB_API_URL", "http://localhost:8000/api/v1")
+    parsed = urlparse(api_url)
+    host = parsed.hostname or "localhost"
+    port = parsed.port
+    if port and port not in (80, 443):
+        return f"{host}:{port}"
+    return host
+
+GIT_HOST = _derive_git_host()
 
 
 def build_repo_url(owner: str, repo_name: str) -> str:

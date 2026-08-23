@@ -32,7 +32,14 @@ export default function RegisterPage() {
       await fetchMe();
       router.push('/dashboard');
     } catch (err: any) {
-      setError(err?.response?.data?.detail || 'Registration failed. Please try again.');
+      const errorMsg =
+        err.response?.data?.error?.message ||
+        err.response?.data?.detail ||
+        err.response?.data?.message ||
+        (typeof err.response?.data === 'string' ? err.response?.data : null) ||
+        err.message ||
+        'Registration failed. Please try again.';
+      setError(errorMsg);
     } finally {
       setLoading(false);
     }

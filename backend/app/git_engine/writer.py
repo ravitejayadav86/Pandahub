@@ -155,10 +155,10 @@ def get_commit_detail(disk_path: str, sha: str) -> Optional[CommitDetail]:
             return None
 
         # Peel tags to the underlying commit.
-        if obj.type == pygit2.GIT_OBJ_TAG:
-            obj = obj.peel(pygit2.GIT_OBJ_COMMIT)
+        if obj.type == pygit2.GIT_OBJECT_TAG:
+            obj = obj.peel(pygit2.GIT_OBJECT_COMMIT)
 
-        if obj.type != pygit2.GIT_OBJ_COMMIT:
+        if obj.type != pygit2.GIT_OBJECT_COMMIT:
             return None
 
         committed_at = datetime.fromtimestamp(

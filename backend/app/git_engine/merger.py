@@ -27,7 +27,7 @@ def _get_branch_commit(repo: pygit2.Repository, branch_name: str) -> pygit2.Comm
     ref = repo.lookup_branch(branch_name)
     if not ref:
         raise AppError(f"Branch '{branch_name}' not found.")
-    return ref.peel(pygit2.GIT_OBJ_COMMIT)
+    return ref.peel(pygit2.GIT_OBJECT_COMMIT)
 
 
 def _fetch_from_fork(
@@ -45,7 +45,7 @@ def _fetch_from_fork(
         # Fetch the specific branch into FETCH_HEAD
         remote.fetch([f"refs/heads/{source_branch}"])
         fetch_head = target_repo.lookup_reference("FETCH_HEAD")
-        return fetch_head.peel(pygit2.GIT_OBJ_COMMIT)
+        return fetch_head.peel(pygit2.GIT_OBJECT_COMMIT)
     finally:
         # Clean up the temporary remote
         if remote_name in [r.name for r in target_repo.remotes]:
@@ -143,7 +143,7 @@ def merge_commit(
     if not target_ref:
         raise AppError(f"Target branch '{target_branch}' not found.")
         
-    target_commit = target_ref.peel(pygit2.GIT_OBJ_COMMIT)
+    target_commit = target_ref.peel(pygit2.GIT_OBJECT_COMMIT)
     
     if target_disk_path == source_disk_path:
         source_commit = _get_branch_commit(target_repo, source_branch)

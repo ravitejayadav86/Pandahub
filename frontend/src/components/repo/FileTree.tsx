@@ -1,10 +1,10 @@
-﻿import { TreeEntry } from '@/types';
+import { TreeEntry } from '@/types';
 
 interface FileTreeProps {
   entries: TreeEntry[];
   owner: string;
   repoName: string;
-  ref: string;
+  branch: string;
   currentPath?: string;
   onNavigate: (path: string, type: 'blob' | 'tree') => void;
 }
@@ -35,7 +35,7 @@ function formatSize(bytes?: number): string {
   return `${(bytes / 1048576).toFixed(1)} MB`;
 }
 
-export default function FileTree({ entries, owner, repoName, ref, currentPath, onNavigate }: FileTreeProps) {
+export default function FileTree({ entries, owner, repoName, branch, currentPath, onNavigate }: FileTreeProps) {
   const dirs = entries.filter(e => e.type === 'tree').sort((a, b) => a.name.localeCompare(b.name));
   const files = entries.filter(e => e.type === 'blob').sort((a, b) => a.name.localeCompare(b.name));
   const sorted = [...dirs, ...files];

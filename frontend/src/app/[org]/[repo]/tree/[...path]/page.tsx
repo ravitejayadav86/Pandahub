@@ -32,6 +32,13 @@ export default function TreePage() {
   const { entries, loading: treeLoading, error: treeError } = useTree(owner, repoName, ref, viewType === 'tree' ? currentPath : undefined);
   const { blob, loading: blobLoading, error: blobError } = useBlob(owner, repoName, ref, viewType === 'blob' ? currentPath : '');
 
+  // If the tree endpoint reports this path is actually a file, switch to blob view.
+  useEffect(() => {
+    if (treeError && treeError.toLowerCase().includes('is a file')) {
+      setViewType('blob');
+    }
+  }, [treeError]);
+
   // Detect empty repository (no commits yet) vs a real error
   const isEmptyRepo = !treeLoading && !!treeError && (treeError.toLowerCase().includes('not found') || treeError.toLowerCase().includes('404') || treeError.toLowerCase().includes('ref'));
 
@@ -100,11 +107,11 @@ export default function TreePage() {
               </div>
             </div>
           )
-          : treeError ? <EmptyState icon="error" title="Could not load tree" description={treeError} />
+          : viewType === 'tree' && treeError ? <EmptyState icon="error" title="Could not load tree" description={treeError} />
           : blobError ? <EmptyState icon="error" title="Could not load file" description={blobError} />
           : viewType === 'blob' && blob ? <CodeViewer blob={blob} />
           : viewType === 'tree' ? (
-            <FileTree entries={entries} owner={owner} repoName={repoName} ref={ref} currentPath={currentPath} onNavigate={handleNavigate} />
+            <FileTree entries={entries} owner={owner} repoName={repoName} branch={ref} currentPath={currentPath} onNavigate={handleNavigate} />
           ) : null}
       </div>
     </div>

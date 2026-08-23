@@ -1,4 +1,4 @@
-﻿"""panda.core.api_client — Thin HTTP client for the PandaHub REST API."""
+"""panda.core.api_client — Thin HTTP client for the PandaHub REST API."""
 from __future__ import annotations
 
 from typing import Any, Optional
@@ -19,6 +19,10 @@ def _extract_detail(response: requests.Response) -> str:
     try:
         body = response.json()
         if isinstance(body, dict):
+            # Backend wraps errors as: {"error": {"code": ..., "message": ...}}
+            error_obj = body.get("error")
+            if isinstance(error_obj, dict):
+                return str(error_obj.get("message") or error_obj)
             return str(body.get("detail") or body.get("message") or body)
         return str(body)
     except ValueError:

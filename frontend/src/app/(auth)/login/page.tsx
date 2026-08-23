@@ -94,7 +94,14 @@ function LoginPageContent() {
       }, 2000);
       
     } catch (err: any) {
-      setError(err.response?.data?.detail || 'An error occurred. Please try again.');
+      const errorMsg =
+        err.response?.data?.error?.message ||
+        err.response?.data?.detail ||
+        err.response?.data?.message ||
+        (typeof err.response?.data === 'string' ? err.response?.data : null) ||
+        err.message ||
+        'An error occurred. Please try again.';
+      setError(errorMsg);
     } finally {
       setLoading(false);
     }

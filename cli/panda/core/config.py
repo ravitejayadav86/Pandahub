@@ -10,7 +10,10 @@ from typing import Any, Optional
 CONFIG_DIR = Path.home() / ".pandahub"
 CONFIG_FILE = CONFIG_DIR / "config.json"
 
-DEFAULT_API_BASE_URL = "https://pandahub-taupe.vercel.app/api/v1"
+# Default to local dev; override with env var or `panda config set api_base_url <url>`
+DEFAULT_API_BASE_URL = os.environ.get(
+    "PANDAHUB_API_URL", "http://localhost:8000/api/v1"
+)
 
 def _ensure_config_dir() -> None:
     CONFIG_DIR.mkdir(parents=True, exist_ok=True)

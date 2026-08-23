@@ -1,17 +1,11 @@
-﻿/** @type {import('next').NextConfig} */
+/** @type {import('next').NextConfig} */
 
 const isLocalDev = process.env.NODE_ENV !== "production";
 
-const apiUrl =
-  process.env.NEXT_PUBLIC_API_URL ||
-  (isLocalDev ? "http://localhost:8000" : null);
-
 const proxyUrl =
   process.env.INTERNAL_API_URL ||
-  apiUrl ||
-  (process.env.NODE_ENV === "production"
-    ? "https://pandas-store-api.onrender.com"
-    : null);
+  process.env.NEXT_PUBLIC_API_URL ||
+  (isLocalDev ? "http://localhost:8000" : "https://pandas-store-api.onrender.com");
 
 const nextConfig = {
   reactStrictMode: true,

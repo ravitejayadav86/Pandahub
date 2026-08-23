@@ -103,11 +103,11 @@ def _resolve_ref(repo: pygit2.Repository, ref: str) -> pygit2.Commit:
                     f"Branch '{ref}' does not point to a valid commit."
                 )
 
-            if obj.type == pygit2.GIT_OBJ_COMMIT:
+            if obj.type == pygit2.GIT_OBJECT_COMMIT:
                 return obj
 
             try:
-                peeled = obj.peel(pygit2.GIT_OBJ_COMMIT)
+                peeled = obj.peel(pygit2.GIT_OBJECT_COMMIT)
                 return peeled
             except (KeyError, pygit2.GitError, ValueError) as exc:
                 raise NotFoundError(
@@ -129,12 +129,12 @@ def _resolve_ref(repo: pygit2.Repository, ref: str) -> pygit2.Commit:
                     f"Reference '{ref}' does not point to a valid commit."
                 ) from exc
 
-            if obj is not None and obj.type == pygit2.GIT_OBJ_COMMIT:
+            if obj is not None and obj.type == pygit2.GIT_OBJECT_COMMIT:
                 return obj
 
             if obj is not None:
                 try:
-                    return obj.peel(pygit2.GIT_OBJ_COMMIT)
+                    return obj.peel(pygit2.GIT_OBJECT_COMMIT)
                 except (KeyError, pygit2.GitError, ValueError) as exc:
                     raise NotFoundError(
                         f"Reference '{ref}' does not point to a commit."
@@ -156,12 +156,12 @@ def _resolve_ref(repo: pygit2.Repository, ref: str) -> pygit2.Commit:
             f"Ref '{ref}' not found in this repository."
         )
 
-    if obj.type == pygit2.GIT_OBJ_COMMIT:
+    if obj.type == pygit2.GIT_OBJECT_COMMIT:
         return obj
 
-    if obj.type == pygit2.GIT_OBJ_TAG:
+    if obj.type == pygit2.GIT_OBJECT_TAG:
         try:
-            peeled = obj.peel(pygit2.GIT_OBJ_COMMIT)
+            peeled = obj.peel(pygit2.GIT_OBJECT_COMMIT)
         except (KeyError, pygit2.GitError, ValueError) as exc:
             raise NotFoundError(
                 f"Ref '{ref}' does not point to a commit."
@@ -170,7 +170,7 @@ def _resolve_ref(repo: pygit2.Repository, ref: str) -> pygit2.Commit:
         return peeled
 
     try:
-        peeled = obj.peel(pygit2.GIT_OBJ_COMMIT)
+        peeled = obj.peel(pygit2.GIT_OBJECT_COMMIT)
         return peeled
     except (KeyError, pygit2.GitError, ValueError) as exc:
         raise NotFoundError(

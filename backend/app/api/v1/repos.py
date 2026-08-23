@@ -275,7 +275,7 @@ async def get_root_tree(    ref: str,
 
     # Empty repository or nonexistent ref.
     if not live_branches or not any(
-        branch.get("name") == ref for branch in live_branches
+        branch.name == ref for branch in live_branches
     ):
         return TreeOut(
             ref=ref,
@@ -306,7 +306,7 @@ async def get_subtree(    ref: str,
 
     # Empty repository or nonexistent ref.
     if not live_branches or not any(
-        branch.get("name") == ref for branch in live_branches
+        branch.name == ref for branch in live_branches
     ):
         return TreeOut(
             ref=ref,

@@ -6,7 +6,8 @@ import Link from 'next/link'
 import api from '@/lib/api'
 import { 
   MapPin, Link as LinkIcon, Calendar, BookMarked, GitMerge, Star, Users, 
-  Smile, Search, ChevronDown, Activity, Package, Layout, Book, Trophy, Hexagon
+  Smile, Search, ChevronDown, Activity, Package, Layout, Book, Trophy, Hexagon,
+  Settings, Trash2, AlertTriangle, X, Loader2
 } from 'lucide-react'
 import { useAuthStore } from '@/store/authStore'
 import Navbar from '@/components/shared/Navbar'
@@ -58,6 +59,12 @@ export default function UserProfilePage() {
   const [activeTab, setActiveTab] = useState<TabType>('overview')
   const [repoSearch, setRepoSearch] = useState('')
   const [isChatOpen, setIsChatOpen] = useState(false)
+
+  // Delete repo modal state
+  const [repoToDelete, setRepoToDelete] = useState<Repository | null>(null)
+  const [deleteConfirmInput, setDeleteConfirmInput] = useState('')
+  const [isDeletingRepo, setIsDeletingRepo] = useState(false)
+  const [deleteModalError, setDeleteModalError] = useState<string | null>(null)
 
   const router = useRouter()
   
@@ -129,6 +136,32 @@ export default function UserProfilePage() {
     setIsChatOpen(true)
   }
 
+  const handleDeleteRepo = async () => {
+    if (!repoToDelete || !profile) return
+    if (deleteConfirmInput.trim() !== repoToDelete.name) return
+
+    setIsDeletingRepo(true)
+    setDeleteModalError(null)
+
+    try {
+      await api.delete(`/${encodeURIComponent(profile.username)}/${encodeURIComponent(repoToDelete.name)}`)
+      // Remove from repos list
+      setRepos(prev => prev.filter(r => r.id !== repoToDelete.id))
+      setProfile(prev => prev ? { ...prev, repo_count: Math.max(0, prev.repo_count - 1) } : prev)
+      setRepoToDelete(null)
+      setDeleteConfirmInput('')
+    } catch (err: any) {
+      setDeleteModalError(
+        err?.response?.data?.detail || 
+        err?.response?.data?.message || 
+        err?.response?.data?.error?.message ||
+        'Failed to delete repository. Please ensure you are logged in as the owner.'
+      )
+    } finally {
+      setIsDeletingRepo(false)
+    }
+  }
+
   if (loading) {
     return (
       <div className="min-h-screen bg-white dark:bg-[#0d1117] flex flex-col">
@@ -155,7 +188,7 @@ export default function UserProfilePage() {
     )
   }
 
-  const isOwner = currentUser && currentUser.username === profile.username
+  const isOwner = !!currentUser && !!profile && currentUser.username?.toLowerCase() === profile.username?.toLowerCase()
   
   // Repo filtering
   const filteredRepos = repos.filter(r => r.name.toLowerCase().includes(repoSearch.toLowerCase()))
@@ -432,10 +465,34 @@ export default function UserProfilePage() {
                           <span>Updated on {new Date(repo.updated_at).toLocaleDateString()}</span>
                         </div>
                       </div>
-                      <div className="flex flex-col items-end gap-2">
-                        <button className="flex items-center gap-1 px-3 py-1 text-sm font-semibold border border-slate-300 dark:border-slate-600 rounded-md bg-slate-50 dark:bg-[#21262d] hover:bg-slate-100 dark:hover:bg-[#30363d] shadow-sm text-slate-700 dark:text-slate-300">
-                          <Star className="w-4 h-4 text-slate-400" /> Star
+                      <div className="flex flex-col sm:flex-row items-end sm:items-center gap-2">
+                        <button className="flex items-center gap-1 px-3 py-1.5 text-xs font-semibold border border-slate-300 dark:border-slate-600 rounded-md bg-slate-50 dark:bg-[#21262d] hover:bg-slate-100 dark:hover:bg-[#30363d] shadow-sm text-slate-700 dark:text-slate-300 transition-colors">
+                          <Star className="w-3.5 h-3.5 text-slate-400" /> Star
                         </button>
+
+                        {isOwner && (
+                          <>
+                            <Link
+                              href={`/${profile.username}/${repo.name}#settings`}
+                              className="flex items-center gap-1 px-3 py-1.5 text-xs font-semibold border border-slate-300 dark:border-slate-600 rounded-md bg-slate-50 dark:bg-[#21262d] hover:bg-slate-100 dark:hover:bg-[#30363d] shadow-sm text-slate-700 dark:text-slate-300 no-underline transition-colors"
+                              title="Repository Settings"
+                            >
+                              <Settings className="w-3.5 h-3.5 text-slate-400" /> Settings
+                            </Link>
+
+                            <button
+                              onClick={() => {
+                                setRepoToDelete(repo)
+                                setDeleteConfirmInput('')
+                                setDeleteModalError(null)
+                              }}
+                              className="flex items-center gap-1 px-3 py-1.5 text-xs font-semibold border border-red-200 dark:border-red-900/50 rounded-md bg-red-50 dark:bg-red-950/30 hover:bg-red-100 dark:hover:bg-red-900/50 text-red-600 dark:text-red-400 shadow-sm transition-colors"
+                              title="Delete Repository"
+                            >
+                              <Trash2 className="w-3.5 h-3.5" /> Delete
+                            </button>
+                          </>
+                        )}
                       </div>
                     </div>
                   ))
@@ -463,6 +520,100 @@ export default function UserProfilePage() {
           recipientUsername={profile.username} 
           onClose={() => setIsChatOpen(false)} 
         />
+      )}
+
+      {/* ── Delete Repository Confirmation Modal ──────────────────────── */}
+      {repoToDelete && (
+        <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/60 backdrop-blur-sm p-4 animate-fade-in">
+          <div className="w-full max-w-md rounded-2xl bg-white dark:bg-[#161b22] border border-red-200 dark:border-red-900/50 shadow-2xl overflow-hidden">
+            {/* Header */}
+            <div className="px-6 py-4 border-b border-red-100 dark:border-red-900/30 bg-red-50/70 dark:bg-red-950/40 flex items-center justify-between">
+              <div className="flex items-center gap-2.5">
+                <div className="w-8 h-8 rounded-lg bg-red-100 dark:bg-red-900/50 flex items-center justify-center text-red-600 dark:text-red-400">
+                  <Trash2 className="w-4 h-4" />
+                </div>
+                <div>
+                  <h3 className="text-sm font-bold text-red-700 dark:text-red-400">Delete repository</h3>
+                  <p className="text-xs text-red-500/80">{profile.username}/{repoToDelete.name}</p>
+                </div>
+              </div>
+              <button
+                type="button"
+                onClick={() => setRepoToDelete(null)}
+                className="text-slate-400 hover:text-slate-600 dark:hover:text-slate-200 p-1 rounded-lg hover:bg-red-100/50"
+              >
+                <X className="w-4 h-4" />
+              </button>
+            </div>
+
+            {/* Body */}
+            <div className="p-6 space-y-4">
+              <div className="rounded-xl bg-amber-50 dark:bg-amber-950/30 border border-amber-200 dark:border-amber-900/50 p-3 flex items-start gap-2.5 text-xs text-amber-800 dark:text-amber-300">
+                <AlertTriangle className="w-4 h-4 shrink-0 mt-0.5 text-amber-600 dark:text-amber-400" />
+                <span>
+                  <strong>Warning:</strong> This action cannot be undone. All commits, branches, issues, and files will be permanently deleted.
+                </span>
+              </div>
+
+              <p className="text-xs text-slate-600 dark:text-slate-400">
+                To confirm deletion, please type{' '}
+                <span className="font-mono font-bold text-slate-900 dark:text-slate-100 bg-slate-100 dark:bg-slate-800 px-1.5 py-0.5 rounded border border-slate-200 dark:border-slate-700">
+                  {repoToDelete.name}
+                </span>{' '}
+                below:
+              </p>
+
+              <input
+                type="text"
+                value={deleteConfirmInput}
+                onChange={e => setDeleteConfirmInput(e.target.value)}
+                placeholder={repoToDelete.name}
+                className="w-full px-3 py-2 text-sm font-mono border border-slate-300 dark:border-slate-700 rounded-lg bg-slate-50 dark:bg-[#0d1117] text-slate-900 dark:text-slate-100 focus:ring-2 focus:ring-red-500 focus:border-red-500 outline-none"
+                autoFocus
+                onKeyDown={e => {
+                  if (e.key === 'Enter' && deleteConfirmInput.trim() === repoToDelete.name) {
+                    handleDeleteRepo()
+                  }
+                }}
+              />
+
+              {deleteModalError && (
+                <div className="rounded-lg bg-red-50 dark:bg-red-950/40 border border-red-200 dark:border-red-900/50 p-2.5 text-xs text-red-700 dark:text-red-400">
+                  {deleteModalError}
+                </div>
+              )}
+
+              <div className="flex gap-3 pt-2">
+                <button
+                  type="button"
+                  onClick={() => setRepoToDelete(null)}
+                  disabled={isDeletingRepo}
+                  className="flex-1 py-2 text-xs font-semibold border border-slate-300 dark:border-slate-700 rounded-lg text-slate-700 dark:text-slate-300 hover:bg-slate-50 dark:hover:bg-slate-800 transition-colors disabled:opacity-50"
+                >
+                  Cancel
+                </button>
+                <button
+                  type="button"
+                  onClick={handleDeleteRepo}
+                  disabled={deleteConfirmInput.trim() !== repoToDelete.name || isDeletingRepo}
+                  className="flex-1 py-2 text-xs font-semibold bg-red-600 hover:bg-red-700 text-white rounded-lg transition-colors flex items-center justify-center gap-1.5 disabled:opacity-40 disabled:cursor-not-allowed shadow-sm"
+                >
+                  {isDeletingRepo ? (
+                    <>
+                      <Loader2 className="w-3.5 h-3.5 animate-spin" />
+                      Deleting…
+                    </>
+                  ) : (
+                    <>
+                      <Trash2 className="w-3.5 h-3.5" />
+                      Delete this repository
+                    </>
+                  )}
+                </button>
+              </div>
+            </div>
+          </div>
+        </div>
       )}
     </div>
   )

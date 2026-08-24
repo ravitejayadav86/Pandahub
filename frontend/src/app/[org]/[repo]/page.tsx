@@ -95,6 +95,20 @@ export default function RepoDashboardPage() {
   const [isDeleting, setIsDeleting] = useState(false);
   const [deleteError, setDeleteError] = useState<string | null>(null);
 
+  // Quickstart guide tabs
+  const [quickstartTab, setQuickstartTab] = useState<'panda-new' | 'panda-existing' | 'git-https' | 'cli-reference'>('panda-new');
+  const [copiedSnippet, setCopiedSnippet] = useState<string | null>(null);
+
+  const copyCode = async (code: string, id: string) => {
+    try {
+      await navigator.clipboard.writeText(code);
+      setCopiedSnippet(id);
+      setTimeout(() => setCopiedSnippet(null), 2000);
+    } catch {
+      setNotice('Could not copy code snippet.');
+    }
+  };
+
   const isOwner = !!user && !!owner && user.username?.trim().toLowerCase() === owner?.trim().toLowerCase();
 
   const profileRef = useRef<HTMLDivElement>(null);
@@ -875,53 +889,331 @@ export default function RepoDashboardPage() {
               </div>
             </section>
 
-            {/* Empty repository */}
+            {/* Empty repository — Full Panda CLI & Quickstart Redevelopment */}
             {isEmptyRepository && activeTab !== 'Settings' && (
-              <section className="mt-6 rounded-3xl border border-dashed border-slate-300 bg-white p-8 sm:p-12 text-center shadow-sm">
-                <div className="mx-auto w-16 h-16 rounded-2xl bg-slate-100 flex items-center justify-center">
-                  <span className="material-symbols-outlined text-[30px] text-slate-500">
-                    inventory_2
-                  </span>
-                </div>
+              <section className="mt-6 space-y-6 animate-fade-in">
+                {/* Hero Header */}
+                <div className="rounded-3xl border border-slate-200 bg-white p-6 sm:p-8 shadow-sm">
+                  <div className="flex flex-col md:flex-row md:items-center justify-between gap-4">
+                    <div className="flex items-center gap-4">
+                      <div className="w-14 h-14 rounded-2xl bg-gradient-to-br from-slate-900 to-slate-800 flex items-center justify-center text-white shadow-md">
+                        <span className="material-symbols-outlined text-[28px]">terminal</span>
+                      </div>
+                      <div>
+                        <h2 className="text-xl sm:text-2xl font-extrabold text-slate-950">
+                          Quick setup — start with Panda CLI
+                        </h2>
+                        <p className="text-xs sm:text-sm text-slate-500 mt-1">
+                          Use the native <code className="font-mono font-semibold text-slate-800 bg-slate-100 px-1.5 py-0.5 rounded">panda</code> command-line tool or standard Git to push your code.
+                        </p>
+                      </div>
+                    </div>
 
-                <h2 className="mt-5 text-xl sm:text-2xl font-extrabold text-slate-950">
-                  This repository is empty
-                </h2>
+                    <div className="flex items-center gap-2">
+                      <button
+                        type="button"
+                        onClick={handleCopyCloneUrl}
+                        className="h-10 px-4 rounded-xl bg-slate-950 hover:bg-slate-800 text-white text-xs sm:text-sm font-semibold flex items-center gap-2 shadow-sm transition-colors"
+                      >
+                        <span className="material-symbols-outlined text-[17px]">content_copy</span>
+                        {copied ? "Clone URL copied!" : "Copy Clone URL"}
+                      </button>
 
-                <p className="mt-2 max-w-xl mx-auto text-sm leading-6 text-slate-500">
-                  No commits or branches exist yet. Create your first commit
-                  locally and push it to PandaHub to start browsing code.
-                </p>
-
-                <div className="mt-6 max-w-2xl mx-auto rounded-2xl bg-slate-950 p-5 text-left overflow-x-auto">
-                  <div className="text-[11px] uppercase tracking-wider text-slate-400 font-bold mb-3">
-                    Panda CLI
+                      <Link
+                        href={`${repoBase}/upload`}
+                        className="h-10 px-4 rounded-xl border border-slate-200 bg-white text-slate-700 hover:bg-slate-50 text-xs sm:text-sm font-semibold flex items-center gap-1.5 no-underline transition-colors shadow-sm"
+                      >
+                        <span className="material-symbols-outlined text-[17px]">upload_file</span>
+                        Upload files
+                      </Link>
+                    </div>
                   </div>
 
-                  <pre className="text-xs sm:text-sm text-slate-200 leading-7">
-{`panda clone ${owner}/${repoName}
+                  {/* Quick Tabs */}
+                  <div className="mt-8 border-b border-slate-100 flex gap-2 sm:gap-4 overflow-x-auto">
+                    {[
+                      { id: 'panda-new', label: '🐼 New Repo (Panda CLI)', icon: 'terminal' },
+                      { id: 'panda-existing', label: 'Existing Folder', icon: 'folder_open' },
+                      { id: 'git-https', label: 'Standard Git', icon: 'alt_route' },
+                      { id: 'cli-reference', label: 'CLI Cheat Sheet', icon: 'menu_book' },
+                    ].map(tab => (
+                      <button
+                        key={tab.id}
+                        type="button"
+                        onClick={() => setQuickstartTab(tab.id as any)}
+                        className={`pb-3.5 px-2 text-xs sm:text-sm font-bold border-b-2 whitespace-nowrap transition-colors flex items-center gap-1.5 ${
+                          quickstartTab === tab.id
+                            ? 'border-slate-950 text-slate-950'
+                            : 'border-transparent text-slate-500 hover:text-slate-900'
+                        }`}
+                      >
+                        <span>{tab.label}</span>
+                      </button>
+                    ))}
+                  </div>
+
+                  {/* Tab 1: Panda CLI - Create New Repo */}
+                  {quickstartTab === 'panda-new' && (
+                    <div className="mt-6 space-y-4">
+                      <div className="text-xs font-semibold text-slate-600 uppercase tracking-wider">
+                        …or create a new repository on the command line
+                      </div>
+
+                      <div className="relative rounded-2xl bg-slate-950 border border-slate-800 p-5 overflow-x-auto shadow-inner group">
+                        <button
+                          type="button"
+                          onClick={() => copyCode(
+`# 1. Log in to PandaHub (auto-configures Git credentials)
+panda login
+
+# 2. Initialize your project folder
+mkdir ${repoName}
 cd ${repoName}
+panda init
+
+# 3. Create initial file & commit
+echo "# ${repoName}" >> README.md
 panda add .
-panda commit -m "Initial commit"
-panda push -u pandahub main`}
-                  </pre>
-                </div>
+panda commit -m "feat: initial commit"
 
-                <div className="mt-6 flex flex-wrap justify-center gap-3">
-                  <button
-                    type="button"
-                    onClick={handleCopyCloneUrl}
-                    className="h-10 px-4 rounded-xl bg-slate-950 text-white text-sm font-semibold hover:bg-slate-800"
-                  >
-                    {copied ? "Clone URL copied" : "Copy clone URL"}
-                  </button>
+# 4. Connect to PandaHub & push
+panda remote-add ${owner}/${repoName}
+panda push -u pandahub main`,
+                            'new-repo'
+                          )}
+                          className="absolute right-4 top-4 h-8 px-3 rounded-lg bg-slate-800/80 hover:bg-slate-700 text-slate-200 text-xs font-semibold flex items-center gap-1.5 transition-colors border border-slate-700"
+                        >
+                          <span className="material-symbols-outlined text-[15px]">
+                            {copiedSnippet === 'new-repo' ? 'check' : 'content_copy'}
+                          </span>
+                          {copiedSnippet === 'new-repo' ? 'Copied' : 'Copy'}
+                        </button>
 
-                  <Link
-                    href={`${repoBase}/upload`}
-                    className="h-10 px-4 rounded-xl border border-slate-200 bg-white text-slate-700 hover:bg-slate-50 text-sm font-semibold flex items-center no-underline"
-                  >
-                    Upload files
-                  </Link>
+                        <pre className="text-xs sm:text-sm font-mono text-slate-200 leading-7">
+<span className="text-slate-500"># 1. Log in to PandaHub (auto-configures Git credentials)</span>
+<span className="text-emerald-400 font-semibold">panda</span> login
+
+<span className="text-slate-500"># 2. Initialize your project folder</span>
+<span className="text-emerald-400 font-semibold">mkdir</span> {repoName}
+<span className="text-emerald-400 font-semibold">cd</span> {repoName}
+<span className="text-emerald-400 font-semibold">panda</span> init
+
+<span className="text-slate-500"># 3. Create initial file & commit</span>
+<span className="text-emerald-400 font-semibold">echo</span> <span className="text-amber-300">"# {repoName}"</span> &gt;&gt; README.md
+<span className="text-emerald-400 font-semibold">panda</span> add .
+<span className="text-emerald-400 font-semibold">panda</span> commit -m <span className="text-amber-300">"feat: initial commit"</span>
+
+<span className="text-slate-500"># 4. Connect to PandaHub & push</span>
+<span className="text-emerald-400 font-semibold">panda</span> remote-add {owner}/{repoName}
+<span className="text-emerald-400 font-semibold">panda</span> push -u pandahub main
+                        </pre>
+                      </div>
+                    </div>
+                  )}
+
+                  {/* Tab 2: Panda CLI - Push Existing Folder */}
+                  {quickstartTab === 'panda-existing' && (
+                    <div className="mt-6 space-y-4">
+                      <div className="text-xs font-semibold text-slate-600 uppercase tracking-wider">
+                        …or push an existing repository from the command line
+                      </div>
+
+                      <div className="relative rounded-2xl bg-slate-950 border border-slate-800 p-5 overflow-x-auto shadow-inner group">
+                        <button
+                          type="button"
+                          onClick={() => copyCode(
+`# 1. Log in to PandaHub
+panda login
+
+# 2. Inside your existing project directory
+cd your-existing-project
+panda remote-add ${owner}/${repoName}
+
+# 3. Ensure branch is main & push
+panda branch -M main
+panda push -u pandahub main`,
+                            'existing-repo'
+                          )}
+                          className="absolute right-4 top-4 h-8 px-3 rounded-lg bg-slate-800/80 hover:bg-slate-700 text-slate-200 text-xs font-semibold flex items-center gap-1.5 transition-colors border border-slate-700"
+                        >
+                          <span className="material-symbols-outlined text-[15px]">
+                            {copiedSnippet === 'existing-repo' ? 'check' : 'content_copy'}
+                          </span>
+                          {copiedSnippet === 'existing-repo' ? 'Copied' : 'Copy'}
+                        </button>
+
+                        <pre className="text-xs sm:text-sm font-mono text-slate-200 leading-7">
+<span className="text-slate-500"># 1. Log in to PandaHub</span>
+<span className="text-emerald-400 font-semibold">panda</span> login
+
+<span className="text-slate-500"># 2. Inside your existing project directory</span>
+<span className="text-emerald-400 font-semibold">cd</span> your-existing-project
+<span className="text-emerald-400 font-semibold">panda</span> remote-add {owner}/{repoName}
+
+<span className="text-slate-500"># 3. Ensure branch is main & push</span>
+<span className="text-emerald-400 font-semibold">panda</span> branch -M main
+<span className="text-emerald-400 font-semibold">panda</span> push -u pandahub main
+                        </pre>
+                      </div>
+                    </div>
+                  )}
+
+                  {/* Tab 3: Standard Git (HTTPS) */}
+                  {quickstartTab === 'git-https' && (
+                    <div className="mt-6 space-y-4">
+                      <div className="text-xs font-semibold text-slate-600 uppercase tracking-wider">
+                        …or push using standard Git HTTPS
+                      </div>
+
+                      <div className="relative rounded-2xl bg-slate-950 border border-slate-800 p-5 overflow-x-auto shadow-inner group">
+                        <button
+                          type="button"
+                          onClick={() => copyCode(
+`git remote add origin ${cloneUrl}
+git branch -M main
+git push -u origin main`,
+                            'git-https'
+                          )}
+                          className="absolute right-4 top-4 h-8 px-3 rounded-lg bg-slate-800/80 hover:bg-slate-700 text-slate-200 text-xs font-semibold flex items-center gap-1.5 transition-colors border border-slate-700"
+                        >
+                          <span className="material-symbols-outlined text-[15px]">
+                            {copiedSnippet === 'git-https' ? 'check' : 'content_copy'}
+                          </span>
+                          {copiedSnippet === 'git-https' ? 'Copied' : 'Copy'}
+                        </button>
+
+                        <pre className="text-xs sm:text-sm font-mono text-slate-200 leading-7">
+<span className="text-slate-500"># Link remote & push via standard Git</span>
+<span className="text-emerald-400 font-semibold">git</span> remote add origin <span className="text-sky-300">{cloneUrl}</span>
+<span className="text-emerald-400 font-semibold">git</span> branch -M main
+<span className="text-emerald-400 font-semibold">git</span> push -u origin main
+                        </pre>
+                      </div>
+                    </div>
+                  )}
+
+                  {/* Tab 4: Comprehensive Panda CLI Cheatsheet */}
+                  {quickstartTab === 'cli-reference' && (
+                    <div className="mt-6 space-y-4">
+                      <div className="text-xs font-semibold text-slate-600 uppercase tracking-wider">
+                        Available Panda CLI Commands in PandaHub
+                      </div>
+
+                      <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                        {/* Auth commands */}
+                        <div className="p-4 rounded-2xl border border-slate-200 bg-slate-50 space-y-2">
+                          <div className="flex items-center gap-2 font-bold text-sm text-slate-950">
+                            <span className="material-symbols-outlined text-[18px] text-blue-600">key</span>
+                            Authentication
+                          </div>
+                          <div className="space-y-1.5 text-xs font-mono text-slate-700">
+                            <div className="p-2 bg-white rounded-lg border border-slate-200">
+                              <span className="text-emerald-600 font-semibold">panda login</span>
+                              <div className="text-[11px] font-sans text-slate-500">Interactive login & Git auto-auth setup</div>
+                            </div>
+                            <div className="p-2 bg-white rounded-lg border border-slate-200">
+                              <span className="text-emerald-600 font-semibold">panda whoami</span>
+                              <div className="text-[11px] font-sans text-slate-500">Display current authenticated user</div>
+                            </div>
+                            <div className="p-2 bg-white rounded-lg border border-slate-200">
+                              <span className="text-emerald-600 font-semibold">panda token create &lt;name&gt;</span>
+                              <div className="text-[11px] font-sans text-slate-500">Generate a Personal Access Token</div>
+                            </div>
+                            <div className="p-2 bg-white rounded-lg border border-slate-200">
+                              <span className="text-emerald-600 font-semibold">panda token list</span>
+                              <div className="text-[11px] font-sans text-slate-500">List all active access tokens</div>
+                            </div>
+                          </div>
+                        </div>
+
+                        {/* Repo & Remote commands */}
+                        <div className="p-4 rounded-2xl border border-slate-200 bg-slate-50 space-y-2">
+                          <div className="flex items-center gap-2 font-bold text-sm text-slate-950">
+                            <span className="material-symbols-outlined text-[18px] text-purple-600">folder_zip</span>
+                            Repository & Remotes
+                          </div>
+                          <div className="space-y-1.5 text-xs font-mono text-slate-700">
+                            <div className="p-2 bg-white rounded-lg border border-slate-200">
+                              <span className="text-emerald-600 font-semibold">panda clone {owner}/{repoName}</span>
+                              <div className="text-[11px] font-sans text-slate-500">Clone repository with auto-credentials</div>
+                            </div>
+                            <div className="p-2 bg-white rounded-lg border border-slate-200">
+                              <span className="text-emerald-600 font-semibold">panda remote-add {owner}/{repoName}</span>
+                              <div className="text-[11px] font-sans text-slate-500">Add or update PandaHub remote</div>
+                            </div>
+                            <div className="p-2 bg-white rounded-lg border border-slate-200">
+                              <span className="text-emerald-600 font-semibold">panda repo create &lt;name&gt;</span>
+                              <div className="text-[11px] font-sans text-slate-500">Create a new repository under account</div>
+                            </div>
+                            <div className="p-2 bg-white rounded-lg border border-slate-200">
+                              <span className="text-emerald-600 font-semibold">panda repo list</span>
+                              <div className="text-[11px] font-sans text-slate-500">List all repositories owned by user</div>
+                            </div>
+                          </div>
+                        </div>
+
+                        {/* Git daily workflow */}
+                        <div className="p-4 rounded-2xl border border-slate-200 bg-slate-50 space-y-2">
+                          <div className="flex items-center gap-2 font-bold text-sm text-slate-950">
+                            <span className="material-symbols-outlined text-[18px] text-amber-600">sync</span>
+                            Daily Workflow & Sync
+                          </div>
+                          <div className="space-y-1.5 text-xs font-mono text-slate-700">
+                            <div className="p-2 bg-white rounded-lg border border-slate-200">
+                              <span className="text-emerald-600 font-semibold">panda status</span>
+                              <div className="text-[11px] font-sans text-slate-500">Show working tree status</div>
+                            </div>
+                            <div className="p-2 bg-white rounded-lg border border-slate-200">
+                              <span className="text-emerald-600 font-semibold">panda add .</span>
+                              <div className="text-[11px] font-sans text-slate-500">Stage changes for next commit</div>
+                            </div>
+                            <div className="p-2 bg-white rounded-lg border border-slate-200">
+                              <span className="text-emerald-600 font-semibold">panda commit -m "msg"</span>
+                              <div className="text-[11px] font-sans text-slate-500">Record changes to repository</div>
+                            </div>
+                            <div className="p-2 bg-white rounded-lg border border-slate-200">
+                              <span className="text-emerald-600 font-semibold">panda push [remote] [branch]</span>
+                              <div className="text-[11px] font-sans text-slate-500">Push commits (defaults to 'pandahub')</div>
+                            </div>
+                            <div className="p-2 bg-white rounded-lg border border-slate-200">
+                              <span className="text-emerald-600 font-semibold">panda pull</span>
+                              <div className="text-[11px] font-sans text-slate-500">Fetch and integrate remote changes</div>
+                            </div>
+                          </div>
+                        </div>
+
+                        {/* Branches & History */}
+                        <div className="p-4 rounded-2xl border border-slate-200 bg-slate-50 space-y-2">
+                          <div className="flex items-center gap-2 font-bold text-sm text-slate-950">
+                            <span className="material-symbols-outlined text-[18px] text-emerald-600">fork_right</span>
+                            Branches & History
+                          </div>
+                          <div className="space-y-1.5 text-xs font-mono text-slate-700">
+                            <div className="p-2 bg-white rounded-lg border border-slate-200">
+                              <span className="text-emerald-600 font-semibold">panda branch</span>
+                              <div className="text-[11px] font-sans text-slate-500">List, create, or delete branches</div>
+                            </div>
+                            <div className="p-2 bg-white rounded-lg border border-slate-200">
+                              <span className="text-emerald-600 font-semibold">panda switch -c &lt;branch&gt;</span>
+                              <div className="text-[11px] font-sans text-slate-500">Create and switch to new branch</div>
+                            </div>
+                            <div className="p-2 bg-white rounded-lg border border-slate-200">
+                              <span className="text-emerald-600 font-semibold">panda merge &lt;branch&gt;</span>
+                              <div className="text-[11px] font-sans text-slate-500">Merge development branch into current</div>
+                            </div>
+                            <div className="p-2 bg-white rounded-lg border border-slate-200">
+                              <span className="text-emerald-600 font-semibold">panda log --oneline</span>
+                              <div className="text-[11px] font-sans text-slate-500">View commit history</div>
+                            </div>
+                            <div className="p-2 bg-white rounded-lg border border-slate-200">
+                              <span className="text-emerald-600 font-semibold">panda diff</span>
+                              <div className="text-[11px] font-sans text-slate-500">Show changes between commits/tree</div>
+                            </div>
+                          </div>
+                        </div>
+                      </div>
+                    </div>
+                  )}
                 </div>
               </section>
             )}

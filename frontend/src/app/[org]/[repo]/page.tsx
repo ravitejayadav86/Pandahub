@@ -95,7 +95,7 @@ export default function RepoDashboardPage() {
   const [isDeleting, setIsDeleting] = useState(false);
   const [deleteError, setDeleteError] = useState<string | null>(null);
 
-  const isOwner = !!user && user.username === owner;
+  const isOwner = !!user && !!owner && user.username?.trim().toLowerCase() === owner?.trim().toLowerCase();
 
   const profileRef = useRef<HTMLDivElement>(null);
 
@@ -112,6 +112,11 @@ export default function RepoDashboardPage() {
   useEffect(() => {
     setMounted(true);
     document.documentElement.classList.remove("dark");
+    if (typeof window !== "undefined") {
+      if (window.location.hash === "#settings" || window.location.search.includes("tab=settings")) {
+        setActiveTab("Settings");
+      }
+    }
   }, []);
 
   useEffect(() => {
@@ -352,9 +357,14 @@ export default function RepoDashboardPage() {
     setDeleteError(null);
     try {
       await api.delete(`/${encodeURIComponent(owner)}/${encodeURIComponent(repoName)}`);
-      router.push('/dashboard');
+      // Hard redirect to dashboard so the deleted repo isn't re-fetched
+      if (typeof window !== "undefined") {
+        window.location.assign('/dashboard');
+      } else {
+        router.push('/dashboard');
+      }
     } catch (error) {
-      setDeleteError(getErrorMessage(error, 'Failed to delete repository. Please try again.'));
+      setDeleteError(getErrorMessage(error, 'Failed to delete repository. Please ensure you are logged in as the repository owner.'));
       setIsDeleting(false);
     }
   };
@@ -397,6 +407,11 @@ export default function RepoDashboardPage() {
       label: "Security",
       icon: "security",
       href: `${repoBase}/security`,
+    },
+    {
+      label: "Settings",
+      icon: "settings",
+      href: `${repoBase}#settings`,
     },
   ];
 
@@ -458,15 +473,38 @@ export default function RepoDashboardPage() {
 
             <div className="space-y-1">
               {sidebarItems.map((item) => {
-                const active =
-                  item.label === "Code"
-                    ? pathname === repoBase
-                    : isActive(item.href);
+                const isSettings = item.label === "Settings";
+                const active = isSettings
+                  ? activeTab === "Settings"
+                  : item.label === "Code"
+                    ? pathname === repoBase && activeTab !== "Settings"
+                    : isActive(item.href) && activeTab !== "Settings";
+
+                if (isSettings) {
+                  return (
+                    <button
+                      key={item.label}
+                      type="button"
+                      onClick={() => setActiveTab("Settings")}
+                      className={`w-full flex items-center gap-3 px-3 py-2.5 rounded-xl text-sm font-medium transition-colors ${
+                        active
+                          ? "bg-red-50 text-red-700 font-semibold"
+                          : "text-slate-600 hover:bg-slate-50 hover:text-slate-950"
+                      }`}
+                    >
+                      <span className="material-symbols-outlined text-[19px]">
+                        {item.icon}
+                      </span>
+                      <span>Repo Settings</span>
+                    </button>
+                  );
+                }
 
                 return (
                   <Link
                     key={`${item.label}-${item.href}`}
                     href={item.href}
+                    onClick={() => setActiveTab("Overview")}
                     className={`flex items-center gap-3 px-3 py-2.5 rounded-xl text-sm font-medium no-underline transition-colors ${
                       active
                         ? "bg-slate-100 text-slate-950"
@@ -796,7 +834,7 @@ export default function RepoDashboardPage() {
                   { label: "Issues", href: `${repoBase}/issues` },
                   { label: "Pull Requests", href: `${repoBase}/pulls` },
                   { label: "Security", href: `${repoBase}/security` },
-                  ...(isOwner ? [{ label: "Settings", href: `${repoBase}#settings` }] : []),
+                  { label: "Settings", href: `${repoBase}#settings` },
                 ].map((item) => {
                   const isSettings = item.label === 'Settings';
                   const selected = isSettings
@@ -810,7 +848,7 @@ export default function RepoDashboardPage() {
                       key="Settings"
                       type="button"
                       onClick={() => setActiveTab(activeTab === 'Settings' ? 'Overview' : 'Settings')}
-                      className={`h-full flex items-center gap-1.5 border-b-2 text-sm font-semibold whitespace-nowrap ${
+                      className={`h-full flex items-center gap-1.5 border-b-2 text-sm font-semibold whitespace-nowrap transition-colors ${
                         selected
                           ? 'border-red-500 text-red-600'
                           : 'border-transparent text-slate-500 hover:text-slate-950'
@@ -888,76 +926,93 @@ panda push -u pandahub main`}
               </section>
             )}
 
-            {/* ── Repo Settings (owner only) ───────────────────────────────── */}
-            {activeTab === 'Settings' && isOwner && (
-              <div className="mt-6 space-y-6 max-w-2xl">
-
-                {/* General settings */}
-                <section className="rounded-3xl border border-slate-200 bg-white shadow-sm overflow-hidden">
-                  <div className="px-6 py-5 border-b border-slate-100">
-                    <h2 className="text-base font-extrabold text-slate-950">General</h2>
-                    <p className="text-xs text-slate-500 mt-0.5">Basic repository settings</p>
+            {/* ── Repo Settings ───────────────────────────────── */}
+            {activeTab === 'Settings' && (
+              !isOwner ? (
+                <div className="mt-6 rounded-3xl border border-slate-200 bg-white p-8 text-center max-w-xl shadow-sm">
+                  <div className="w-12 h-12 rounded-2xl bg-amber-50 border border-amber-200 text-amber-600 flex items-center justify-center mx-auto mb-4">
+                    <span className="material-symbols-outlined text-[24px]">lock</span>
                   </div>
-                  <div className="p-6 space-y-4">
-                    <div>
-                      <label className="block text-xs font-semibold text-slate-600 mb-1.5" htmlFor="repo-description">Description</label>
-                      <textarea
-                        id="repo-description"
-                        rows={3}
-                        defaultValue={repoMeta?.description ?? ''}
-                        placeholder="A short description of your repository…"
-                        className="w-full rounded-xl border border-slate-200 bg-slate-50 px-3.5 py-2.5 text-sm text-slate-900 placeholder:text-slate-400 focus:outline-none focus:border-blue-400 focus:ring-2 focus:ring-blue-100 resize-none"
-                      />
+                  <h2 className="text-lg font-extrabold text-slate-950">Owner Access Required</h2>
+                  <p className="text-sm text-slate-500 mt-2 leading-6">
+                    Repository settings and danger zone controls are only accessible to the repository owner (<span className="font-semibold text-slate-900">@{owner}</span>).
+                    {!user && " Please sign in with the owner account to manage this repository."}
+                  </p>
+                  {!user && (
+                    <Link href="/login" className="mt-5 inline-flex items-center gap-2 px-5 py-2.5 rounded-xl bg-slate-950 text-white text-sm font-semibold hover:bg-slate-800 no-underline shadow-sm">
+                      Sign in
+                    </Link>
+                  )}
+                </div>
+              ) : (
+                <div className="mt-6 space-y-6 max-w-2xl">
+                  {/* General settings */}
+                  <section className="rounded-3xl border border-slate-200 bg-white shadow-sm overflow-hidden">
+                    <div className="px-6 py-5 border-b border-slate-100">
+                      <h2 className="text-base font-extrabold text-slate-950">General</h2>
+                      <p className="text-xs text-slate-500 mt-0.5">Basic repository settings</p>
                     </div>
-                    <div>
-                      <label className="block text-xs font-semibold text-slate-600 mb-1.5">Visibility</label>
-                      <div className="flex gap-3">
-                        {(['public', 'private', 'internal'] as const).map(v => (
-                          <label key={v} className="flex items-center gap-2 cursor-pointer">
-                            <input type="radio" name="visibility" value={v} defaultChecked={repoMeta?.visibility === v} className="accent-blue-600" />
-                            <span className="text-sm text-slate-700 capitalize">{v}</span>
-                          </label>
-                        ))}
-                      </div>
-                    </div>
-                    <button
-                      type="button"
-                      className="h-9 px-4 rounded-xl bg-slate-950 hover:bg-slate-800 text-white text-sm font-semibold"
-                      onClick={() => setNotice('Settings saved (demo — API update coming soon).')}
-                    >
-                      Save changes
-                    </button>
-                  </div>
-                </section>
-
-                {/* Danger zone */}
-                <section className="rounded-3xl border-2 border-red-200 bg-white shadow-sm overflow-hidden">
-                  <div className="px-6 py-5 border-b border-red-100 bg-red-50/50">
-                    <div className="flex items-center gap-2">
-                      <span className="material-symbols-outlined text-red-500 text-[20px]">warning</span>
-                      <h2 className="text-base font-extrabold text-red-700">Danger Zone</h2>
-                    </div>
-                    <p className="text-xs text-red-500 mt-0.5">These actions are irreversible — proceed with extreme caution.</p>
-                  </div>
-
-                  <div className="p-6">
-                    <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4 py-4 border-b border-slate-100 last:border-0">
+                    <div className="p-6 space-y-4">
                       <div>
-                        <div className="font-semibold text-slate-900 text-sm">Delete this repository</div>
-                        <div className="text-xs text-slate-500 mt-0.5">Once deleted, all code, issues, and pull requests will be permanently removed.</div>
+                        <label className="block text-xs font-semibold text-slate-600 mb-1.5" htmlFor="repo-description">Description</label>
+                        <textarea
+                          id="repo-description"
+                          rows={3}
+                          defaultValue={repoMeta?.description ?? ''}
+                          placeholder="A short description of your repository…"
+                          className="w-full rounded-xl border border-slate-200 bg-slate-50 px-3.5 py-2.5 text-sm text-slate-900 placeholder:text-slate-400 focus:outline-none focus:border-blue-400 focus:ring-2 focus:ring-blue-100 resize-none"
+                        />
+                      </div>
+                      <div>
+                        <label className="block text-xs font-semibold text-slate-600 mb-1.5">Visibility</label>
+                        <div className="flex gap-3">
+                          {(['public', 'private', 'internal'] as const).map(v => (
+                            <label key={v} className="flex items-center gap-2 cursor-pointer">
+                              <input type="radio" name="visibility" value={v} defaultChecked={repoMeta?.visibility === v} className="accent-blue-600" />
+                              <span className="text-sm text-slate-700 capitalize">{v}</span>
+                            </label>
+                          ))}
+                        </div>
                       </div>
                       <button
                         type="button"
-                        onClick={() => { setShowDeleteModal(true); setDeleteConfirmText(''); setDeleteError(null); }}
-                        className="shrink-0 h-9 px-4 rounded-xl border border-red-300 bg-red-50 hover:bg-red-100 text-red-700 font-semibold text-sm flex items-center gap-1.5"
+                        className="h-9 px-4 rounded-xl bg-slate-950 hover:bg-slate-800 text-white text-sm font-semibold"
+                        onClick={() => setNotice('Settings saved (demo — API update coming soon).')}
                       >
-                        <span className="material-symbols-outlined text-[17px]">delete_forever</span>
-                        Delete repository
+                        Save changes
                       </button>
                     </div>
-                  </div>
-                </section>
-              </div>
+                  </section>
+
+                  {/* Danger zone */}
+                  <section className="rounded-3xl border-2 border-red-200 bg-white shadow-sm overflow-hidden">
+                    <div className="px-6 py-5 border-b border-red-100 bg-red-50/50">
+                      <div className="flex items-center gap-2">
+                        <span className="material-symbols-outlined text-red-500 text-[20px]">warning</span>
+                        <h2 className="text-base font-extrabold text-red-700">Danger Zone</h2>
+                      </div>
+                      <p className="text-xs text-red-500 mt-0.5">These actions are irreversible — proceed with extreme caution.</p>
+                    </div>
+
+                    <div className="p-6">
+                      <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4 py-4 border-b border-slate-100 last:border-0">
+                        <div>
+                          <div className="font-semibold text-slate-900 text-sm">Delete this repository</div>
+                          <div className="text-xs text-slate-500 mt-0.5">Once deleted, all code, issues, and pull requests will be permanently removed.</div>
+                        </div>
+                        <button
+                          type="button"
+                          onClick={() => { setShowDeleteModal(true); setDeleteConfirmText(''); setDeleteError(null); }}
+                          className="shrink-0 h-9 px-4 rounded-xl border border-red-300 bg-red-50 hover:bg-red-100 text-red-700 font-semibold text-sm flex items-center gap-1.5"
+                        >
+                          <span className="material-symbols-outlined text-[17px]">delete_forever</span>
+                          Delete repository
+                        </button>
+                      </div>
+                    </div>
+                  </section>
+                </div>
+              )
             )}
 
             {/* Main grid */}

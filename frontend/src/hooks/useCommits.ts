@@ -14,7 +14,7 @@ export function useCommits(owner: string, repoName: string, ref: string, page = 
     setError(null);
     try {
       const { data } = await api.get<Commit[]>(
-        `/repos/${owner}/${repoName}/git/commits/${ref}?page=${currentPage}&per_page=${perPage}`
+        `/${owner}/${repoName}/git/commits/${ref}?page=${currentPage}&per_page=${perPage}`
       );
       setCommits(data);
       setHasMore(data.length === perPage);

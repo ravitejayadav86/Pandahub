@@ -892,6 +892,79 @@ export default function RepoDashboardPage() {
             {/* Empty repository — Full Panda CLI & Quickstart Redevelopment */}
             {isEmptyRepository && activeTab !== 'Settings' && (
               <section className="mt-6 space-y-6 animate-fade-in">
+
+                {/* Get started callout */}
+                <div
+                  className="glass-card rounded-2xl border overflow-hidden"
+                  style={{ borderColor: 'var(--glass-border)' }}
+                >
+                  <div
+                    className="px-5 py-4 flex flex-col sm:flex-row sm:items-center justify-between gap-3"
+                    style={{
+                      background: 'linear-gradient(135deg, rgba(37,99,235,0.08) 0%, rgba(139,92,246,0.08) 100%)',
+                    }}
+                  >
+                    <div className="flex items-center gap-3">
+                      <div
+                        className="w-9 h-9 rounded-xl flex items-center justify-center shrink-0"
+                        style={{ background: 'linear-gradient(135deg, #2563eb, #7c3aed)', boxShadow: '0 4px 12px rgba(37,99,235,0.3)' }}
+                      >
+                        <span className="material-symbols-outlined text-white" style={{ fontSize: 18 }}>rocket_launch</span>
+                      </div>
+                      <div>
+                        <p className="text-sm font-bold" style={{ color: 'var(--text-primary)' }}>
+                          Get started with <span style={{ color: '#3b82f6' }}>{repoName}</span>
+                        </p>
+                        <p className="text-xs" style={{ color: 'var(--text-secondary)' }}>
+                          Get started by{' '}
+                          <Link
+                            href={`${repoBase}/tree/${repoMeta?.default_branch || 'main'}?new=1`}
+                            className="font-semibold no-underline"
+                            style={{ color: '#3b82f6' }}
+                          >
+                            creating a new file
+                          </Link>
+                          {' '}or{' '}
+                          <Link
+                            href={`${repoBase}/upload`}
+                            className="font-semibold no-underline"
+                            style={{ color: '#3b82f6' }}
+                          >
+                            upload file from file manager
+                          </Link>
+                        </p>
+                      </div>
+                    </div>
+
+                    <div className="flex items-center gap-2 shrink-0">
+                      <Link
+                        href={`${repoBase}/tree/${repoMeta?.default_branch || 'main'}?new=1`}
+                        className="flex items-center gap-1.5 no-underline px-4 py-2 rounded-xl text-sm font-semibold transition-all"
+                        style={{
+                          background: 'linear-gradient(135deg, #2563eb, #4f46e5)',
+                          color: '#fff',
+                          boxShadow: '0 4px 12px rgba(37,99,235,0.3)',
+                        }}
+                      >
+                        <span className="material-symbols-outlined" style={{ fontSize: 16 }}>add</span>
+                        Create new file
+                      </Link>
+
+                      <Link
+                        href={`${repoBase}/upload`}
+                        className="flex items-center gap-1.5 no-underline px-4 py-2 rounded-xl text-sm font-semibold glass-card transition-all"
+                        style={{
+                          border: '1px solid var(--glass-border)',
+                          color: 'var(--text-primary)',
+                        }}
+                      >
+                        <span className="material-symbols-outlined" style={{ fontSize: 16 }}>upload_file</span>
+                        Upload file
+                      </Link>
+                    </div>
+                  </div>
+                </div>
+
                 {/* Hero Header */}
                 <div className="rounded-3xl border border-slate-200 bg-white p-6 sm:p-8 shadow-sm">
                   <div className="flex flex-col md:flex-row md:items-center justify-between gap-4">
@@ -1425,6 +1498,69 @@ git push -u origin main`,
 
                 {/* Center */}
                 <div className="space-y-6">
+
+                  {/* Get started banner — shown to owner */}
+                  {isOwner && (
+                    <div
+                      className="glass-card rounded-2xl border overflow-hidden"
+                      style={{ borderColor: 'var(--glass-border)' }}
+                    >
+                      <div
+                        className="px-5 py-4 flex flex-col sm:flex-row sm:items-center justify-between gap-3"
+                        style={{
+                          background: 'linear-gradient(135deg, rgba(37,99,235,0.08) 0%, rgba(139,92,246,0.08) 100%)',
+                          borderBottom: '1px solid var(--glass-border)',
+                        }}
+                      >
+                        <div className="flex items-center gap-3">
+                          <div
+                            className="w-9 h-9 rounded-xl flex items-center justify-center shrink-0"
+                            style={{ background: 'linear-gradient(135deg, #2563eb, #7c3aed)', boxShadow: '0 4px 12px rgba(37,99,235,0.3)' }}
+                          >
+                            <span className="material-symbols-outlined text-white" style={{ fontSize: 18 }}>rocket_launch</span>
+                          </div>
+                          <div>
+                            <p className="text-sm font-bold" style={{ color: 'var(--text-primary)' }}>
+                              Get started with <span style={{ color: '#3b82f6' }}>{repoName}</span>
+                            </p>
+                            <p className="text-xs" style={{ color: 'var(--text-secondary)' }}>
+                              Get started by creating a new file or uploading an existing one.
+                            </p>
+                          </div>
+                        </div>
+
+                        <div className="flex items-center gap-2 shrink-0">
+                          {/* Create new file */}
+                          <Link
+                            href={`${repoBase}/tree/${repoMeta?.default_branch || 'main'}?new=1`}
+                            className="flex items-center gap-1.5 no-underline px-4 py-2 rounded-xl text-sm font-semibold transition-all"
+                            style={{
+                              background: 'linear-gradient(135deg, #2563eb, #4f46e5)',
+                              color: '#fff',
+                              boxShadow: '0 4px 12px rgba(37,99,235,0.3)',
+                            }}
+                          >
+                            <span className="material-symbols-outlined" style={{ fontSize: 16 }}>add</span>
+                            Create new file
+                          </Link>
+
+                          {/* Upload from file manager */}
+                          <Link
+                            href={`${repoBase}/upload`}
+                            className="flex items-center gap-1.5 no-underline px-4 py-2 rounded-xl text-sm font-semibold glass-card transition-all"
+                            style={{
+                              border: '1px solid var(--glass-border)',
+                              color: 'var(--text-primary)',
+                            }}
+                          >
+                            <span className="material-symbols-outlined" style={{ fontSize: 16 }}>upload_file</span>
+                            Upload file
+                          </Link>
+                        </div>
+                      </div>
+                    </div>
+                  )}
+
                   <section className="rounded-3xl border border-slate-200 bg-white shadow-sm overflow-hidden">
                     <div className="px-6 py-5 border-b border-slate-100 flex items-center justify-between gap-4">
                       <div>

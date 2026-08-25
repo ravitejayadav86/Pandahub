@@ -95,6 +95,84 @@ export default function RepoDashboardPage() {
   const [isDeleting, setIsDeleting] = useState(false);
   const [deleteError, setDeleteError] = useState<string | null>(null);
 
+  // Create File / File Manager Upload
+  const [showCreateFileModal, setShowCreateFileModal] = useState(false);
+  const [newFileName, setNewFileName] = useState('README.md');
+  const [newFileContent, setNewFileContent] = useState('');
+  const [newFileMessage, setNewFileMessage] = useState('Create README.md');
+  const [newFileBranch, setNewFileBranch] = useState('main');
+  const [isCreatingFile, setIsCreatingFile] = useState(false);
+  const [createFileError, setCreateFileError] = useState<string | null>(null);
+  const quickFileInputRef = useRef<HTMLInputElement>(null);
+
+  const handleOpenCreateFile = (defaultName = 'README.md', defaultContent = `# ${repoName}\n\nWelcome to ${repoName}!`) => {
+    setNewFileName(defaultName);
+    setNewFileContent(defaultContent);
+    setNewFileMessage(`Create ${defaultName}`);
+    setNewFileBranch(repoMeta?.default_branch || 'main');
+    setCreateFileError(null);
+    setShowCreateFileModal(true);
+  };
+
+  const handleCreateFile = async (e: React.FormEvent) => {
+    e.preventDefault();
+    if (!newFileName.trim()) {
+      setCreateFileError('Please enter a file name.');
+      return;
+    }
+    setIsCreatingFile(true);
+    setCreateFileError(null);
+    try {
+      const fd = new FormData();
+      const blob = new Blob([newFileContent], { type: 'text/plain' });
+      fd.append('files', blob, newFileName.trim());
+      fd.append('branch', newFileBranch.trim() || repoMeta?.default_branch || 'main');
+      fd.append('message', newFileMessage.trim() || `Create ${newFileName.trim()}`);
+      fd.append('target_path', '');
+
+      await api.post(`/${owner}/${repoName}/git/upload`, fd, {
+        headers: { 'Content-Type': 'multipart/form-data' },
+      });
+
+      setShowCreateFileModal(false);
+      setNotice(`Successfully created ${newFileName.trim()}!`);
+      setTimeout(() => {
+        window.location.reload();
+      }, 500);
+    } catch (err: any) {
+      setCreateFileError(err?.response?.data?.detail || 'Failed to create file. Please try again.');
+    } finally {
+      setIsCreatingFile(false);
+    }
+  };
+
+  const handleQuickUpload = async (e: React.ChangeEvent<HTMLInputElement>) => {
+    if (!e.target.files || e.target.files.length === 0) return;
+    const filesList = Array.from(e.target.files);
+    const fd = new FormData();
+    for (const f of filesList) {
+      const rel = (f as any).webkitRelativePath || f.name;
+      const blob = new Blob([f], { type: f.type });
+      fd.append('files', blob, rel);
+    }
+    fd.append('branch', repoMeta?.default_branch || 'main');
+    fd.append('message', `Upload ${filesList.length} file${filesList.length > 1 ? 's' : ''} via file manager`);
+    fd.append('target_path', '');
+
+    setNotice('Uploading file(s) from file manager...');
+    try {
+      await api.post(`/${owner}/${repoName}/git/upload`, fd, {
+        headers: { 'Content-Type': 'multipart/form-data' },
+      });
+      setNotice('Files uploaded successfully!');
+      setTimeout(() => {
+        window.location.reload();
+      }, 500);
+    } catch (err: any) {
+      setNotice(err?.response?.data?.detail || 'Failed to upload files.');
+    }
+  };
+
   // Quickstart guide tabs
   const [quickstartTab, setQuickstartTab] = useState<'panda-new' | 'panda-existing' | 'git-https' | 'cli-reference'>('panda-new');
   const [copiedSnippet, setCopiedSnippet] = useState<string | null>(null);
@@ -804,9 +882,27 @@ export default function RepoDashboardPage() {
                   <div className="flex flex-wrap gap-2">
                     <button
                       type="button"
+                      onClick={() => handleOpenCreateFile('README.md', `# ${repoName}\n\nWelcome to ${repoName}!`)}
+                      className="h-10 px-4 rounded-xl bg-gradient-to-r from-blue-600 to-indigo-600 hover:from-blue-700 hover:to-indigo-700 text-white font-semibold text-sm flex items-center gap-2 shadow-md shadow-blue-500/20 transition-all cursor-pointer"
+                    >
+                      <span className="material-symbols-outlined text-[18px]">add</span>
+                      Create file
+                    </button>
+
+                    <button
+                      type="button"
+                      onClick={() => quickFileInputRef.current?.click()}
+                      className="h-10 px-4 rounded-xl glass-card border border-[var(--glass-border)] text-[var(--text-primary)] hover:bg-[var(--glass-bg-3)] font-semibold text-sm flex items-center gap-2 transition-all cursor-pointer"
+                    >
+                      <span className="material-symbols-outlined text-[18px]">drive_folder_upload</span>
+                      Upload files
+                    </button>
+
+                    <button
+                      type="button"
                       onClick={handleCopyCloneUrl}
                       disabled={!cloneUrl}
-                      className="h-10 px-4 rounded-xl border border-slate-200 bg-white text-slate-700 hover:bg-slate-50 font-semibold text-sm flex items-center gap-2 disabled:opacity-50"
+                      className="h-10 px-4 rounded-xl glass-card border border-[var(--glass-border)] text-[var(--text-primary)] hover:bg-[var(--glass-bg-3)] font-semibold text-sm flex items-center gap-2 disabled:opacity-50 transition-all cursor-pointer"
                     >
                       <span className="material-symbols-outlined text-[18px]">
                         content_copy
@@ -818,7 +914,7 @@ export default function RepoDashboardPage() {
                       type="button"
                       onClick={handleStar}
                       disabled={starring || repoLoading}
-                      className="h-10 px-4 rounded-xl border border-slate-200 bg-white text-slate-700 hover:bg-slate-50 font-semibold text-sm flex items-center gap-2 disabled:opacity-50"
+                      className="h-10 px-4 rounded-xl glass-card border border-[var(--glass-border)] text-[var(--text-primary)] hover:bg-[var(--glass-bg-3)] font-semibold text-sm flex items-center gap-2 disabled:opacity-50 transition-all cursor-pointer"
                     >
                       <span className="material-symbols-outlined text-[18px]">
                         star
@@ -830,7 +926,7 @@ export default function RepoDashboardPage() {
                       type="button"
                       onClick={handleFork}
                       disabled={!repoMeta}
-                      className="h-10 px-4 rounded-xl bg-slate-950 hover:bg-slate-800 text-white font-semibold text-sm flex items-center gap-2 disabled:opacity-50"
+                      className="h-10 px-4 rounded-xl glass-card border border-[var(--glass-border)] text-[var(--text-primary)] hover:bg-[var(--glass-bg-3)] font-semibold text-sm flex items-center gap-2 disabled:opacity-50 transition-all cursor-pointer"
                     >
                       <span className="material-symbols-outlined text-[18px]">
                         fork_right
@@ -841,7 +937,16 @@ export default function RepoDashboardPage() {
                 </div>
               </div>
 
-              <div className="border-t border-slate-100 px-5 sm:px-7 h-14 flex items-center gap-5 overflow-x-auto">
+              {/* Hidden file input for file manager uploads */}
+              <input
+                type="file"
+                ref={quickFileInputRef}
+                multiple
+                onChange={handleQuickUpload}
+                style={{ display: 'none' }}
+              />
+
+              <div className="border-t border-[var(--glass-border)] px-5 sm:px-7 h-14 flex items-center gap-5 overflow-x-auto">
                 {[
                   { label: "Overview", href: repoBase },
                   { label: "Commits", href: `${repoBase}/commits` },
@@ -864,8 +969,8 @@ export default function RepoDashboardPage() {
                       onClick={() => setActiveTab(activeTab === 'Settings' ? 'Overview' : 'Settings')}
                       className={`h-full flex items-center gap-1.5 border-b-2 text-sm font-semibold whitespace-nowrap transition-colors ${
                         selected
-                          ? 'border-red-500 text-red-600'
-                          : 'border-transparent text-slate-500 hover:text-slate-950'
+                          ? 'border-red-500 text-red-500'
+                          : 'border-transparent text-[var(--text-secondary)] hover:text-[var(--text-primary)]'
                       }`}
                     >
                       <span className="material-symbols-outlined text-[16px]">settings</span>
@@ -878,8 +983,8 @@ export default function RepoDashboardPage() {
                       onClick={() => setActiveTab('Overview')}
                       className={`h-full flex items-center border-b-2 text-sm font-semibold no-underline whitespace-nowrap ${
                         selected
-                          ? "border-blue-600 text-blue-600"
-                          : "border-transparent text-slate-500 hover:text-slate-950"
+                          ? "border-blue-500 text-blue-500 font-bold"
+                          : "border-transparent text-[var(--text-secondary)] hover:text-[var(--text-primary)]"
                       }`}
                     >
                       {item.label}
@@ -892,75 +997,57 @@ export default function RepoDashboardPage() {
             {/* Empty repository — Full Panda CLI & Quickstart Redevelopment */}
             {isEmptyRepository && activeTab !== 'Settings' && (
               <section className="mt-6 space-y-6 animate-fade-in">
-
-                {/* Get started callout */}
-                <div
-                  className="glass-card rounded-2xl border overflow-hidden"
-                  style={{ borderColor: 'var(--glass-border)' }}
-                >
-                  <div
-                    className="px-5 py-4 flex flex-col sm:flex-row sm:items-center justify-between gap-3"
-                    style={{
-                      background: 'linear-gradient(135deg, rgba(37,99,235,0.08) 0%, rgba(139,92,246,0.08) 100%)',
-                    }}
-                  >
-                    <div className="flex items-center gap-3">
-                      <div
-                        className="w-9 h-9 rounded-xl flex items-center justify-center shrink-0"
-                        style={{ background: 'linear-gradient(135deg, #2563eb, #7c3aed)', boxShadow: '0 4px 12px rgba(37,99,235,0.3)' }}
-                      >
-                        <span className="material-symbols-outlined text-white" style={{ fontSize: 18 }}>rocket_launch</span>
+                {/* Get started options banner */}
+                <div className="rounded-3xl border border-blue-500/25 bg-gradient-to-r from-blue-500/10 via-indigo-500/10 to-sky-500/10 backdrop-blur-xl p-6 sm:p-7 shadow-sm">
+                  <div className="flex flex-col md:flex-row md:items-center justify-between gap-5">
+                    <div className="flex items-start sm:items-center gap-4">
+                      <div className="w-12 h-12 rounded-2xl bg-blue-500/20 text-blue-500 border border-blue-500/30 flex items-center justify-center shrink-0 shadow-inner">
+                        <span className="material-symbols-outlined text-[26px]">rocket_launch</span>
                       </div>
                       <div>
-                        <p className="text-sm font-bold" style={{ color: 'var(--text-primary)' }}>
-                          Get started with <span style={{ color: '#3b82f6' }}>{repoName}</span>
-                        </p>
-                        <p className="text-xs" style={{ color: 'var(--text-secondary)' }}>
+                        <h3 className="text-base sm:text-lg font-extrabold text-[var(--text-primary)]">
+                          Get started with your repository
+                        </h3>
+                        <p className="text-xs sm:text-sm text-[var(--text-secondary)] mt-1">
                           Get started by{' '}
-                          <Link
-                            href={`${repoBase}/tree/${repoMeta?.default_branch || 'main'}?new=1`}
-                            className="font-semibold no-underline"
-                            style={{ color: '#3b82f6' }}
+                          <button
+                            type="button"
+                            onClick={() => handleOpenCreateFile('README.md', `# ${repoName}\n\nWelcome to ${repoName}!`)}
+                            className="font-bold text-blue-500 hover:text-blue-400 underline cursor-pointer bg-transparent border-none p-0 inline"
                           >
                             creating a new file
-                          </Link>
-                          {' '}or{' '}
-                          <Link
-                            href={`${repoBase}/upload`}
-                            className="font-semibold no-underline"
-                            style={{ color: '#3b82f6' }}
+                          </button>{' '}
+                          or{' '}
+                          <button
+                            type="button"
+                            onClick={() => quickFileInputRef.current?.click()}
+                            className="font-bold text-blue-500 hover:text-blue-400 underline cursor-pointer bg-transparent border-none p-0 inline"
                           >
                             upload file from file manager
-                          </Link>
+                          </button>
+                          .
                         </p>
                       </div>
                     </div>
 
-                    <div className="flex items-center gap-2 shrink-0">
-                      <Link
-                        href={`${repoBase}/tree/${repoMeta?.default_branch || 'main'}?new=1`}
-                        className="flex items-center gap-1.5 no-underline px-4 py-2 rounded-xl text-sm font-semibold transition-all"
-                        style={{
-                          background: 'linear-gradient(135deg, #2563eb, #4f46e5)',
-                          color: '#fff',
-                          boxShadow: '0 4px 12px rgba(37,99,235,0.3)',
-                        }}
+                    <div className="flex flex-wrap items-center gap-2.5 shrink-0">
+                      <button
+                        type="button"
+                        onClick={() => handleOpenCreateFile('README.md', `# ${repoName}\n\nWelcome to ${repoName}!`)}
+                        className="h-10 px-4 rounded-xl bg-gradient-to-r from-blue-600 to-indigo-600 hover:from-blue-700 hover:to-indigo-700 text-white text-xs sm:text-sm font-semibold flex items-center gap-2 shadow-md shadow-blue-500/20 transition-all cursor-pointer"
                       >
-                        <span className="material-symbols-outlined" style={{ fontSize: 16 }}>add</span>
-                        Create new file
-                      </Link>
+                        <span className="material-symbols-outlined text-[18px]">add_circle</span>
+                        Create a new file
+                      </button>
 
-                      <Link
-                        href={`${repoBase}/upload`}
-                        className="flex items-center gap-1.5 no-underline px-4 py-2 rounded-xl text-sm font-semibold glass-card transition-all"
-                        style={{
-                          border: '1px solid var(--glass-border)',
-                          color: 'var(--text-primary)',
-                        }}
+                      <button
+                        type="button"
+                        onClick={() => quickFileInputRef.current?.click()}
+                        className="h-10 px-4 rounded-xl glass-card border border-[var(--glass-border)] text-[var(--text-primary)] hover:bg-[var(--glass-bg-3)] text-xs sm:text-sm font-semibold flex items-center gap-2 transition-all cursor-pointer"
                       >
-                        <span className="material-symbols-outlined" style={{ fontSize: 16 }}>upload_file</span>
-                        Upload file
-                      </Link>
+                        <span className="material-symbols-outlined text-[18px]">drive_folder_upload</span>
+                        Upload from file manager
+                      </button>
                     </div>
                   </div>
                 </div>
@@ -992,13 +1079,14 @@ export default function RepoDashboardPage() {
                         {copied ? "Clone URL copied!" : "Copy Clone URL"}
                       </button>
 
-                      <Link
-                        href={`${repoBase}/upload`}
-                        className="h-10 px-4 rounded-xl border border-slate-200 bg-white text-slate-700 hover:bg-slate-50 text-xs sm:text-sm font-semibold flex items-center gap-1.5 no-underline transition-colors shadow-sm"
+                      <button
+                        type="button"
+                        onClick={() => quickFileInputRef.current?.click()}
+                        className="h-10 px-4 rounded-xl border border-slate-200 bg-white text-slate-700 hover:bg-slate-50 text-xs sm:text-sm font-semibold flex items-center gap-1.5 transition-colors shadow-sm cursor-pointer"
                       >
                         <span className="material-symbols-outlined text-[17px]">upload_file</span>
                         Upload files
-                      </Link>
+                      </button>
                     </div>
                   </div>
 
@@ -1498,69 +1586,6 @@ git push -u origin main`,
 
                 {/* Center */}
                 <div className="space-y-6">
-
-                  {/* Get started banner — shown to owner */}
-                  {isOwner && (
-                    <div
-                      className="glass-card rounded-2xl border overflow-hidden"
-                      style={{ borderColor: 'var(--glass-border)' }}
-                    >
-                      <div
-                        className="px-5 py-4 flex flex-col sm:flex-row sm:items-center justify-between gap-3"
-                        style={{
-                          background: 'linear-gradient(135deg, rgba(37,99,235,0.08) 0%, rgba(139,92,246,0.08) 100%)',
-                          borderBottom: '1px solid var(--glass-border)',
-                        }}
-                      >
-                        <div className="flex items-center gap-3">
-                          <div
-                            className="w-9 h-9 rounded-xl flex items-center justify-center shrink-0"
-                            style={{ background: 'linear-gradient(135deg, #2563eb, #7c3aed)', boxShadow: '0 4px 12px rgba(37,99,235,0.3)' }}
-                          >
-                            <span className="material-symbols-outlined text-white" style={{ fontSize: 18 }}>rocket_launch</span>
-                          </div>
-                          <div>
-                            <p className="text-sm font-bold" style={{ color: 'var(--text-primary)' }}>
-                              Get started with <span style={{ color: '#3b82f6' }}>{repoName}</span>
-                            </p>
-                            <p className="text-xs" style={{ color: 'var(--text-secondary)' }}>
-                              Get started by creating a new file or uploading an existing one.
-                            </p>
-                          </div>
-                        </div>
-
-                        <div className="flex items-center gap-2 shrink-0">
-                          {/* Create new file */}
-                          <Link
-                            href={`${repoBase}/tree/${repoMeta?.default_branch || 'main'}?new=1`}
-                            className="flex items-center gap-1.5 no-underline px-4 py-2 rounded-xl text-sm font-semibold transition-all"
-                            style={{
-                              background: 'linear-gradient(135deg, #2563eb, #4f46e5)',
-                              color: '#fff',
-                              boxShadow: '0 4px 12px rgba(37,99,235,0.3)',
-                            }}
-                          >
-                            <span className="material-symbols-outlined" style={{ fontSize: 16 }}>add</span>
-                            Create new file
-                          </Link>
-
-                          {/* Upload from file manager */}
-                          <Link
-                            href={`${repoBase}/upload`}
-                            className="flex items-center gap-1.5 no-underline px-4 py-2 rounded-xl text-sm font-semibold glass-card transition-all"
-                            style={{
-                              border: '1px solid var(--glass-border)',
-                              color: 'var(--text-primary)',
-                            }}
-                          >
-                            <span className="material-symbols-outlined" style={{ fontSize: 16 }}>upload_file</span>
-                            Upload file
-                          </Link>
-                        </div>
-                      </div>
-                    </div>
-                  )}
-
                   <section className="rounded-3xl border border-slate-200 bg-white shadow-sm overflow-hidden">
                     <div className="px-6 py-5 border-b border-slate-100 flex items-center justify-between gap-4">
                       <div>
@@ -2013,6 +2038,147 @@ panda push`}
                 </button>
               </div>
             </div>
+          </div>
+        </div>
+      )}
+
+      {/* Create New File Modal */}
+      {showCreateFileModal && (
+        <div className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-black/60 backdrop-blur-md animate-fade-in">
+          <div className="w-full max-w-2xl rounded-3xl bg-[var(--glass-bg-4)] border border-[var(--glass-border)] shadow-2xl backdrop-blur-2xl overflow-hidden text-[var(--text-primary)]">
+            {/* Header */}
+            <div className="px-6 py-5 border-b border-[var(--glass-border)] bg-[var(--glass-bg-2)] flex items-center justify-between">
+              <div className="flex items-center gap-3">
+                <div className="w-10 h-10 rounded-xl bg-blue-500/20 text-blue-500 flex items-center justify-center shrink-0 border border-blue-500/30">
+                  <span className="material-symbols-outlined text-[22px]">note_add</span>
+                </div>
+                <div>
+                  <div className="text-base font-extrabold text-[var(--text-primary)]">Create new file</div>
+                  <div className="text-xs text-[var(--text-secondary)] mt-0.5">{owner}/{repoName}</div>
+                </div>
+              </div>
+              <button
+                type="button"
+                onClick={() => setShowCreateFileModal(false)}
+                className="w-8 h-8 rounded-xl hover:bg-[var(--glass-bg-2)] flex items-center justify-center text-[var(--text-secondary)] transition-colors cursor-pointer"
+              >
+                <span className="material-symbols-outlined text-[20px]">close</span>
+              </button>
+            </div>
+
+            {/* Form Body */}
+            <form onSubmit={handleCreateFile} className="p-6 space-y-4">
+              <div>
+                <label className="block text-xs font-bold text-[var(--text-secondary)] uppercase tracking-wider mb-2">
+                  File name
+                </label>
+                <input
+                  type="text"
+                  value={newFileName}
+                  onChange={e => setNewFileName(e.target.value)}
+                  placeholder="e.g. README.md, .gitignore, index.js"
+                  required
+                  className="glass-input w-full px-4 py-2.5 rounded-xl text-sm font-mono outline-none border border-[var(--glass-border)]"
+                />
+                {/* Template Chips */}
+                <div className="flex flex-wrap items-center gap-1.5 mt-2">
+                  <span className="text-[11px] text-[var(--text-secondary)] mr-1">Templates:</span>
+                  {[
+                    { name: 'README.md', content: `# ${repoName}\n\nA modern project created on PandaHub.\n\n## Getting Started\n\n\`\`\`bash\npanda clone ${owner}/${repoName}\n\`\`\`\n` },
+                    { name: '.gitignore', content: `node_modules/\n.env\n.env.local\ndist/\nbuild/\n__pycache__/\n*.pyc\n.DS_Store\n` },
+                    { name: 'LICENSE', content: `MIT License\n\nCopyright (c) ${new Date().getFullYear()} ${owner}\n\nPermission is hereby granted, free of charge, to any person obtaining a copy\nof this software and associated documentation files (the "Software"), to deal\nin the Software without restriction, including without limitation the rights\nto use, copy, modify, merge, publish, distribute, sublicense, and/or sell\ncopies of the Software, and to permit persons to whom the Software is\nfurnished to do so, subject to the following conditions:\n\nThe above copyright notice and this permission notice shall be included in all\ncopies or substantial portions of the Software.\n` },
+                    { name: 'index.js', content: `console.log("Welcome to ${repoName} on PandaHub!");\n` },
+                  ].map(tpl => (
+                    <button
+                      key={tpl.name}
+                      type="button"
+                      onClick={() => {
+                        setNewFileName(tpl.name);
+                        setNewFileContent(tpl.content);
+                        setNewFileMessage(`Create ${tpl.name}`);
+                      }}
+                      className="px-2 py-0.5 rounded-lg text-xs font-mono bg-[var(--glass-bg-2)] hover:bg-[var(--glass-bg-3)] border border-[var(--glass-border)] text-[var(--text-secondary)] hover:text-[var(--text-primary)] transition-colors cursor-pointer"
+                    >
+                      {tpl.name}
+                    </button>
+                  ))}
+                </div>
+              </div>
+
+              <div>
+                <label className="block text-xs font-bold text-[var(--text-secondary)] uppercase tracking-wider mb-2">
+                  File content
+                </label>
+                <textarea
+                  value={newFileContent}
+                  onChange={e => setNewFileContent(e.target.value)}
+                  rows={8}
+                  placeholder="Enter file contents..."
+                  className="glass-input w-full p-4 rounded-xl text-sm font-mono outline-none border border-[var(--glass-border)] resize-y leading-relaxed"
+                />
+              </div>
+
+              <div className="grid sm:grid-cols-2 gap-3 pt-2">
+                <div>
+                  <label className="block text-xs font-bold text-[var(--text-secondary)] uppercase tracking-wider mb-1.5">
+                    Commit message
+                  </label>
+                  <input
+                    type="text"
+                    value={newFileMessage}
+                    onChange={e => setNewFileMessage(e.target.value)}
+                    placeholder="Commit message"
+                    className="glass-input w-full px-3.5 py-2 rounded-xl text-xs outline-none border border-[var(--glass-border)]"
+                  />
+                </div>
+                <div>
+                  <label className="block text-xs font-bold text-[var(--text-secondary)] uppercase tracking-wider mb-1.5">
+                    Commit to branch
+                  </label>
+                  <input
+                    type="text"
+                    value={newFileBranch}
+                    onChange={e => setNewFileBranch(e.target.value)}
+                    placeholder="main"
+                    className="glass-input w-full px-3.5 py-2 rounded-xl text-xs font-mono outline-none border border-[var(--glass-border)]"
+                  />
+                </div>
+              </div>
+
+              {createFileError && (
+                <div className="rounded-xl bg-red-500/10 border border-red-500/20 px-4 py-2.5 text-xs font-semibold text-red-500">
+                  {createFileError}
+                </div>
+              )}
+
+              <div className="flex justify-end gap-2.5 pt-4 border-t border-[var(--glass-border)]">
+                <button
+                  type="button"
+                  onClick={() => setShowCreateFileModal(false)}
+                  disabled={isCreatingFile}
+                  className="px-4 py-2 rounded-xl glass-card border border-[var(--glass-border)] text-[var(--text-secondary)] hover:text-[var(--text-primary)] text-sm font-semibold transition-colors cursor-pointer"
+                >
+                  Cancel
+                </button>
+                <button
+                  type="submit"
+                  disabled={isCreatingFile}
+                  className="px-5 py-2 rounded-xl bg-gradient-to-r from-blue-600 to-indigo-600 hover:from-blue-700 hover:to-indigo-700 text-white text-sm font-semibold flex items-center gap-2 shadow-md shadow-blue-500/20 transition-all cursor-pointer disabled:opacity-50"
+                >
+                  {isCreatingFile ? (
+                    <>
+                      <span className="material-symbols-outlined text-[16px] animate-spin">progress_activity</span>
+                      Committing…
+                    </>
+                  ) : (
+                    <>
+                      <span className="material-symbols-outlined text-[18px]">check_circle</span>
+                      Commit new file
+                    </>
+                  )}
+                </button>
+              </div>
+            </form>
           </div>
         </div>
       )}

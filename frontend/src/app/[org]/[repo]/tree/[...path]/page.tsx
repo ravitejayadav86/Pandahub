@@ -96,9 +96,21 @@ export default function TreePage() {
             <div style={{ textAlign: 'center', padding: '64px 24px' }}>
               <span className="material-symbols-outlined" style={{ fontSize: 64, color: 'var(--text-muted)', display: 'block', marginBottom: 16 }}>source</span>
               <h2 style={{ fontSize: 20, fontWeight: 700, marginBottom: 8, color: 'var(--text-primary)' }}>This repository is empty</h2>
-              <p style={{ color: 'var(--text-muted)', marginBottom: 24, fontSize: 14 }}>Get started by pushing your first commit.</p>
-              <div style={{ background: 'var(--bg-secondary)', borderRadius: 10, padding: '20px 24px', textAlign: 'left', maxWidth: 520, margin: '0 auto', fontFamily: 'monospace', fontSize: 13, lineHeight: 1.8, border: '1px solid var(--border-color)' }}>
-                <p style={{ margin: 0, color: 'var(--text-muted)' }}># …create a new repository on the command line</p>
+              <p style={{ color: 'var(--text-muted)', marginBottom: 24, fontSize: 14 }}>
+                Get started by <Link href={`/${owner}/${repoName}`} style={{ color: 'var(--color-primary)', fontWeight: 700, textDecoration: 'underline' }}>creating a new file</Link> or <Link href={`/${owner}/${repoName}/upload`} style={{ color: 'var(--color-primary)', fontWeight: 700, textDecoration: 'underline' }}>uploading files from file manager</Link>.
+              </p>
+              <div style={{ display: 'flex', gap: 12, justifyContent: 'center', marginBottom: 32 }}>
+                <Link href={`/${owner}/${repoName}`} className="btn-primary" style={{ padding: '8px 18px', borderRadius: 10, textDecoration: 'none', fontSize: 13, fontWeight: 600, display: 'flex', alignItems: 'center', gap: 6 }}>
+                  <span className="material-symbols-outlined" style={{ fontSize: 18 }}>note_add</span>
+                  Create new file
+                </Link>
+                <Link href={`/${owner}/${repoName}/upload`} style={{ padding: '8px 18px', borderRadius: 10, border: '1px solid var(--glass-border)', background: 'var(--glass-bg-2)', color: 'var(--text-primary)', textDecoration: 'none', fontSize: 13, fontWeight: 600, display: 'flex', alignItems: 'center', gap: 6 }}>
+                  <span className="material-symbols-outlined" style={{ fontSize: 18 }}>upload_file</span>
+                  Upload files
+                </Link>
+              </div>
+              <div style={{ background: 'var(--glass-bg-2)', borderRadius: 14, padding: '20px 24px', textAlign: 'left', maxWidth: 520, margin: '0 auto', fontFamily: 'monospace', fontSize: 13, lineHeight: 1.8, border: '1px solid var(--glass-border)' }}>
+                <p style={{ margin: 0, color: 'var(--text-muted)' }}># …or push from the command line</p>
                 <p style={{ margin: 0 }}>git init</p>
                 <p style={{ margin: 0 }}>git add .</p>
                 <p style={{ margin: 0 }}>git commit -m "first commit"</p>

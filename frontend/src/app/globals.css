@@ -34,17 +34,16 @@
   --text-muted:      #94a3b8;
   --border-color:    rgba(15, 23, 42, 0.08);
 
-  /* ── GLASSMORPHISM tokens ── */
-  --glass-bg-1:     rgba(255, 255, 255, 0.06);   /* deep far layer */
-  --glass-bg-2:     rgba(255, 255, 255, 0.14);   /* mid layer */
-  --glass-bg-3:     rgba(255, 255, 255, 0.28);   /* near layer */
-  --glass-bg-4:     rgba(255, 255, 255, 0.72);   /* surface */
-  --glass-border:   rgba(255, 255, 255, 0.05);
-  --glass-shadow:   rgba(15, 23, 42, 0.08);
-  --glass-bg:       rgba(255, 255, 255, 0.88);
+  /* ── GLASSMORPHISM tokens (Simple Liquid Glass) ── */
+  --glass-bg-1:     rgba(255, 255, 255, 0.45);   /* deep far layer */
+  --glass-bg-2:     rgba(255, 255, 255, 0.65);   /* mid layer */
+  --glass-bg-3:     rgba(255, 255, 255, 0.82);   /* near layer */
+  --glass-bg-4:     rgba(255, 255, 255, 0.94);   /* surface / navbar */
+  --glass-border:   rgba(15, 23, 42, 0.09);
+  --glass-border-subtle: rgba(15, 23, 42, 0.05);
+  --glass-shadow:   0 8px 32px rgba(15, 23, 42, 0.06);
+  --glass-bg:       rgba(255, 255, 255, 0.85);
 
-  
-  
   /* ── SPATIAL / Depth tokens ── */
   --spatial-z1: 0px;
   --spatial-z2: 20px;
@@ -68,15 +67,16 @@
   --text-primary:    #f1f5f9;
   --text-secondary:  #94a3b8;
   --text-muted:      #475569;
-  --border-color:    rgba(255, 255, 255, 0.06);
+  --border-color:    rgba(255, 255, 255, 0.08);
 
-  --glass-bg-1:     rgba(12, 20, 40, 0.35);
-  --glass-bg-2:     rgba(12, 20, 40, 0.55);
-  --glass-bg-3:     rgba(12, 20, 40, 0.72);
-  --glass-bg-4:     rgba(12, 20, 40, 0.88);
-  --glass-border:   rgba(255, 255, 255, 0.03);
-  --glass-shadow:   rgba(0, 0, 0, 0.4);
-  --glass-bg:       rgba(10, 16, 30, 0.88);
+  --glass-bg-1:     rgba(15, 23, 42, 0.45);
+  --glass-bg-2:     rgba(15, 23, 42, 0.65);
+  --glass-bg-3:     rgba(15, 23, 42, 0.80);
+  --glass-bg-4:     rgba(10, 16, 30, 0.92);
+  --glass-border:   rgba(255, 255, 255, 0.08);
+  --glass-border-subtle: rgba(255, 255, 255, 0.04);
+  --glass-shadow:   0 8px 32px rgba(0, 0, 0, 0.45);
+  --glass-bg:       rgba(10, 16, 30, 0.85);
 
         
   --color-on-surface:          var(--text-primary);
@@ -688,7 +688,42 @@
       radial-gradient(at 50%  50%,  hsla(200,100%,60%,0.03) 0px, transparent 70%);
   }
 
-  /* Preserve 3D */
+  /* ── Liquid Glass Helpers ── */
+  .glass-card-interactive {
+    background: var(--glass-bg-3);
+    backdrop-filter: blur(20px) saturate(1.8);
+    -webkit-backdrop-filter: blur(20px) saturate(1.8);
+    border: 1px solid var(--glass-border);
+    box-shadow: var(--glass-shadow);
+    transition: all 0.3s var(--ease-smooth);
+  }
+  .glass-card-interactive:hover {
+    transform: translateY(-3px);
+    border-color: rgba(10, 132, 255, 0.25);
+    box-shadow: 0 16px 40px rgba(0, 0, 0, 0.12), 0 0 20px rgba(10, 132, 255, 0.15);
+  }
+
+  .glass-input {
+    background: var(--glass-bg-2);
+    backdrop-filter: blur(16px);
+    -webkit-backdrop-filter: blur(16px);
+    border: 1px solid var(--glass-border);
+    color: var(--text-primary);
+    transition: all 0.2s ease;
+  }
+  .glass-input:focus {
+    background: var(--glass-bg-3);
+    border-color: var(--color-primary);
+    box-shadow: 0 0 0 3px rgba(10, 132, 255, 0.2);
+  }
+
+  .glass-header {
+    background: var(--glass-bg-4);
+    backdrop-filter: blur(24px) saturate(2);
+    -webkit-backdrop-filter: blur(24px) saturate(2);
+    border-bottom: 1px solid var(--glass-border);
+  }
+
   .perspective-1000 { perspective: 1000px; }
   .perspective-1200 { perspective: 1200px; }
   .preserve-3d      { transform-style: preserve-3d; }

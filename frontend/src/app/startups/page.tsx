@@ -125,7 +125,7 @@ export default function StartupsPage() {
       </div>
 
       {/* Stats Banner — derived from real data */}
-      <div style={{ background: '#fff', borderBottom: '1px solid var(--border-color)', padding: '0 16px', overflowX: 'auto' }}>
+      <div style={{ background: 'var(--glass-bg-3)', backdropFilter: 'blur(20px)', borderBottom: '1px solid var(--glass-border)', padding: '0 16px', overflowX: 'auto' }}>
         <div style={{ maxWidth: 1200, margin: '0 auto', display: 'flex', gap: 0, minWidth: 'max-content' }}>
           {[
             { value: startups.length.toString(), label: 'Startups Listed' },
@@ -133,7 +133,7 @@ export default function StartupsPage() {
             { value: startups.filter(s => s.stage === 'idea' || s.stage === 'mvp').length.toString(), label: 'Early Stage' },
             { value: startups.reduce((a, s) => a + (s.member_count || 0), 0).toString(), label: 'Team Members' },
           ].map((stat, i) => (
-            <div key={stat.label} style={{ flex: '0 0 auto', width: 140, padding: '16px 20px', borderRight: i < 3 ? '1px solid var(--border-color)' : 'none', textAlign: 'center' }}>
+            <div key={stat.label} style={{ flex: '0 0 auto', width: 150, padding: '16px 20px', borderRight: i < 3 ? '1px solid var(--glass-border)' : 'none', textAlign: 'center' }}>
               <div style={{ fontSize: 22, fontWeight: 800, color: 'var(--text-primary)' }}>{stat.value}</div>
               <div style={{ fontSize: 11, color: 'var(--text-muted)', fontWeight: 500 }}>{stat.label}</div>
             </div>
@@ -148,32 +148,35 @@ export default function StartupsPage() {
           {/* Search input + submit in one row */}
           <div style={{ display: 'flex', gap: 10, alignItems: 'center' }}>
             <div style={{ flex: 1, position: 'relative' }}>
-              <span className="material-symbols-outlined" style={{ position: 'absolute', left: 12, top: '50%', transform: 'translateY(-50%)', fontSize: 20, color: 'var(--text-muted)' }}>search</span>
+              <span className="material-symbols-outlined" style={{ position: 'absolute', left: 14, top: '50%', transform: 'translateY(-50%)', fontSize: 20, color: 'var(--text-muted)' }}>search</span>
               <input
                 type="text"
                 placeholder="Search startups…"
                 value={search}
                 onChange={e => setSearch(e.target.value)}
+                className="glass-input"
                 style={{
-                  width: '100%', height: 44, paddingLeft: 42, paddingRight: 12, border: '1px solid var(--border-color)',
-                  borderRadius: 12, fontSize: 14, outline: 'none', background: '#fff', fontFamily: 'Inter, sans-serif',
+                  width: '100%', height: 46, paddingLeft: 44, paddingRight: 14,
+                  borderRadius: 14, fontSize: 14, outline: 'none', fontFamily: 'Inter, sans-serif',
                   boxSizing: 'border-box',
                 }}
               />
             </div>
             <button type="submit" style={{
-              height: 44, padding: '0 20px', borderRadius: 12, background: 'linear-gradient(135deg, #6366f1, #8b5cf6)',
+              height: 46, padding: '0 24px', borderRadius: 14, background: 'linear-gradient(135deg, #6366f1, #8b5cf6)',
               color: '#fff', fontWeight: 600, fontSize: 14, border: 'none', cursor: 'pointer', whiteSpace: 'nowrap', flexShrink: 0,
+              boxShadow: '0 4px 16px rgba(99,102,241,0.3)',
             }}>Search</button>
           </div>
           {/* Stage filters — scrollable row */}
-          <div style={{ display: 'flex', gap: 6, flexWrap: 'wrap' }}>
+          <div style={{ display: 'flex', gap: 8, flexWrap: 'wrap' }}>
             {STAGES.map(s => (
               <button key={s.key} type="button" onClick={() => setStageFilter(s.key)} style={{
-                padding: '6px 12px', borderRadius: 999, fontSize: 12, fontWeight: 600, cursor: 'pointer',
-                border: stageFilter === s.key ? `2px solid ${s.color}` : '1.5px solid var(--border-color)',
-                background: stageFilter === s.key ? `${s.color}15` : '#fff',
+                padding: '7px 16px', borderRadius: 999, fontSize: 12, fontWeight: 600, cursor: 'pointer',
+                border: stageFilter === s.key ? `2px solid ${s.color}` : '1px solid var(--glass-border)',
+                background: stageFilter === s.key ? `${s.color}25` : 'var(--glass-bg-2)',
                 color: stageFilter === s.key ? s.color : 'var(--text-secondary)',
+                backdropFilter: 'blur(10px)',
                 transition: 'all 0.15s', whiteSpace: 'nowrap',
               }}>{s.label}</button>
             ))}
@@ -186,24 +189,24 @@ export default function StartupsPage() {
             Loading startups…
           </div>
         ) : error ? (
-          <div style={{ textAlign: 'center', padding: '80px', background: '#fff1f1', borderRadius: 24, border: '1px solid #fca5a5' }}>
+          <div style={{ textAlign: 'center', padding: '80px', background: 'rgba(239, 68, 68, 0.1)', borderRadius: 24, border: '1px solid rgba(239, 68, 68, 0.3)' }}>
             <span className="material-symbols-outlined" style={{ fontSize: 48, display: 'block', marginBottom: 12, color: '#ef4444' }}>error</span>
             <p style={{ color: '#ef4444', fontWeight: 600 }}>{error}</p>
-            <button onClick={() => window.location.reload()} style={{ marginTop: 16, padding: '10px 24px', borderRadius: 10, background: '#ef4444', color: '#fff', fontWeight: 600, border: 'none', cursor: 'pointer' }}>
+            <button onClick={() => window.location.reload()} style={{ marginTop: 16, padding: '10px 24px', borderRadius: 12, background: '#ef4444', color: '#fff', fontWeight: 600, border: 'none', cursor: 'pointer' }}>
               Retry
             </button>
           </div>
         ) : startups.length === 0 ? (
-          <div style={{ textAlign: 'center', padding: '80px', background: '#fff', borderRadius: 24, border: '1px solid var(--border-color)' }}>
+          <div className="glass-card" style={{ textAlign: 'center', padding: '80px', borderRadius: 24, border: '1px solid var(--glass-border)' }}>
             <span className="material-symbols-outlined" style={{ fontSize: 56, display: 'block', marginBottom: 16, color: 'var(--text-muted)' }}>rocket_launch</span>
-            <h2 style={{ fontSize: 20, fontWeight: 700, marginBottom: 8 }}>No startups found</h2>
+            <h2 style={{ fontSize: 20, fontWeight: 700, marginBottom: 8, color: 'var(--text-primary)' }}>No startups found</h2>
             <p style={{ color: 'var(--text-muted)', marginBottom: 24 }}>
               {search || stageFilter !== 'all'
                 ? 'Try adjusting your search or filter.'
                 : 'Be the first to list yours!'}
             </p>
             {user && (
-              <button onClick={() => router.push('/startups/new')} style={{ padding: '12px 24px', borderRadius: 10, background: 'linear-gradient(135deg, #6366f1, #8b5cf6)', color: '#fff', fontWeight: 600, border: 'none', cursor: 'pointer' }}>
+              <button onClick={() => router.push('/startups/new')} style={{ padding: '12px 24px', borderRadius: 12, background: 'linear-gradient(135deg, #6366f1, #8b5cf6)', color: '#fff', fontWeight: 600, border: 'none', cursor: 'pointer', boxShadow: '0 4px 16px rgba(99,102,241,0.3)' }}>
                 List a Startup
               </button>
             )}
@@ -213,30 +216,30 @@ export default function StartupsPage() {
             {startups.map(startup => {
               const stage = stageInfo(startup.stage);
               return (
-                <div key={startup.id} style={{
-                  background: '#fff', borderRadius: 20, border: '1px solid var(--border-color)',
-                  boxShadow: '0 4px 20px rgba(0,0,0,0.04)', overflow: 'hidden', cursor: 'pointer',
+                <div key={startup.id} className="glass-card" style={{
+                  borderRadius: 20, border: '1px solid var(--glass-border)',
+                  boxShadow: 'var(--glass-shadow)', overflow: 'hidden', cursor: 'pointer',
                   transition: 'transform 0.2s, box-shadow 0.2s',
                 }}
-                  onMouseEnter={e => { (e.currentTarget as HTMLElement).style.transform = 'translateY(-4px)'; (e.currentTarget as HTMLElement).style.boxShadow = '0 12px 40px rgba(0,0,0,0.1)'; }}
-                  onMouseLeave={e => { (e.currentTarget as HTMLElement).style.transform = 'none'; (e.currentTarget as HTMLElement).style.boxShadow = '0 4px 20px rgba(0,0,0,0.04)'; }}
+                  onMouseEnter={e => { (e.currentTarget as HTMLElement).style.transform = 'translateY(-4px)'; }}
+                  onMouseLeave={e => { (e.currentTarget as HTMLElement).style.transform = 'none'; }}
                   onClick={() => router.push(`/startups/${startup.slug}`)}
                 >
                   {/* Card Header */}
-                  <div style={{ height: 80, background: `linear-gradient(135deg, ${stage.color}22, ${stage.color}08)`, padding: '20px 24px', display: 'flex', alignItems: 'center', justifyContent: 'space-between', borderBottom: '1px solid var(--border-color)' }}>
-                    <div style={{ width: 44, height: 44, borderRadius: 12, background: startup.logo_url ? 'transparent' : `linear-gradient(135deg, ${stage.color}, ${stage.color}88)`, display: 'flex', alignItems: 'center', justifyContent: 'center', border: '2px solid rgba(255,255,255,0.8)', boxShadow: '0 2px 8px rgba(0,0,0,0.1)' }}>
+                  <div style={{ height: 80, background: `linear-gradient(135deg, ${stage.color}25, ${stage.color}0a)`, padding: '20px 24px', display: 'flex', alignItems: 'center', justifyContent: 'space-between', borderBottom: '1px solid var(--glass-border)' }}>
+                    <div style={{ width: 44, height: 44, borderRadius: 12, background: startup.logo_url ? 'transparent' : `linear-gradient(135deg, ${stage.color}, ${stage.color}88)`, display: 'flex', alignItems: 'center', justifyContent: 'center', border: '2px solid rgba(255,255,255,0.4)', boxShadow: '0 2px 8px rgba(0,0,0,0.15)' }}>
                       {startup.logo_url
                         ? <img src={startup.logo_url} alt="" style={{ width: '100%', height: '100%', borderRadius: 10 }} />
                         : <span style={{ fontSize: 20, fontWeight: 800, color: '#fff' }}>{startup.name[0]}</span>
                       }
                     </div>
-                    <span style={{ padding: '4px 12px', borderRadius: 999, fontSize: 11, fontWeight: 700, background: `${stage.color}20`, color: stage.color, textTransform: 'uppercase', letterSpacing: '0.06em' }}>
+                    <span style={{ padding: '4px 12px', borderRadius: 999, fontSize: 11, fontWeight: 700, background: `${stage.color}25`, color: stage.color, textTransform: 'uppercase', letterSpacing: '0.06em', border: `1px solid ${stage.color}40` }}>
                       {stage.label}
                     </span>
                   </div>
                   {/* Card Body */}
                   <div style={{ padding: 24 }}>
-                    <h3 style={{ fontSize: 17, fontWeight: 700, marginBottom: 8 }}>{startup.name}</h3>
+                    <h3 style={{ fontSize: 17, fontWeight: 700, marginBottom: 8, color: 'var(--text-primary)' }}>{startup.name}</h3>
                     <p style={{ fontSize: 13, color: 'var(--text-secondary)', lineHeight: 1.6, marginBottom: 20, minHeight: 40 }}>{startup.tagline || 'No tagline yet.'}</p>
                     <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between' }}>
                       <div style={{ display: 'flex', gap: 16 }}>

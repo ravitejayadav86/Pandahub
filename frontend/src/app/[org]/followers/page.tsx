@@ -61,7 +61,7 @@ export default function FollowersPage() {
 
   if (loading) {
     return (
-      <div className="min-h-screen bg-white dark:bg-[#0d1117] flex flex-col">
+      <div className="min-h-screen bg-[var(--bg-primary)] flex flex-col">
         <Navbar />
         <div className="flex-1 flex items-center justify-center">
           <div className="w-8 h-8 border-4 border-blue-500 border-t-transparent rounded-full animate-spin" />
@@ -72,12 +72,12 @@ export default function FollowersPage() {
 
   if (error || !profile) {
     return (
-      <div className="min-h-screen bg-white dark:bg-[#0d1117] flex flex-col">
+      <div className="min-h-screen bg-[var(--bg-primary)] flex flex-col">
         <Navbar />
         <div className="flex-1 flex flex-col items-center justify-center">
           <h1 className="text-4xl font-bold text-slate-800 dark:text-slate-200 mb-4">404</h1>
           <p className="text-slate-500 mb-6">User not found.</p>
-          <Link href="/dashboard" className="px-6 py-2 bg-blue-600 text-white rounded-lg font-medium hover:bg-blue-700 transition-colors">
+          <Link href="/dashboard" className="px-6 py-2 bg-blue-600 text-white rounded-lg font-medium hover:bg-blue-700 transition-colors shadow-lg shadow-blue-500/20">
             Go Home
           </Link>
         </div>
@@ -97,11 +97,11 @@ export default function FollowersPage() {
   ]
 
   return (
-    <div className="min-h-screen bg-white dark:bg-[#0d1117] flex flex-col font-sans text-[#24292f] dark:text-[#c9d1d9]">
+    <div className="min-h-screen bg-[var(--bg-primary)] flex flex-col font-sans text-[var(--text-primary)]">
       <Navbar />
       
       {/* ── Sticky Tab Bar ── */}
-      <div className="sticky top-[60px] z-40 bg-white dark:bg-[#0d1117] border-b border-slate-200 dark:border-slate-800 mt-6">
+      <div className="sticky top-[60px] z-40 bg-[var(--glass-bg-4)] backdrop-blur-xl border-b border-[var(--glass-border)] mt-4">
         <div className="max-w-[1280px] w-full mx-auto px-4 md:px-8 flex items-end">
           <div className="hidden md:block w-[296px] shrink-0 mr-6" />
           <nav className="flex gap-2 overflow-x-auto no-scrollbar">
@@ -112,13 +112,13 @@ export default function FollowersPage() {
                   href={tab.href}
                   className={`
                     flex items-center gap-2 px-4 py-3 text-sm transition-colors border-b-2 whitespace-nowrap
-                    border-transparent text-slate-600 dark:text-slate-400 hover:bg-slate-100 dark:hover:bg-slate-800/50 rounded-t-lg hover:border-slate-300 dark:hover:border-slate-600
+                    border-transparent text-[var(--text-secondary)] hover:bg-[var(--glass-bg-2)] rounded-t-lg hover:text-[var(--text-primary)]
                   `}
                 >
-                  <tab.icon className={`w-4 h-4 text-slate-400 dark:text-slate-500`} />
+                  <tab.icon className={`w-4 h-4 text-slate-400`} />
                   {tab.label}
                   {'count' in tab && tab.count !== undefined && (
-                    <span className="ml-1 bg-slate-100 dark:bg-slate-800 text-slate-700 dark:text-slate-300 text-xs font-medium px-2 py-0.5 rounded-full">
+                    <span className="ml-1 bg-[var(--glass-bg-2)] text-[var(--text-secondary)] text-xs font-medium px-2 py-0.5 rounded-full border border-[var(--glass-border)]">
                       {tab.count}
                     </span>
                   )}
@@ -133,72 +133,72 @@ export default function FollowersPage() {
         
         {/* ── Left Sidebar ── */}
         <div className="w-full md:w-[296px] shrink-0 -mt-10 md:mt-0 relative z-10">
-          <div className="relative w-full max-w-[296px] aspect-square rounded-full border border-slate-200 dark:border-slate-700 overflow-hidden bg-white dark:bg-slate-800 mb-4 shadow-sm z-10">
+          <div className="relative w-full max-w-[296px] aspect-square rounded-full border border-[var(--glass-border)] overflow-hidden bg-[var(--glass-bg-3)] backdrop-blur-xl mb-4 shadow-xl z-10">
             {profile.avatar_url ? (
               <img src={profile.avatar_url} alt={profile.username} className="w-full h-full object-cover" />
             ) : (
-              <div className="w-full h-full bg-gradient-to-br from-slate-800 to-slate-600 flex items-center justify-center text-white text-7xl font-bold">
+              <div className="w-full h-full bg-gradient-to-br from-blue-600 to-purple-600 flex items-center justify-center text-white text-7xl font-bold">
                 {profile.username.charAt(0).toUpperCase()}
               </div>
             )}
             
             {isOwner && (
-              <button className="absolute bottom-6 right-6 w-10 h-10 bg-white dark:bg-[#0d1117] border border-slate-200 dark:border-slate-700 rounded-full flex items-center justify-center shadow-sm hover:text-blue-500 transition-colors z-20" aria-label="Set status">
-                <Smile className="w-5 h-5 text-slate-500" />
+              <button className="absolute bottom-6 right-6 w-10 h-10 glass-panel rounded-full flex items-center justify-center shadow-lg hover:text-blue-500 transition-colors z-20 border border-[var(--glass-border)]" aria-label="Set status">
+                <Smile className="w-5 h-5 text-slate-400" />
               </button>
             )}
           </div>
 
-          <h1 className="text-2xl font-bold text-slate-900 dark:text-slate-100 leading-tight">
+          <h1 className="text-2xl font-bold text-[var(--text-primary)] leading-tight">
             {profile.full_name || profile.username}
           </h1>
-          <h2 className="text-xl font-light text-slate-500 dark:text-slate-400 mb-4">
+          <h2 className="text-xl font-light text-[var(--text-secondary)] mb-4">
             {profile.username}
           </h2>
 
           {isOwner ? (
-            <Link href="/settings" className="block w-full py-1.5 text-center text-sm font-semibold text-slate-700 dark:text-slate-300 bg-slate-50 dark:bg-[#21262d] hover:bg-slate-100 dark:hover:bg-[#30363d] border border-slate-300 dark:border-slate-600 rounded-md mb-4 transition-colors">
+            <Link href="/settings" className="block w-full py-2 text-center text-sm font-semibold text-[var(--text-primary)] glass-card hover:bg-[var(--glass-bg-4)] rounded-xl mb-4 transition-all border border-[var(--glass-border)]">
               Edit profile
             </Link>
           ) : (
-            <button className="block w-full py-1.5 text-center text-sm font-semibold text-slate-700 dark:text-slate-300 bg-slate-50 dark:bg-[#21262d] hover:bg-slate-100 dark:hover:bg-[#30363d] border border-slate-300 dark:border-slate-600 rounded-md mb-4 transition-colors">
+            <button className="block w-full py-2 text-center text-sm font-semibold text-white bg-gradient-to-r from-blue-600 to-indigo-600 hover:from-blue-700 hover:to-indigo-700 rounded-xl mb-4 transition-all shadow-lg shadow-blue-500/20">
               Follow
             </button>
           )}
 
-          <div className="flex items-center gap-1 text-sm text-slate-600 dark:text-slate-400 mb-4">
+          <div className="flex items-center gap-1 text-sm text-[var(--text-secondary)] mb-4">
             <Users className="w-4 h-4" />
-            <Link href={`/${profile.username}/followers`} className="text-slate-900 dark:text-slate-200 hover:text-blue-600 flex items-center gap-1 font-semibold">
-              <span className="font-semibold text-slate-900 dark:text-slate-200">{profile.follower_count ?? 0}</span> followers
+            <Link href={`/${profile.username}/followers`} className="text-[var(--text-primary)] hover:text-blue-500 flex items-center gap-1 font-semibold">
+              <span className="font-semibold">{profile.follower_count ?? 0}</span> followers
             </Link>
             <span className="mx-1">·</span>
-            <Link href={`/${profile.username}/following`} className="hover:text-blue-600 flex items-center gap-1">
-              <span className="font-semibold text-slate-900 dark:text-slate-200">{profile.following_count ?? 0}</span> following
+            <Link href={`/${profile.username}/following`} className="hover:text-blue-500 flex items-center gap-1">
+              <span className="font-semibold text-[var(--text-primary)]">{profile.following_count ?? 0}</span> following
             </Link>
           </div>
 
           {profile.bio && (
-            <p className="text-[15px] text-slate-700 dark:text-slate-300 mb-4 leading-relaxed">{profile.bio}</p>
+            <p className="text-[15px] text-[var(--text-secondary)] mb-4 leading-relaxed">{profile.bio}</p>
           )}
 
-          <div className="flex flex-col gap-2 text-sm text-slate-600 dark:text-slate-400">
+          <div className="flex flex-col gap-2 text-sm text-[var(--text-secondary)]">
             {profile.location && (
               <div className="flex items-center gap-2">
-                <MapPin className="w-4 h-4" />
+                <MapPin className="w-4 h-4 text-slate-400" />
                 {profile.location}
               </div>
             )}
             {profile.website_url && (
               <div className="flex items-center gap-2">
-                <LinkIcon className="w-4 h-4" />
-                <a href={profile.website_url} target="_blank" rel="noopener noreferrer" className="font-semibold hover:text-blue-600 hover:underline">
+                <LinkIcon className="w-4 h-4 text-slate-400" />
+                <a href={profile.website_url} target="_blank" rel="noopener noreferrer" className="font-semibold hover:text-blue-500 hover:underline">
                   {profile.website_url.replace(/^https?:\/\//, '')}
                 </a>
               </div>
             )}
             {profile.created_at && (
               <div className="flex items-center gap-2">
-                <Calendar className="w-4 h-4" />
+                <Calendar className="w-4 h-4 text-slate-400" />
                 Joined {new Date(profile.created_at).toLocaleDateString('en-US', { month: 'long', year: 'numeric' })}
               </div>
             )}
@@ -207,42 +207,44 @@ export default function FollowersPage() {
 
         {/* ── Main Content Area ── */}
         <div className="flex-1 min-w-0">
-          <div className="flex items-center justify-between mb-4 pb-2 border-b border-slate-200 dark:border-slate-800">
+          <div className="flex items-center justify-between mb-6 pb-2 border-b border-[var(--glass-border)]">
              <div className="flex gap-4">
-                 <Link href={`/${profile.username}/followers`} className="font-semibold text-slate-900 dark:text-slate-200 border-b-2 border-[#fd8c73] pb-2 px-2">
-                     Followers <span className="bg-slate-100 dark:bg-slate-800 text-slate-700 dark:text-slate-300 text-xs font-medium px-2 py-0.5 rounded-full ml-1">{profile.follower_count ?? 0}</span>
+                 <Link href={`/${profile.username}/followers`} className="font-semibold text-blue-500 border-b-2 border-blue-500 pb-2 px-2 flex items-center gap-1.5">
+                     Followers <span className="bg-[var(--glass-bg-2)] border border-[var(--glass-border)] text-xs font-medium px-2 py-0.5 rounded-full">{profile.follower_count ?? 0}</span>
                  </Link>
-                 <Link href={`/${profile.username}/following`} className="text-slate-600 dark:text-slate-400 hover:text-slate-900 dark:hover:text-slate-200 pb-2 px-2">
-                     Following <span className="bg-slate-100 dark:bg-slate-800 text-slate-700 dark:text-slate-300 text-xs font-medium px-2 py-0.5 rounded-full ml-1">{profile.following_count ?? 0}</span>
+                 <Link href={`/${profile.username}/following`} className="text-[var(--text-secondary)] hover:text-[var(--text-primary)] pb-2 px-2 flex items-center gap-1.5">
+                     Following <span className="bg-[var(--glass-bg-2)] border border-[var(--glass-border)] text-xs font-medium px-2 py-0.5 rounded-full">{profile.following_count ?? 0}</span>
                  </Link>
              </div>
           </div>
           
           <div className="space-y-4">
             {followers.length === 0 ? (
-               <div className="text-slate-500 py-8">No followers yet.</div>
+               <div className="glass-card p-12 text-center text-slate-400 rounded-2xl border border-[var(--glass-border)]">
+                 No followers yet.
+               </div>
             ) : followers.map(follower => (
-               <div key={follower.id} className="flex items-start gap-4 py-4 border-b border-slate-200 dark:border-slate-800 last:border-b-0">
+               <div key={follower.id} className="glass-card p-5 rounded-2xl border border-[var(--glass-border)] flex items-start gap-4 transition-all hover:scale-[1.01]">
                   <Link href={`/${follower.username}`}>
                     {follower.avatar_url ? (
-                      <img src={follower.avatar_url} alt={follower.username} className="w-12 h-12 rounded-full object-cover border border-slate-200 dark:border-slate-700" />
+                      <img src={follower.avatar_url} alt={follower.username} className="w-12 h-12 rounded-full object-cover border border-[var(--glass-border)]" />
                     ) : (
-                      <div className="w-12 h-12 rounded-full bg-slate-200 dark:bg-slate-800 flex items-center justify-center font-bold">
+                      <div className="w-12 h-12 rounded-full bg-gradient-to-br from-blue-500 to-indigo-600 flex items-center justify-center font-bold text-white shadow-sm">
                         {follower.username.charAt(0).toUpperCase()}
                       </div>
                     )}
                   </Link>
                   <div className="flex-1">
-                     <div className="flex items-center gap-1 mb-1">
-                        <Link href={`/${follower.username}`} className="font-semibold text-slate-900 dark:text-slate-200 hover:text-blue-600 hover:underline">
+                     <div className="flex items-center gap-2 mb-1">
+                        <Link href={`/${follower.username}`} className="font-semibold text-[var(--text-primary)] hover:text-blue-500 hover:underline">
                            {follower.full_name || follower.username}
                         </Link>
-                        <Link href={`/${follower.username}`} className="text-slate-500 hover:text-blue-600">
-                           {follower.username}
+                        <Link href={`/${follower.username}`} className="text-sm text-slate-400 hover:text-blue-500">
+                           @{follower.username}
                         </Link>
                      </div>
                      {follower.bio && (
-                        <p className="text-sm text-slate-700 dark:text-slate-300 mb-2">{follower.bio}</p>
+                        <p className="text-sm text-[var(--text-secondary)] leading-relaxed">{follower.bio}</p>
                      )}
                   </div>
                </div>

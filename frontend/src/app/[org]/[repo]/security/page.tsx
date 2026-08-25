@@ -81,26 +81,26 @@ export default function SecurityPage() {
   };
 
   return (
-    <div className="flex-1 overflow-y-auto bg-[#F8F9FB] p-8">
+    <div className="flex-1 overflow-y-auto bg-[var(--bg-primary)] p-8 min-h-screen text-[var(--text-primary)]">
       <div className="max-w-[1000px] mx-auto">
         <div className="flex items-center justify-between mb-8">
           <div>
-            <h1 className="text-2xl font-bold text-slate-900 flex items-center gap-2">
-              <span className="material-symbols-outlined text-[28px] text-slate-700">security</span>
+            <h1 className="text-2xl font-bold text-[var(--text-primary)] flex items-center gap-2">
+              <span className="material-symbols-outlined text-[28px] text-blue-500">security</span>
               Security Alerts
             </h1>
-            <p className="text-sm text-slate-500 mt-1">
-              Review and manage security findings for <span className="font-semibold">{repoName}</span>.
+            <p className="text-sm text-[var(--text-secondary)] mt-1">
+              Review and manage security findings for <span className="font-semibold text-[var(--text-primary)]">{repoName}</span>.
             </p>
           </div>
           <div className="flex items-center gap-3">
-            <Link href={`/${owner}/${repoName}`} className="text-sm font-medium text-slate-600 hover:text-slate-900 flex items-center gap-1 transition-colors">
+            <Link href={`/${owner}/${repoName}`} className="text-sm font-medium text-[var(--text-secondary)] hover:text-[var(--text-primary)] flex items-center gap-1 transition-colors">
               <span className="material-symbols-outlined text-[18px]">arrow_back</span>
               Back to repository
             </Link>
             <button
               onClick={triggerScan}
-              className="btn-primary flex items-center gap-2 px-4 py-2 rounded-lg text-sm font-medium"
+              className="flex items-center gap-2 px-4 py-2 rounded-xl text-sm font-semibold bg-gradient-to-r from-blue-600 to-indigo-600 text-white shadow-md shadow-blue-500/20 hover:from-blue-700 hover:to-indigo-700 transition-all"
             >
               <span className="material-symbols-outlined text-[18px]">radar</span>
               Run Full Scan
@@ -109,25 +109,25 @@ export default function SecurityPage() {
         </div>
 
         {/* Tabs */}
-        <div className="flex border-b border-slate-200 mb-6 gap-6">
+        <div className="flex border-b border-[var(--glass-border)] mb-6 gap-6">
           {(['secret', 'vulnerability', 'code_quality'] as const).map(tab => (
             <button
               key={tab}
               onClick={() => setActiveTab(tab)}
               className={`pb-3 px-1 text-sm font-semibold capitalize relative transition-colors ${
-                activeTab === tab ? "text-blue-600" : "text-slate-500 hover:text-slate-900"
+                activeTab === tab ? "text-blue-500" : "text-[var(--text-secondary)] hover:text-[var(--text-primary)]"
               }`}
             >
               {tab.replace('_', ' ')}s
               {activeTab === tab && (
-                <span className="absolute bottom-[-1px] left-0 right-0 h-0.5 bg-blue-600 rounded-t-full" />
+                <span className="absolute bottom-[-1px] left-0 right-0 h-0.5 bg-blue-500 rounded-t-full" />
               )}
             </button>
           ))}
         </div>
 
         {error && (
-          <div className="bg-red-50 text-red-700 p-4 rounded-xl text-sm font-medium border border-red-100 mb-6 flex items-center gap-2">
+          <div className="bg-red-500/10 text-red-500 p-4 rounded-xl text-sm font-medium border border-red-500/20 mb-6 flex items-center gap-2">
             <span className="material-symbols-outlined text-[20px]">error</span>
             {error}
           </div>
@@ -135,45 +135,45 @@ export default function SecurityPage() {
 
         {loading ? (
           <div className="flex justify-center items-center h-40">
-            <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-slate-900"></div>
+            <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-blue-500"></div>
           </div>
         ) : alerts.length === 0 ? (
-          <div className="bg-white rounded-2xl border border-slate-200/60 p-12 text-center shadow-sm">
-            <div className="w-16 h-16 bg-green-50 text-green-600 rounded-full flex items-center justify-center mx-auto mb-4 border border-green-100">
+          <div className="glass-card rounded-2xl border border-[var(--glass-border)] p-12 text-center shadow-sm">
+            <div className="w-16 h-16 bg-emerald-500/10 text-emerald-500 rounded-full flex items-center justify-center mx-auto mb-4 border border-emerald-500/20">
               <span className="material-symbols-outlined text-[32px]">check_circle</span>
             </div>
-            <h3 className="text-lg font-bold text-slate-900">No {activeTab.replace('_', ' ')} alerts</h3>
-            <p className="text-sm text-slate-500 mt-2">
+            <h3 className="text-lg font-bold text-[var(--text-primary)]">No {activeTab.replace('_', ' ')} alerts</h3>
+            <p className="text-sm text-[var(--text-secondary)] mt-2">
               We couldn&apos;t find any open {activeTab.replace('_', ' ')} alerts in this repository.
             </p>
           </div>
         ) : (
           <div className="space-y-4">
             {alerts.map(alert => (
-              <div key={alert.id} className="bg-white rounded-2xl border border-slate-200/60 p-5 shadow-sm hover:shadow-md transition-shadow">
+              <div key={alert.id} className="glass-card rounded-2xl border border-[var(--glass-border)] p-5 shadow-sm hover:scale-[1.005] transition-all">
                 <div className="flex items-start justify-between">
                   <div>
                     <div className="flex items-center gap-3 mb-2">
-                      <span className={`text-xs font-bold px-2 py-0.5 rounded-md border uppercase tracking-wider ${severityColor(alert.severity)}`}>
+                      <span className={`text-xs font-bold px-2.5 py-0.5 rounded-md border uppercase tracking-wider ${severityColor(alert.severity)}`}>
                         {alert.severity}
                       </span>
-                      <h3 className="text-base font-bold text-slate-900">{alert.title}</h3>
+                      <h3 className="text-base font-bold text-[var(--text-primary)]">{alert.title}</h3>
                     </div>
-                    <div className="text-sm text-slate-600 mb-3 font-mono bg-slate-50 px-2 py-1 rounded inline-block">
+                    <div className="text-sm text-[var(--text-secondary)] mb-3 font-mono bg-[var(--glass-bg-2)] border border-[var(--glass-border)] px-2.5 py-1 rounded-md inline-block">
                       {alert.file_path}{alert.line_number ? `:${alert.line_number}` : ''}
                     </div>
                     {alert.description && (
-                      <p className="text-sm text-slate-600 mb-4 whitespace-pre-wrap">{alert.description}</p>
+                      <p className="text-sm text-[var(--text-secondary)] mb-4 whitespace-pre-wrap leading-relaxed">{alert.description}</p>
                     )}
                     {alert.raw_finding && (
-                      <div className="bg-slate-900 text-slate-200 text-xs font-mono p-3 rounded-lg overflow-x-auto whitespace-pre">
+                      <div className="bg-[var(--glass-bg-4)] border border-[var(--glass-border)] text-slate-200 text-xs font-mono p-3.5 rounded-xl overflow-x-auto whitespace-pre">
                         {alert.raw_finding}
                       </div>
                     )}
                   </div>
                   <button
                     onClick={() => dismissAlert(alert.id)}
-                    className="shrink-0 ml-4 px-3 py-1.5 border border-slate-200 text-slate-600 text-sm font-semibold rounded-lg hover:bg-slate-50 transition-colors"
+                    className="shrink-0 ml-4 px-3.5 py-1.5 glass-card border border-[var(--glass-border)] text-[var(--text-secondary)] hover:text-[var(--text-primary)] text-sm font-semibold rounded-xl transition-colors"
                   >
                     Dismiss
                   </button>

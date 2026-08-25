@@ -442,26 +442,26 @@ export default function RepoDashboardPage() {
       .toUpperCase();
 
   return (
-    <div className="min-h-screen bg-[#f8fafc] text-slate-900 font-sans">
+    <div className="min-h-screen bg-[var(--bg-primary)] text-[var(--text-primary)] font-sans">
       <div className="flex min-h-screen">
         {/* Sidebar */}
-        <aside className="hidden md:flex w-[260px] shrink-0 flex-col border-r border-slate-200 bg-white sticky top-0 h-screen">
-          <div className="h-[72px] border-b border-slate-100 px-6 flex items-center">
+        <aside className="hidden md:flex w-[260px] shrink-0 flex-col border-r border-[var(--glass-border)] bg-[var(--glass-bg-3)] backdrop-blur-xl sticky top-0 h-screen">
+          <div className="h-[72px] border-b border-[var(--glass-border)] px-6 flex items-center">
             <Link
               href="/dashboard"
               className="flex items-center gap-3 no-underline"
             >
-              <div className="w-10 h-10 rounded-xl bg-slate-950 flex items-center justify-center shadow-sm">
+              <div className="w-10 h-10 rounded-xl bg-gradient-to-br from-blue-600 to-indigo-600 flex items-center justify-center shadow-lg shadow-blue-500/20">
                 <span className="material-symbols-outlined text-white">
                   public
                 </span>
               </div>
 
               <div>
-                <div className="text-base font-extrabold tracking-tight">
+                <div className="text-base font-extrabold tracking-tight text-[var(--text-primary)]">
                   PandaHub
                 </div>
-                <div className="text-[11px] text-slate-500 font-medium">
+                <div className="text-[11px] text-[var(--text-secondary)] font-medium">
                   Repository platform
                 </div>
               </div>
@@ -471,7 +471,7 @@ export default function RepoDashboardPage() {
           <div className="p-5">
             <Link
               href="/new"
-              className="w-full h-10 rounded-xl bg-slate-950 hover:bg-slate-800 text-white flex items-center justify-center gap-2 text-sm font-semibold no-underline transition-colors"
+              className="w-full h-10 rounded-xl bg-gradient-to-r from-blue-600 to-indigo-600 hover:from-blue-700 hover:to-indigo-700 text-white flex items-center justify-center gap-2 text-sm font-semibold no-underline transition-all shadow-lg shadow-blue-500/20"
             >
               <span className="material-symbols-outlined text-[18px]">
                 add
@@ -481,7 +481,7 @@ export default function RepoDashboardPage() {
           </div>
 
           <nav className="px-3 flex-1">
-            <div className="px-3 pb-2 text-[10px] font-bold uppercase tracking-[0.18em] text-slate-400">
+            <div className="px-3 pb-2 text-[10px] font-bold uppercase tracking-[0.18em] text-[var(--text-muted)]">
               Repository
             </div>
 
@@ -502,8 +502,8 @@ export default function RepoDashboardPage() {
                       onClick={() => setActiveTab("Settings")}
                       className={`w-full flex items-center gap-3 px-3 py-2.5 rounded-xl text-sm font-medium transition-colors ${
                         active
-                          ? "bg-red-50 text-red-700 font-semibold"
-                          : "text-slate-600 hover:bg-slate-50 hover:text-slate-950"
+                          ? "bg-red-500/10 text-red-500 font-semibold border border-red-500/20"
+                          : "text-[var(--text-secondary)] hover:bg-[var(--glass-bg-2)] hover:text-[var(--text-primary)]"
                       }`}
                     >
                       <span className="material-symbols-outlined text-[19px]">
@@ -519,10 +519,10 @@ export default function RepoDashboardPage() {
                     key={`${item.label}-${item.href}`}
                     href={item.href}
                     onClick={() => setActiveTab("Overview")}
-                    className={`flex items-center gap-3 px-3 py-2.5 rounded-xl text-sm font-medium no-underline transition-colors ${
+                    className={`flex items-center gap-3 px-3 py-2.5 rounded-xl text-sm font-medium no-underline transition-all ${
                       active
-                        ? "bg-slate-100 text-slate-950"
-                        : "text-slate-600 hover:bg-slate-50 hover:text-slate-950"
+                        ? "bg-[var(--glass-bg-2)] text-blue-500 font-semibold border border-[var(--glass-border)] shadow-sm"
+                        : "text-[var(--text-secondary)] hover:bg-[var(--glass-bg-1)] hover:text-[var(--text-primary)]"
                     }`}
                   >
                     <span className="material-symbols-outlined text-[19px]">
@@ -534,7 +534,7 @@ export default function RepoDashboardPage() {
               })}
             </div>
 
-            <div className="mt-7 px-3 pb-2 text-[10px] font-bold uppercase tracking-[0.18em] text-slate-400">
+            <div className="mt-7 px-3 pb-2 text-[10px] font-bold uppercase tracking-[0.18em] text-[var(--text-muted)]">
               Repository tools
             </div>
 
@@ -554,7 +554,7 @@ export default function RepoDashboardPage() {
                 <Link
                   key={item.label}
                   href={item.href}
-                  className="flex items-center gap-3 px-3 py-2.5 rounded-xl text-sm font-medium text-slate-600 hover:bg-slate-50 hover:text-slate-950 no-underline transition-colors"
+                  className="flex items-center gap-3 px-3 py-2.5 rounded-xl text-sm font-medium text-[var(--text-secondary)] hover:bg-[var(--glass-bg-1)] hover:text-[var(--text-primary)] no-underline transition-colors"
                 >
                   <span className="material-symbols-outlined text-[19px]">
                     {item.icon}
@@ -565,10 +565,10 @@ export default function RepoDashboardPage() {
             </div>
           </nav>
 
-          <div className="border-t border-slate-100 p-3 space-y-1">
+          <div className="border-t border-[var(--glass-border)] p-3 space-y-1">
             <Link
               href="/settings"
-              className="flex items-center gap-3 px-3 py-2.5 rounded-xl text-sm font-medium text-slate-600 hover:bg-slate-50 hover:text-slate-950 no-underline"
+              className="flex items-center gap-3 px-3 py-2.5 rounded-xl text-sm font-medium text-[var(--text-secondary)] hover:bg-[var(--glass-bg-1)] hover:text-[var(--text-primary)] no-underline transition-colors"
             >
               <span className="material-symbols-outlined text-[19px]">
                 settings
@@ -578,7 +578,7 @@ export default function RepoDashboardPage() {
 
             <Link
               href="/explore"
-              className="flex items-center gap-3 px-3 py-2.5 rounded-xl text-sm font-medium text-slate-600 hover:bg-slate-50 hover:text-slate-950 no-underline"
+              className="flex items-center gap-3 px-3 py-2.5 rounded-xl text-sm font-medium text-[var(--text-secondary)] hover:bg-[var(--glass-bg-1)] hover:text-[var(--text-primary)] no-underline transition-colors"
             >
               <span className="material-symbols-outlined text-[19px]">
                 explore
@@ -591,35 +591,35 @@ export default function RepoDashboardPage() {
         {/* Main */}
         <main className="flex-1 min-w-0">
           {/* Header */}
-          <header className="sticky top-0 z-40 border-b border-slate-200 bg-white/95 backdrop-blur">
+          <header className="sticky top-0 z-40 border-b border-[var(--glass-border)] bg-[var(--glass-bg-4)] backdrop-blur-xl shadow-[var(--glass-shadow)]">
             <div className="min-h-[72px] px-5 lg:px-8 flex items-center justify-between gap-4">
               <div className="min-w-0 flex items-center gap-3">
                 <div className="min-w-0">
                   <div className="flex items-center gap-2 min-w-0">
                     <Link
                       href={`/${owner}`}
-                      className="text-sm font-semibold text-slate-500 hover:text-slate-950 no-underline truncate"
+                      className="text-sm font-semibold text-[var(--text-secondary)] hover:text-[var(--text-primary)] no-underline truncate"
                     >
                       {owner || "owner"}
                     </Link>
 
-                    <span className="text-slate-300">/</span>
+                    <span className="text-[var(--text-muted)]">/</span>
 
                     <Link
                       href={repoBase}
-                      className="text-sm sm:text-base font-bold text-slate-950 hover:text-blue-600 no-underline truncate"
+                      className="text-sm sm:text-base font-bold text-[var(--text-primary)] hover:text-blue-500 no-underline truncate"
                     >
                       {repoName || "repository"}
                     </Link>
 
                     <span
-                      className={`shrink-0 rounded-md border px-2 py-0.5 text-[10px] font-bold uppercase tracking-wide ${visibilityClass}`}
+                      className={`shrink-0 rounded-md border border-[var(--glass-border)] px-2 py-0.5 text-[10px] font-bold uppercase tracking-wide bg-[var(--glass-bg-2)]`}
                     >
                       {repoMeta?.visibility || "—"}
                     </span>
                   </div>
 
-                  <p className="mt-1 text-xs text-slate-500 truncate max-w-[52vw]">
+                  <p className="mt-1 text-xs text-[var(--text-secondary)] truncate max-w-[52vw]">
                     {repoMeta?.description ||
                       "Repository overview and developer activity"}
                   </p>
@@ -630,7 +630,7 @@ export default function RepoDashboardPage() {
                 <Link
                   href={`${repoBase}/commits`}
                   title="Commit history"
-                  className="hidden sm:flex w-9 h-9 rounded-lg border border-slate-200 items-center justify-center text-slate-500 hover:text-slate-950 hover:bg-slate-50 no-underline"
+                  className="hidden sm:flex w-9 h-9 rounded-xl border border-[var(--glass-border)] items-center justify-center text-[var(--text-secondary)] hover:text-[var(--text-primary)] hover:bg-[var(--glass-bg-2)] no-underline transition-colors"
                 >
                   <span className="material-symbols-outlined text-[19px]">
                     history
@@ -640,7 +640,7 @@ export default function RepoDashboardPage() {
                 <button
                   type="button"
                   onClick={() => setShowDeployModal(true)}
-                  className="h-9 px-3 rounded-lg bg-slate-950 hover:bg-slate-800 text-white text-xs sm:text-sm font-semibold flex items-center gap-2"
+                  className="h-9 px-3.5 rounded-xl bg-gradient-to-r from-blue-600 to-indigo-600 hover:from-blue-700 hover:to-indigo-700 text-white text-xs sm:text-sm font-semibold flex items-center gap-2 shadow-md shadow-blue-500/20 transition-all"
                 >
                   <span>🚀</span>
                   <span className="hidden sm:inline">Deploy</span>
@@ -650,7 +650,7 @@ export default function RepoDashboardPage() {
                   <button
                     type="button"
                     onClick={() => setIsProfileOpen((value) => !value)}
-                    className="w-9 h-9 rounded-full border border-slate-200 overflow-hidden bg-slate-100 flex items-center justify-center"
+                    className="w-9 h-9 rounded-full border border-[var(--glass-border)] overflow-hidden bg-[var(--glass-bg-3)] flex items-center justify-center shadow-sm"
                     aria-label="Open profile menu"
                   >
                     {user?.avatar_url ? (
@@ -660,19 +660,19 @@ export default function RepoDashboardPage() {
                         className="w-full h-full object-cover"
                       />
                     ) : (
-                      <span className="text-xs font-bold text-slate-600">
+                      <span className="text-xs font-bold text-[var(--text-primary)]">
                         {(user?.username || "U").charAt(0).toUpperCase()}
                       </span>
                     )}
                   </button>
 
                   {isProfileOpen && (
-                    <div className="absolute right-0 mt-2 w-56 rounded-2xl border border-slate-200 bg-white shadow-2xl p-2">
-                      <div className="px-3 py-3 border-b border-slate-100">
-                        <div className="text-sm font-bold text-slate-950">
+                    <div className="absolute right-0 mt-2 w-56 rounded-2xl border border-[var(--glass-border)] glass-panel shadow-2xl p-2 z-50">
+                      <div className="px-3 py-3 border-b border-[var(--glass-border)]">
+                        <div className="text-sm font-bold text-[var(--text-primary)]">
                           {user?.username || "User"}
                         </div>
-                        <div className="text-xs text-slate-500 truncate">
+                        <div className="text-xs text-[var(--text-secondary)] truncate">
                           {user?.email || "No email"}
                         </div>
                       </div>
@@ -699,7 +699,7 @@ export default function RepoDashboardPage() {
                             key={item.label}
                             href={item.href}
                             onClick={() => setIsProfileOpen(false)}
-                            className="flex items-center gap-2 px-3 py-2.5 rounded-xl text-sm text-slate-600 hover:text-slate-950 hover:bg-slate-50 no-underline"
+                            className="flex items-center gap-2 px-3 py-2.5 rounded-xl text-sm text-[var(--text-secondary)] hover:text-[var(--text-primary)] hover:bg-[var(--glass-bg-2)] no-underline transition-colors"
                           >
                             <span className="material-symbols-outlined text-[18px]">
                               {item.icon}
@@ -711,7 +711,7 @@ export default function RepoDashboardPage() {
                         <button
                           type="button"
                           onClick={handleLogout}
-                          className="w-full flex items-center gap-2 px-3 py-2.5 rounded-xl text-sm text-red-600 hover:bg-red-50"
+                          className="w-full flex items-center gap-2 px-3 py-2.5 rounded-xl text-sm text-red-500 hover:bg-red-500/10 transition-colors"
                         >
                           <span className="material-symbols-outlined text-[18px]">
                             logout
@@ -734,15 +734,15 @@ export default function RepoDashboardPage() {
           >
             {/* Error banner */}
             {repoError && (
-              <div className="mb-6 rounded-2xl border border-red-200 bg-red-50 px-4 py-3 flex items-start gap-3">
+              <div className="mb-6 rounded-2xl border border-red-500/30 bg-red-500/10 px-4 py-3 flex items-start gap-3">
                 <span className="material-symbols-outlined text-red-500 mt-0.5">
                   error
                 </span>
                 <div className="min-w-0">
-                  <div className="font-semibold text-red-800 text-sm">
+                  <div className="font-semibold text-red-500 text-sm">
                     Unable to load repository
                   </div>
-                  <div className="text-xs text-red-700 mt-1">
+                  <div className="text-xs text-red-400 mt-1">
                     {repoError}
                   </div>
                 </div>
@@ -750,12 +750,12 @@ export default function RepoDashboardPage() {
             )}
 
             {/* Repo summary */}
-            <section className="rounded-3xl border border-slate-200 bg-white shadow-sm overflow-hidden">
+            <section className="rounded-3xl border border-[var(--glass-border)] glass-card shadow-sm overflow-hidden mb-6">
               <div className="p-5 sm:p-7">
                 <div className="flex flex-col lg:flex-row lg:items-start lg:justify-between gap-5">
                   <div className="min-w-0">
                     <div className="flex flex-wrap items-center gap-2 mb-3">
-                      <span className="inline-flex items-center gap-1.5 rounded-full bg-slate-100 px-2.5 py-1 text-[11px] font-semibold text-slate-600">
+                      <span className="inline-flex items-center gap-1.5 rounded-full bg-[var(--glass-bg-2)] border border-[var(--glass-border)] px-2.5 py-1 text-[11px] font-semibold text-[var(--text-secondary)]">
                         <span className="material-symbols-outlined text-[15px]">
                           folder
                         </span>
@@ -763,7 +763,7 @@ export default function RepoDashboardPage() {
                       </span>
 
                       {repoMeta?.is_fork && (
-                        <span className="inline-flex items-center gap-1.5 rounded-full bg-purple-50 px-2.5 py-1 text-[11px] font-semibold text-purple-700">
+                        <span className="inline-flex items-center gap-1.5 rounded-full bg-purple-500/10 border border-purple-500/20 px-2.5 py-1 text-[11px] font-semibold text-purple-400">
                           <span className="material-symbols-outlined text-[15px]">
                             fork_right
                           </span>
@@ -772,26 +772,26 @@ export default function RepoDashboardPage() {
                       )}
                     </div>
 
-                    <h1 className="text-2xl sm:text-3xl font-extrabold tracking-tight text-slate-950">
+                    <h1 className="text-2xl sm:text-3xl font-extrabold tracking-tight text-[var(--text-primary)]">
                       {repoName || "Repository"}
                     </h1>
 
-                    <p className="mt-2 max-w-3xl text-sm sm:text-base leading-6 text-slate-500">
+                    <p className="mt-2 max-w-3xl text-sm sm:text-base leading-6 text-[var(--text-secondary)]">
                       {repoLoading
                         ? "Loading repository details…"
                         : repoMeta?.description ||
                           "No repository description has been added yet."}
                     </p>
 
-                    <div className="mt-5 flex flex-wrap gap-2 text-xs text-slate-500">
-                      <span className="rounded-lg border border-slate-200 bg-slate-50 px-3 py-1.5 font-medium">
+                    <div className="mt-5 flex flex-wrap gap-2 text-xs text-[var(--text-secondary)]">
+                      <span className="rounded-xl border border-[var(--glass-border)] bg-[var(--glass-bg-2)] px-3 py-1.5 font-medium">
                         Default branch:{" "}
-                        <span className="text-slate-900 font-semibold">
+                        <span className="text-[var(--text-primary)] font-semibold">
                           {repoMeta?.default_branch || "main"}
                         </span>
                       </span>
 
-                      <span className="rounded-lg border border-slate-200 bg-slate-50 px-3 py-1.5 font-medium">
+                      <span className="rounded-xl border border-[var(--glass-border)] bg-[var(--glass-bg-2)] px-3 py-1.5 font-medium">
                         {branchesLoading
                           ? "Checking branches…"
                           : `${branches?.total ?? 0} branch${

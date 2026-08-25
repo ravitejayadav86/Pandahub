@@ -4,6 +4,8 @@ import Link from 'next/link';
 import api from '@/lib/api';
 import { Repository, User } from '@/types';
 
+import Navbar from '@/components/shared/Navbar';
+
 export default function ExplorePage() {
   const [repos, setRepos] = useState<Repository[]>([]);
   const [users, setUsers] = useState<Partial<User>[]>([]);
@@ -36,26 +38,25 @@ export default function ExplorePage() {
   };
 
   return (
-    <div style={{ minHeight: '100vh', background: 'var(--background)' }}>
+    <div style={{ minHeight: '100vh', background: 'var(--bg-primary)', color: 'var(--text-primary)' }}>
+      <Navbar />
       {/* Header */}
       <div style={{
-        background: 'var(--surface)',
-        borderBottom: '1px solid var(--border-color)',
+        background: 'var(--glass-bg-3)',
+        backdropFilter: 'blur(20px)',
+        borderBottom: '1px solid var(--glass-border)',
         padding: '40px 0 32px',
         position: 'relative', overflow: 'hidden',
       }}>
         <div style={{
           position: 'absolute', top: -80, right: -80,
           width: 300, height: 300, borderRadius: '50%',
-          background: 'radial-gradient(circle, rgba(124,58,237,0.1) 0%, transparent 70%)',
+          background: 'radial-gradient(circle, rgba(59,130,246,0.15) 0%, transparent 70%)',
         }} />
-        <div className="container">
-          <Link href="/" style={{ color: 'var(--text-secondary)', fontSize: 13, marginBottom: 16, display: 'block' }}>
-            ← PandaHub
-          </Link>
-          <h1 style={{ fontSize: '1.8rem', fontWeight: 800, marginBottom: 8 }}>Explore</h1>
-          <p style={{ color: 'var(--text-secondary)', marginBottom: 24 }}>
-            Discover public repositories and users from the community.
+        <div className="container" style={{ maxWidth: 1200, margin: '0 auto', padding: '0 24px' }}>
+          <h1 style={{ fontSize: '2rem', fontWeight: 800, marginBottom: 8, color: 'var(--text-primary)' }}>Explore PandaHub</h1>
+          <p style={{ color: 'var(--text-secondary)', marginBottom: 24, fontSize: 15 }}>
+            Discover public repositories, developer communities, and creators.
           </p>
           {/* Search */}
           <form onSubmit={handleSearch} style={{ display: 'flex', gap: 10, maxWidth: 560 }}>
@@ -64,18 +65,18 @@ export default function ExplorePage() {
               placeholder="Search repositories and users…"
               value={query}
               onChange={(e) => setQuery(e.target.value)}
+              className="glass-input"
               style={{
-                flex: 1, padding: '10px 16px',
-                background: 'var(--surface-variant)',
-                border: '1px solid var(--border-color)',
-                borderRadius: 8, color: 'var(--text-primary)',
+                flex: 1, padding: '12px 18px',
+                borderRadius: 14, color: 'var(--text-primary)',
                 fontSize: 14, outline: 'none',
               }}
             />
             <button type="submit" style={{
-              padding: '10px 20px', borderRadius: 8,
-              background: 'var(--gradient-brand)',
+              padding: '12px 24px', borderRadius: 14,
+              background: 'linear-gradient(135deg, #2563eb, #4f46e5)',
               color: '#fff', fontWeight: 600, border: 'none', cursor: 'pointer',
+              boxShadow: '0 4px 14px rgba(37,99,235,0.3)',
             }}>
               Search
             </button>
@@ -83,20 +84,21 @@ export default function ExplorePage() {
         </div>
       </div>
 
-      <div className="container" style={{ padding: '24px 1.5rem' }}>
+      <div className="container" style={{ maxWidth: 1200, margin: '0 auto', padding: '32px 24px' }}>
         {/* Sort controls */}
-        <div style={{ display: 'flex', gap: 8, marginBottom: 24, alignItems: 'center' }}>
-          <span style={{ color: 'var(--text-secondary)', fontSize: 13 }}>Sort Repos by:</span>
+        <div style={{ display: 'flex', gap: 8, marginBottom: 28, alignItems: 'center' }}>
+          <span style={{ color: 'var(--text-secondary)', fontSize: 13, fontWeight: 500 }}>Sort Repos by:</span>
           {(['updated', 'stars', 'forks'] as const).map((s) => (
             <button
               key={s}
               onClick={() => setSort(s)}
               style={{
-                padding: '5px 12px', borderRadius: 6, border: '1px solid var(--border-color)',
-                background: sort === s ? 'var(--bg-tertiary)' : 'transparent',
-                color: sort === s ? 'var(--text-primary)' : 'var(--text-secondary)',
-                fontWeight: sort === s ? 600 : 400,
-                cursor: 'pointer', fontSize: 13,
+                padding: '6px 16px', borderRadius: 999, border: '1px solid var(--glass-border)',
+                background: sort === s ? 'var(--glass-bg-4)' : 'var(--glass-bg-2)',
+                color: sort === s ? '#3b82f6' : 'var(--text-secondary)',
+                fontWeight: sort === s ? 600 : 500,
+                backdropFilter: 'blur(10px)',
+                cursor: 'pointer', fontSize: 13, transition: 'all 0.15s ease',
               }}
             >
               {s.charAt(0).toUpperCase() + s.slice(1)}
@@ -105,11 +107,11 @@ export default function ExplorePage() {
         </div>
 
         {loading ? (
-          <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fill, minmax(320px, 1fr))', gap: 16 }}>
+          <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fill, minmax(320px, 1fr))', gap: 20 }}>
             {[1, 2, 3, 4, 5, 6].map((i) => (
-              <div key={i} className="glass-card" style={{ padding: 24, opacity: 0.5 }}>
-                <div style={{ width: 180, height: 16, background: 'var(--bg-hover)', borderRadius: 4, marginBottom: 8 }} />
-                <div style={{ width: '70%', height: 12, background: 'var(--bg-hover)', borderRadius: 4 }} />
+              <div key={i} className="glass-card" style={{ padding: 24, opacity: 0.5, borderRadius: 20, border: '1px solid var(--glass-border)' }}>
+                <div style={{ width: 180, height: 16, background: 'var(--glass-bg-4)', borderRadius: 6, marginBottom: 12 }} />
+                <div style={{ width: '70%', height: 12, background: 'var(--glass-bg-3)', borderRadius: 6 }} />
               </div>
             ))}
           </div>
@@ -159,22 +161,22 @@ function ExploreUserCard({ user }: { user: Partial<User> }) {
       href={`/${user.username}`}
       className="glass-card animate-fade-in"
       style={{
-        display: 'flex', alignItems: 'center', gap: 16, padding: '16px',
-        textDecoration: 'none', color: 'inherit',
-        transition: 'all var(--transition-normal)',
+        display: 'flex', alignItems: 'center', gap: 16, padding: '18px 20px',
+        textDecoration: 'none', color: 'inherit', borderRadius: 20,
+        border: '1px solid var(--glass-border)',
+        transition: 'all 0.2s ease',
         transform: hovered ? 'translateY(-3px)' : 'translateY(0)',
-        boxShadow: hovered ? '0 8px 24px rgba(0,0,0,0.4)' : 'var(--shadow-sm)',
-        borderColor: hovered ? 'rgba(124,58,237,0.3)' : 'var(--border-color)',
+        boxShadow: hovered ? 'var(--glass-shadow)' : 'none',
       }}
       onMouseEnter={() => setHovered(true)}
       onMouseLeave={() => setHovered(false)}
     >
       <div style={{
         width: 48, height: 48, borderRadius: '50%',
-        background: 'var(--gradient-brand)',
+        background: 'linear-gradient(135deg, #3b82f6, #8b5cf6)',
         display: 'flex', alignItems: 'center', justifyContent: 'center',
         fontSize: 18, fontWeight: 700, color: '#fff', flexShrink: 0,
-        overflow: 'hidden'
+        overflow: 'hidden', border: '1px solid var(--glass-border)',
       }}>
         {user.avatar_url ? (
           <img src={user.avatar_url} alt="" style={{ width: '100%', height: '100%', objectFit: 'cover' }} />
@@ -199,12 +201,12 @@ function ExploreRepoCard({ repo }: { repo: Repository }) {
       href={`/${owner}/${name}`}
       className="glass-card animate-fade-in"
       style={{
-        display: 'block', padding: '20px 22px',
+        display: 'block', padding: '20px 24px', borderRadius: 20,
+        border: '1px solid var(--glass-border)',
         textDecoration: 'none', color: 'inherit',
-        transition: 'all var(--transition-normal)',
+        transition: 'all 0.2s ease',
         transform: hovered ? 'translateY(-3px)' : 'translateY(0)',
-        boxShadow: hovered ? '0 8px 24px rgba(0,0,0,0.4)' : 'var(--shadow-sm)',
-        borderColor: hovered ? 'rgba(124,58,237,0.3)' : 'var(--border-color)',
+        boxShadow: hovered ? 'var(--glass-shadow)' : 'none',
       }}
       onMouseEnter={() => setHovered(true)}
       onMouseLeave={() => setHovered(false)}
@@ -212,7 +214,7 @@ function ExploreRepoCard({ repo }: { repo: Repository }) {
       <div style={{ display: 'flex', alignItems: 'center', gap: 10, marginBottom: 8 }}>
         <div style={{
           width: 28, height: 28, borderRadius: '50%',
-          background: 'var(--gradient-brand)',
+          background: 'linear-gradient(135deg, #3b82f6, #8b5cf6)',
           display: 'flex', alignItems: 'center', justifyContent: 'center',
           fontSize: 13, fontWeight: 700, color: '#fff', flexShrink: 0,
         }}>
@@ -220,7 +222,7 @@ function ExploreRepoCard({ repo }: { repo: Repository }) {
         </div>
         <span style={{ fontSize: 14, color: 'var(--text-secondary)' }}>{owner}</span>
         <span style={{ color: 'var(--text-muted)' }}>/</span>
-        <span style={{ fontWeight: 700, color: 'var(--brand-accent)' }}>{name}</span>
+        <span style={{ fontWeight: 700, color: 'var(--color-primary)' }}>{name}</span>
       </div>
       {repo.description && (
         <p style={{

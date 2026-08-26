@@ -18,10 +18,11 @@ export default function CommitsPage() {
   const { repo } = useRepo(owner, repoName);
   const { branches } = useBranches(owner, repoName);
   const ref =
-  selectedBranch ||
-  branches.find((b) => b.name === repo?.default_branch)?.name ||
-  branches[0]?.name ||
-  "";
+    selectedBranch ||
+    branches.find((b) => b.name === repo?.default_branch)?.name ||
+    branches[0]?.name ||
+    repo?.default_branch ||
+    "main";
   const { commits, loading, error, hasMore } = useCommits(owner, repoName, ref, page);
 
   return (
@@ -38,7 +39,7 @@ export default function CommitsPage() {
             </select>
             <span className="material-symbols-outlined" style={{ position: 'absolute', right: 10, top: '50%', transform: 'translateY(-50%)', fontSize: 18, color: 'var(--text-muted)', pointerEvents: 'none' }}>expand_more</span>
           </div>
-          <span style={{ fontSize: 13, color: 'var(--text-muted)' }}>Commits on <strong style={{ color: 'var(--text-primary)' }}>{ref}</strong></span>
+          <span style={{ fontSize: 13, color: 'var(--text-muted)' }}>Commits on <strong style={{ color: 'var(--text-primary)' }}>{ref || 'main'}</strong></span>
         </div>
         {loading ? <LoadingSpinner label="Loading commits..." />
           : error ? <EmptyState icon="error" title="Could not load commits" description={error} />

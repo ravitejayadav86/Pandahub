@@ -75,6 +75,18 @@ def _open_repo(disk_path: str) -> pygit2.Repository:
         ) from exc
 
 
+def _is_repo_empty(repo: pygit2.Repository) -> bool:
+    """Return True if repository has no commits or unborn HEAD."""
+    if getattr(repo, "is_empty", False) or getattr(repo, "head_is_unborn", False):
+        return True
+    try:
+        if not list(repo.branches.local):
+            return True
+    except Exception:
+        pass
+    return False
+
+
 def _resolve_ref(repo: pygit2.Repository, ref: str) -> pygit2.Commit:
     """
     Resolve a branch, tag, full SHA, or abbreviated SHA to a commit.
@@ -208,7 +220,7 @@ def _list_branches_sync(disk_path: str) -> list[BranchInfo]:
     repo = _open_repo(disk_path)
 
     # Empty repository = no branches yet.
-    if repo.is_empty:
+    if _is_repo_empty(repo):
         return []
 
     try:
@@ -262,7 +274,7 @@ def _get_tree_sync(
     repo = _open_repo(disk_path)
 
     # Empty repository has no commit/tree to browse.
-    if repo.is_empty:
+    if _is_repo_empty(repo):
         raise NotFoundError(
             f"Repository is empty — ref '{ref}' does not exist."
         )
@@ -348,9 +360,9 @@ def _get_blob_sync(
 ) -> BlobOut:
     repo = _open_repo(disk_path)
 
-    if repo.is_empty:
+    if _is_repo_empty(repo):
         raise NotFoundError(
-            f"Repository is empty — ref '{ref}' does not exist."
+            f"Repository is empty — file '{path}' cannot be loaded."
         )
 
     if not path.strip("/"):
@@ -433,10 +445,15 @@ def _get_commits_sync(
 
     repo = _open_repo(disk_path)
 
-    if repo.is_empty:
+    if _is_repo_empty(repo):
         return [], 0
 
-    commit = _resolve_ref(repo, ref)
+    try:
+        commit = _resolve_ref(repo, ref)
+    except NotFoundError:
+        if _is_repo_empty(repo):
+            return [], 0
+        raise
 
     try:
         walker = repo.walk(commit.id, pygit2.GIT_SORT_TIME)
@@ -486,10 +503,13 @@ def _get_readme_sync(
 ) -> Optional[ReadmeOut]:
     repo = _open_repo(disk_path)
 
-    if repo.is_empty:
+    if _is_repo_empty(repo):
         return None
 
-    commit = _resolve_ref(repo, ref)
+    try:
+        commit = _resolve_ref(repo, ref)
+    except NotFoundError:
+        return None
     tree = commit.tree
 
     for candidate in _README_CANDIDATES:

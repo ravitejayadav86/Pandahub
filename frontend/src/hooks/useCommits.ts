@@ -9,17 +9,35 @@ export function useCommits(owner: string, repoName: string, ref: string, page = 
   const [hasMore, setHasMore] = useState(false);
 
   const fetchCommits = useCallback(async (currentPage = page) => {
-    if (!owner || !repoName || !ref) return;
+    if (!owner || !repoName) return;
+    if (!ref) {
+      setCommits([]);
+      setHasMore(false);
+      setLoading(false);
+      return;
+    }
     setLoading(true);
     setError(null);
     try {
       const { data } = await api.get<{ items: Commit[]; total: number }>(
-        `/${owner}/${repoName}/git/commits/${ref}?page=${currentPage}&per_page=${perPage}`
+        `/${encodeURIComponent(owner)}/${encodeURIComponent(repoName)}/git/commits/${encodeURIComponent(ref)}?page=${currentPage}&per_page=${perPage}`
       );
-      setCommits(data.items);
-      setHasMore(data.items.length === perPage);
+      setCommits(Array.isArray(data?.items) ? data.items : []);
+      setHasMore((data?.items?.length || 0) === perPage);
     } catch (e: any) {
-      setError(e?.response?.data?.detail ?? 'Failed to load commits');
+      if (e?.response?.status === 404) {
+        // Empty repository or uninitialized branch has 0 commits
+        setCommits([]);
+        setHasMore(false);
+        setError(null);
+      } else {
+        const errorMsg =
+          e?.response?.data?.error?.message ||
+          e?.response?.data?.detail ||
+          e?.response?.data?.message ||
+          'Failed to load commits';
+        setError(errorMsg);
+      }
     } finally {
       setLoading(false);
     }

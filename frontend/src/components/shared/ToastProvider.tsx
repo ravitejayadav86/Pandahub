@@ -165,7 +165,7 @@ export function ToastProvider({ children }: { children: React.ReactNode }) {
   // Escape key dismisses the topmost toast
   useEffect(() => {
     const handler = (e: KeyboardEvent) => {
-      if (e.key === 'Escape' && toasts.length > 0) {
+      if (e.key === 'Escape' && toasts.length > 0 && toasts[0]) {
         dismiss(toasts[0].id);
       }
     };

@@ -32,15 +32,13 @@ interface ErrorListResponse {
   items: ErrorRecord[];
 }
 
-/* ─────────────────────────────────────────────────────────────────────────
-   Config
-───────────────────────────────────────────────────────────────────────── */
+const DEFAULT_SEV_STYLE = { badge: 'bg-red-500/20 text-red-400 border-red-500/30', dot: 'bg-red-400', row: 'bg-red-500/3' };
 
 const SEVERITY_STYLES: Record<string, { badge: string; dot: string; row: string }> = {
   debug:    { badge: 'bg-slate-500/20 text-slate-400 border-slate-500/30',    dot: 'bg-slate-400',   row: '' },
   info:     { badge: 'bg-blue-500/20 text-blue-400 border-blue-500/30',       dot: 'bg-blue-400',    row: '' },
   warning:  { badge: 'bg-amber-500/20 text-amber-400 border-amber-500/30',    dot: 'bg-amber-400',   row: 'bg-amber-500/3' },
-  error:    { badge: 'bg-red-500/20 text-red-400 border-red-500/30',          dot: 'bg-red-400',     row: 'bg-red-500/3' },
+  error:    DEFAULT_SEV_STYLE,
   critical: { badge: 'bg-purple-500/20 text-purple-400 border-purple-500/30', dot: 'bg-purple-400',  row: 'bg-purple-500/5' },
 };
 
@@ -295,7 +293,7 @@ export default function AdminErrorsPage() {
                 </div>
 
                 {records.map((record) => {
-                  const sev  = SEVERITY_STYLES[record.severity] || SEVERITY_STYLES.error;
+                  const sev  = SEVERITY_STYLES[record.severity] ?? DEFAULT_SEV_STYLE;
                   const isExpanded = expandedId === record.id;
                   return (
                     <div key={record.id} className={`border-b border-white/4 last:border-0 ${sev.row}`}>
@@ -403,7 +401,7 @@ export default function AdminErrorsPage() {
             ) : (
               <div className="space-y-2">
                 {stats.map((stat) => {
-                  const sev = SEVERITY_STYLES[stat.severity] || SEVERITY_STYLES.error;
+                  const sev = SEVERITY_STYLES[stat.severity] ?? DEFAULT_SEV_STYLE;
                   const maxCount = stats[0]?.count || 1;
                   const pct = (stat.count / maxCount) * 100;
                   return (

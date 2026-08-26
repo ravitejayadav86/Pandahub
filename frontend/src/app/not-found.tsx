@@ -1,13 +1,10 @@
+'use client';
+
 /**
  * Custom 404 page — Next.js App Router.
  * Shown whenever a route is not found.
  */
 import Link from 'next/link';
-
-export const metadata = {
-  title: '404 — Page Not Found · PandaHub',
-  description: 'The page you are looking for does not exist.',
-};
 
 export default function NotFound() {
   return (

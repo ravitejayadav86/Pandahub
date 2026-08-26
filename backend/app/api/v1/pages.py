@@ -23,7 +23,7 @@ from __future__ import annotations
 
 from typing import Optional
 
-from fastapi import APIRouter, Depends, Response, status
+from fastapi import APIRouter, Depends, status
 from fastapi.responses import Response as FastAPIResponse
 from sqlalchemy.ext.asyncio import AsyncSession
 
@@ -225,9 +225,6 @@ async def serve_pages(
     # ------------------------------------------------------------------
     # 1. Look up the repository (public repos only for Pages)
     # ------------------------------------------------------------------
-    from sqlalchemy import select  # noqa: PLC0415
-    from app.models.user import User as _User  # noqa: PLC0415
-    from app.models.organization import Organization  # noqa: PLC0415
     from app.services.repo_service import get_repo_by_owner_and_name  # noqa: PLC0415
     from app.models.enums import RepositoryVisibility  # noqa: PLC0415
 

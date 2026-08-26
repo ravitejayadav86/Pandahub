@@ -86,7 +86,7 @@ export function parseApiError(err: unknown): ParsedError {
   if (isAxiosError(err) && !err.response) {
     return {
       code:           'NETWORK_ERROR',
-      message:        USER_MESSAGES.NETWORK_ERROR,
+      message:        USER_MESSAGES['NETWORK_ERROR'] || "Can't reach the server. Check your internet connection and try again.",
       hint:           'Check your internet connection and try again.',
       severity:       'error',
       status:         0,
@@ -107,7 +107,7 @@ export function parseApiError(err: unknown): ParsedError {
     const hint      = (envelope.hint as string)      || DEFAULT_HINTS[code];
     const docs      = envelope.docs as string | undefined;
     const severity  = (envelope.severity as ParsedError['severity']) || 'error';
-    const requestId = (envelope.request_id as string) | undefined;
+    const requestId = typeof envelope.request_id === 'string' ? envelope.request_id : undefined;
     const fields    = (envelope.fields as FieldError[]) || [];
 
     return {

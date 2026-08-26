@@ -31,7 +31,6 @@ from __future__ import annotations
 from typing import Optional
 
 from fastapi import APIRouter, Depends, HTTPException, Query, status
-from sqlalchemy.ext.asyncio import AsyncSession
 
 from app.api.dependencies import get_current_active_user
 from app.core.exceptions import (
@@ -40,7 +39,6 @@ from app.core.exceptions import (
     clear_error_log,
     remove_error_record,
 )
-from app.db.session import get_db
 from app.models.user import User
 
 router = APIRouter(prefix="/admin/errors", tags=["admin", "errors"])

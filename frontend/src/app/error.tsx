@@ -9,7 +9,7 @@
  * in the layout tree above individual pages.
  */
 
-import { useEffect } from 'react';
+import { useEffect, useState } from 'react';
 
 export default function ErrorPage({
   error,
@@ -18,11 +18,12 @@ export default function ErrorPage({
   error: Error & { digest?: string };
   reset: () => void;
 }) {
+  const [copied, setCopied] = useState(false);
+
   useEffect(() => {
     console.error('[NextJS ErrorPage]', error);
   }, [error]);
 
-  const [copied, setCopied] = ('useState' in {}) ? [false, () => {}] : [false, () => {}];
   const digest = error?.digest || 'unknown';
 
   return (
@@ -88,10 +89,12 @@ export default function ErrorPage({
             <button
               onClick={() => {
                 navigator.clipboard.writeText(digest);
+                setCopied(true);
+                setTimeout(() => setCopied(false), 2000);
               }}
               className="text-xs px-3 py-1.5 rounded-lg bg-white/6 text-slate-400 hover:bg-white/10 transition-all border border-white/8"
             >
-              Copy
+              {copied ? '✓ Copied' : 'Copy'}
             </button>
           </div>
         </div>

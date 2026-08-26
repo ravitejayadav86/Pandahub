@@ -26,8 +26,6 @@ from __future__ import annotations
 
 import mimetypes
 import uuid
-from datetime import datetime, timezone
-from io import BytesIO
 from pathlib import PurePosixPath
 from typing import Optional
 
@@ -35,11 +33,10 @@ from sqlalchemy import select
 from sqlalchemy.ext.asyncio import AsyncSession
 
 from app.core.config import get_settings
-from app.core.exceptions import ConflictError, NotFoundError
+from app.core.exceptions import NotFoundError
 from app.core.logging import get_logger
 from app.models.pages import RepositoryPages
 from app.models.repo import Repository
-from app.models.user import User
 
 settings = get_settings()
 logger = get_logger("app.services.pages_service")
@@ -284,8 +281,6 @@ def _enqueue_build(repo_id: str, owner_username: str, repo_name: str) -> None:
 
 def _delete_build_artifacts(owner: str, repo_name: str, sha: str) -> None:
     """Delete all MinIO objects under the pages/{owner}/{repo}/{sha}/ prefix."""
-    from botocore.exceptions import ClientError  # noqa: PLC0415
-
     client = _s3()
     bucket = settings.MINIO_BUCKET_PAGES
     prefix = _pages_prefix(owner, repo_name, sha)

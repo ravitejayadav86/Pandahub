@@ -32,7 +32,10 @@ highlight individual form inputs rather than showing a wall of text.
 """
 from __future__ import annotations
 
+import threading
 import traceback
+import uuid as _uuid
+from collections import deque
 from datetime import datetime, timezone
 from typing import Optional
 
@@ -428,10 +431,6 @@ def register_exception_handlers(app: FastAPI) -> None:
 # ---------------------------------------------------------------------------
 # Stores the last MAX_ERROR_RECORDS error events.  One list per process.
 # Replace with a Redis list for multi-process / multi-dyno deployments.
-
-import threading
-import uuid as _uuid
-from collections import deque
 
 _MAX_ERROR_RECORDS = 500
 _error_log_lock = threading.Lock()

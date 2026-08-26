@@ -20,7 +20,7 @@ export default function Navbar() {
     const ensureE2EEKeys = async () => {
       try {
         // First check if the server already has a public key for this user
-        const { data: profile } = await api.get(`/auth/users/${user.username}`);
+        const { data: profile } = await api.get(`/users/${user.username}`);
         if (profile.public_key) return; // Already set up, nothing to do
 
         // Try loading an existing private key from IndexedDB first

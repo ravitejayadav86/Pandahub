@@ -74,13 +74,13 @@ export default function UserProfilePage() {
     const fetchData = async () => {
       setLoading(true)
       try {
-        const { data: profileData } = await api.get<UserProfile>(`/auth/users/${org}`)
+        const { data: profileData } = await api.get<UserProfile>(`/users/${org}`)
         setProfile(profileData)
 
         // Check follow status if logged in and not owner
         if (currentUser && currentUser.username !== org) {
           try {
-            const { data: followers } = await api.get<any[]>(`/auth/users/${org}/followers`)
+            const { data: followers } = await api.get<any[]>(`/users/${org}/followers`)
             setIsFollowing(followers.some(f => f.username === currentUser.username))
           } catch (e) {
             console.error("Failed to load followers", e)
@@ -113,11 +113,11 @@ export default function UserProfilePage() {
     setFollowLoading(true)
     try {
       if (isFollowing) {
-        await api.delete(`/auth/users/${org}/follow`)
+        await api.delete(`/users/${org}/follow`)
         setIsFollowing(false)
         setProfile(prev => prev ? { ...prev, follower_count: Math.max(0, prev.follower_count - 1) } : prev)
       } else {
-        await api.post(`/auth/users/${org}/follow`)
+        await api.post(`/users/${org}/follow`)
         setIsFollowing(true)
         setProfile(prev => prev ? { ...prev, follower_count: prev.follower_count + 1 } : prev)
       }

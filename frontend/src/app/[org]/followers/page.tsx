@@ -45,10 +45,10 @@ export default function FollowersPage() {
     const fetchData = async () => {
       setLoading(true)
       try {
-        const { data: profileData } = await api.get<UserProfile>(`/auth/users/${org}`)
+        const { data: profileData } = await api.get<UserProfile>(`/users/${org}`)
         setProfile(profileData)
         
-        const { data: followersData } = await api.get<any[]>(`/auth/users/${org}/followers`)
+        const { data: followersData } = await api.get<any[]>(`/users/${org}/followers`)
         setFollowers(followersData)
       } catch (err) {
         setError(true)

@@ -48,7 +48,7 @@ export default function ChatBox({ recipientUsername, onClose }: ChatBoxProps) {
     
     try {
       // 1. Get recipient profile + public key
-      const { data: profile } = await api.get(`/auth/users/${recipientUsername}`)
+      const { data: profile } = await api.get(`/users/${recipientUsername}`)
       
       if (!profile.public_key) {
         // Recipient hasn't set up E2EE — show friendly message

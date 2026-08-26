@@ -13,11 +13,11 @@ export function useCommits(owner: string, repoName: string, ref: string, page = 
     setLoading(true);
     setError(null);
     try {
-      const { data } = await api.get<Commit[]>(
+      const { data } = await api.get<{ items: Commit[]; total: number }>(
         `/${owner}/${repoName}/git/commits/${ref}?page=${currentPage}&per_page=${perPage}`
       );
-      setCommits(data);
-      setHasMore(data.length === perPage);
+      setCommits(data.items);
+      setHasMore(data.items.length === perPage);
     } catch (e: any) {
       setError(e?.response?.data?.detail ?? 'Failed to load commits');
     } finally {

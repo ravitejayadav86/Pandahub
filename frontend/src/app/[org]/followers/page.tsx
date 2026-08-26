@@ -50,8 +50,27 @@ export default function FollowersPage() {
         
         const { data: followersData } = await api.get<any[]>(`/users/${org}/followers`)
         setFollowers(followersData)
-      } catch (err) {
-        setError(true)
+      } catch {
+        try {
+          const { data: orgData } = await api.get<any>(`/orgs/${org}`)
+          setProfile({
+            id: String(orgData.id),
+            username: orgData.name,
+            full_name: orgData.display_name || orgData.name,
+            bio: orgData.description || null,
+            avatar_url: orgData.avatar_url || null,
+            location: null,
+            website_url: orgData.website_url || null,
+            is_verified: true,
+            created_at: orgData.created_at || null,
+            repo_count: 0,
+            follower_count: 0,
+            following_count: 0,
+          })
+          setFollowers([])
+        } catch {
+          setError(true)
+        }
       } finally {
         setLoading(false)
       }
@@ -74,12 +93,22 @@ export default function FollowersPage() {
     return (
       <div className="min-h-screen bg-[var(--bg-primary)] flex flex-col">
         <Navbar />
-        <div className="flex-1 flex flex-col items-center justify-center">
-          <h1 className="text-4xl font-bold text-slate-800 dark:text-slate-200 mb-4">404</h1>
-          <p className="text-slate-500 mb-6">User not found.</p>
-          <Link href="/dashboard" className="px-6 py-2 bg-blue-600 text-white rounded-lg font-medium hover:bg-blue-700 transition-colors shadow-lg shadow-blue-500/20">
-            Go Home
-          </Link>
+        <div className="flex-1 flex flex-col items-center justify-center text-center px-4">
+          <div className="w-20 h-20 rounded-3xl bg-blue-500/10 border border-blue-500/20 flex items-center justify-center text-4xl mb-4 select-none">
+            🐼
+          </div>
+          <h1 className="text-3xl font-bold text-[var(--text-primary)] mb-2">User Not Found</h1>
+          <p className="text-[var(--text-secondary)] text-sm max-w-md mb-6">
+            The profile for <strong className="text-[var(--text-primary)]">@{org}</strong> does not exist.
+          </p>
+          <div className="flex items-center gap-3">
+            <Link href="/dashboard" className="px-5 py-2.5 bg-blue-600 hover:bg-blue-700 text-white rounded-xl text-sm font-semibold transition-all shadow-lg shadow-blue-500/20">
+              Dashboard
+            </Link>
+            <Link href="/explore" className="px-5 py-2.5 bg-[var(--glass-bg-2)] hover:bg-[var(--glass-bg-3)] border border-[var(--glass-border)] text-[var(--text-primary)] rounded-xl text-sm font-medium transition-all">
+              Explore Users
+            </Link>
+          </div>
         </div>
       </div>
     )

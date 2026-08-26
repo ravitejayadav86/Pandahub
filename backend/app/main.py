@@ -172,6 +172,7 @@ app.add_middleware(RequestContextMiddleware)
 register_exception_handlers(app)
 
 app.include_router(auth.router, prefix=settings.API_V1_PREFIX)
+app.include_router(auth.users_router, prefix=settings.API_V1_PREFIX)
 app.include_router(repos.router, prefix=settings.API_V1_PREFIX)
 app.include_router(issues.router, prefix=settings.API_V1_PREFIX)
 app.include_router(pulls.router, prefix=settings.API_V1_PREFIX)

@@ -106,6 +106,14 @@ class AppError(Exception):
         super().__init__(message)
 
 
+# ── 400 Bad Request ───────────────────────────────────────────────────────
+
+class BadRequestError(AppError):
+    status_code = status.HTTP_400_BAD_REQUEST
+    code = "BAD_REQUEST"
+    severity = Severity.WARNING
+
+
 # ── 404 Not Found ─────────────────────────────────────────────────────────
 
 class NotFoundError(AppError):
@@ -275,7 +283,7 @@ def register_exception_handlers(app: FastAPI) -> None:
                 "error_code":   exc.code,
                 "status_code":  exc.status_code,
                 "path":         path,
-                "message":      exc.message,
+                "error_detail": exc.message,
             },
         )
 

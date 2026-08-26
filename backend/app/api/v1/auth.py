@@ -38,6 +38,7 @@ from app.services import auth_service
 from app.services.storage_service import upload_avatar
 
 router = APIRouter(prefix="/auth", tags=["authentication"])
+users_router = APIRouter(prefix="/users", tags=["users"])
 
 
 # ---------------------------------------------------------------------------
@@ -329,6 +330,7 @@ async def get_my_activity(
 # ---------------------------------------------------------------------------
 
 @router.get("/users/{username}", summary="Get public user profile")
+@users_router.get("/{username}", summary="Get public user profile")
 async def get_user_profile(
     username: str,
     db: AsyncSession = Depends(get_db),
@@ -390,6 +392,7 @@ async def get_user_profile(
 # ---------------------------------------------------------------------------
 
 @router.post("/users/{username}/follow", summary="Follow a user")
+@users_router.post("/{username}/follow", summary="Follow a user")
 async def follow_user(
     username: str,
     db: AsyncSession = Depends(get_db),
@@ -426,6 +429,7 @@ async def follow_user(
     return {"status": "ok", "message": f"Successfully followed {username}."}
 
 @router.delete("/users/{username}/follow", summary="Unfollow a user")
+@users_router.delete("/{username}/follow", summary="Unfollow a user")
 async def unfollow_user(
     username: str,
     db: AsyncSession = Depends(get_db),
@@ -454,6 +458,7 @@ async def unfollow_user(
     return {"status": "ok", "message": f"Successfully unfollowed {username}."}
 
 @router.get("/users/{username}/followers", summary="Get users following this user")
+@users_router.get("/{username}/followers", summary="Get users following this user")
 async def get_followers(
     username: str,
     db: AsyncSession = Depends(get_db),
@@ -483,6 +488,7 @@ async def get_followers(
     ]
 
 @router.get("/users/{username}/following", summary="Get users this user is following")
+@users_router.get("/{username}/following", summary="Get users this user is following")
 async def get_following(
     username: str,
     db: AsyncSession = Depends(get_db),
@@ -516,6 +522,7 @@ async def get_following(
 # ---------------------------------------------------------------------------
 
 @router.get("/users", summary="List and search users (admin)")
+@users_router.get("", summary="List and search users (admin)")
 async def list_users(
     q: str | None = None,
     limit: int = 50,

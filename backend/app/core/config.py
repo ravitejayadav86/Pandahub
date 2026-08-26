@@ -81,6 +81,7 @@ class Settings(BaseSettings):
     MINIO_BUCKET_AVATARS: str = "pandahub-avatars"
     MINIO_BUCKET_LFS: str = "pandahub-lfs"
     MINIO_BUCKET_ARTIFACTS: str = "pandahub-artifacts"
+    MINIO_BUCKET_PAGES: str = "pandahub-pages"
     MINIO_USE_SSL: bool = False
  
 # ---- Backblaze B2 (S3-compatible) — durable git repo storage ----

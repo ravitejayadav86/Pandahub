@@ -501,6 +501,11 @@ export default function RepoDashboardPage() {
       href: `${repoBase}/security`,
     },
     {
+      label: "Pages",
+      icon: "public",
+      href: `${repoBase}/pages`,
+    },
+    {
       label: "Settings",
       icon: "settings",
       href: `${repoBase}#settings`,

@@ -25,6 +25,7 @@ celery_app = Celery(
     include=[
         "app.worker.tasks.email_tasks",
         "app.worker.tasks.git_tasks",
+        "app.worker.tasks.pages_tasks",
         # "app.worker.tasks.ai_tasks",    -- added in Module 11
     ],
 )

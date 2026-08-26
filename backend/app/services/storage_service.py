@@ -53,6 +53,7 @@ def ensure_buckets_exist() -> None:
             settings.MINIO_BUCKET_AVATARS,
             settings.MINIO_BUCKET_LFS,
             settings.MINIO_BUCKET_ARTIFACTS,
+            settings.MINIO_BUCKET_PAGES,
         ):
             try:
                 client.head_bucket(Bucket=bucket)

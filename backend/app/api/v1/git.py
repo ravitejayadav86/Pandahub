@@ -550,10 +550,12 @@ def _fire_post_receive_hook(
     stderr_output: str,
 ) -> None:
     """
-    Enqueue the post-receive Celery task.
+    Enqueue the post-receive Celery task and, if Pages is enabled on this
+    repository, also enqueue a Pages rebuild when the pushed branch matches
+    the configured Pages source branch.
 
     Called synchronously from the receive-pack handler after the subprocess
-    completes.  The task itself runs asynchronously in the worker process.
+    completes.  Both tasks run asynchronously in the worker process.
     """
     try:
         from app.worker.tasks.git_tasks import post_receive_hook
@@ -568,5 +570,68 @@ def _fire_post_receive_hook(
         # the Branch cache will be stale until the next push.
         logger.error(
             "Failed to enqueue post-receive hook",
+            extra={"repo_id": repo_id, "error": str(exc)},
+        )
+
+    # ------------------------------------------------------------------
+    # Pages auto-deploy: if Pages is enabled and the pushed branch
+    # matches the source branch, trigger a rebuild.
+    # ------------------------------------------------------------------
+    try:
+        from app.git_engine.writer import parse_receive_pack_output  # noqa: PLC0415
+        from app.worker.tasks.pages_tasks import build_pages_task  # noqa: PLC0415
+        from app.models.pages import RepositoryPages  # noqa: PLC0415
+        from sqlalchemy import create_engine, select  # noqa: PLC0415
+        from sqlalchemy.orm import sessionmaker  # noqa: PLC0415
+        import uuid as _uuid  # noqa: PLC0415
+
+        # Build sync DB session (same pattern used by git_tasks)
+        sync_url = settings.DATABASE_URL.replace(
+            "postgresql+asyncpg://", "postgresql+psycopg://"
+        ).replace("postgresql://", "postgresql+psycopg://")
+        engine = create_engine(sync_url, pool_pre_ping=True, pool_size=2, max_overflow=5)
+        Session = sessionmaker(bind=engine, expire_on_commit=False)
+        session = Session()
+
+        try:
+            repo_uuid = _uuid.UUID(repo_id)
+            pages = session.execute(
+                select(RepositoryPages).where(
+                    RepositoryPages.repository_id == repo_uuid,
+                    RepositoryPages.enabled == True,  # noqa: E712
+                )
+            ).scalar_one_or_none()
+
+            if pages:
+                # Check if any pushed ref is to the Pages source branch
+                pushed_refs = parse_receive_pack_output(stderr_output)
+                source_branch = pages.source_branch
+                for ref in pushed_refs:
+                    if (
+                        not ref.is_delete
+                        and ref.is_branch
+                        and ref.branch_name == source_branch
+                    ):
+                        logger.info(
+                            "Pages auto-deploy triggered",
+                            extra={
+                                "repo_id": repo_id,
+                                "branch": source_branch,
+                            },
+                        )
+                        build_pages_task.delay(
+                            repo_id,
+                            pusher_username,  # used as owner slug for MinIO key
+                            "",  # repo_name resolved inside the task from DB
+                        )
+                        break
+        finally:
+            session.close()
+            engine.dispose()
+
+    except Exception as exc:
+        # Pages auto-deploy is non-fatal — push already succeeded
+        logger.warning(
+            "Pages auto-deploy check failed (non-fatal)",
             extra={"repo_id": repo_id, "error": str(exc)},
         )

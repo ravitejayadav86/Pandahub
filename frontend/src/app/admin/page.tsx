@@ -90,6 +90,18 @@ export default function AdminPage() {
           </div>
         </div>
         <span style={{ fontSize: 13, color: 'var(--text-secondary)' }}>Signed in as <strong style={{ color: 'var(--text-primary)' }}>{user?.username}</strong></span>
+        <button
+          onClick={() => router.push('/admin/errors')}
+          style={{
+            display: 'flex', alignItems: 'center', gap: 6, padding: '7px 14px',
+            borderRadius: 10, border: '1px solid rgba(239,68,68,0.3)',
+            background: 'rgba(239,68,68,0.08)', color: '#f87171',
+            fontSize: 12, fontWeight: 600, cursor: 'pointer',
+          }}
+        >
+          <span style={{ width: 6, height: 6, borderRadius: '50%', background: '#ef4444', display: 'inline-block' }} />
+          Error Log
+        </button>
       </header>
 
       <div style={{ maxWidth: 1200, margin: '0 auto', padding: '32px 24px', opacity: mounted ? 1 : 0, transition: 'opacity 0.4s' }}>

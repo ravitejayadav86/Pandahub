@@ -13,7 +13,7 @@ from pathlib import Path
 from fastapi import FastAPI
 from fastapi.middleware.cors import CORSMiddleware
 
-from app.api.v1 import auth, repos, git, issues, pulls, orgs, startups, messages
+from app.api.v1 import auth, repos, git, issues, pulls, orgs, startups, messages, pages, error_logs
 from app.api import ws
 from app.core.config import get_settings
 from app.core.exceptions import register_exception_handlers
@@ -178,7 +178,11 @@ app.include_router(pulls.router, prefix=settings.API_V1_PREFIX)
 app.include_router(orgs.router, prefix=settings.API_V1_PREFIX)
 app.include_router(startups.router, prefix=settings.API_V1_PREFIX)
 app.include_router(messages.router, prefix=f"{settings.API_V1_PREFIX}/messages", tags=["messages"])
-# Git transport routes are NOT under /api/v1 â€” they use the /git/ prefix
+# Pages router: registered so /api/v1/pages/... static serving resolves correctly.
+app.include_router(pages.router, prefix=settings.API_V1_PREFIX)
+# Admin error log — superuser-only, exposes the in-memory error buffer
+app.include_router(error_logs.router, prefix=settings.API_V1_PREFIX)
+# Git transport routes are NOT under /api/v1 — they use the /git/ prefix
 # that nginx routes separately (proxy_request_buffering off, long timeouts).
 # The .git URL convention is a well-known client expectation that must not
 # be nested under /api/v1.

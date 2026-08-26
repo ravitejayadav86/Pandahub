@@ -249,3 +249,42 @@ class CollaboratorOut(BaseModel):
     repository_id: uuid.UUID
     user_id: uuid.UUID
     permission: PermissionLevel
+
+
+# ---------------------------------------------------------------------------
+# Pages schemas (PandaHub Pages — static site hosting)
+# ---------------------------------------------------------------------------
+
+class PagesCreate(BaseModel):
+    """Payload for POST /{owner}/{repo}/pages — enable Pages on a repository."""
+
+    source_branch: str = Field("main", max_length=255, description="Branch to build from")
+    source_folder: str = Field("/", max_length=500, description="Folder inside the branch: '/' or '/docs'")
+
+
+class PagesUpdate(BaseModel):
+    """Payload for PATCH /{owner}/{repo}/pages — change source branch or folder."""
+
+    source_branch: Optional[str] = Field(None, max_length=255)
+    source_folder: Optional[str] = Field(None, max_length=500)
+
+
+class PagesOut(BaseModel):
+    """Full Pages configuration returned by the Pages endpoints."""
+
+    model_config = ConfigDict(from_attributes=True)
+
+    id: uuid.UUID
+    repository_id: uuid.UUID
+    enabled: bool
+    source_branch: str
+    source_folder: str
+    status: str           # "pending" | "building" | "active" | "failed"
+    published_sha: Optional[str]
+    published_at: Optional[datetime]
+    custom_domain: Optional[str]
+    created_at: datetime
+    updated_at: datetime
+
+    # Computed field — not stored in DB
+    url: Optional[str] = None

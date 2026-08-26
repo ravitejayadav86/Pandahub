@@ -12,7 +12,7 @@ export function useIssues(owner: string, repoName: string, state: 'open' | 'clos
     setLoading(true);
     setError(null);
     try {
-      const { data } = await api.get<Issue[]>(`/repos/${owner}/${repoName}/issues?state=${filterState}`);
+      const { data } = await api.get<Issue[]>(`/${owner}/${repoName}/issues?state=${filterState}`);
       setIssues(data);
     } catch (e: any) {
       setError(e?.response?.data?.detail ?? 'Failed to load issues');
@@ -26,11 +26,11 @@ export function useIssues(owner: string, repoName: string, state: 'open' | 'clos
 }
 
 export async function createIssue(owner: string, repoName: string, payload: { title: string; body?: string; priority?: string }) {
-  const { data } = await api.post<Issue>(`/repos/${owner}/${repoName}/issues`, payload);
+  const { data } = await api.post<Issue>(`/${owner}/${repoName}/issues`, payload);
   return data;
 }
 
 export async function closeIssue(owner: string, repoName: string, issueNumber: number) {
-  const { data } = await api.patch<Issue>(`/repos/${owner}/${repoName}/issues/${issueNumber}`, { state: 'closed' });
+  const { data } = await api.patch<Issue>(`/${owner}/${repoName}/issues/${issueNumber}`, { state: 'closed' });
   return data;
 }

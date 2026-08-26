@@ -24,8 +24,8 @@ export default function IssuesPage() {
     setLoading(true);
     try {
       const [repoRes, issueRes] = await Promise.all([
-        api.get<Repository>(`/repos/${owner}/${repoName}`),
-        api.get<Issue[]>(`/repos/${owner}/${repoName}/issues?state=${state}`),
+        api.get<Repository>(`/${owner}/${repoName}`),
+        api.get<Issue[]>(`/${owner}/${repoName}/issues?state=${state}`),
       ]);
       setRepo(repoRes.data);
       setIssues(issueRes.data);
@@ -39,7 +39,7 @@ export default function IssuesPage() {
     e.preventDefault();
     setSubmitting(true);
     try {
-      await api.post(`/repos/${owner}/${repoName}/issues`, newIssue);
+      await api.post(`/${owner}/${repoName}/issues`, newIssue);
       setNewIssue({ title: '', body: '' });
       setShowNew(false);
       loadIssues();

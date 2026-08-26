@@ -28,7 +28,7 @@ export function usePulls(owner: string, repoName: string, state: 'open' | 'close
     setLoading(true);
     setError(null);
     try {
-      const { data } = await api.get<PullRequest[]>(`/repos/${owner}/${repoName}/pulls?state=${filterState}`);
+      const { data } = await api.get<PullRequest[]>(`/${owner}/${repoName}/pulls?state=${filterState}`);
       setPulls(data);
     } catch (e: any) {
       setError(e?.response?.data?.detail ?? 'Failed to load pull requests');
@@ -44,11 +44,11 @@ export function usePulls(owner: string, repoName: string, state: 'open' | 'close
 export async function createPullRequest(owner: string, repoName: string, payload: {
   title: string; body?: string; head_branch: string; base_branch: string;
 }) {
-  const { data } = await api.post<PullRequest>(`/repos/${owner}/${repoName}/pulls`, payload);
+  const { data } = await api.post<PullRequest>(`/${owner}/${repoName}/pulls`, payload);
   return data;
 }
 
 export async function mergePullRequest(owner: string, repoName: string, prNumber: number, strategy?: string) {
-  const { data } = await api.post(`/repos/${owner}/${repoName}/pulls/${prNumber}/merge`, { strategy: strategy ?? 'merge' });
+  const { data } = await api.post(`/${owner}/${repoName}/pulls/${prNumber}/merge`, { strategy: strategy ?? 'merge' });
   return data;
 }

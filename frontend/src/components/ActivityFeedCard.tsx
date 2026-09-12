@@ -1,11 +1,7 @@
 import React from 'react';
-import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/Card';
-import { Avatar } from '@/components/ui/Avatar';
-import { Badge } from '@/components/ui/Badge';
+import Link from 'next/link';
+import { Card, CardHeader } from '@/components/ui/Card';
 import { Clock } from 'lucide-react';
-import { useAuthStore } from '@/store/authStore';
-import api from '@/lib/api';
-import { Link } from 'next/link';
 
 interface ActivityEvent {
   id: string;
@@ -32,7 +28,6 @@ function activityDescription(type: string): string {
 }
 
 export default function ActivityFeedCard({ activity }: { activity: ActivityEvent }) {
-  const { user } = useAuthStore();
   const timeAgo = (iso: string) => {
     const diff = Date.now() - new Date(iso).getTime();
     const mins = Math.floor(diff / 60000);

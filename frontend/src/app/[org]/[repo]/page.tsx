@@ -276,7 +276,7 @@ export default function RepoDashboardPage() {
 
       try {
         const { data } = await api.get<UserProfile>(
-          `/users/${encodeURIComponent(owner)}`
+          `/auth/users/${encodeURIComponent(owner)}`
         );
 
         if (!cancelled) {

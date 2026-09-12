@@ -18,7 +18,7 @@ export function DashboardNav({ onMenuClick }: DashboardNavProps) {
   const router = useRouter()
 
   return (
-    <header className="sticky top-0 z-50 h-[64px] bg-white/80 dark:bg-slate-900/80 backdrop-blur-xl border-b border-slate-200 dark:border-slate-800 flex items-center justify-between px-4 md:px-6">
+    <header className="sticky top-0 z-50 h-[64px] bg-white/90 dark:bg-slate-900/90 backdrop-blur-md border-b border-slate-200 dark:border-slate-800 flex items-center justify-between px-4 md:px-6" style={{ transform: 'translateZ(0)', willChange: 'transform' }}>
       
       {/* Left section: Logo & Context */}
       <div className="flex items-center gap-4 md:gap-6">
@@ -29,7 +29,7 @@ export function DashboardNav({ onMenuClick }: DashboardNavProps) {
           <Menu className="w-5 h-5" />
         </button>
         <Link href="/dashboard" className="flex items-center gap-2">
-          <span className="text-2xl animate-wiggle inline-block">🐼</span>
+          <span className="text-2xl inline-block hover:animate-wiggle cursor-default">🐼</span>
           <span className="font-bold text-xl tracking-tight hidden md:block text-slate-900 dark:text-white">
             PandaHub
           </span>

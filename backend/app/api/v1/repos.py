@@ -414,7 +414,7 @@ async def upload_files(
     repository: Repository = Depends(get_repository),
     current_user: User = Depends(get_current_active_user),
     _perm: PermissionLevel = Depends(
-        require_repo_permission(PermissionLevel.WRITE, allow_anonymous=False)
+        require_repo_permission(PermissionLevel.ADMIN, allow_anonymous=False)  # owner-only: WRITE collaborators must use git push
     ),
     files: _List[UploadFile] = File(..., description="Files to commit"),
     branch: str = Form("main", description="Target branch name"),
@@ -724,7 +724,7 @@ async def dismiss_security_alert(
     db: AsyncSession = Depends(get_db),
     current_user: User = Depends(get_current_active_user),
     _perm: PermissionLevel = Depends(
-        require_repo_permission(PermissionLevel.WRITE, allow_anonymous=False)
+        require_repo_permission(PermissionLevel.ADMIN, allow_anonymous=False)  # owner-only: WRITE collaborators must use git push
     ),
 ):
     from app.models.security_alert import SecurityAlert
@@ -757,7 +757,7 @@ async def trigger_security_scan(
     db: AsyncSession = Depends(get_db),
     current_user: User = Depends(get_current_active_user),
     _perm: PermissionLevel = Depends(
-        require_repo_permission(PermissionLevel.WRITE, allow_anonymous=False)
+        require_repo_permission(PermissionLevel.ADMIN, allow_anonymous=False)  # owner-only: WRITE collaborators must use git push
     ),
 ):
     """Enqueue a full security scan (dependency + code analysis) for this repo."""

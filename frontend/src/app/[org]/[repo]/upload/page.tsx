@@ -33,6 +33,7 @@ export default function UploadFilesPage() {
   const [error, setError] = useState('');
   const [result, setResult] = useState<UploadResult | null>(null);
 
+  // All hooks must be declared before any conditional return (React rules of hooks).
   const fileInputRef = useRef<HTMLInputElement>(null);
   const folderInputRef = useRef<HTMLInputElement>(null);
 
@@ -50,6 +51,50 @@ export default function UploadFilesPage() {
       return [...prev, ...added];
     });
   }, []);
+
+  // ── Ownership guard ──────────────────────────────────────────────────────
+  // Only the repository owner may access the web upload UI.
+  // This mirrors the backend ADMIN permission check on POST /{owner}/{repo}/git/upload.
+  const isOwner = user !== null && user.username === owner;
+  const repoBase = `/${owner}/${repoName}`;
+
+  if (!isOwner) {
+    return (
+      <main style={styles.root}>
+        <PageHeader owner={owner} repoName={repoName} repoBase={repoBase} />
+        <div style={{ maxWidth: 560, margin: '0 auto', padding: '80px 20px', textAlign: 'center' }}>
+          {/* Lock icon */}
+          <div style={{
+            width: 72, height: 72, borderRadius: '50%',
+            background: 'rgba(248,81,73,0.08)',
+            border: '1px solid rgba(248,81,73,0.3)',
+            display: 'flex', alignItems: 'center', justifyContent: 'center',
+            margin: '0 auto 24px',
+          }}>
+            <svg width="30" height="30" viewBox="0 0 16 16" fill="#f85149">
+              <path d="M4 4a4 4 0 0 1 8 0v2h.25c.966 0 1.75.784 1.75 1.75v5.5A1.75 1.75 0 0 1 12.25 15h-8.5A1.75 1.75 0 0 1 2 13.25v-5.5C2 6.784 2.784 6 3.75 6H4Zm8.25 3.5h-8.5a.25.25 0 0 0-.25.25v5.5c0 .138.112.25.25.25h8.5a.25.25 0 0 0 .25-.25v-5.5a.25.25 0 0 0-.25-.25ZM10.5 4a2.5 2.5 0 0 0-5 0v2h5Z" />
+            </svg>
+          </div>
+          <h1 style={{ fontSize: 20, fontWeight: 700, color: '#e6edf3', margin: '0 0 10px' }}>
+            Access restricted
+          </h1>
+          <p style={{ color: '#7d8590', fontSize: 14, margin: '0 0 28px', lineHeight: 1.6 }}>
+            Only the repository owner can upload files through the web interface.
+            {user
+              ? ' You are not the owner of this repository.'
+              : ' Please sign in as the repository owner to continue.'}
+          </p>
+          <div style={{ display: 'flex', gap: 10, justifyContent: 'center', flexWrap: 'wrap' }}>
+            {!user && (
+              <a href="/login" style={styles.btnPrimary}>Sign in</a>
+            )}
+            <a href={repoBase} style={styles.btnDefault}>Back to repository</a>
+          </div>
+        </div>
+      </main>
+    );
+  }
+  // ────────────────────────────────────────────────────────────────────────
 
   const handleDrop = (e: React.DragEvent) => {
     e.preventDefault();
@@ -119,9 +164,7 @@ export default function UploadFilesPage() {
     setUploading(false);
   };
 
-  const repoBase = `/${owner}/${repoName}`;
-
-  // â”€â”€ Success screen â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
+  // ── Success screen ─────────────────────────────────────────────────────────
   if (result) {
     return (
       <main style={styles.root}>

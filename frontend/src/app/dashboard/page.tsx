@@ -139,8 +139,11 @@ export default function DashboardPage() {
   if (isEntering) {
     return (
       <div className="fixed inset-0 flex flex-col items-center justify-center bg-[#F8F9FB] dark:bg-[#0f172a] z-[9999] overflow-hidden">
-        <div className="absolute top-[20%] left-[30%] w-[40vw] h-[40vw] bg-blue-500/10 rounded-full blur-[100px] animate-pulse-ring mix-blend-multiply"></div>
-        <div className="absolute bottom-[20%] right-[30%] w-[35vw] h-[35vw] bg-purple-500/10 rounded-full blur-[100px] animate-pulse-ring mix-blend-multiply" style={{ animationDelay: '0.75s' }}></div>
+      {/* Static ambient background — zero GPU cost, same premium look */}
+      <div className="fixed inset-0 pointer-events-none" aria-hidden>
+        <div className="absolute top-[-10%] left-[-5%] w-[45%] h-[45%] rounded-full bg-blue-500/6 blur-[80px]" />
+        <div className="absolute bottom-[-10%] right-[-5%] w-[40%] h-[40%] rounded-full bg-purple-500/6 blur-[80px]" />
+      </div>
         <div className="relative z-10 flex flex-col items-center animate-bounce-in">
           <div className="relative w-24 h-24 mb-8">
             <div className="absolute inset-0 rounded-[28px] bg-gradient-to-br from-[#0A84FF] to-[#6d28d9] shadow-[0_0_40px_rgba(10,132,255,0.4)] animate-spin-slow"></div>
@@ -206,7 +209,7 @@ export default function DashboardPage() {
   )
 
   const renderSidebar = () => (
-    <div className="hidden md:flex w-full md:w-64 flex-col gap-2 shrink-0 animate-fade-in-up">
+    <div className="hidden md:flex w-full md:w-64 flex-col gap-2 shrink-0 motion-blur-right">
       <div className="text-xs font-semibold text-slate-400 uppercase tracking-wider mb-2 pl-3">Menu</div>
       <Button variant="ghost" className="justify-start text-slate-700 font-medium bg-slate-100 dark:bg-slate-800 dark:text-slate-200" onClick={() => router.push('/dashboard')}>
         <LayoutDashboard className="w-4 h-4 mr-2" /> Home
@@ -249,8 +252,8 @@ export default function DashboardPage() {
             key={act.id}
             variant="glass-panel"
             interactive="glow"
-            className="flex flex-row items-center gap-4 p-4 animate-fade-in-up"
-            style={{ animationDelay: `${i * 0.1}s` }}
+            className={`flex flex-row items-center gap-4 p-4 card-motion-blur motion-blur-right-${Math.min(i+1,6)}`}
+            style={{ animationDelay: `${i * 0.08}s` }}
           >
             <div className="p-2 bg-blue-50 dark:bg-blue-900/30 rounded-full text-blue-500 shrink-0">
               <ActivityIcon type={act.type} />
@@ -301,8 +304,8 @@ export default function DashboardPage() {
             key={repo.id}
             variant="default"
             interactive="lift"
-            style={{ animationDelay: `${i * 0.05}s` }}
-            className="animate-fade-in-up p-5"
+            style={{ animationDelay: `${i * 0.06}s` }}
+            className={`card-motion-blur motion-blur-up-${Math.min(i+1,6)} p-5`}
           >
             <div className="flex justify-between items-start mb-2">
               <Link href={`/${repo.owner_username || user?.username}/${repo.name}`} className="font-semibold text-blue-600 hover:underline text-lg truncate">
@@ -328,7 +331,7 @@ export default function DashboardPage() {
   }
 
   const renderWidgets = () => (
-    <div className="w-full md:w-80 flex flex-col gap-6 shrink-0 animate-fade-in-up" style={{ animationDelay: '0.2s' }}>
+    <div className="w-full md:w-80 flex flex-col gap-6 shrink-0 motion-blur-left" style={{ animationDelay: '0.15s' }}>
       <Card variant="glass-card">
         <CardHeader className="pb-3">
           <CardTitle className="text-sm flex items-center justify-between">
@@ -376,8 +379,11 @@ export default function DashboardPage() {
       {renderSlideOutMenu()}
       <DashboardNav onMenuClick={() => setIsMenuOpen(true)} />
 
-      <div className="fixed top-[-20%] left-[-10%] w-[50%] h-[50%] rounded-full bg-blue-400/5 blur-[120px] pointer-events-none" />
-      <div className="fixed bottom-[-20%] right-[-10%] w-[40%] h-[40%] rounded-full bg-purple-400/5 blur-[100px] pointer-events-none" />
+      {/* Ambient gradient background — static, zero GPU cost */}
+      <div className="fixed inset-0 pointer-events-none" aria-hidden>
+        <div className="absolute top-[-10%] left-[-5%] w-[50%] h-[50%] rounded-full bg-blue-400/5 blur-[80px]" />
+        <div className="absolute bottom-[-10%] right-[-5%] w-[40%] h-[40%] rounded-full bg-purple-400/5 blur-[80px]" />
+      </div>
 
       <main className="max-w-7xl mx-auto p-4 md:p-6 lg:p-8 flex flex-col md:flex-row gap-8 relative z-10">
         {renderSidebar()}

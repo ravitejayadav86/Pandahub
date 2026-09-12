@@ -1,7 +1,8 @@
 import type { Metadata, Viewport } from 'next';
 import './globals.css';
 import { ErrorBoundary }  from '@/components/shared/ErrorBoundary';
-import { ToastProvider }  from '@/components/shared/ToastProvider';
+import { ToastProvider } from '@/components/shared/ToastProvider';
+import GlobalLoading from '@/components/GlobalLoading';
 
 export const metadata: Metadata = {
   title: { default: 'PandaHub', template: '%s | PandaHub' },
@@ -33,6 +34,7 @@ export default function RootLayout({ children }: { children: React.ReactNode }) 
         */}
         <ErrorBoundary>
           <ToastProvider>
+            <GlobalLoading />
             {children}
           </ToastProvider>
         </ErrorBoundary>

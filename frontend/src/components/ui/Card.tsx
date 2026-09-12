@@ -16,8 +16,8 @@ const Card = React.forwardRef<HTMLDivElement, CardProps>(
     }
 
     const interactiveClasses = {
-      lift: "card-lift cursor-pointer",
-      glow: "card-glow cursor-pointer",
+      lift: "card-lift card-motion-blur cursor-pointer",
+      glow: "card-glow card-motion-blur cursor-pointer",
       none: "",
     }
 

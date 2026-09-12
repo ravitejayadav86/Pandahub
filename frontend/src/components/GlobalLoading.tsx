@@ -2,21 +2,25 @@
 
 import { useEffect, useState } from 'react';
 import { usePathname } from 'next/navigation';
+import PandaLoader from '@/components/ui/PandaLoader';
 
 /**
- * GlobalLoading — App Router compatible route-change indicator.
+ * GlobalLoading — Single, unified, ultra-premium route change indicator.
  *
- * next/router events don't exist in the App Router; instead we watch
- * usePathname() for changes and briefly show the loading overlay.
+ * Replaces multiple overlapping progress bars, background dimmers, and spinners
+ * with a single signature PandaHub photonic orbital animation.
  */
 export default function GlobalLoading() {
   const pathname = usePathname();
   const [loading, setLoading] = useState(false);
 
   useEffect(() => {
-    // Flash the loader whenever the route changes
+    // Show single loader on route transition
     setLoading(true);
-    const timer = setTimeout(() => setLoading(false), 500);
+    const timer = setTimeout(() => {
+      setLoading(false);
+    }, 450);
+
     return () => clearTimeout(timer);
   }, [pathname]);
 
@@ -24,27 +28,12 @@ export default function GlobalLoading() {
 
   return (
     <div
-      aria-label="Loading"
-      className="fixed inset-x-0 top-0 z-[9999] pointer-events-none"
+      aria-label="Loading page..."
+      className="fixed inset-0 z-[9999] pointer-events-none flex items-center justify-center"
     >
-      {/* Thin progress bar at the top — premium feel, zero layout impact */}
-      <div className="h-[2.5px] w-full bg-gradient-to-r from-[#0A84FF] via-[#7c3aed] to-[#06b6d4] animate-gradient origin-left" />
-
-      {/* Subtle full-screen dimmer with motion blur */}
-      <div className="fixed inset-0 bg-black/5 backdrop-blur-[1px] animate-fade-in-scale" />
-
-      {/* Centered spinner */}
-      <div className="fixed inset-0 flex items-center justify-center">
-        <div className="relative w-12 h-12">
-          {/* Outer ring */}
-          <div className="absolute inset-0 rounded-full border-[2.5px] border-slate-200/40 dark:border-slate-700/40" />
-          {/* Spinning arc */}
-          <div className="absolute inset-0 rounded-full border-[2.5px] border-transparent border-t-[#0A84FF] animate-spin-slow" />
-          {/* Inner glow dot */}
-          <div className="absolute inset-0 flex items-center justify-center">
-            <div className="w-2 h-2 rounded-full bg-[#0A84FF] animate-glow-pulse" />
-          </div>
-        </div>
+      {/* Single floating glass badge containing ONLY the single unified PandaLoader */}
+      <div className="motion-blur-scale flex items-center justify-center p-5 rounded-3xl bg-white/70 dark:bg-slate-900/70 backdrop-blur-md border border-slate-200/50 dark:border-slate-800/60 shadow-[0_20px_50px_rgba(0,0,0,0.18)]">
+        <PandaLoader size="lg" glow={true} />
       </div>
     </div>
   );

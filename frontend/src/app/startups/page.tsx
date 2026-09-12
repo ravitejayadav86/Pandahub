@@ -4,6 +4,7 @@ import Link from 'next/link';
 import { useRouter } from 'next/navigation';
 import api from '@/lib/api';
 import { useAuthStore } from '@/store/authStore';
+import PandaLoader from '@/components/ui/PandaLoader';
 
 interface Startup {
   id: string;
@@ -184,9 +185,8 @@ export default function StartupsPage() {
         </form>
 
         {loading ? (
-          <div style={{ textAlign: 'center', padding: '80px', color: 'var(--text-muted)' }}>
-            <span className="material-symbols-outlined" style={{ fontSize: 40, display: 'block', marginBottom: 12 }}>hourglass_empty</span>
-            Loading startups…
+          <div className="flex justify-center items-center py-24 motion-blur-scale">
+            <PandaLoader size="xl" glow={true} label="Loading startups…" />
           </div>
         ) : error ? (
           <div style={{ textAlign: 'center', padding: '80px', background: 'rgba(239, 68, 68, 0.1)', borderRadius: 24, border: '1px solid rgba(239, 68, 68, 0.3)' }}>
@@ -213,13 +213,12 @@ export default function StartupsPage() {
           </div>
         ) : (
           <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fill, minmax(320px, 1fr))', gap: 24 }}>
-            {startups.map(startup => {
+            {startups.map((startup, i) => {
               const stage = stageInfo(startup.stage);
               return (
-                <div key={startup.id} className="glass-card" style={{
+                <div key={startup.id} className={`glass-card card-motion-blur motion-stagger-${Math.min(i + 1, 8)}`} style={{
                   borderRadius: 20, border: '1px solid var(--glass-border)',
                   boxShadow: 'var(--glass-shadow)', overflow: 'hidden', cursor: 'pointer',
-                  transition: 'transform 0.2s, box-shadow 0.2s',
                 }}
                   onMouseEnter={e => { (e.currentTarget as HTMLElement).style.transform = 'translateY(-4px)'; }}
                   onMouseLeave={e => { (e.currentTarget as HTMLElement).style.transform = 'none'; }}

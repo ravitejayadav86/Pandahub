@@ -1,8 +1,9 @@
-﻿"use client";
+"use client";
 
 import { useEffect } from "react";
 import { useParams, useRouter } from "next/navigation";
 import { useRepo, useBranches } from "@/hooks/useRepo";
+import PandaLoader from "@/components/ui/PandaLoader";
 
 export default function RepoTreeRedirectPage() {
   const params = useParams<{ org: string; repo: string }>();
@@ -53,12 +54,9 @@ export default function RepoTreeRedirectPage() {
 
   if (loading) {
     return (
-      <main className="min-h-screen bg-[#f8f9fb] flex items-center justify-center px-6">
-        <div className="rounded-2xl border border-slate-200 bg-white px-8 py-6 shadow-sm text-center">
-          <div className="mx-auto mb-3 h-8 w-8 animate-spin rounded-full border-2 border-slate-200 border-t-slate-900" />
-          <p className="text-sm font-semibold text-slate-700">
-            Loading repository…
-          </p>
+      <main className="min-h-screen bg-[#f8f9fb] dark:bg-[#0f172a] flex items-center justify-center px-6">
+        <div className="motion-blur-scale rounded-3xl border border-slate-200/60 dark:border-slate-800/60 bg-white/70 dark:bg-slate-900/70 backdrop-blur-md px-10 py-8 shadow-sm text-center">
+          <PandaLoader size="lg" glow={true} label="Loading repository…" />
         </div>
       </main>
     );

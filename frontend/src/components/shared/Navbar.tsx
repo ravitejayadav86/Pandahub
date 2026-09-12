@@ -99,7 +99,7 @@ export default function Navbar() {
 
       {/* Right side */}
       <div style={{ display: 'flex', alignItems: 'center', gap: 8 }}>
-        <Link href="/new" style={{
+        <Link href="/new" className="btn-motion-blur" style={{
           display: 'flex', alignItems: 'center', gap: 4, padding: '7px 14px', borderRadius: 8,
           background: 'linear-gradient(135deg, #0A84FF, #0070e0)',
           color: '#fff', fontSize: 13, fontWeight: 600, textDecoration: 'none',
@@ -108,7 +108,7 @@ export default function Navbar() {
           <span className="material-symbols-outlined" style={{ fontSize: 16 }}>add</span>
           New
         </Link>
-        <Link href="/explore" style={{
+        <Link href="/explore" className="btn-motion-blur" style={{
           display: 'flex', alignItems: 'center', gap: 4, padding: '7px 12px', borderRadius: 8,
           border: '1px solid var(--glass-border)', color: 'var(--text-secondary)',
           background: 'var(--glass-bg-1)',
@@ -118,7 +118,7 @@ export default function Navbar() {
           <span className="material-symbols-outlined" style={{ fontSize: 16 }}>explore</span>
           Explore
         </Link>
-        <Link href="/startups" style={{
+        <Link href="/startups" className="btn-motion-blur" style={{
           display: 'flex', alignItems: 'center', gap: 4, padding: '7px 12px', borderRadius: 8,
           border: '1px solid var(--glass-border)', color: 'var(--text-secondary)',
           background: 'var(--glass-bg-1)',
@@ -131,7 +131,7 @@ export default function Navbar() {
 
         {user ? (
           <div style={{ position: 'relative' }}>
-            <button onClick={() => setProfileOpen(!profileOpen)} style={{
+            <button onClick={() => setProfileOpen(!profileOpen)} className="btn-motion-blur" style={{
               width: 34, height: 34, borderRadius: '50%',
               border: '2px solid var(--glass-border)',
               background: 'var(--glass-bg-3)',

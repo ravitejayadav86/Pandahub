@@ -67,10 +67,10 @@ function RevealOnScroll({ children, className = '', delay = 0 }: {
     <div
       ref={ref}
       style={{ transitionDelay: `${delay}ms` }}
-      className={`transition-all duration-[850ms] ease-[cubic-bezier(0.16,1,0.3,1)] ${
+      className={`transition-all duration-[650ms] ease-[cubic-bezier(0.16,1,0.3,1)] will-change-[opacity,transform,filter] ${
         visible
           ? 'opacity-100 translate-y-0 scale-100 blur-0'
-          : 'opacity-0 translate-y-8 scale-[0.97] blur-[2px]'
+          : 'opacity-0 translate-y-8 scale-[0.98] blur-[12px]'
       } ${className}`}
     >
       {children}
@@ -512,7 +512,7 @@ export default function HomePage() {
       <section className="relative z-10 flex flex-col items-center justify-center text-center min-h-screen px-4 sm:px-6 pt-24 pb-28 md:pb-16 max-w-4xl mx-auto">
 
         {/* Badge pill */}
-        <div className="animate-fade-in-up opacity-0 mb-6" style={{ animationFillMode: 'forwards' }}>
+        <div className="motion-blur-down mb-6">
           <div
             className="inline-flex items-center gap-2 px-4 py-1.5 rounded-full text-xs font-bold tracking-widest uppercase"
             style={{
@@ -535,7 +535,7 @@ export default function HomePage() {
 
         {/* Headline */}
         <h1
-          className="animate-fade-in-up-delay text-[clamp(2.2rem,8vw,5rem)] font-black tracking-tighter leading-[1.05] mb-5"
+          className="motion-blur-hero text-[clamp(2.2rem,8vw,5rem)] font-black tracking-tighter leading-[1.05] mb-5"
           style={{ color: 'var(--text-primary)', fontFamily: 'Space Grotesk, Inter, sans-serif' }}
         >
           Code hosting for the
@@ -551,17 +551,17 @@ export default function HomePage() {
 
         {/* Subtitle */}
         <p
-          className="animate-fade-in-up-delay-2 text-lg md:text-xl mb-10 max-w-xl font-medium leading-relaxed"
+          className="motion-stagger-2 text-lg md:text-xl mb-10 max-w-xl font-medium leading-relaxed"
           style={{ color: 'var(--text-secondary)' }}
         >
           Collaborate, build, and ship with PandaHub. The definitive platform for modern developer teams.
         </p>
 
         {/* CTA Buttons — Skeuomorphic + Glass */}
-        <div className="animate-fade-in-up-delay-3 flex flex-col sm:flex-row gap-4 w-full sm:w-auto">
+        <div className="motion-stagger-3 flex flex-col sm:flex-row gap-4 w-full sm:w-auto">
           <a
             href="/login"
-            className="btn-glass border btn-ripple px-8 py-4 rounded-2xl font-bold text-base tracking-wide w-full sm:w-auto flex items-center justify-center gap-2 group min-h-[52px]"
+            className="btn-glass border btn-ripple btn-motion-blur px-8 py-4 rounded-2xl font-bold text-base tracking-wide w-full sm:w-auto flex items-center justify-center gap-2 group min-h-[52px]"
           >
             Get Started Free
             <span className="material-symbols-outlined transition-transform duration-300 group-hover:translate-x-1.5" style={{ fontSize: 20 }}>
@@ -569,7 +569,7 @@ export default function HomePage() {
             </span>
           </a>
           <button
-            className="btn-glass btn-ripple px-8 py-4 rounded-2xl font-bold text-base tracking-wide w-full sm:w-auto flex items-center justify-center gap-2 min-h-[52px]"
+            className="btn-glass btn-ripple btn-motion-blur px-8 py-4 rounded-2xl font-bold text-base tracking-wide w-full sm:w-auto flex items-center justify-center gap-2 min-h-[52px]"
             style={{ color: 'var(--text-primary)' }}
           >
             <span className="material-symbols-outlined" style={{ fontSize: 20 }}>terminal</span>
@@ -579,7 +579,7 @@ export default function HomePage() {
 
         {/* Stats row — floating Spatial layer */}
         <div
-          className="animate-fade-in-up mt-14 w-full max-w-lg rounded-3xl p-6 grid grid-cols-3 gap-4"
+          className="motion-stagger-4 card-motion-blur mt-14 w-full max-w-lg rounded-3xl p-6 grid grid-cols-3 gap-4"
           style={{
             background: 'var(--glass-bg-3)',
             backdropFilter: 'blur(20px) saturate(1.8)',

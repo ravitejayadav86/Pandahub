@@ -47,7 +47,7 @@ export default function ActivityFeedCard({ activity }: { activity: ActivityEvent
     );
 
   return (
-    <Card variant="glass-card" interactive="lift" className="p-4">
+    <Card variant="glass-card" interactive="lift" className="p-4 card-motion-blur">
       <CardHeader className="pb-2">
         <div className="flex items-center space-x-3">
           <div className="p-2 bg-blue-50 dark:bg-blue-900/30 rounded-full text-blue-500">

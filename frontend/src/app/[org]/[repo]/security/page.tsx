@@ -5,6 +5,7 @@ import { useParams } from "next/navigation";
 import Link from "next/link";
 import api from '@/lib/api';
 import { useAuthStore } from '@/store/authStore';
+import PandaLoader from '@/components/ui/PandaLoader';
 
 interface SecurityAlert {
   id: string;
@@ -134,8 +135,8 @@ export default function SecurityPage() {
         )}
 
         {loading ? (
-          <div className="flex justify-center items-center h-40">
-            <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-blue-500"></div>
+          <div className="flex justify-center items-center py-12 motion-blur-scale">
+            <PandaLoader size="lg" glow={true} label="Scanning security alerts..." />
           </div>
         ) : alerts.length === 0 ? (
           <div className="glass-card rounded-2xl border border-[var(--glass-border)] p-12 text-center shadow-sm">

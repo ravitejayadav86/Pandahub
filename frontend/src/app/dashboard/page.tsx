@@ -14,6 +14,7 @@ import { Badge } from '@/components/ui/Badge'
 import { useAuthStore } from '@/store/authStore'
 import api from '@/lib/api'
 import { Repository } from '@/types'
+import PandaLoader from '@/components/ui/PandaLoader'
 
 // Activity event shape returned by GET /auth/me/activity
 interface ActivityEvent {
@@ -139,26 +140,13 @@ export default function DashboardPage() {
   if (isEntering) {
     return (
       <div className="fixed inset-0 flex flex-col items-center justify-center bg-[#F8F9FB] dark:bg-[#0f172a] z-[9999] overflow-hidden">
-      {/* Static ambient background — zero GPU cost, same premium look */}
-      <div className="fixed inset-0 pointer-events-none" aria-hidden>
-        <div className="absolute top-[-10%] left-[-5%] w-[45%] h-[45%] rounded-full bg-blue-500/6 blur-[80px]" />
-        <div className="absolute bottom-[-10%] right-[-5%] w-[40%] h-[40%] rounded-full bg-purple-500/6 blur-[80px]" />
-      </div>
-        <div className="relative z-10 flex flex-col items-center animate-bounce-in">
-          <div className="relative w-24 h-24 mb-8">
-            <div className="absolute inset-0 rounded-[28px] bg-gradient-to-br from-[#0A84FF] to-[#6d28d9] shadow-[0_0_40px_rgba(10,132,255,0.4)] animate-spin-slow"></div>
-            <div className="absolute inset-1 rounded-[24px] bg-white dark:bg-slate-900 flex items-center justify-center">
-              <span className="text-4xl">🐼</span>
-            </div>
-            <div className="absolute -inset-4 border border-[#0A84FF]/30 rounded-[36px] animate-[spin_3s_linear_infinite]">
-              <div className="absolute top-0 left-1/2 w-2 h-2 bg-[#0A84FF] rounded-full -translate-x-1/2 -translate-y-1/2 shadow-[0_0_10px_#0A84FF]"></div>
-            </div>
-          </div>
-          <h1 className="text-2xl font-bold tracking-tight text-slate-900 dark:text-white mb-2 font-display">PandaHub</h1>
-          <div className="flex items-center gap-2 text-slate-500 font-medium text-sm">
-            <div className="w-4 h-4 border-2 border-slate-300 border-t-[#0A84FF] rounded-full animate-spin"></div>
-            Initializing Workspace...
-          </div>
+        {/* Static ambient background — zero GPU cost, same premium look */}
+        <div className="fixed inset-0 pointer-events-none" aria-hidden>
+          <div className="absolute top-[-10%] left-[-5%] w-[45%] h-[45%] rounded-full bg-blue-500/6 blur-[80px]" />
+          <div className="absolute bottom-[-10%] right-[-5%] w-[40%] h-[40%] rounded-full bg-purple-500/6 blur-[80px]" />
+        </div>
+        <div className="relative z-10 flex flex-col items-center motion-blur-scale p-8 rounded-3xl bg-white/60 dark:bg-slate-900/60 backdrop-blur-md border border-slate-200/50 dark:border-slate-800/60 shadow-[0_24px_60px_rgba(0,0,0,0.12)]">
+          <PandaLoader size="xl" glow={true} label="Initializing Workspace..." />
         </div>
       </div>
     )
@@ -229,16 +217,14 @@ export default function DashboardPage() {
   const renderActivityFeed = () => {
     if (activityLoading) {
       return (
-        <div className="space-y-4">
-          {[1, 2, 3].map(i => (
-            <div key={i} className="h-20 bg-slate-100 dark:bg-slate-800 rounded-xl animate-pulse" />
-          ))}
+        <div className="flex flex-col items-center justify-center py-16">
+          <PandaLoader size="md" glow={true} label="Loading activity..." />
         </div>
       )
     }
     if (activity.length === 0) {
       return (
-        <div className="flex flex-col items-center justify-center py-16 text-center">
+        <div className="flex flex-col items-center justify-center py-16 text-center motion-blur-zoom-in">
           <Clock className="w-12 h-12 text-slate-300 mb-4" />
           <h3 className="font-semibold text-slate-700 dark:text-slate-200 mb-1">No recent activity</h3>
           <p className="text-sm text-slate-500">Push code, open issues, or create pull requests to see your activity here.</p>
@@ -252,8 +238,7 @@ export default function DashboardPage() {
             key={act.id}
             variant="glass-panel"
             interactive="glow"
-            className={`flex flex-row items-center gap-4 p-4 card-motion-blur motion-blur-right-${Math.min(i+1,6)}`}
-            style={{ animationDelay: `${i * 0.08}s` }}
+            className={`flex flex-row items-center gap-4 p-4 card-motion-blur motion-stagger-${Math.min(i+1, 8)}`}
           >
             <div className="p-2 bg-blue-50 dark:bg-blue-900/30 rounded-full text-blue-500 shrink-0">
               <ActivityIcon type={act.type} />
@@ -278,16 +263,14 @@ export default function DashboardPage() {
   const renderRepos = () => {
     if (reposLoading) {
       return (
-        <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
-          {[1, 2, 3, 4].map(i => (
-            <div key={i} className="h-32 bg-slate-100 dark:bg-slate-800 rounded-xl animate-pulse" />
-          ))}
+        <div className="flex flex-col items-center justify-center py-16">
+          <PandaLoader size="md" glow={true} label="Loading repositories..." />
         </div>
       )
     }
     if (repos.length === 0) {
       return (
-        <div className="flex flex-col items-center justify-center py-16 text-center">
+        <div className="flex flex-col items-center justify-center py-16 text-center motion-blur-zoom-in">
           <Bookmark className="w-12 h-12 text-slate-300 mb-4" />
           <h3 className="font-semibold text-slate-700 dark:text-slate-200 mb-1">No repositories yet</h3>
           <p className="text-sm text-slate-500 mb-4">Create your first repository to get started.</p>
@@ -298,14 +281,13 @@ export default function DashboardPage() {
       )
     }
     return (
-      <div className="grid grid-cols-1 sm:grid-cols-2 gap-4 animate-fade-in-up">
+      <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
         {repos.map((repo, i) => (
           <Card
             key={repo.id}
             variant="default"
             interactive="lift"
-            style={{ animationDelay: `${i * 0.06}s` }}
-            className={`card-motion-blur motion-blur-up-${Math.min(i+1,6)} p-5`}
+            className={`card-motion-blur motion-stagger-${Math.min(i+1, 8)} p-5`}
           >
             <div className="flex justify-between items-start mb-2">
               <Link href={`/${repo.owner_username || user?.username}/${repo.name}`} className="font-semibold text-blue-600 hover:underline text-lg truncate">
@@ -390,30 +372,30 @@ export default function DashboardPage() {
 
         <div className="flex-1 flex flex-col min-w-0">
           <div className="flex items-center justify-between mb-6">
-            <h1 className="text-2xl font-bold tracking-tight text-slate-900 dark:text-white">Dashboard</h1>
+            <h1 className="text-2xl font-bold tracking-tight text-slate-900 dark:text-white motion-blur-hero">Dashboard</h1>
             <Button variant="primary" className="h-9 text-sm" onClick={() => window.location.href = '/new'}>
               <Plus className="w-4 h-4 mr-1" /> New Repository
             </Button>
           </div>
 
-          <div className="mb-6 animate-fade-in-up">
+          <div className="mb-6 motion-blur-up">
             <div className="overflow-x-auto pb-1 -mx-1 px-1">
               <div className="flex items-center gap-3 mb-4" style={{ minWidth: 'max-content' }}>
                 <button
                   onClick={() => router.push(repos[0] ? `/${user?.username}/${repos[0].name}/issues` : '/new')}
-                  className="px-4 py-2 rounded-full bg-white dark:bg-slate-800 border border-slate-200 dark:border-slate-700 shadow-sm text-sm font-medium flex items-center gap-2 hover:bg-slate-50 transition-all text-slate-700 dark:text-slate-200 whitespace-nowrap"
+                  className="px-4 py-2 rounded-full bg-white dark:bg-slate-800 border border-slate-200 dark:border-slate-700 shadow-sm text-sm font-medium flex items-center gap-2 hover:bg-slate-50 transition-all text-slate-700 dark:text-slate-200 whitespace-nowrap btn-motion-blur"
                 >
                   <CircleDot className="w-4 h-4 text-red-500" /> Create issue
                 </button>
                 <button
                   onClick={() => router.push(repos[0] ? `/${user?.username}/${repos[0].name}/pulls` : '/new')}
-                  className="px-4 py-2 rounded-full bg-white dark:bg-slate-800 border border-slate-200 dark:border-slate-700 shadow-sm text-sm font-medium flex items-center gap-2 hover:bg-slate-50 transition-all text-slate-700 dark:text-slate-200 whitespace-nowrap"
+                  className="px-4 py-2 rounded-full bg-white dark:bg-slate-800 border border-slate-200 dark:border-slate-700 shadow-sm text-sm font-medium flex items-center gap-2 hover:bg-slate-50 transition-all text-slate-700 dark:text-slate-200 whitespace-nowrap btn-motion-blur"
                 >
                   <GitMerge className="w-4 h-4 text-green-500" /> Pull requests
                 </button>
                 <button
                   onClick={() => router.push('/new')}
-                  className="px-4 py-2 rounded-full bg-white dark:bg-slate-800 border border-slate-200 dark:border-slate-700 shadow-sm text-sm font-medium flex items-center gap-2 hover:bg-slate-50 transition-all text-slate-700 dark:text-slate-200 whitespace-nowrap"
+                  className="px-4 py-2 rounded-full bg-white dark:bg-slate-800 border border-slate-200 dark:border-slate-700 shadow-sm text-sm font-medium flex items-center gap-2 hover:bg-slate-50 transition-all text-slate-700 dark:text-slate-200 whitespace-nowrap btn-motion-blur"
                 >
                   <Plus className="w-4 h-4 text-blue-500" /> New repository
                 </button>

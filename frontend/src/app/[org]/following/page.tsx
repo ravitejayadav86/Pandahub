@@ -10,6 +10,7 @@ import {
 } from 'lucide-react'
 import { useAuthStore } from '@/store/authStore'
 import Navbar from '@/components/shared/Navbar'
+import PandaLoader from '@/components/ui/PandaLoader'
 
 // ── Types ──────────────────────────────────────────────────────────────────
 interface UserProfile {
@@ -82,8 +83,8 @@ export default function FollowingPage() {
     return (
       <div className="min-h-screen bg-[var(--bg-primary)] flex flex-col">
         <Navbar />
-        <div className="flex-1 flex items-center justify-center">
-          <div className="w-8 h-8 border-4 border-blue-500 border-t-transparent rounded-full animate-spin" />
+        <div className="flex-1 flex items-center justify-center motion-blur-scale">
+          <PandaLoader size="lg" glow={true} label="Loading following..." />
         </div>
       </div>
     )

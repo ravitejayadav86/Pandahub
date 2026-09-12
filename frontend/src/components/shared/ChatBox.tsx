@@ -49,13 +49,6 @@ export default function ChatBox({ recipientUsername, onClose }: ChatBoxProps) {
     try {
       // 1. Get recipient profile + public key
       const { data: profile } = await api.get(`/auth/users/${recipientUsername}`)
-      
-      if (!profile.public_key) {
-        // Recipient hasn't set up E2EE — show friendly message
-        setChatState('no_recipient_key')
-        return
-      }
-      setTheirPublicKey(profile.public_key)
 
       // 2. Load our private key from IndexedDB, or generate a fresh pair
       let privKey = await loadPrivateKey()
@@ -68,6 +61,14 @@ export default function ChatBox({ recipientUsername, onClose }: ChatBoxProps) {
         await api.post('/messages/keys', { public_key: pubKeyBase64 })
       }
       setOurPrivateKey(privKey)
+
+      
+      if (!profile.public_key) {
+        // Recipient hasn't set up E2EE — show friendly message
+        setChatState('no_recipient_key')
+        return
+      }
+      setTheirPublicKey(profile.public_key)
 
       // 3. Fetch chat history and decrypt
       const { data: history } = await api.get<MessageData[]>(`/messages/${recipientUsername}`)

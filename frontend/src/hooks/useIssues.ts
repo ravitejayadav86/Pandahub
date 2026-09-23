@@ -12,8 +12,8 @@ export function useIssues(owner: string, repoName: string, state: 'open' | 'clos
     setLoading(true);
     setError(null);
     try {
-      const { data } = await api.get<Issue[]>(`/${owner}/${repoName}/issues?state=${filterState}`);
-      setIssues(data);
+      const { data } = await api.get<{ items: Issue[]; total: number }>(`/${owner}/${repoName}/issues?state=${filterState}`);
+      setIssues(data.items);
     } catch (e: any) {
       setError(e?.response?.data?.detail ?? 'Failed to load issues');
     } finally {

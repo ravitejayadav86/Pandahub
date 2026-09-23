@@ -28,8 +28,8 @@ export function usePulls(owner: string, repoName: string, state: 'open' | 'close
     setLoading(true);
     setError(null);
     try {
-      const { data } = await api.get<PullRequest[]>(`/${owner}/${repoName}/pulls?state=${filterState}`);
-      setPulls(data);
+      const { data } = await api.get<{ items: PullRequest[]; total: number }>(`/${owner}/${repoName}/pulls?state=${filterState}`);
+      setPulls(data.items);
     } catch (e: any) {
       setError(e?.response?.data?.detail ?? 'Failed to load pull requests');
     } finally {

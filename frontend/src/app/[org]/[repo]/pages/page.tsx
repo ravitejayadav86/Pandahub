@@ -197,8 +197,8 @@ export default function PagesSettingsPage() {
     <div className="min-h-screen bg-[#0d1117] text-slate-100 antialiased">
       {/* ── Background gradient ── */}
       <div className="fixed inset-0 pointer-events-none">
-        <div className="absolute top-0 left-1/4 w-96 h-96 bg-violet-600/10 rounded-full blur-3xl" />
-        <div className="absolute bottom-0 right-1/4 w-96 h-96 bg-blue-600/10 rounded-full blur-3xl" />
+        <div className="absolute top-0 left-1/4 w-96 h-96 bg-violet-600/10 rounded-full" />
+        <div className="absolute bottom-0 right-1/4 w-96 h-96 bg-blue-600/10 rounded-full" />
       </div>
 
       <div className="relative max-w-3xl mx-auto px-4 py-10">
@@ -245,7 +245,7 @@ export default function PagesSettingsPage() {
 
         {/* ── Status card (only when Pages is enabled) ── */}
         {pages && statusInfo && (
-          <div className="mb-6 rounded-2xl border border-white/8 bg-white/4 backdrop-blur-sm overflow-hidden">
+          <div className="mb-6 rounded-2xl border border-white/8 bg-white/4 overflow-hidden">
             <div className="px-6 py-5 flex items-start justify-between">
               <div className="flex items-start gap-4">
                 {/* Animated status indicator */}
@@ -317,7 +317,7 @@ export default function PagesSettingsPage() {
         )}
 
         {/* ── Configuration card ── */}
-        <div className="rounded-2xl border border-white/8 bg-white/4 backdrop-blur-sm overflow-hidden">
+        <div className="rounded-2xl border border-white/8 bg-white/4 overflow-hidden">
           <div className="px-6 py-5 border-b border-white/6">
             <h2 className="font-semibold text-white">
               {pages ? 'Source Configuration' : 'Enable PandaHub Pages'}

@@ -1,4 +1,4 @@
-"use client";
+﻿"use client";
 
 export default function GeneratedPage() {
   return (
@@ -15,9 +15,9 @@ export default function GeneratedPage() {
 </header>
 
 <div className="fixed inset-0 z-0 overflow-hidden pointer-events-none">
-<div className="absolute top-1/4 left-1/4 w-[500px] h-[500px] rounded-full bg-primary-container/20 blur-[120px] mix-blend-screen orb-1"></div>
-<div className="absolute bottom-1/4 right-1/4 w-[600px] h-[600px] rounded-full bg-secondary-container/20 blur-[150px] mix-blend-screen orb-2"></div>
-<div className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-[400px] h-[400px] rounded-full bg-tertiary-container/10 blur-[100px] mix-blend-screen orb-3"></div>
+<div className="absolute top-1/4 left-1/4 w-[500px] h-[500px] rounded-full bg-primary-container/20 -[120px] mix-blend-screen orb-1"></div>
+<div className="absolute bottom-1/4 right-1/4 w-[600px] h-[600px] rounded-full bg-secondary-container/20 -[150px] mix-blend-screen orb-2"></div>
+<div className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-[400px] h-[400px] rounded-full bg-tertiary-container/10 -[100px] mix-blend-screen orb-3"></div>
 </div>
 
 <main className="relative z-10 flex items-center justify-center min-h-screen px-4 py-24">
@@ -26,7 +26,7 @@ export default function GeneratedPage() {
 
 <div className="flex border-b border-white/10 w-full relative">
 
-<div className="absolute bottom-0 left-0 w-1/2 h-[2px] bg-[#0A84FF] shadow-[0_-2px_10px_rgba(10,132,255,0.5)] transition-transform duration-300 ease-out" id="tabIndicator"></div>
+<div className="absolute bottom-0 left-0 w-1/2 h-[2px] bg-[#E6E6E6] shadow-[0_-2px_10px_rgba(10,132,255,0.5)] transition-transform duration-300 ease-out" id="tabIndicator"></div>
 <button className="flex-1 py-5 text-sm font-semibold tracking-wide text-on-surface transition-colors duration-300" id="tabSignIn" onClick={() => {}} data-onclick="switchTab(0)">
                     Sign In
                 </button>
@@ -59,13 +59,13 @@ export default function GeneratedPage() {
 <div className="absolute inset-y-0 left-0 pl-4 flex items-center pointer-events-none text-outline">
 <span className="material-symbols-outlined text-[20px]">lock</span>
 </div>
-<input className="block w-full pl-11 pr-10 py-3.5 bg-surface-container-low/50 input-glass border-outline-variant/30 rounded-xl text-on-surface placeholder:text-outline focus:ring-0 sm:text-sm glow-accent-focus" id="password" placeholder="••••••••" type="password"/>
+<input className="block w-full pl-11 pr-10 py-3.5 bg-surface-container-low/50 input-glass border-outline-variant/30 rounded-xl text-on-surface placeholder:text-outline focus:ring-0 sm:text-sm glow-accent-focus" id="password" placeholder="â€¢â€¢â€¢â€¢â€¢â€¢â€¢â€¢" type="password"/>
 <button className="absolute inset-y-0 right-0 pr-4 flex items-center text-outline hover:text-on-surface transition-colors" type="button">
 <span className="material-symbols-outlined text-[20px]">visibility_off</span>
 </button>
 </div>
 </div>
-<button className="w-full flex justify-center py-4 px-4 border border-transparent rounded-xl shadow-sm text-sm font-bold text-white bg-[#0A84FF] hover:bg-blue-500 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-[#0A84FF] focus:ring-offset-background transition-all duration-200 active:scale-[0.98] glow-accent mt-8" type="submit">
+<button className="w-full flex justify-center py-4 px-4 border border-transparent rounded-xl shadow-sm text-sm font-bold text-white bg-[#E6E6E6] hover:bg-blue-500 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-[#E6E6E6] focus:ring-offset-background transition-all duration-200 active:scale-[0.98] glow-accent mt-8" type="submit">
                         Sign In
                     </button>
 </form>
@@ -75,7 +75,7 @@ export default function GeneratedPage() {
 <div className="w-full border-t border-white/10"></div>
 </div>
 <div className="relative flex justify-center text-xs">
-<span className="px-3 bg-transparent text-outline font-label backdrop-blur-sm">Or continue with</span>
+<span className="px-3 bg-transparent text-outline font-label">Or continue with</span>
 </div>
 </div>
 <div className="mt-6 grid grid-cols-2 gap-4">
@@ -102,3 +102,4 @@ export default function GeneratedPage() {
     </main>
   );
 }
+

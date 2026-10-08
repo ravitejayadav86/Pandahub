@@ -19,10 +19,10 @@ const Button = React.forwardRef<HTMLButtonElement, ButtonProps>(
     // Maps variant to the specific CSS classes defined in globals.css
     const variantClasses = {
       primary: "btn-primary px-4 py-2",
-      glass: "btn-glass px-4 py-2",
-      danger: "btn-danger px-4 py-2",
-      icon: "btn-icon w-10 h-10",
-      ghost: "hover:bg-slate-100 dark:hover:bg-slate-800 px-4 py-2 rounded-lg transition-colors",
+      glass:   "btn-glass px-4 py-2",
+      danger:  "btn-danger px-4 py-2",
+      icon:    "btn-icon w-10 h-10",
+      ghost:   "btn-ghost px-4 py-2",
     }
 
     // Ripple click handler
@@ -42,7 +42,7 @@ const Button = React.forwardRef<HTMLButtonElement, ButtonProps>(
         disabled={disabled || loading}
         onClick={ripple ? handleRipple : props.onClick}
         className={cn(
-          "inline-flex items-center justify-center gap-2 outline-none disabled:opacity-50 disabled:pointer-events-none cursor-pointer btn-motion-blur",
+          "inline-flex items-center justify-center gap-2 outline-none disabled:opacity-50 disabled:pointer-events-none cursor-pointer btn-motion-",
           variantClasses[variant],
           ripple && "btn-ripple",
           className

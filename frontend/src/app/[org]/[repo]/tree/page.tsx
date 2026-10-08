@@ -55,7 +55,7 @@ export default function RepoTreeRedirectPage() {
   if (loading) {
     return (
       <main className="min-h-screen bg-[#f8f9fb] dark:bg-[#0f172a] flex items-center justify-center px-6">
-        <div className="motion-blur-scale rounded-3xl border border-slate-200/60 dark:border-slate-800/60 bg-white/70 dark:bg-slate-900/70 backdrop-blur-md px-10 py-8 shadow-sm text-center">
+        <div className="motion- rounded-3xl border border-slate-200/60 dark:border-slate-800/60 bg-white/70 dark:bg-slate-900/70 px-10 py-8 shadow-sm text-center">
           <PandaLoader size="lg" glow={true} label="Loading repository…" />
         </div>
       </main>

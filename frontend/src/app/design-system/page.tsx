@@ -57,7 +57,7 @@ export default function DesignSystemPage() {
             </CardHeader>
             <CardContent>
               <p className="text-sm text-slate-500 mb-4">
-                Lighter blur, and glows with the primary color when you hover over it.
+                Lighter , and glows with the primary color when you hover over it.
               </p>
               <div className="space-y-2">
                 <Skeleton className="w-full h-4" />

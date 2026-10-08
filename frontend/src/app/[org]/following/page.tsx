@@ -83,7 +83,7 @@ export default function FollowingPage() {
     return (
       <div className="min-h-screen bg-[var(--bg-primary)] flex flex-col">
         <Navbar />
-        <div className="flex-1 flex items-center justify-center motion-blur-scale">
+        <div className="flex-1 flex items-center justify-center motion-">
           <PandaLoader size="lg" glow={true} label="Loading following..." />
         </div>
       </div>
@@ -131,7 +131,7 @@ export default function FollowingPage() {
       <Navbar />
       
       {/* ── Sticky Tab Bar ── */}
-      <div className="sticky top-[60px] z-40 bg-[var(--glass-bg-4)] backdrop-blur-xl border-b border-[var(--glass-border)] mt-4">
+      <div className="sticky top-[60px] z-40 bg-[var(--glass-bg-4)] border-b border-[var(--glass-border)] mt-4">
         <div className="max-w-[1280px] w-full mx-auto px-4 md:px-8 flex items-end">
           <div className="hidden md:block w-[296px] shrink-0 mr-6" />
           <nav className="flex gap-2 overflow-x-auto no-scrollbar">
@@ -163,7 +163,7 @@ export default function FollowingPage() {
         
         {/* ── Left Sidebar ── */}
         <div className="w-full md:w-[296px] shrink-0 -mt-10 md:mt-0 relative z-10">
-          <div className="relative w-full max-w-[296px] aspect-square rounded-full border border-[var(--glass-border)] overflow-hidden bg-[var(--glass-bg-3)] backdrop-blur-xl mb-4 shadow-xl z-10">
+          <div className="relative w-full max-w-[296px] aspect-square rounded-full border border-[var(--glass-border)] overflow-hidden bg-[var(--glass-bg-3)] mb-4 shadow-xl z-10">
             {profile.avatar_url ? (
               <img src={profile.avatar_url} alt={profile.username} className="w-full h-full object-cover" />
             ) : (
@@ -191,7 +191,7 @@ export default function FollowingPage() {
               Edit profile
             </Link>
           ) : (
-            <button className="block w-full py-2 text-center text-sm font-semibold text-white bg-gradient-to-r from-blue-600 to-indigo-600 hover:from-blue-700 hover:to-indigo-700 rounded-xl mb-4 transition-all shadow-lg shadow-blue-500/20">
+            <button className="block w-full py-2 text-center text-sm font-bold text-black bg-white hover:bg-zinc-200 rounded-xl mb-4 transition-all shadow-md">
               Follow
             </button>
           )}

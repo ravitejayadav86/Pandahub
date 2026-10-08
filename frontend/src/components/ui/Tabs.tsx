@@ -18,7 +18,7 @@ export function Tabs({ tabs, defaultTab, className }: TabsProps) {
 
   return (
     <div className={cn("flex flex-col w-full", className)}>
-      <div className="flex items-center gap-6 border-b border-slate-200 dark:border-slate-800">
+      <div className="flex items-center gap-6 border-b border-[#27272a]">
         {tabs.map((tab) => {
           const isActive = activeTab === tab.id
           return (

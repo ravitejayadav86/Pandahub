@@ -43,7 +43,7 @@ export default function ExplorePage() {
       {/* Header */}
       <div style={{
         background: 'var(--glass-bg-3)',
-        backdropFilter: 'blur(20px)',
+        backdropFilter: '(20px)',
         borderBottom: '1px solid var(--glass-border)',
         padding: '40px 0 32px',
         position: 'relative', overflow: 'hidden',
@@ -62,7 +62,7 @@ export default function ExplorePage() {
           <form onSubmit={handleSearch} style={{ display: 'flex', gap: 10, maxWidth: 560 }}>
             <input
               type="text"
-              placeholder="Search repositories and users…"
+              placeholder="Search repositories and usersâ€¦"
               value={query}
               onChange={(e) => setQuery(e.target.value)}
               className="glass-input"
@@ -74,9 +74,9 @@ export default function ExplorePage() {
             />
             <button type="submit" style={{
               padding: '12px 24px', borderRadius: 14,
-              background: 'linear-gradient(135deg, #2563eb, #4f46e5)',
-              color: '#fff', fontWeight: 600, border: 'none', cursor: 'pointer',
-              boxShadow: '0 4px 14px rgba(37,99,235,0.3)',
+              background: '#ffffff',
+              color: '#000000', fontWeight: 700, border: '1px solid #ffffff', cursor: 'pointer',
+              boxShadow: '0 4px 14px rgba(255,255,255,0.18)',
             }}>
               Search
             </button>
@@ -95,9 +95,9 @@ export default function ExplorePage() {
               style={{
                 padding: '6px 16px', borderRadius: 999, border: '1px solid var(--glass-border)',
                 background: sort === s ? 'var(--glass-bg-4)' : 'var(--glass-bg-2)',
-                color: sort === s ? '#3b82f6' : 'var(--text-secondary)',
+                color: sort === s ? '#C8C8C8' : 'var(--text-secondary)',
                 fontWeight: sort === s ? 600 : 500,
-                backdropFilter: 'blur(10px)',
+                backdropFilter: '(10px)',
                 cursor: 'pointer', fontSize: 13, transition: 'all 0.15s ease',
               }}
             >
@@ -117,7 +117,7 @@ export default function ExplorePage() {
           </div>
         ) : (repos.length === 0 && users.length === 0) ? (
           <div style={{ textAlign: 'center', padding: '80px', color: 'var(--text-secondary)' }}>
-            <div style={{ fontSize: 48, marginBottom: 12 }}>🔍</div>
+            <div style={{ fontSize: 48, marginBottom: 12 }}>ðŸ”</div>
             <p>No repositories or users found. Try a different search.</p>
           </div>
         ) : (
@@ -173,7 +173,7 @@ function ExploreUserCard({ user }: { user: Partial<User> }) {
     >
       <div style={{
         width: 48, height: 48, borderRadius: '50%',
-        background: 'linear-gradient(135deg, #3b82f6, #8b5cf6)',
+        background: 'linear-gradient(135deg, #C8C8C8, #A8A8A8)',
         display: 'flex', alignItems: 'center', justifyContent: 'center',
         fontSize: 18, fontWeight: 700, color: '#fff', flexShrink: 0,
         overflow: 'hidden', border: '1px solid var(--glass-border)',
@@ -214,7 +214,7 @@ function ExploreRepoCard({ repo }: { repo: Repository }) {
       <div style={{ display: 'flex', alignItems: 'center', gap: 10, marginBottom: 8 }}>
         <div style={{
           width: 28, height: 28, borderRadius: '50%',
-          background: 'linear-gradient(135deg, #3b82f6, #8b5cf6)',
+          background: 'linear-gradient(135deg, #C8C8C8, #A8A8A8)',
           display: 'flex', alignItems: 'center', justifyContent: 'center',
           fontSize: 13, fontWeight: 700, color: '#fff', flexShrink: 0,
         }}>
@@ -235,8 +235,8 @@ function ExploreRepoCard({ repo }: { repo: Repository }) {
         </p>
       )}
       <div style={{ display: 'flex', gap: 16, fontSize: 12, color: 'var(--text-muted)' }}>
-        <span>⭐ {repo.star_count}</span>
-        <span>🔀 {repo.fork_count}</span>
+        <span>â­ {repo.star_count}</span>
+        <span>ðŸ”€ {repo.fork_count}</span>
         <span style={{ marginLeft: 'auto' }}>
           {new Date(repo.updated_at).toLocaleDateString()}
         </span>
@@ -244,3 +244,4 @@ function ExploreRepoCard({ repo }: { repo: Repository }) {
     </Link>
   );
 }
+

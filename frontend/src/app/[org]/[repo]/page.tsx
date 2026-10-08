@@ -528,13 +528,13 @@ export default function RepoDashboardPage() {
     <div className="min-h-screen bg-[var(--bg-primary)] text-[var(--text-primary)] font-sans">
       <div className="flex min-h-screen">
         {/* Sidebar */}
-        <aside className="hidden md:flex w-[260px] shrink-0 flex-col border-r border-[var(--glass-border)] bg-[var(--glass-bg-3)] backdrop-blur-xl sticky top-0 h-screen">
+        <aside className="hidden md:flex w-[260px] shrink-0 flex-col border-r border-[var(--glass-border)] bg-[var(--glass-bg-3)] sticky top-0 h-screen">
           <div className="h-[72px] border-b border-[var(--glass-border)] px-6 flex items-center">
             <Link
               href="/dashboard"
               className="flex items-center gap-3 no-underline"
             >
-              <div className="w-10 h-10 rounded-xl bg-gradient-to-br from-blue-600 to-indigo-600 flex items-center justify-center shadow-lg shadow-blue-500/20">
+              <div className="w-10 h-10 rounded-xl bg-[#18181b] border border-[#333333] flex items-center justify-center shadow-md">
                 <span className="material-symbols-outlined text-white">
                   public
                 </span>
@@ -554,7 +554,7 @@ export default function RepoDashboardPage() {
           <div className="p-5">
             <Link
               href="/new"
-              className="w-full h-10 rounded-xl bg-gradient-to-r from-blue-600 to-indigo-600 hover:from-blue-700 hover:to-indigo-700 text-white flex items-center justify-center gap-2 text-sm font-semibold no-underline transition-all shadow-lg shadow-blue-500/20"
+              className="w-full h-10 rounded-xl bg-white hover:bg-zinc-200 text-black flex items-center justify-center gap-2 text-sm font-bold no-underline transition-all shadow-md"
             >
               <span className="material-symbols-outlined text-[18px]">
                 add
@@ -674,7 +674,7 @@ export default function RepoDashboardPage() {
         {/* Main */}
         <main className="flex-1 min-w-0">
           {/* Header */}
-          <header className="sticky top-0 z-40 border-b border-[var(--glass-border)] bg-[var(--glass-bg-4)] backdrop-blur-xl shadow-[var(--glass-shadow)]">
+          <header className="sticky top-0 z-40 border-b border-[var(--glass-border)] bg-[var(--glass-bg-4)] shadow-[var(--glass-shadow)]">
             <div className="min-h-[72px] px-5 lg:px-8 flex items-center justify-between gap-4">
               <div className="min-w-0 flex items-center gap-3">
                 <div className="min-w-0">
@@ -723,7 +723,7 @@ export default function RepoDashboardPage() {
                 <button
                   type="button"
                   onClick={() => setShowDeployModal(true)}
-                  className="h-9 px-3.5 rounded-xl bg-gradient-to-r from-blue-600 to-indigo-600 hover:from-blue-700 hover:to-indigo-700 text-white text-xs sm:text-sm font-semibold flex items-center gap-2 shadow-md shadow-blue-500/20 transition-all"
+                  className="h-9 px-3.5 rounded-xl bg-white hover:bg-zinc-200 text-black text-xs sm:text-sm font-bold flex items-center gap-2 shadow-md transition-all"
                 >
                   <span>🚀</span>
                   <span className="hidden sm:inline">Deploy</span>
@@ -888,7 +888,7 @@ export default function RepoDashboardPage() {
                     <button
                       type="button"
                       onClick={() => handleOpenCreateFile('README.md', `# ${repoName}\n\nWelcome to ${repoName}!`)}
-                      className="h-10 px-4 rounded-xl bg-gradient-to-r from-blue-600 to-indigo-600 hover:from-blue-700 hover:to-indigo-700 text-white font-semibold text-sm flex items-center gap-2 shadow-md shadow-blue-500/20 transition-all cursor-pointer"
+                      className="h-10 px-4 rounded-xl bg-white hover:bg-zinc-200 text-black font-bold text-sm flex items-center gap-2 shadow-md transition-all cursor-pointer"
                     >
                       <span className="material-symbols-outlined text-[18px]">add</span>
                       Create file
@@ -1003,10 +1003,10 @@ export default function RepoDashboardPage() {
             {isEmptyRepository && activeTab !== 'Settings' && (
               <section className="mt-6 space-y-6 animate-fade-in">
                 {/* Get started options banner */}
-                <div className="rounded-3xl border border-blue-500/25 bg-gradient-to-r from-blue-500/10 via-indigo-500/10 to-sky-500/10 backdrop-blur-xl p-6 sm:p-7 shadow-sm">
+                <div className="rounded-3xl border border-white/10 bg-zinc-950/80 p-6 sm:p-7 shadow-sm">
                   <div className="flex flex-col md:flex-row md:items-center justify-between gap-5">
                     <div className="flex items-start sm:items-center gap-4">
-                      <div className="w-12 h-12 rounded-2xl bg-blue-500/20 text-blue-500 border border-blue-500/30 flex items-center justify-center shrink-0 shadow-inner">
+                      <div className="w-12 h-12 rounded-2xl bg-zinc-900 text-white border border-zinc-700 flex items-center justify-center shrink-0 shadow-inner">
                         <span className="material-symbols-outlined text-[26px]">rocket_launch</span>
                       </div>
                       <div>
@@ -1018,7 +1018,7 @@ export default function RepoDashboardPage() {
                           <button
                             type="button"
                             onClick={() => handleOpenCreateFile('README.md', `# ${repoName}\n\nWelcome to ${repoName}!`)}
-                            className="font-bold text-blue-500 hover:text-blue-400 underline cursor-pointer bg-transparent border-none p-0 inline"
+                            className="font-bold text-white hover:underline cursor-pointer bg-transparent border-none p-0 inline"
                           >
                             creating a new file
                           </button>{' '}
@@ -1026,7 +1026,7 @@ export default function RepoDashboardPage() {
                           <button
                             type="button"
                             onClick={() => quickFileInputRef.current?.click()}
-                            className="font-bold text-blue-500 hover:text-blue-400 underline cursor-pointer bg-transparent border-none p-0 inline"
+                            className="font-bold text-white hover:underline cursor-pointer bg-transparent border-none p-0 inline"
                           >
                             upload file from file manager
                           </button>
@@ -1039,7 +1039,7 @@ export default function RepoDashboardPage() {
                       <button
                         type="button"
                         onClick={() => handleOpenCreateFile('README.md', `# ${repoName}\n\nWelcome to ${repoName}!`)}
-                        className="h-10 px-4 rounded-xl bg-gradient-to-r from-blue-600 to-indigo-600 hover:from-blue-700 hover:to-indigo-700 text-white text-xs sm:text-sm font-semibold flex items-center gap-2 shadow-md shadow-blue-500/20 transition-all cursor-pointer"
+                        className="h-10 px-4 rounded-xl bg-white hover:bg-zinc-200 text-black text-xs sm:text-sm font-bold flex items-center gap-2 shadow-md transition-all cursor-pointer"
                       >
                         <span className="material-symbols-outlined text-[18px]">add_circle</span>
                         Create a new file
@@ -1884,7 +1884,7 @@ panda push`}
            {/* Deploy modal */}
       {showDeployModal && (
         <div
-          className="fixed inset-0 z-[120] bg-slate-950/70 backdrop-blur-sm flex items-center justify-center p-4"
+          className="fixed inset-0 z-[120] bg-slate-950/70 flex items-center justify-center p-4"
           onClick={(event) => {
             if (event.target === event.currentTarget) {
               setShowDeployModal(false);
@@ -1962,7 +1962,7 @@ panda push`}
 
       {/* ── Delete Repository Confirmation Modal ────────────────────────── */}
       {showDeleteModal && (
-        <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/60 backdrop-blur-sm px-4">
+        <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/60 px-4">
           <div className="w-full max-w-md rounded-3xl bg-white border border-red-200 shadow-2xl overflow-hidden">
             {/* Header */}
             <div className="px-6 py-5 border-b border-red-100 bg-red-50 flex items-center gap-3">
@@ -2049,8 +2049,8 @@ panda push`}
 
       {/* Create New File Modal */}
       {showCreateFileModal && (
-        <div className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-black/60 backdrop-blur-md animate-fade-in">
-          <div className="w-full max-w-2xl rounded-3xl bg-[var(--glass-bg-4)] border border-[var(--glass-border)] shadow-2xl backdrop-blur-2xl overflow-hidden text-[var(--text-primary)]">
+        <div className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-black/60 animate-fade-in">
+          <div className="w-full max-w-2xl rounded-3xl bg-[var(--glass-bg-4)] border border-[var(--glass-border)] shadow-2xl overflow-hidden text-[var(--text-primary)]">
             {/* Header */}
             <div className="px-6 py-5 border-b border-[var(--glass-border)] bg-[var(--glass-bg-2)] flex items-center justify-between">
               <div className="flex items-center gap-3">
@@ -2168,7 +2168,7 @@ panda push`}
                 <button
                   type="submit"
                   disabled={isCreatingFile}
-                  className="px-5 py-2 rounded-xl bg-gradient-to-r from-blue-600 to-indigo-600 hover:from-blue-700 hover:to-indigo-700 text-white text-sm font-semibold flex items-center gap-2 shadow-md shadow-blue-500/20 transition-all cursor-pointer disabled:opacity-50"
+                  className="px-5 py-2 rounded-xl bg-white hover:bg-zinc-200 text-black text-sm font-bold flex items-center gap-2 shadow-md transition-all cursor-pointer disabled:opacity-50"
                 >
                   {isCreatingFile ? (
                     <>

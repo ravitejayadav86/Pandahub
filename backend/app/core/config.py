@@ -102,6 +102,19 @@ class Settings(BaseSettings):
     ANTHROPIC_API_KEY: str | None = None
     AI_MODEL: str = "claude-sonnet-4-6"
 
+    # ---- Hybrid Expert Routing (OpenRouter) ----
+    # Set OPENROUTER_API_KEY to enable Qwen2.5-Coder-32B / Mistral-7B routing.
+    # When unset, the system transparently falls back to Claude (Anthropic).
+    OPENROUTER_API_KEY: str | None = None
+    OPENROUTER_BASE_URL: str = "https://openrouter.ai/api/v1/chat/completions"
+
+    # ---- RAG Vector Database (Qdrant) ----
+    # Qdrant is the vector store for the two-layer knowledge base.
+    # QDRANT_API_KEY is optional (needed for Qdrant Cloud; leave empty for local).
+    QDRANT_HOST: str = "qdrant"
+    QDRANT_PORT: int = 6333
+    QDRANT_API_KEY: str | None = None
+
     # ---- Celery ----
     CELERY_BROKER_URL: str = "redis://redis:6379/1"
     CELERY_RESULT_BACKEND: str = "redis://redis:6379/2"

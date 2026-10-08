@@ -101,7 +101,7 @@ export default function SecurityPage() {
             </Link>
             <button
               onClick={triggerScan}
-              className="flex items-center gap-2 px-4 py-2 rounded-xl text-sm font-semibold bg-gradient-to-r from-blue-600 to-indigo-600 text-white shadow-md shadow-blue-500/20 hover:from-blue-700 hover:to-indigo-700 transition-all"
+              className="flex items-center gap-2 px-4 py-2 rounded-xl text-sm font-bold bg-white text-black shadow-md hover:bg-zinc-200 transition-all"
             >
               <span className="material-symbols-outlined text-[18px]">radar</span>
               Run Full Scan
@@ -135,7 +135,7 @@ export default function SecurityPage() {
         )}
 
         {loading ? (
-          <div className="flex justify-center items-center py-12 motion-blur-scale">
+          <div className="flex justify-center items-center py-12 motion-">
             <PandaLoader size="lg" glow={true} label="Scanning security alerts..." />
           </div>
         ) : alerts.length === 0 ? (

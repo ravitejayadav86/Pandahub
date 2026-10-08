@@ -52,28 +52,28 @@ export default function GeneratedPage() {
     <main className="min-h-screen text-on-surface bg-background font-body relative overflow-hidden">
 
 <div className="fixed inset-0 z-0 overflow-hidden pointer-events-none">
-  <div className="absolute top-[10%] left-[15%] w-[600px] h-[600px] rounded-full bg-primary-container/15 blur-[120px] mix-blend-screen animate-orb"></div>
-  <div className="absolute bottom-[10%] right-[15%] w-[500px] h-[500px] rounded-full bg-secondary-container/15 blur-[100px] mix-blend-screen animate-orb-reverse"></div>
-  <div className="absolute top-[40%] left-[50%] -translate-x-1/2 -translate-y-1/2 w-[800px] h-[800px] rounded-full bg-tertiary-container/10 blur-[150px] mix-blend-screen animate-orb-slow"></div>
+  <div className="absolute top-[10%] left-[15%] w-[600px] h-[600px] rounded-full bg-primary-container/15 -[120px] mix-blend-screen animate-orb"></div>
+  <div className="absolute bottom-[10%] right-[15%] w-[500px] h-[500px] rounded-full bg-secondary-container/15 -[100px] mix-blend-screen animate-orb-reverse"></div>
+  <div className="absolute top-[40%] left-[50%] -translate-x-1/2 -translate-y-1/2 w-[800px] h-[800px] rounded-full bg-tertiary-container/10 -[150px] mix-blend-screen animate-orb-slow"></div>
 </div>
 
-<header className="fixed top-0 w-full z-50 bg-surface/70 backdrop-blur-xl border-b border-white/10 backdrop-saturate-150 shadow-[0_8px_32px_0_rgba(0,0,0,0.36)] font-headline text-body font-medium tracking-tight">
+<header className="fixed top-0 w-full z-50 bg-surface/70 border-b border-white/10 backdrop-saturate-150 shadow-[0_8px_32px_0_rgba(0,0,0,0.36)] font-headline text-body font-medium tracking-tight">
 <div className="flex justify-between items-center w-full px-6 py-4 max-w-7xl mx-auto">
 
-<div className="flex items-center gap-2 text-xl font-bold tracking-tighter text-on-surface bg-clip-text hover:bg-white/5 hover:backdrop-blur-md transition-all duration-300 rounded-lg px-3 py-1 cursor-pointer">
+<div className="flex items-center gap-2 text-xl font-bold tracking-tighter text-on-surface bg-clip-text hover:bg-white/5 hover: transition-all duration-300 rounded-lg px-3 py-1 cursor-pointer">
 <span className="material-symbols-outlined text-primary-container" style={{fontVariationSettings: '"FILL" 1'}}>cloud_sync</span>
 <span>PandaHub</span>
 </div>
 
 <nav className="hidden md:flex items-center gap-8">
 <a className="text-primary font-semibold border-b-2 border-primary pb-1 active:scale-95 transition-transform duration-200 ease-out" href="/explore">Product</a>
-<a className="text-on-surface-variant hover:text-on-surface transition-colors duration-300 hover:bg-white/5 hover:backdrop-blur-md px-3 py-1 rounded-lg" href="/explore">Solutions</a>
-<a className="text-on-surface-variant hover:text-on-surface transition-colors duration-300 hover:bg-white/5 hover:backdrop-blur-md px-3 py-1 rounded-lg" href="/explore">Open Source</a>
-<a className="text-on-surface-variant hover:text-on-surface transition-colors duration-300 hover:bg-white/5 hover:backdrop-blur-md px-3 py-1 rounded-lg" href="/explore">Pricing</a>
+<a className="text-on-surface-variant hover:text-on-surface transition-colors duration-300 hover:bg-white/5 hover: px-3 py-1 rounded-lg" href="/explore">Solutions</a>
+<a className="text-on-surface-variant hover:text-on-surface transition-colors duration-300 hover:bg-white/5 hover: px-3 py-1 rounded-lg" href="/explore">Open Source</a>
+<a className="text-on-surface-variant hover:text-on-surface transition-colors duration-300 hover:bg-white/5 hover: px-3 py-1 rounded-lg" href="/explore">Pricing</a>
 </nav>
 
 <div className="flex items-center gap-4">
-<a className="hidden md:block text-on-surface hover:text-primary transition-colors text-sm font-semibold hover:bg-white/5 hover:backdrop-blur-md px-3 py-1.5 rounded-lg" href="/login">Sign In</a>
+<a className="hidden md:block text-on-surface hover:text-primary transition-colors text-sm font-semibold hover:bg-white/5 hover: px-3 py-1.5 rounded-lg" href="/login">Sign In</a>
 <a href="/login" className="bg-primary-container text-on-primary-container px-5 py-2 rounded-lg font-bold text-sm tracking-wide btn-glow hover:bg-primary-container/90 active:scale-95 transition-all duration-200 ease-out inline-block">Get Started</a>
 </div>
 </div>
@@ -102,7 +102,7 @@ export default function GeneratedPage() {
 </section>
 </main>
 
-<div className="w-full overflow-hidden bg-surface-container-lowest/50 backdrop-blur-md border-y border-white/5 py-4 mb-24 relative z-10">
+<div className="w-full overflow-hidden bg-surface-container-lowest/50 border-y border-white/5 py-4 mb-24 relative z-10">
   <div className="absolute left-0 top-0 bottom-0 w-32 bg-gradient-to-r from-background to-transparent z-10 pointer-events-none"></div>
   <div className="absolute right-0 top-0 bottom-0 w-32 bg-gradient-to-l from-background to-transparent z-10 pointer-events-none"></div>
   <div className="animate-ticker gap-8 px-4 flex w-max">
@@ -118,7 +118,7 @@ export default function GeneratedPage() {
 <section className="w-full max-w-5xl mx-auto mb-32 group perspective">
 <div className="glass-panel rounded-2xl overflow-hidden shadow-[0_20px_50px_rgba(0,0,0,0.5)] transform transition-transform duration-700 hover:scale-[1.02] hover:shadow-[0_30px_60px_rgba(62,144,255,0.2)] border border-white/10">
 
-<div className="bg-surface-container-highest/80 backdrop-blur-md px-4 py-3 flex items-center gap-4 border-b border-white/5">
+<div className="bg-surface-container-highest/80 px-4 py-3 flex items-center gap-4 border-b border-white/5">
 <div className="flex gap-2">
 <div className="w-3 h-3 rounded-full bg-error"></div>
 <div className="w-3 h-3 rounded-full bg-tertiary"></div>

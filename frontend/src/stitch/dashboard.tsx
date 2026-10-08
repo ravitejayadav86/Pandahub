@@ -5,10 +5,10 @@ export default function GeneratedPage() {
     <main className="min-h-screen text-on-surface bg-background font-body">
 
 
-<div className="fixed top-[-20%] left-[-10%] w-[50%] h-[50%] rounded-full bg-primary-container/5 blur-[120px] pointer-events-none"></div>
-<div className="fixed bottom-[-20%] right-[-10%] w-[40%] h-[40%] rounded-full bg-secondary-container/10 blur-[100px] pointer-events-none"></div>
+<div className="fixed top-[-20%] left-[-10%] w-[50%] h-[50%] rounded-full bg-primary-container/5 -[120px] pointer-events-none"></div>
+<div className="fixed bottom-[-20%] right-[-10%] w-[40%] h-[40%] rounded-full bg-secondary-container/10 -[100px] pointer-events-none"></div>
 
-<nav className="hidden md:flex bg-surface/60 backdrop-blur-3xl h-screen w-72 flex-col border-r border-outline-variant/20 shadow-2xl shadow-surface-container-lowest/50 fixed left-0 top-0 p-4 z-40">
+<nav className="hidden md:flex bg-surface/60 h-screen w-72 flex-col border-r border-outline-variant/20 shadow-2xl shadow-surface-container-lowest/50 fixed left-0 top-0 p-4 z-40">
 
 <div className="flex items-center gap-4 px-2 py-4 mb-6">
 <div className="w-10 h-10 rounded-xl overflow-hidden shadow-lg border border-white/10">
@@ -26,7 +26,7 @@ export default function GeneratedPage() {
         </button>
 
 <div className="flex-1 space-y-2">
-<a className="flex items-center gap-3 px-4 py-3 bg-primary-container/30 backdrop-blur-md text-on-primary-container rounded-xl shadow-[inset_0_1px_1px_rgba(255,255,255,0.1)] transition-all duration-300 font-body text-label-sm font-medium tracking-tight" href="/explore">
+<a className="flex items-center gap-3 px-4 py-3 bg-primary-container/30 text-on-primary-container rounded-xl shadow-[inset_0_1px_1px_rgba(255,255,255,0.1)] transition-all duration-300 font-body text-label-sm font-medium tracking-tight" href="/explore">
 <span className="material-symbols-outlined" style={{fontVariationSettings: '"FILL" 1'}}>dashboard</span>
                 Dashboard
             </a>
@@ -62,7 +62,7 @@ export default function GeneratedPage() {
 
 <div className="flex-1 flex flex-col md:ml-72 min-h-screen overflow-hidden relative">
 
-<header className="bg-surface/40 backdrop-blur-2xl w-full h-16 sticky top-0 z-50 border-b border-outline-variant/10 shadow-sm flex justify-between items-center px-6 gap-8 backdrop-filter-transition-duration-500">
+<header className="bg-surface/40 w-full h-16 sticky top-0 z-50 border-b border-outline-variant/10 shadow-sm flex justify-between items-center px-6 gap-8 backdrop-filter-transition-duration-500">
 <div className="flex items-center gap-6">
 
 <button className="md:hidden text-on-surface p-2 hover:bg-surface-variant/30 rounded-full transition-all">
@@ -102,7 +102,7 @@ export default function GeneratedPage() {
 
 <div className="glass-panel rounded-3xl p-6 relative overflow-hidden group">
 
-<div className="absolute top-0 right-0 w-32 h-32 bg-primary-container/20 rounded-full blur-2xl -mr-10 -mt-10 transition-transform duration-700 group-hover:scale-150"></div>
+<div className="absolute top-0 right-0 w-32 h-32 bg-primary-container/20 rounded-full -mr-10 -mt-10 transition-transform duration-700 group-hover:scale-150"></div>
 <div className="flex flex-col items-center text-center relative z-10">
 <div className="w-24 h-24 rounded-full overflow-hidden border-2 border-primary-container/30 shadow-[0_0_20px_rgba(62,144,255,0.2)] mb-4 p-1 bg-surface-container-highest/50">
 <img alt="User Profile" className="w-full h-full object-cover rounded-full" data-alt="A high-quality portrait of a software engineer, dark moody cinematic lighting, neon blue rim light, highly detailed, photorealistic." src="https://lh3.googleusercontent.com/aida-public/AB6AXuCACb3tKALLGQkS330l1aa0JtP48CbpH6Re_-fRiG3XaPGldXRlWDjIWr0kGWSapG0lWBmqJwjTQ0ys0GrMVG2w3jAbwp02yiXF2W8GhvnDRpmBg9bcpNtGN1qoEVI3Di_g6JH_npVHVx-EGDx0CR1Mxm9Mrqv7Xs3IyXL7bMiZwh_HBQOZlnvWrK_9_uLFjepWVYq_R13r33XcgI1nl7-ZeXndRi5axYXU-TTTnDnpWzGJCDaSIRl6fGL9wkhNZAvr-vJ04gQULl5u"/>
@@ -171,7 +171,7 @@ export default function GeneratedPage() {
 <div className="lg:col-span-6 space-y-6">
 <div className="flex items-center justify-between mb-2 px-2">
 <h2 className="text-2xl font-headline font-bold tracking-tight text-on-surface">Overview</h2>
-<div className="flex gap-2 bg-surface-container-high/50 p-1 rounded-lg backdrop-blur-md border border-white/5">
+<div className="flex gap-2 bg-surface-container-high/50 p-1 rounded-lg border border-white/5">
 <button className="px-3 py-1 text-xs font-medium bg-surface-variant text-on-surface rounded-md shadow-sm">All</button>
 <button className="px-3 py-1 text-xs font-medium text-on-surface-variant hover:text-on-surface rounded-md transition-colors">Commits</button>
 <button className="px-3 py-1 text-xs font-medium text-on-surface-variant hover:text-on-surface rounded-md transition-colors">PRs</button>
@@ -192,7 +192,7 @@ export default function GeneratedPage() {
 </div>
 <h4 className="font-headline font-semibold text-on-surface mb-2 group-hover:text-primary-fixed transition-colors">Implement Liquid Glass Design System</h4>
 <p className="text-sm text-on-surface-variant leading-relaxed line-clamp-2">
-                                    Refactored core components to use backdrop-blur and semi-transparent surfaces. Updated Tailwind config with new semantic color tokens and border radii.
+                                    Refactored core components to use  and semi-transparent surfaces. Updated Tailwind config with new semantic color tokens and border radii.
                                 </p>
 <div className="mt-4 flex items-center gap-4 text-xs text-on-surface-variant">
 <div className="flex items-center gap-1">

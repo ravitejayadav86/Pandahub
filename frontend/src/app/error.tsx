@@ -67,13 +67,13 @@ export default function ErrorPage({
             <div className="flex gap-3">
               <button
                 onClick={reset}
-                className="flex-1 py-2.5 px-4 rounded-xl bg-gradient-to-r from-blue-600 to-violet-600 text-white text-sm font-semibold hover:from-blue-500 hover:to-violet-500 transition-all shadow-lg shadow-blue-500/20 active:scale-95"
+                className="flex-1 py-2.5 px-4 rounded-xl bg-white text-black text-sm font-bold hover:bg-zinc-200 transition-all shadow-md active:scale-95"
               >
                 ↺ Try again
               </button>
               <button
                 onClick={() => { window.location.href = '/dashboard'; }}
-                className="flex-1 py-2.5 px-4 rounded-xl border border-white/10 bg-white/4 text-slate-300 text-sm hover:bg-white/8 transition-all"
+                className="flex-1 py-2.5 px-4 rounded-xl border border-zinc-700 bg-zinc-900 text-zinc-100 text-sm font-semibold hover:bg-zinc-800 transition-all"
               >
                 🏠 Dashboard
               </button>

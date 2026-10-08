@@ -1,1061 +1,354 @@
 "use client";
-import { useState, useEffect, useRef } from 'react';
-import dynamic from 'next/dynamic';
-import Link from 'next/link';
-import Settings from './Settings';
 
-/* ═══════════════════════════════════════════════════════
-   3D TILT CARD — Spatial UI
-═══════════════════════════════════════════════════════ */
-function TiltCard({ children, className, style }: {
-  children: React.ReactNode;
-  className?: string;
-  style?: React.CSSProperties;
-}) {
-  const [rotate, setRotate] = useState({ x: 0, y: 0 });
+import Link from "next/link";
+import { useEffect, useRef } from "react";
+import MotionDetectiveBackground from "@/components/MotionDetectiveBackground";
+import {
+  ArrowDownRight,
+  ArrowRight,
+  Boxes,
+  GitBranch,
+  Github,
+  Layers3,
+  Search,
+  ShieldCheck,
+  Sparkles,
+  Terminal,
+  Zap,
+} from "lucide-react";
 
-  function handleMouseMove(e: React.MouseEvent<HTMLDivElement>) {
-    const rect = e.currentTarget.getBoundingClientRect();
-    const mouseX = e.clientX - rect.left - rect.width / 2;
-    const mouseY = e.clientY - rect.top - rect.height / 2;
-    setRotate({
-      x: -(mouseY / (rect.height / 2)) * 12,
-      y:  (mouseX / (rect.width  / 2)) * 12,
-    });
-  }
-
-  return (
-    <div
-      onMouseMove={handleMouseMove}
-      onMouseLeave={() => setRotate({ x: 0, y: 0 })}
-      style={{
-        transform: `perspective(1100px) rotateX(${rotate.x}deg) rotateY(${rotate.y}deg)`,
-        transformStyle: 'preserve-3d',
-        transition: 'transform 0.18s ease-out',
-        ...style,
-      }}
-      className={className}
-    >
-      <div style={{ transform: 'translateZ(32px)', transformStyle: 'preserve-3d' }}>
-        {children}
-      </div>
-    </div>
-  );
-}
-
-/* ═══════════════════════════════════════════════════════
-   SCROLL REVEAL
-═══════════════════════════════════════════════════════ */
-function RevealOnScroll({ children, className = '', delay = 0 }: {
-  children: React.ReactNode;
-  className?: string;
-  delay?: number;
-}) {
-  const ref = useRef<HTMLDivElement>(null);
-  const [visible, setVisible] = useState(false);
-
-  useEffect(() => {
-    const obs = new IntersectionObserver(
-      ([e]) => { if (e?.isIntersecting) { setVisible(true); obs.disconnect(); } },
-      { threshold: 0.08, rootMargin: '-40px' }
-    );
-    if (ref.current) obs.observe(ref.current);
-    return () => obs.disconnect();
-  }, []);
-
-  return (
-    <div
-      ref={ref}
-      style={{ transitionDelay: `${delay}ms` }}
-      className={`transition-all duration-[650ms] ease-[cubic-bezier(0.16,1,0.3,1)] will-change-[opacity,transform,filter] ${
-        visible
-          ? 'opacity-100 translate-y-0 scale-100 blur-0'
-          : 'opacity-0 translate-y-8 scale-[0.98] blur-[12px]'
-      } ${className}`}
-    >
-      {children}
-    </div>
-  );
-}
-
-/* ═══════════════════════════════════════════════════════
-   MINIMALIST GLASS WINDOW
-═══════════════════════════════════════════════════════ */
-function GlassWindow({ children }: { children: React.ReactNode }) {
-  return (
-    <div
-      className="rounded-2xl overflow-hidden glass-layer-2 relative"
-      style={{
-        border: '1px solid var(--glass-border)',
-        boxShadow: '0 8px 32px rgba(0,0,0,0.2)',
-      }}
-    >
-      {/* Titlebar — Minimalist */}
-      <div
-        className="flex items-center px-4 py-3 gap-3 relative"
-        style={{
-          background: 'rgba(255,255,255,0.02)',
-          borderBottom: '1px solid var(--glass-border)',
-        }}
-      >
-        {/* Minimalist dots */}
-        <div className="flex gap-2">
-          {[
-            { color: 'rgba(255,255,255,0.2)' },
-            { color: 'rgba(255,255,255,0.2)' },
-            { color: 'rgba(255,255,255,0.2)' },
-          ].map(({ color }, i) => (
-            <div
-              key={i}
-              className="w-2.5 h-2.5 rounded-full"
-              style={{ background: color }}
-            />
-          ))}
-        </div>
-        {/* Address bar */}
-        <div className="flex-grow flex justify-center">
-          <div
-            className="px-4 py-1 rounded-md text-[11px] text-slate-400 font-mono flex items-center gap-2 tracking-wider"
-            style={{
-              background: 'rgba(0,0,0,0.2)',
-              border: '1px solid rgba(255,255,255,0.05)',
-            }}
-          >
-            <span className="material-symbols-outlined text-[13px] opacity-70">account_tree</span>
-            architecture.txt
-          </div>
-        </div>
-      </div>
-      {children}
-    </div>
-  );
-}
-
-/* ═══════════════════════════════════════════════════════
-   MINIMALIST APP ICON
-═══════════════════════════════════════════════════════ */
-function AppIcon({ icon, color, gradient }: {
-  icon: string;
-  color: string;
-  gradient: string;
-}) {
-  return (
-    <div
-      className="w-12 h-12 flex items-center justify-center rounded-xl glass-layer-2"
-      style={{ border: '1px solid var(--glass-border)' }}
-    >
-      <span
-        className="material-symbols-outlined"
-        style={{
-          fontSize: 24,
-          color: color || 'white',
-          opacity: 0.9
-        }}
-      >
-        {icon}
-      </span>
-    </div>
-  );
-}
-
-/* ═══════════════════════════════════════════════════════
-   MOBILE BOTTOM NAV — Glassmorphism
-═══════════════════════════════════════════════════════ */
-function MobileBottomNav({ active = 0 }: { active?: number }) {
-  const [activeIdx, setActiveIdx] = useState(active);
-
-  const items = [
-    { href: '/explore', icon: 'home',        label: 'Home' },
-    { href: '/explore', icon: 'category',    label: 'Product' },
-    { href: '/explore', icon: 'code_blocks', label: 'Source' },
-    { href: '/login',   icon: 'person',      label: 'Account' },
-  ];
-
-  return (
-    <div
-      className="md:hidden fixed bottom-0 w-full z-50"
-      style={{
-        paddingBottom: 'calc(8px + env(safe-area-inset-bottom, 0px))',
-        background: 'var(--glass-bg-4)',
-        backdropFilter: 'blur(40px) saturate(2)',
-        WebkitBackdropFilter: 'blur(40px) saturate(2)',
-        borderTop: '1px solid var(--glass-border)',
-        boxShadow: '0 -2px 30px rgba(0,0,0,0.10), inset 0 1px 0 rgba(255,255,255,0.35)',
-      }}
-    >
-      <nav className="flex justify-around items-center px-2 pt-2">
-        {items.map(({ href, icon, label }, i) => (
-          <Link
-            key={label}
-            href={href}
-            onClick={() => setActiveIdx(i)}
-            className="flex flex-col items-center gap-0.5 py-1 px-3 rounded-2xl transition-all duration-300 min-w-[56px]"
-            style={{
-              color: activeIdx === i ? 'var(--color-primary)' : 'var(--text-muted)',
-              background: activeIdx === i
-                ? 'rgba(10,132,255,0.12)'
-                : 'transparent',
-              boxShadow: 'none',
-            }}
-          >
-            <span
-              className="material-symbols-outlined transition-all duration-300"
-              style={{
-                fontSize: 22,
-                fontVariationSettings: activeIdx === i ? '"FILL" 1' : '"FILL" 0',
-                filter: activeIdx === i ? 'drop-shadow(0 2px 6px rgba(10,132,255,0.5))' : 'none',
-              }}
-            >
-              {icon}
-            </span>
-            <span className="text-[10px] font-semibold tracking-wide">{label}</span>
-          </Link>
-        ))}
-      </nav>
-    </div>
-  );
-}
-
-/* ═══════════════════════════════════════════════════════
-   ANIMATED COUNTER
-═══════════════════════════════════════════════════════ */
-function AnimatedStat({ value, label, color }: { value: string; label: string; color: string }) {
-  const ref = useRef<HTMLDivElement>(null);
-  const [visible, setVisible] = useState(false);
-
-  useEffect(() => {
-    const obs = new IntersectionObserver(([e]) => {
-      if (e?.isIntersecting) { setVisible(true); obs.disconnect(); }
-    }, { threshold: 0.5 });
-    if (ref.current) obs.observe(ref.current);
-    return () => obs.disconnect();
-  }, []);
-
-  return (
-    <div ref={ref} className="flex flex-col items-center gap-1">
-      <span
-        className="text-3xl md:text-4xl font-black tracking-tighter transition-all duration-700"
-        style={{
-          color,
-          filter: visible ? `drop-shadow(0 0 16px ${color}88)` : 'none',
-          transform: visible ? 'scale(1)' : 'scale(0.6)',
-          opacity: visible ? 1 : 0,
-        }}
-      >
-        {value}
-      </span>
-      <span className="text-xs font-semibold tracking-widest uppercase" style={{ color: 'var(--text-muted)' }}>
-        {label}
-      </span>
-    </div>
-  );
-}
-
-/* ═══════════════════════════════════════════════════════
-   SPACE BACKGROUND
-═══════════════════════════════════════════════════════ */
-const SpaceBackground = dynamic(() => import('./SpaceBackground'), { ssr: false });
-
-/* ═══════════════════════════════════════════════════════
-   TYPEWRITER PHRASES
-═══════════════════════════════════════════════════════ */
-const TYPE_PHRASES = ["next generation.", "AI era.", "future of code.", "speed of thought."];
-
-/* ═══════════════════════════════════════════════════════
-   MAIN PAGE
-═══════════════════════════════════════════════════════ */
 export default function HomePage() {
-  const [phraseIndex, setPhraseIndex] = useState(0);
-  const [charIndex, setCharIndex]     = useState(0);
-  const [isDeleting, setIsDeleting]   = useState(false);
-  const [text, setText]               = useState("");
-  const [mobileMenuOpen, setMobileMenuOpen] = useState(false);
-  const [scrolled, setScrolled]       = useState(false);
+  const frame = useRef<number | null>(null);
+  const cinemaRef = useRef<HTMLDivElement>(null);
 
-  // Track scroll for header style
   useEffect(() => {
-    const onScroll = () => setScrolled(window.scrollY > 20);
-    window.addEventListener('scroll', onScroll, { passive: true });
-    return () => window.removeEventListener('scroll', onScroll);
+    const cinema = cinemaRef.current;
+    if (!cinema) return;
+
+    // Grab all animated elements ONCE — no repeated DOM queries during scroll
+    const camera    = cinema.querySelector<HTMLElement>(".phx-camera");
+    const beamA     = cinema.querySelector<HTMLElement>(".phx-beam-a");
+    const beamB     = cinema.querySelector<HTMLElement>(".phx-beam-b");
+    const beamC     = cinema.querySelector<HTMLElement>(".phx-beam-c");
+    const f1        = cinema.querySelector<HTMLElement>(".f1");
+    const f2        = cinema.querySelector<HTMLElement>(".f2");
+    const f3        = cinema.querySelector<HTMLElement>(".f3");
+    const f4        = cinema.querySelector<HTMLElement>(".f4");
+    const f5        = cinema.querySelector<HTMLElement>(".f5");
+    const f6        = cinema.querySelector<HTMLElement>(".f6");
+    const r1        = cinema.querySelector<HTMLElement>(".r1");
+    const r2        = cinema.querySelector<HTMLElement>(".r2");
+    const r3        = cinema.querySelector<HTMLElement>(".r3");
+    const slabA     = cinema.querySelector<HTMLElement>(".slab-a");
+    const slabB     = cinema.querySelector<HTMLElement>(".slab-b");
+    const slabC     = cinema.querySelector<HTMLElement>(".slab-c");
+    const gridfloor = cinema.querySelector<HTMLElement>(".phx-gridfloor");
+    const s1        = cinema.querySelector<HTMLElement>(".s1");
+    const s2        = cinema.querySelector<HTMLElement>(".s2");
+    const s3        = cinema.querySelector<HTMLElement>(".s3");
+    const scan      = cinema.querySelector<HTMLElement>(".phx-scan");
+
+    // Elements outside the cinema div
+    const progressBar  = document.querySelector<HTMLElement>(".phx-progress");
+    const consoleBack  = document.querySelector<HTMLElement>(".phx-console-back");
+    const consoleMain  = document.querySelector<HTMLElement>(".phx-console-main");
+    const chipA        = document.querySelector<HTMLElement>(".chip-a");
+    const chipB        = document.querySelector<HTMLElement>(".chip-b");
+    const layerCard    = document.querySelector<HTMLElement>(".phx-layer-card");
+    const core         = document.querySelector<HTMLElement>(".core");
+    const o1           = document.querySelector<HTMLElement>(".o1");
+    const o2           = document.querySelector<HTMLElement>(".o2");
+    const o3           = document.querySelector<HTMLElement>(".o3");
+    const terminal     = document.querySelector<HTMLElement>(".phx-terminal");
+
+    let lastY = window.scrollY;
+    let lastT = performance.now();
+    let maxScroll = Math.max(1, document.documentElement.scrollHeight - window.innerHeight);
+
+    const updateMaxScroll = () => {
+      maxScroll = Math.max(1, document.documentElement.scrollHeight - window.innerHeight);
+    };
+
+    // Inline style.transform = directly targets the compositor — no style recalc, no layout
+    const st = (el: HTMLElement | null, v: string) => { if (el) el.style.transform = v; };
+
+    const paint = () => {
+      frame.current = null;
+      const y   = window.scrollY;
+      const p   = Math.max(0, Math.min(1, y / maxScroll)); // 0 → 1
+      const now = performance.now();
+      const vel = Math.max(-3, Math.min(3, ((y - lastY) / Math.max(16, now - lastT)) * 16));
+      lastY = y;
+      lastT = now;
+
+      // ── Camera ──
+      st(camera, `translate3d(${p*18}px,${p*-85}px,0) scale(${1+p*.09}) rotateX(${p*4}deg)`);
+
+      // ── Beams ──
+      st(beamA, `translate3d(${p*480}px,0,-280px) rotate(12deg)`);
+      st(beamB, `translate3d(${p*-280}px,0,-360px) rotate(-9deg)`);
+      st(beamC, `translate3d(${p*-430}px,0,-420px) rotate(-15deg)`);
+
+      // ── Tunnel frames ──
+      st(f1, `translate3d(${p*-80}px,${p*130}px,0) rotateX(64deg) scale(.96)`);
+      st(f2, `translate3d(${p*100}px,${p*-95}px,-130px) rotateX(64deg) scale(.81)`);
+      st(f3, `translate3d(${p*-120}px,${p*70}px,-250px) rotateX(64deg) scale(.67)`);
+      st(f4, `translate3d(${p*150}px,${p*-120}px,-380px) rotateX(64deg) scale(.54)`);
+      st(f5, `translate3d(${p*-185}px,${p*90}px,-530px) rotateX(64deg) scale(.42)`);
+      st(f6, `translate3d(${p*220}px,${p*-80}px,-700px) rotateX(64deg) scale(.32)`);
+
+      // ── Rings ──
+      st(r1, `translate3d(${p*-170}px,${p*130}px,260px) rotateX(68deg) rotateZ(${p*105}deg)`);
+      st(r2, `translate3d(${p*170}px,${p*-110}px,140px) rotateY(72deg) rotateZ(${p*-85}deg)`);
+      st(r3, `translate3d(${p*30}px,${p*140}px,340px) rotateY(70deg) rotateZ(${p*65}deg)`);
+
+      // ── Slabs ──
+      st(slabA, `translate3d(${p*220}px,${p*-100}px,420px) rotateX(${p*-18+8}deg) rotateY(${p*30-18}deg) rotateZ(${p*-8}deg)`);
+      st(slabB, `translate3d(${p*-270}px,${p*170}px,-150px) rotateX(${p*14-8}deg) rotateY(${p*-35-18}deg) rotateZ(${p*5}deg)`);
+      st(slabC, `translate3d(${p*290}px,${p*90}px,320px) rotateX(${p*24}deg) rotateY(${p*52}deg) rotateZ(${p*-10}deg)`);
+
+      // ── Gridfloor ──
+      st(gridfloor, `perspective(900px) rotateX(68deg) translate3d(0,${p*300}px,-180px) scale(1.3)`);
+
+      // ── Streaks ──
+      st(s1, `translate3d(${p*320}px,${p*180}px,0) rotate(-13deg)`);
+      st(s2, `translate3d(${p*-360}px,${p*-100}px,0) rotate(11deg)`);
+      st(s3, `translate3d(${p*170}px,${p*-210}px,0) rotate(-4deg)`);
+
+      // ── Scan line ──
+      st(scan, `translate3d(0,${p*520-240}px,0)`);
+
+      // ── Progress bar — scaleX avoids width layout recalc ──
+      if (progressBar) progressBar.style.transform = `scaleX(${p})`;
+
+      // ── Console 3D panels ──
+      st(consoleBack, `translate3d(${p*-180}px,${p*220}px,-240px) rotateX(${p*17-12}deg) rotateY(${p*-24-18}deg) rotateZ(${p*5-3}deg)`);
+      st(consoleMain, `translate3d(${p*80}px,${p*190}px,${p*290}px) rotateX(${p*-16+5}deg) rotateY(${p*18-14}deg) rotateZ(${p*-4+1}deg)`);
+
+      // ── Chips ──
+      st(chipA, `translate3d(${p*-270}px,${p*170}px,450px) rotateX(${p*23-13}deg) rotateY(${p*-28-5}deg) rotateZ(${p*4}deg)`);
+      st(chipB, `translate3d(${p*240}px,${p*-190}px,530px) rotateX(${p*-15+11}deg) rotateY(${p*30+4}deg) rotateZ(${p*-5}deg)`);
+
+      // ── Layer card ──
+      st(layerCard, `translate3d(${p*190}px,${p*-120}px,190px) rotateX(${p*13+7}deg) rotateY(${p*-30+13}deg)`);
+
+      // ── Orb ── (Optimized stable 3D rotation, avoiding 90deg matrix singularities)
+      st(core,      `translate3d(${p*-80}px,${p*90}px,140px) rotateX(${p*32+14}deg) rotateY(${p*-36+14}deg)`);
+      st(o1,        `translate3d(${p*90}px,${p*-60}px,90px) rotateX(65deg) rotateZ(${p*50}deg)`);
+      st(o2,        `translate3d(${p*-90}px,${p*70}px,120px) rotateY(65deg) rotateZ(${p*-40}deg)`);
+      st(o3,        `translate3d(${p*40}px,${p*40}px,-30px) rotateX(55deg) rotateZ(${p*30}deg)`);
+
+      // Terminal
+      st(terminal, `translate3d(${p*150}px,${p*-180}px,360px) rotateX(${p*14+8}deg) rotateY(${p*25-12}deg) rotateZ(${p*-4}deg)`);
+    };
+
+    const schedule = () => {
+      if (frame.current === null) frame.current = requestAnimationFrame(paint);
+    };
+
+    const handleResize = () => { updateMaxScroll(); schedule(); };
+
+    const ro = new ResizeObserver(() => { updateMaxScroll(); schedule(); });
+    ro.observe(document.body);
+
+    paint();
+    window.addEventListener("scroll", schedule, { passive: true });
+    window.addEventListener("resize", handleResize);
+    return () => {
+      window.removeEventListener("scroll", schedule);
+      window.removeEventListener("resize", handleResize);
+      ro.disconnect();
+      if (frame.current !== null) cancelAnimationFrame(frame.current);
+    };
   }, []);
 
-  // Typewriter
   useEffect(() => {
-    const phrase = TYPE_PHRASES[phraseIndex];
-    if (!phrase) return;
-    let timer: NodeJS.Timeout;
-    if (isDeleting) {
-      timer = setTimeout(() => {
-        setText(phrase.substring(0, charIndex - 1));
-        setCharIndex(c => c - 1);
-        if (charIndex <= 1) {
-          setIsDeleting(false);
-          setPhraseIndex(p => (p + 1) % TYPE_PHRASES.length);
-        }
-      }, 45);
-    } else {
-      timer = setTimeout(() => {
-        setText(phrase.substring(0, charIndex + 1));
-        setCharIndex(c => c + 1);
-        if (charIndex >= phrase.length) {
-          setTimeout(() => setIsDeleting(true), 2800);
-        }
-      }, 90);
+    const nodes = document.querySelectorAll<HTMLElement>(".phx-content-reveal");
+    if (!("IntersectionObserver" in window)) {
+      nodes.forEach((n) => n.classList.add("is-visible"));
+      return;
     }
-    return () => clearTimeout(timer);
-  }, [charIndex, isDeleting, phraseIndex]);
+    const observer = new IntersectionObserver(
+      (entries) => entries.forEach((e) => e.isIntersecting && e.target.classList.add("is-visible")),
+      { threshold: 0.16, rootMargin: "0px 0px -10% 0px" }
+    );
+    nodes.forEach((n) => observer.observe(n));
+    return () => observer.disconnect();
+  }, []);
 
   return (
-    <main className="min-h-screen text-on-surface font-body relative overflow-hidden bg-transparent">
-
-      {/* ── Animated Space Background ── */}
-      <SpaceBackground />
-
-      {/* ── Morphing Blobs — depth layer (Spatial) ── */}
-      <div className="fixed inset-0 z-[1] pointer-events-none overflow-hidden">
-        <div
-          className="absolute morphing-blob"
-          style={{
-            width: '55vw', height: '55vw',
-            maxWidth: 700, maxHeight: 700,
-            top: '-10%', left: '-10%',
-            background: 'radial-gradient(ellipse, rgba(10,132,255,0.18) 0%, rgba(10,132,255,0.04) 70%, transparent 100%)',
-          }}
-        />
-        <div
-          className="absolute morphing-blob-alt"
-          style={{
-            width: '50vw', height: '50vw',
-            maxWidth: 600, maxHeight: 600,
-            bottom: '5%', right: '-8%',
-            background: 'radial-gradient(ellipse, rgba(124,58,237,0.16) 0%, rgba(124,58,237,0.04) 70%, transparent 100%)',
-          }}
-        />
-        <div
-          className="absolute morphing-blob"
-          style={{
-            width: '40vw', height: '40vw',
-            maxWidth: 500, maxHeight: 500,
-            top: '40%', left: '40%',
-            animationDuration: '20s',
-            background: 'radial-gradient(ellipse, rgba(6,182,212,0.10) 0%, rgba(6,182,212,0.02) 70%, transparent 100%)',
-          }}
-        />
+    <main className="phx-page">
+      <MotionDetectiveBackground />
+      <div className="phx-cinema" aria-hidden="true" ref={cinemaRef}>
+        <div className="phx-camera">
+          <div className="phx-ambient" />
+          <div className="phx-beam phx-beam-a" />
+          <div className="phx-beam phx-beam-b" />
+          <div className="phx-beam phx-beam-c" />
+          <div className="phx-tunnel">
+            <div className="phx-frame3d f1" />
+            <div className="phx-frame3d f2" />
+            <div className="phx-frame3d f3" />
+            <div className="phx-frame3d f4" />
+            <div className="phx-frame3d f5" />
+            <div className="phx-frame3d f6" />
+          </div>
+          <div className="phx-ring r1" />
+          <div className="phx-ring r2" />
+          <div className="phx-ring r3" />
+          <div className="phx-slab slab-a" />
+          <div className="phx-slab slab-b" />
+          <div className="phx-slab slab-c" />
+          <div className="phx-gridfloor" />
+          <div className="phx-streak s1" />
+          <div className="phx-streak s2" />
+          <div className="phx-streak s3" />
+          <div className="phx-particles">
+            {Array.from({ length: 14 }).map((_, i) => (
+              <i key={i} style={{ animationDelay: `${-i * 0.55}s` }} />
+            ))}
+          </div>
+        </div>
+        <div className="phx-scan" />
+        <div className="phx-vignette" />
+        <div className="phx-grain" />
+        <div className="phx-letterbox top" />
+        <div className="phx-letterbox bottom" />
       </div>
 
-      {/* ── Mobile Nav Drawer ── */}
-      {mobileMenuOpen && (
-        <>
-          <div
-            className="mobile-overlay md:hidden"
-            onClick={() => setMobileMenuOpen(false)}
-            aria-hidden="true"
-          />
-          <div
-            className="mobile-drawer md:hidden"
-            role="dialog"
-            aria-modal="true"
-            aria-label="Navigation menu"
-          >
-            {/* Header */}
-            <div
-              className="flex items-center justify-between px-5 py-5"
-              style={{
-                borderBottom: '1px solid var(--glass-border)',
-                background: 'var(--glass-bg-3)',
-              }}
-            >
-              <div className="flex items-center gap-2.5 text-lg font-black tracking-tight" style={{ color: 'var(--text-primary)' }}>
-                <div
-                  className="w-8 h-8 flex items-center justify-center rounded-lg glass-layer-2"
-                  style={{ border: '1px solid var(--glass-border)' }}
-                >
-                  <span className="material-symbols-outlined" style={{ fontSize: 16, color: 'var(--color-primary)' }}>cloud_sync</span>
+      <div className="phx-progress" aria-hidden="true" />
+
+      <nav className="phx-nav">
+        <Link href="/" className="phx-brand">
+          <span className="phx-brand-icon">P</span><span>PANDAHUB</span>
+        </Link>
+        <div className="phx-nav-links">
+          <Link href="/explore">Explore</Link>
+          <Link href="/startups">Startups</Link>
+          <Link href="/dashboard">Workspace</Link>
+        </div>
+        <div className="phx-nav-actions">
+          <Link href="/login" className="phx-login">Sign in</Link>
+          <Link href="/register" className="phx-nav-cta">Start building</Link>
+        </div>
+      </nav>
+
+      <section className="phx-hero">
+        <div className="phx-hero-copy phx-content-reveal">
+          <div className="phx-kicker"><Sparkles size={14} /> PANDAHUB / MOTION SYSTEM</div>
+          <h1>Build in <i>motion.</i><br />Ship with <i>clarity.</i></h1>
+          <p>PandaHub is a source-control and collaboration workspace designed as a continuous premium experience.</p>
+          <div className="phx-actions">
+            <Link href="/register" className="phx-primary">Create workspace <ArrowRight size={17} /></Link>
+            <Link href="/explore" className="phx-secondary">Explore PandaHub</Link>
+          </div>
+          <div className="phx-proof">
+            <span><GitBranch size={13}/> Git native</span>
+            <span><ShieldCheck size={13}/> Team ready</span>
+            <span><Zap size={13}/> Fast by design</span>
+          </div>
+        </div>
+
+        <div className="phx-console" aria-hidden="true">
+          <div className="phx-console-back">
+            <small>PROJECT MAP</small><strong>PANDAHUB</strong>
+            <div className="line" /><div className="line short" /><div className="line" />
+            <div className="tree">core/<br />&nbsp;&nbsp;workspace/<br />&nbsp;&nbsp;product/<br />&nbsp;&nbsp;infra/</div>
+          </div>
+          <div className="phx-console-main">
+            <div className="windowbar"><span/><span/><span/><b>PANDAHUB / WORKSPACE</b></div>
+            <div className="windowbody">
+              <aside>
+                <small>WORKSPACE</small><strong>Mission control</strong>
+                <div className="active">Overview</div>
+                <div>Repositories</div><div>Issues</div><div>Activity</div><div>Deployments</div>
+              </aside>
+              <div className="consolecontent">
+                <small className="consolelabel">OPERATING SYSTEM FOR BUILDERS</small>
+                <h2>Build / review / ship</h2>
+                <div className="stats">
+                  <div><small>REPOSITORIES</small><b>24</b></div>
+                  <div><small>ISSUES</small><b>08</b></div>
+                  <div><small>DEPLOYS</small><b>46</b></div>
                 </div>
-                PandaHub
+                <div className="codebox">
+                  <div><Terminal size={13}/> production.log</div>
+                  <code>
+                    <span>$</span> panda inspect workspace<br/>
+                    <span>+</span> checks passed<br/>
+                    <span>+</span> branch synchronized<br/>
+                    <span>+</span> deployment ready
+                  </code>
+                </div>
               </div>
-              <button
-                onClick={() => setMobileMenuOpen(false)}
-                className="btn-icon p-2"
-                aria-label="Close menu"
-                style={{ color: 'var(--text-secondary)' }}
-              >
-                <span className="material-symbols-outlined text-[22px]">close</span>
-              </button>
             </div>
-            {/* Links */}
-            <nav className="flex flex-col p-3 gap-1">
-              {[
-                { href: '/explore', label: 'Product',     icon: 'category' },
-                { href: '/explore', label: 'Solutions',   icon: 'hub' },
-                { href: '/explore', label: 'Open Source', icon: 'code_blocks' },
-                { href: '/explore', label: 'Pricing',     icon: 'sell' },
-              ].map(({ href, label, icon }) => (
-                <Link
-                  key={label}
-                  href={href}
-                  className="sidebar-item"
-                  onClick={() => setMobileMenuOpen(false)}
-                >
-                  <span className="material-symbols-outlined icon text-[20px]">{icon}</span>
-                  {label}
-                </Link>
-              ))}
-              <div className="my-3" style={{ borderTop: '1px solid var(--glass-border)' }} />
-              <a
-                href="/login"
-                className="btn-glass flex items-center justify-center gap-2 px-5 py-3.5 rounded-2xl font-bold text-sm border"
-                onClick={() => setMobileMenuOpen(false)}
-              >
-                <span className="material-symbols-outlined text-[18px]">login</span>
-                Sign In
-              </a>
-            </nav>
           </div>
-        </>
-      )}
-
-      {/* ═══════════════════════════════════════════════
-          HEADER — Glassmorphism Layer 4
-      ═══════════════════════════════════════════════ */}
-      <header
-        className="fixed top-0 w-full z-50 transition-all duration-500"
-        style={{
-          background: scrolled ? 'var(--glass-bg-4)' : 'var(--glass-bg-1)',
-          backdropFilter: scrolled ? 'blur(40px) saturate(2.2)' : 'blur(6px) saturate(1.4)',
-          WebkitBackdropFilter: scrolled ? 'blur(40px) saturate(2.2)' : 'blur(6px) saturate(1.4)',
-          borderBottom: `1px solid ${scrolled ? 'var(--glass-border)' : 'transparent'}`,
-          boxShadow: scrolled
-            ? '0 2px 20px rgba(0,0,0,0.10), inset 0 1px 0 rgba(255,255,255,0.4)'
-            : 'none',
-        }}
-      >
-        <div className="flex justify-between items-center w-full px-4 sm:px-6 py-3 sm:py-4 max-w-7xl mx-auto">
-          {/* Logo — Skeuomorphic badge */}
-          <div className="flex items-center gap-2.5 cursor-pointer group">
-            <div className="w-9 h-9 flex items-center justify-center rounded-lg glass-layer-2 transition-transform duration-300 group-hover:rotate-12" style={{ border: '1px solid var(--glass-border)' }}>
-              <span className="material-symbols-outlined" style={{ fontSize: 18, color: 'var(--color-primary)' }}>cloud_sync</span>
-            </div>
-            <span className="text-xl font-black tracking-tight" style={{ color: 'var(--text-primary)' }}>PandaHub</span>
-          </div>
-
-          {/* Desktop Nav */}
-          <nav className="hidden md:flex items-center gap-1">
-            {[
-              { href: '/explore', label: 'Product',     active: true },
-              { href: '/explore', label: 'Solutions',   active: false },
-              { href: '/explore', label: 'Open Source', active: false },
-              { href: '/explore', label: 'Pricing',     active: false },
-            ].map(({ href, label, active }) => (
-              <Link
-                key={label}
-                href={href}
-                className="px-4 py-2 rounded-xl text-sm font-semibold transition-all duration-300"
-                style={{
-                  color: active ? 'var(--color-primary)' : 'var(--text-secondary)',
-                  background: active ? 'rgba(10,132,255,0.10)' : 'transparent',
-                  boxShadow: active
-                    ? '3px 3px 8px var(--neo-shadow-d), -3px -3px 8px var(--neo-shadow-l)'
-                    : 'none',
-                }}
-                onMouseEnter={e => {
-                  if (!active) {
-                    e.currentTarget.style.background = 'var(--glass-bg-2)';
-                    e.currentTarget.style.color = 'var(--text-primary)';
-                  }
-                }}
-                onMouseLeave={e => {
-                  if (!active) {
-                    e.currentTarget.style.background = 'transparent';
-                    e.currentTarget.style.color = 'var(--text-secondary)';
-                  }
-                }}
-              >
-                {label}
-              </Link>
-            ))}
-          </nav>
-
-          {/* CTA buttons */}
-          <div className="flex items-center gap-2 sm:gap-3">
-            <a
-              href="/login"
-              className="hidden md:block btn-glass btn-ripple text-sm font-semibold px-4 py-2 rounded-xl"
-              style={{ color: 'var(--text-primary)' }}
-            >
-              Sign In
-            </a>
-            <a
-              href="/login"
-              className="btn-glass border btn-ripple px-4 sm:px-5 py-2 rounded-xl font-bold text-sm tracking-wide inline-flex items-center gap-2"
-            >
-              Get Started
-              <span className="material-symbols-outlined" style={{ fontSize: 16 }}>arrow_forward</span>
-            </a>
-            {/* Hamburger */}
-            <button
-              className="md:hidden btn-icon p-2"
-              aria-label="Open navigation menu"
-              aria-expanded={mobileMenuOpen}
-              onClick={() => setMobileMenuOpen(true)}
-              style={{ color: 'var(--text-secondary)' }}
-            >
-              <span className="material-symbols-outlined text-[24px]">menu</span>
-            </button>
-          </div>
-        </div>
-      </header>
-
-      {/* ═══════════════════════════════════════════════
-          HERO — Spatial + Glassmorphism
-      ═══════════════════════════════════════════════ */}
-      <section className="relative z-10 flex flex-col items-center justify-center text-center min-h-screen px-4 sm:px-6 pt-24 pb-28 md:pb-16 max-w-4xl mx-auto">
-
-        {/* Badge pill */}
-        <div className="motion-blur-down mb-6">
-          <div
-            className="inline-flex items-center gap-2 px-4 py-1.5 rounded-full text-xs font-bold tracking-widest uppercase"
-            style={{
-              background: 'var(--glass-bg-3)',
-              backdropFilter: 'blur(16px)',
-              WebkitBackdropFilter: 'blur(16px)',
-              border: '1px solid var(--glass-border)',
-              color: 'var(--color-primary)',
-              boxShadow: '0 4px 16px rgba(10,132,255,0.15), inset 0 1px 0 rgba(255,255,255,0.4)',
-            }}
-          >
-            <span
-              className="w-1.5 h-1.5 rounded-full animate-pulse"
-              style={{ background: 'var(--color-success)', boxShadow: '0 0 6px rgba(34,197,94,0.8)' }}
-            />
-            Now in Public Beta
-            <span className="material-symbols-outlined" style={{ fontSize: 14 }}>rocket_launch</span>
-          </div>
+          <div className="phx-chip chip-a"><Search size={14}/><div><small>DISCOVERY</small><b>Find what matters</b></div></div>
+          <div className="phx-chip chip-b"><Boxes size={14}/><div><small>DELIVERY</small><b>46 releases tracked</b></div></div>
         </div>
 
-        {/* Headline */}
-        <h1
-          className="motion-blur-hero text-[clamp(2.2rem,8vw,5rem)] font-black tracking-tighter leading-[1.05] mb-5"
-          style={{ color: 'var(--text-primary)', fontFamily: 'Space Grotesk, Inter, sans-serif' }}
-        >
-          Code hosting for the
-          <br />
-          <span className="text-gradient-hero">
-            {text}
-          </span>
-          <span
-            className="animate-cursor-blink inline-block w-0.5 h-[1em] ml-1 align-middle rounded-full"
-            style={{ background: 'var(--color-primary)', verticalAlign: '-0.1em' }}
-          />
-        </h1>
+        <div className="phx-scroll">SCROLL TO MOVE THE CAMERA <ArrowDownRight size={15}/></div>
+      </section>
 
-        {/* Subtitle */}
-        <p
-          className="motion-stagger-2 text-lg md:text-xl mb-10 max-w-xl font-medium leading-relaxed"
-          style={{ color: 'var(--text-secondary)' }}
-        >
-          Collaborate, build, and ship with PandaHub. The definitive platform for modern developer teams.
-        </p>
-
-        {/* CTA Buttons — Skeuomorphic + Glass */}
-        <div className="motion-stagger-3 flex flex-col sm:flex-row gap-4 w-full sm:w-auto">
-          <a
-            href="/login"
-            className="btn-glass border btn-ripple btn-motion-blur px-8 py-4 rounded-2xl font-bold text-base tracking-wide w-full sm:w-auto flex items-center justify-center gap-2 group min-h-[52px]"
-          >
-            Get Started Free
-            <span className="material-symbols-outlined transition-transform duration-300 group-hover:translate-x-1.5" style={{ fontSize: 20 }}>
-              arrow_forward
-            </span>
-          </a>
-          <button
-            className="btn-glass btn-ripple btn-motion-blur px-8 py-4 rounded-2xl font-bold text-base tracking-wide w-full sm:w-auto flex items-center justify-center gap-2 min-h-[52px]"
-            style={{ color: 'var(--text-primary)' }}
-          >
-            <span className="material-symbols-outlined" style={{ fontSize: 20 }}>terminal</span>
-            View Docs
-          </button>
+      <section className="phx-panel-section">
+        <div className="phx-panel-copy phx-content-reveal">
+          <div className="phx-number">01</div>
+          <div className="phx-kicker">THE WORKSPACE</div>
+          <h2>The screen is only the <i>surface.</i></h2>
+          <p>Scroll deeper and the interface opens into layers. Repository context, reviews, activity and shipping signals move at different depths.</p>
         </div>
-
-        {/* Stats row — floating Spatial layer */}
-        <div
-          className="motion-stagger-4 card-motion-blur mt-14 w-full max-w-lg rounded-3xl p-6 grid grid-cols-3 gap-4"
-          style={{
-            background: 'var(--glass-bg-3)',
-            backdropFilter: 'blur(20px) saturate(1.8)',
-            WebkitBackdropFilter: 'blur(20px) saturate(1.8)',
-            border: '1px solid var(--glass-border)',
-            boxShadow: '0 12px 40px rgba(0,0,0,0.12), inset 0 1px 0 rgba(255,255,255,0.35)',
-          }}
-        >
-          <AnimatedStat value="50K+"  label="Repos"       color="var(--color-primary)" />
-          <AnimatedStat value="12K+"  label="Developers"  color="var(--color-secondary)" />
-          <AnimatedStat value="99.9%" label="Uptime"      color="var(--color-success)" />
+        <div className="phx-layer-card layer-card-a">
+          <Layers3 size={14}/><small>CONNECTED WORKSPACE</small><strong>One system. Many signals.</strong>
+          <div className="mini-bars"><i/><i/><i/><i/><i/></div>
         </div>
       </section>
 
-      {/* ═══════════════════════════════════════════════
-          CODE WINDOW — Skeuomorphism
-      ═══════════════════════════════════════════════ */}
-      <RevealOnScroll className="w-full max-w-5xl mx-auto px-4 sm:px-6 mb-32 relative z-10">
-        <GlassWindow>
-          <div
-            className="p-5 sm:p-7 md:p-8 font-mono text-xs sm:text-sm overflow-x-auto"
-            style={{
-              background: 'linear-gradient(160deg, #0d1117 0%, #0a0e16 100%)',
-              backgroundImage: `
-                radial-gradient(at 0% 100%, rgba(10,132,255,0.06) 0, transparent 50%),
-                radial-gradient(at 100% 0%, rgba(124,58,237,0.06) 0, transparent 50%)
-              `,
-            }}
-          >
-            <pre style={{ color: '#8b9eb7' }}>
-              <code>
-                <span style={{ color: '#30D158', fontWeight: 700 }}>FastAPI Application</span>
-                <span style={{ color: '#64748b' }}> (The Brain)</span>{'\n'}
-                {'│   ├── '}
-                <span style={{ color: '#64D2FF' }}>app/</span>{'\n'}
-                {'│   │   ├── '}
-                <span style={{ color: '#64D2FF' }}>api/</span>
-                <span style={{ color: '#475569' }}>              # RESTful routing (users, repos, issues)</span>{'\n'}
-                {'│   │   ├── '}
-                <span style={{ color: '#64D2FF' }}>models/</span>
-                <span style={{ color: '#475569' }}>           # SQLAlchemy database schemas</span>{'\n'}
-                {'│   │   └── '}
-                <span style={{ color: '#64D2FF' }}>services/</span>
-                <span style={{ color: '#475569' }}>         # Business logic (auth, permissions)</span>{'\n'}
-                {'│\n'}
-                {'├── '}
-                <span style={{ color: '#BF5AF2', fontWeight: 700 }}>git-server/</span>
-                <span style={{ color: '#475569' }}>               # The Protocol Layer (Go/Rust/Python)</span>{'\n'}
-                {'│   ├── '}
-                <span style={{ color: '#64D2FF' }}>ssh_handler/</span>
-                <span style={{ color: '#475569' }}>          # Validates SSH keys for push/pull</span>{'\n'}
-                {'│   └── '}
-                <span style={{ color: '#64D2FF' }}>git_engine/</span>
-                <span style={{ color: '#475569' }}>           # Talks directly to the LibGit2 C-library</span>{'\n'}
-                {'│\n'}
-                {'└── '}
-                <span style={{ color: '#FF6B6B', fontWeight: 700 }}>infrastructure/</span>
-                <span style={{ color: '#475569' }}>           # Deployment & DevOps</span>{'\n'}
-                {'    ├── '}
-                docker-compose.yml
-                <span style={{ color: '#475569' }}>    # Runs Postgres, Redis, and services locally</span>{'\n'}
-                {'    └── '}
-                <span style={{ color: '#64D2FF' }}>runners/</span>
-                <span style={{ color: '#475569' }}>              # Scripts to spin up isolated CI/CD containers</span>
-              </code>
-            </pre>
-          </div>
-        </GlassWindow>
-      </RevealOnScroll>
-
-      {/* ═══════════════════════════════════════════════
-          FEATURE CARDS — Neomorphism + Spatial
-      ═══════════════════════════════════════════════ */}
-      <section className="w-full max-w-6xl mx-auto px-4 sm:px-6 mb-32 relative z-10">
-        <RevealOnScroll className="text-center mb-14">
-          <h2
-            className="text-3xl md:text-5xl font-black tracking-tighter mb-4"
-            style={{ color: 'var(--text-primary)', fontFamily: 'Space Grotesk, sans-serif' }}
-          >
-            Everything you need to{' '}
-            <span className="text-gradient-hero">ship faster</span>
-          </h2>
-          <p className="text-lg font-medium max-w-xl mx-auto" style={{ color: 'var(--text-secondary)' }}>
-            An integrated platform built for modern teams who move at the speed of thought.
-          </p>
-        </RevealOnScroll>
-
-        <div className="flex overflow-x-auto snap-x snap-mandatory hide-scrollbar md:grid md:grid-cols-3 gap-5 pb-4">
-          {[
-            {
-              icon: 'source',
-              title: 'Version Control',
-              subtitle: 'Hosting Service',
-              desc: 'Its core function is hosting Git repositories. It acts as the central server where a permanent, tracked history of source code is stored, allowing you to branch off, experiment, and merge code safely.',
-              gradient: 'linear-gradient(145deg, #1a9aff 0%, #0055cc 100%)',
-              glowColor: 'rgba(10,132,255,0.3)',
-            },
-            {
-              icon: 'group',
-              title: 'Collaborative',
-              subtitle: 'Dev Platform',
-              desc: 'Built-in tools for tracking bugs (Issues), planning sprints, and reviewing code (Pull Requests) before it is integrated into the main codebase.',
-              gradient: 'linear-gradient(145deg, #a855f7 0%, #6d28d9 100%)',
-              glowColor: 'rgba(124,58,237,0.3)',
-            },
-            {
-              icon: 'rocket_launch',
-              title: 'CI/CD &',
-              subtitle: 'Automation Platform',
-              desc: 'Through PandaHub Actions, the platform can automatically run tests and trigger live deployments directly to external hosting environments like Vercel.',
-              gradient: 'linear-gradient(145deg, #34d399 0%, #059669 100%)',
-              glowColor: 'rgba(34,197,94,0.3)',
-            },
-          ].map(({ icon, title, subtitle, desc, gradient, glowColor }, i) => (
-            <RevealOnScroll key={title} delay={i * 100} className="flex-none w-[84vw] md:w-auto snap-center">
-              <TiltCard className="glass-layer-2 rounded-2xl border border-[var(--glass-border)] p-7 flex flex-col gap-5 cursor-default h-full">
-                {/* Skeuomorphic app icon */}
-                <AppIcon icon={icon} color="#fff" gradient={gradient} />
-
-                <div>
-                  <p className="text-xs font-bold tracking-widest uppercase mb-1" style={{ color: 'var(--text-muted)' }}>
-                    {subtitle}
-                  </p>
-                  <h3
-                    className="text-xl font-black leading-tight"
-                    style={{ color: 'var(--text-primary)', fontFamily: 'Space Grotesk, sans-serif' }}
-                  >
-                    {title}
-                  </h3>
-                </div>
-
-                <p className="text-sm leading-relaxed flex-grow" style={{ color: 'var(--text-secondary)' }}>
-                  {desc}
-                </p>
-
-                {/* Neo progress indicator */}
-                <div
-                  className="w-full h-1 rounded-full overflow-hidden" style={{ background: "rgba(255,255,255,0.05)" }}
-                >
-                  <div
-                    className="h-full rounded-full animate-gradient"
-                    style={{
-                      width: '70%',
-                      background: gradient,
-                      backgroundSize: '200% 200%',
-                      boxShadow: `0 0 8px ${glowColor}`,
-                    }}
-                  />
-                </div>
-              </TiltCard>
-            </RevealOnScroll>
-          ))}
+      <section className="phx-panel-section second">
+        <div className="phx-orb-scene">
+          <div className="core"><span>PANDA</span><b>HUB</b></div>
+          <div className="orb-ring o1"/>
+          <div className="orb-ring o2"/>
+          <div className="orb-ring o3"/>
+        </div>
+        <div className="phx-panel-copy phx-content-reveal">
+          <div className="phx-number">02</div>
+          <div className="phx-kicker">MOTION ENGINE</div>
+          <h2>Movement with <i>intent.</i></h2>
+          <p>The camera, rings, light field and depth planes react to scroll progress, creating the feeling of travelling through a living product environment.</p>
         </div>
       </section>
 
-      {/* ═══════════════════════════════════════════════
-          ARCHITECTURE BENTO — Spatial + Glass + Neo
-      ═══════════════════════════════════════════════ */}
-      <RevealOnScroll className="w-full max-w-6xl mx-auto px-4 sm:px-6 mb-32 relative z-10">
-        <div className="text-center mb-14">
-          <h2
-            className="text-3xl md:text-5xl font-black tracking-tighter mb-4"
-            style={{ color: 'var(--text-primary)', fontFamily: 'Space Grotesk, sans-serif' }}
-          >
-            Platform{' '}
-            <span className="text-gradient-hero">Architecture</span>
-          </h2>
-          <p className="font-medium text-lg max-w-xl mx-auto" style={{ color: 'var(--text-secondary)' }}>
-            Built from the ground up for massive scale, extreme concurrency, and unbreakable security.
-          </p>
+      <section className="phx-panel-section third">
+        <div className="phx-panel-copy phx-content-reveal">
+          <div className="phx-number">03</div>
+          <div className="phx-kicker">SIGNAL OVER NOISE</div>
+          <h2>Premium feels <i>quiet.</i></h2>
+          <p>Pure monochrome, crisp borders, measured typography and restrained motion. No neon required.</p>
+          <Link href="/dashboard" className="phx-inline">Open workspace <ArrowRight size={16}/></Link>
         </div>
-
-        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-12 gap-5">
-
-          {/* 1. Protocol Layer — Glassmorphism */}
-          <RevealOnScroll delay={0} className="lg:col-span-8">
-            <div
-              className="glass-layer-3 p-7 rounded-3xl group relative overflow-hidden transition-all duration-500 h-full"
-              style={{
-                border: '1px solid var(--glass-border)',
-                boxShadow: '0 8px 40px rgba(10,132,255,0.08), inset 0 1px 0 rgba(255,255,255,0.3)',
-              }}
-              onMouseEnter={e => {
-                e.currentTarget.style.boxShadow = '0 16px 60px rgba(10,132,255,0.15), inset 0 1px 0 rgba(255,255,255,0.4), 0 0 0 1px rgba(10,132,255,0.2)';
-              }}
-              onMouseLeave={e => {
-                e.currentTarget.style.boxShadow = '0 8px 40px rgba(10,132,255,0.08), inset 0 1px 0 rgba(255,255,255,0.3)';
-              }}
-            >
-              <div className="absolute top-0 right-0 w-56 h-56 rounded-full -mr-16 -mt-16 pointer-events-none"
-                style={{ background: 'radial-gradient(ellipse, rgba(10,132,255,0.12) 0%, transparent 70%)' }} />
-
-              <div className="flex items-center gap-3 mb-5 relative z-10">
-                <div className="skeu-icon-badge w-11 h-11 flex items-center justify-center"
-                  style={{ background: 'linear-gradient(145deg, #1a9aff, #0044bb)' }}>
-                  <span className="material-symbols-outlined" style={{ fontSize: 20, color: 'white', fontVariationSettings: '"FILL" 1' }}>terminal</span>
-                </div>
-                <div>
-                  <p className="text-xs font-bold uppercase tracking-widest" style={{ color: 'var(--color-primary)' }}>Layer 01</p>
-                  <h3 className="text-xl font-black" style={{ color: 'var(--text-primary)' }}>The Protocol Layer</h3>
-                </div>
-              </div>
-              <p className="text-sm mb-6 relative z-10" style={{ color: 'var(--text-secondary)' }}>
-                The engine that speaks directly to developers&apos; local terminals.
-              </p>
-
-              <div className="grid grid-cols-1 sm:grid-cols-3 gap-4 relative z-10">
-                {[
-                  { icon: 'key', label: 'SSH Server', desc: 'Handles secure connections, verifies keys, and routes git-receive-pack commands.', color: '#0A84FF' },
-                  { icon: 'http', label: 'Smart HTTP', desc: 'Efficient stream processing over HTTPS so massive codebases don\'t crash memory.', color: '#30D158' },
-                  { icon: 'memory', label: 'Git Abstraction', desc: 'Low-level library parsing raw Git objects directly for instant frontend diffs.', color: '#BF5AF2' },
-                ].map(({ icon, label, desc, color }) => (
-                  <div
-                    key={label}
-                    className="neo-inset p-4 rounded-2xl transition-all duration-300 hover:scale-[1.02]"
-                    style={{ background: 'var(--neo-bg)' }}
-                  >
-                    <h4 className="font-black text-sm mb-2 flex items-center gap-2" style={{ color: 'var(--text-primary)' }}>
-                      <span className="material-symbols-outlined" style={{ fontSize: 16, color }}>{icon}</span>
-                      {label}
-                    </h4>
-                    <p className="text-xs leading-relaxed" style={{ color: 'var(--text-muted)' }}>{desc}</p>
-                  </div>
-                ))}
-              </div>
-            </div>
-          </RevealOnScroll>
-
-          {/* 2. Dual Storage — Neomorphism */}
-          <RevealOnScroll delay={80} className="lg:col-span-4">
-            <div
-              className="glass-layer-2 rounded-2xl border border-[var(--glass-border)] p-7 rounded-3xl flex flex-col h-full"
-              style={{ background: 'var(--neo-bg)' }}
-            >
-              <div className="flex items-center gap-3 mb-4">
-                <div className="skeu-icon-badge w-11 h-11 flex items-center justify-center"
-                  style={{ background: 'linear-gradient(145deg, #fb923c, #c2410c)' }}>
-                  <span className="material-symbols-outlined" style={{ fontSize: 20, color: 'white', fontVariationSettings: '"FILL" 1' }}>database</span>
-                </div>
-                <div>
-                  <p className="text-xs font-bold uppercase tracking-widest" style={{ color: '#f97316' }}>Layer 02</p>
-                  <h3 className="text-xl font-black" style={{ color: 'var(--text-primary)' }}>Dual-Storage</h3>
-                </div>
-              </div>
-              <p className="text-sm mb-5 flex-grow" style={{ color: 'var(--text-secondary)' }}>
-                A split architecture to separate metadata from raw blobs.
-              </p>
-              <div className="space-y-3">
-                {[
-                  { icon: 'table', label: 'Relational DB', sub: 'PostgreSQL for users, issues, PRs.' },
-                  { icon: 'folder_zip', label: 'Object Storage', sub: 'AWS S3/MinIO for raw Git files & LFS.' },
-                ].map(({ icon, label, sub }) => (
-                  <div
-                    key={label}
-                    className="neo-inset flex items-start gap-3 p-3.5 rounded-2xl"
-                    style={{ background: 'var(--neo-bg)' }}
-                  >
-                    <span className="material-symbols-outlined" style={{ fontSize: 20, color: '#f97316', marginTop: 1 }}>{icon}</span>
-                    <div>
-                      <h4 className="text-sm font-bold" style={{ color: 'var(--text-primary)' }}>{label}</h4>
-                      <p className="text-xs" style={{ color: 'var(--text-muted)' }}>{sub}</p>
-                    </div>
-                  </div>
-                ))}
-              </div>
-            </div>
-          </RevealOnScroll>
-
-          {/* 3. Web App & API — Glass */}
-          <RevealOnScroll delay={140} className="lg:col-span-5">
-            <div
-              className="glass-layer-3 p-7 rounded-3xl relative overflow-hidden h-full transition-all duration-500"
-              style={{
-                border: '1px solid var(--glass-border)',
-                boxShadow: '0 8px 40px rgba(244,63,94,0.07), inset 0 1px 0 rgba(255,255,255,0.3)',
-              }}
-              onMouseEnter={e => {
-                e.currentTarget.style.boxShadow = '0 16px 60px rgba(244,63,94,0.14), inset 0 1px 0 rgba(255,255,255,0.4), 0 0 0 1px rgba(244,63,94,0.2)';
-              }}
-              onMouseLeave={e => {
-                e.currentTarget.style.boxShadow = '0 8px 40px rgba(244,63,94,0.07), inset 0 1px 0 rgba(255,255,255,0.3)';
-              }}
-            >
-              <div className="absolute inset-0 pointer-events-none"
-                style={{ background: 'radial-gradient(ellipse at 50% 50%, rgba(244,63,94,0.08) 0%, transparent 70%)' }} />
-
-              <div className="flex items-center gap-3 mb-5 relative z-10">
-                <div className="skeu-icon-badge w-11 h-11 flex items-center justify-center"
-                  style={{ background: 'linear-gradient(145deg, #f87171, #be123c)' }}>
-                  <span className="material-symbols-outlined" style={{ fontSize: 20, color: 'white', fontVariationSettings: '"FILL" 1' }}>api</span>
-                </div>
-                <div>
-                  <p className="text-xs font-bold uppercase tracking-widest" style={{ color: '#f43f5e' }}>Layer 03</p>
-                  <h3 className="text-xl font-black" style={{ color: 'var(--text-primary)' }}>Web App & API</h3>
-                </div>
-              </div>
-
-              <div className="space-y-4 relative z-10">
-                {[
-                  { dot: '#f43f5e', label: 'Dynamic Frontend', sub: 'Next.js & React for file trees and side-by-side diffs.' },
-                  { dot: '#f43f5e', label: 'Fast Backend API',  sub: 'Go/Rust/FastAPI for concurrent user auth and permissions.' },
-                  { dot: '#f43f5e', label: 'Search Engine',     sub: 'Elasticsearch to index millions of files instantly.' },
-                ].map(({ dot, label, sub }) => (
-                  <div key={label}>
-                    <h4 className="font-black text-sm flex items-center gap-2" style={{ color: 'var(--text-primary)' }}>
-                      <span className="w-2 h-2 rounded-full flex-shrink-0" style={{ background: dot, boxShadow: `0 0 6px ${dot}` }} />
-                      {label}
-                    </h4>
-                    <p className="text-xs leading-relaxed pl-4 mt-1" style={{ color: 'var(--text-muted)' }}>{sub}</p>
-                  </div>
-                ))}
-              </div>
-            </div>
-          </RevealOnScroll>
-
-          {/* 4. Workers & CI/CD — Neo + Glass hybrid */}
-          <RevealOnScroll delay={200} className="lg:col-span-7">
-            <div
-              className="glass-layer-3 p-7 rounded-3xl relative overflow-hidden h-full transition-all duration-500"
-              style={{
-                border: '1px solid var(--glass-border)',
-                boxShadow: '0 8px 40px rgba(34,197,94,0.07), inset 0 1px 0 rgba(255,255,255,0.3)',
-              }}
-              onMouseEnter={e => {
-                e.currentTarget.style.boxShadow = '0 16px 60px rgba(34,197,94,0.14), inset 0 1px 0 rgba(255,255,255,0.4), 0 0 0 1px rgba(34,197,94,0.2)';
-              }}
-              onMouseLeave={e => {
-                e.currentTarget.style.boxShadow = '0 8px 40px rgba(34,197,94,0.07), inset 0 1px 0 rgba(255,255,255,0.3)';
-              }}
-            >
-              <div className="absolute right-0 bottom-0 w-48 h-48 pointer-events-none"
-                style={{ background: 'radial-gradient(ellipse, rgba(34,197,94,0.10) 0%, transparent 70%)' }} />
-
-              <div className="flex items-center gap-3 mb-5 relative z-10">
-                <div className="skeu-icon-badge w-11 h-11 flex items-center justify-center"
-                  style={{ background: 'linear-gradient(145deg, #4ade80, #15803d)' }}>
-                  <span className="material-symbols-outlined" style={{ fontSize: 20, color: 'white', fontVariationSettings: '"FILL" 1' }}>conveyor_belt</span>
-                </div>
-                <div>
-                  <p className="text-xs font-bold uppercase tracking-widest" style={{ color: '#22c55e' }}>Layer 04</p>
-                  <h3 className="text-xl font-black" style={{ color: 'var(--text-primary)' }}>Workers & CI/CD</h3>
-                </div>
-              </div>
-              <p className="text-sm mb-6 relative z-10" style={{ color: 'var(--text-secondary)' }}>
-                Doing the heavy lifting asynchronously to keep the platform lightning fast.
-              </p>
-
-              <div className="flex flex-col sm:flex-row gap-4 relative z-10">
-                {[
-                  { icon: 'queue', label: 'Message Brokers', desc: 'Redis or RabbitMQ queue background tasks like notifications and webhook triggers.' },
-                  { icon: 'dns',   label: 'Runner Infrastructure', desc: 'Isolated Docker & Kubernetes clusters to safely execute untrusted CI build scripts.' },
-                ].map(({ icon, label, desc }) => (
-                  <div
-                    key={label}
-                    className="flex-1 neo-inset p-5 rounded-2xl transition-all duration-300 hover:scale-[1.02]"
-                    style={{ background: 'var(--neo-bg)' }}
-                  >
-                    <span className="material-symbols-outlined mb-3 block" style={{ fontSize: 22, color: '#22c55e' }}>{icon}</span>
-                    <h4 className="font-black text-sm mb-2" style={{ color: 'var(--text-primary)' }}>{label}</h4>
-                    <p className="text-xs leading-relaxed" style={{ color: 'var(--text-muted)' }}>{desc}</p>
-                  </div>
-                ))}
-              </div>
-            </div>
-          </RevealOnScroll>
+        <div className="phx-terminal">
+          <div className="terminal-head"><span><Terminal size={14}/> terminal</span><em>LIVE</em></div>
+          <pre>{`$ panda connect\n> repository linked\n> review queue synchronized\n> deployment pipeline ready\n\n$ panda ship --prod\n> checks passed\n> production updated`}</pre>
         </div>
-      </RevealOnScroll>
+      </section>
 
-      {/* ═══════════════════════════════════════════════
-          FINAL CTA BANNER — Skeuomorphism
-      ═══════════════════════════════════════════════ */}
-      <RevealOnScroll className="w-full max-w-4xl mx-auto px-4 sm:px-6 mb-32 relative z-10">
-        <div
-          className="rounded-3xl p-10 text-center relative overflow-hidden"
-          style={{
-            background: 'linear-gradient(135deg, #0a1628 0%, #0f2044 50%, #0a1628 100%)',
-            boxShadow: `
-              inset 0 1px 0 rgba(255,255,255,0.12),
-              inset 0 -1px 0 rgba(0,0,0,0.4),
-              0 32px 80px rgba(0,0,0,0.4),
-              0 12px 32px rgba(10,132,255,0.15)
-            `,
-            border: '1px solid rgba(10,132,255,0.25)',
-          }}
-        >
-          {/* Inner gloss */}
-          <div
-            className="absolute top-0 left-0 right-0 h-1/2 pointer-events-none rounded-3xl"
-            style={{ background: 'linear-gradient(180deg, rgba(255,255,255,0.06) 0%, transparent 100%)' }}
-          />
-          {/* Orbs */}
-          <div className="absolute top-0 left-1/4 w-64 h-64 rounded-full pointer-events-none"
-            style={{ background: 'radial-gradient(ellipse, rgba(10,132,255,0.18) 0%, transparent 70%)' }} />
-          <div className="absolute bottom-0 right-1/4 w-48 h-48 rounded-full pointer-events-none"
-            style={{ background: 'radial-gradient(ellipse, rgba(124,58,237,0.18) 0%, transparent 70%)' }} />
-
-          <div className="relative z-10">
-            <h2 className="text-3xl md:text-5xl font-black tracking-tighter mb-4 text-white">
-              Ready to build the future?
-            </h2>
-            <p className="text-lg mb-8 font-medium" style={{ color: 'rgba(255,255,255,0.6)' }}>
-              Join thousands of developers already shipping faster with PandaHub.
-            </p>
-            <div className="flex flex-col sm:flex-row gap-4 justify-center">
-              <a
-                href="/login"
-                className="btn-glass border btn-ripple px-8 py-4 rounded-2xl font-bold text-base tracking-wide inline-flex items-center justify-center gap-2 group"
-              >
-                Start for Free
-                <span className="material-symbols-outlined transition-transform duration-300 group-hover:translate-x-1.5" style={{ fontSize: 20 }}>
-                  arrow_forward
-                </span>
-              </a>
-              <a
-                href="/explore"
-                className="btn-glass btn-ripple px-8 py-4 rounded-2xl font-bold text-base inline-flex items-center justify-center gap-2"
-                style={{ color: 'rgba(255,255,255,0.85)' }}
-              >
-                <span className="material-symbols-outlined" style={{ fontSize: 20 }}>explore</span>
-                Explore Projects
-              </a>
-            </div>
-          </div>
+      <section className="phx-end">
+        <div className="phx-end-copy phx-content-reveal">
+          <div className="phx-kicker">04 / ENTER THE SYSTEM</div>
+          <h2>Make the next <i>commit matter.</i></h2>
+          <Link href="/register" className="phx-primary large">Create your workspace <ArrowRight size={18}/></Link>
         </div>
-      </RevealOnScroll>
+      </section>
 
-      {/* ═══════════════════════════════════════════════
-          FOOTER — Glass
-      ═══════════════════════════════════════════════ */}
-      <footer
-        className="w-full relative z-10 transition-colors duration-300"
-        style={{
-          background: 'var(--glass-bg-4)',
-          backdropFilter: 'blur(32px) saturate(2)',
-          WebkitBackdropFilter: 'blur(32px) saturate(2)',
-          borderTop: '1px solid var(--glass-border)',
-          boxShadow: 'inset 0 1px 0 rgba(255,255,255,0.25)',
-        }}
-      >
-        <div className="flex flex-col md:flex-row justify-between items-center py-8 px-6 max-w-7xl mx-auto gap-6">
-          <div className="flex items-center gap-2.5 font-black text-lg" style={{ color: 'var(--text-primary)' }}>
-            <div
-              className="skeu-icon-badge w-8 h-8 flex items-center justify-center"
-              style={{ background: 'linear-gradient(145deg, #1a9aff, #0055cc)' }}
-            >
-              <span className="material-symbols-outlined" style={{ fontSize: 15, color: 'white', fontVariationSettings: '"FILL" 1' }}>cloud_sync</span>
-            </div>
-            PandaHub
-          </div>
-
-          <nav className="flex flex-wrap justify-center gap-6 text-sm">
-            {['Security', 'Privacy', 'Terms', 'Docs', 'Status'].map(link => (
-              <Link
-                key={link}
-                href="/explore"
-                className="font-semibold transition-all duration-200 hover:underline decoration-primary underline-offset-4"
-                style={{ color: 'var(--text-muted)' }}
-                onMouseEnter={e => { e.currentTarget.style.color = 'var(--color-primary)'; }}
-                onMouseLeave={e => { e.currentTarget.style.color = 'var(--text-muted)'; }}
-              >
-                {link}
-              </Link>
-            ))}
-          </nav>
-
-          <div className="text-xs font-semibold" style={{ color: 'var(--text-muted)' }}>
-            © 2027 PandaHub, Inc.
-          </div>
+      <footer className="phx-footer">
+        <span>PANDAHUB</span>
+        <div>
+          <Link href="/explore">Explore</Link>
+          <Link href="/startups">Startups</Link>
+          <Link href="/login">Sign in</Link>
         </div>
+        <Github size={15}/>
       </footer>
-
-      {/* Mobile Bottom Nav */}
-      <MobileBottomNav active={0} />
-
-      {/* Settings */}
-      <Settings />
     </main>
   );
 }

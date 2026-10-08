@@ -134,13 +134,13 @@ export default function ChatBox({ recipientUsername, onClose }: ChatBoxProps) {
   return (
     <div className="fixed bottom-4 right-4 w-80 h-[430px] glass-panel rounded-2xl shadow-2xl flex flex-col z-50 overflow-hidden font-sans border border-[var(--glass-border)] animate-fade-in-up">
       {/* Header */}
-      <div className="px-4 py-3 bg-gradient-to-r from-blue-600/90 to-purple-600/90 backdrop-blur-md text-white flex justify-between items-center shrink-0 border-b border-white/10">
+      <div className="px-4 py-3 bg-[#18181b] border-b border-[#333333] text-white flex justify-between items-center shrink-0">
         <div className="flex items-center gap-2">
-          <Lock className="w-3.5 h-3.5 opacity-90" />
+          <Lock className="w-3.5 h-3.5 opacity-90 text-white" />
           <h3 className="font-semibold text-sm">Chat with {recipientUsername}</h3>
         </div>
-        <button onClick={onClose} className="hover:bg-white/20 p-1 rounded-md transition-colors" aria-label="Close chat">
-          <X className="w-4 h-4" />
+        <button onClick={onClose} className="hover:bg-white/10 p-1 rounded-md transition-colors" aria-label="Close chat">
+          <X className="w-4 h-4 text-white" />
         </button>
       </div>
 
@@ -197,8 +197,8 @@ export default function ChatBox({ recipientUsername, onClose }: ChatBoxProps) {
           <div key={msg.id} className={`flex ${msg.isMine ? 'justify-end' : 'justify-start'}`}>
             <div className={`max-w-[80%] rounded-2xl px-3.5 py-2 text-sm shadow-sm ${
               msg.isMine 
-                ? 'bg-gradient-to-r from-blue-600 to-indigo-600 text-white rounded-br-none shadow-blue-500/20' 
-                : 'glass-card text-slate-800 dark:text-slate-200 rounded-bl-none'
+                ? 'bg-white text-black font-semibold rounded-br-none shadow-md' 
+                : 'bg-[#18181b] border border-[#333333] text-zinc-100 rounded-bl-none'
             }`}>
               {msg.text}
             </div>
@@ -208,7 +208,7 @@ export default function ChatBox({ recipientUsername, onClose }: ChatBoxProps) {
       </div>
 
       {/* Input */}
-      <form onSubmit={handleSend} className="p-3 border-t border-[var(--glass-border)] flex gap-2 shrink-0" style={{ background: 'var(--glass-bg-3)' }}>
+      <form onSubmit={handleSend} className="p-3 border-t border-[#333333] flex gap-2 shrink-0 bg-[#0e0e10]">
         <input 
           type="text" 
           value={input}
@@ -220,7 +220,7 @@ export default function ChatBox({ recipientUsername, onClose }: ChatBoxProps) {
         <button 
           type="submit" 
           disabled={!input.trim() || chatState !== 'ready'}
-          className="bg-blue-600 hover:bg-blue-700 disabled:opacity-40 disabled:cursor-not-allowed text-white rounded-full p-2 flex items-center justify-center transition-colors shadow-sm"
+          className="bg-white hover:bg-zinc-200 disabled:opacity-40 disabled:cursor-not-allowed text-black rounded-full p-2 flex items-center justify-center transition-colors shadow-md"
           aria-label="Send message"
         >
           <Send className="w-4 h-4" />

@@ -26,7 +26,9 @@ celery_app = Celery(
         "app.worker.tasks.email_tasks",
         "app.worker.tasks.git_tasks",
         "app.worker.tasks.pages_tasks",
-        # "app.worker.tasks.ai_tasks",    -- added in Module 11
+        "app.worker.tasks.ai_tasks",
+        "app.worker.tasks.rag_tasks",
+        "app.worker.tasks.crc_tasks",
     ],
 )
 
@@ -44,8 +46,10 @@ celery_app.conf.update(
     task_reject_on_worker_lost=True,
     task_routes={
         "app.worker.tasks.email_tasks.*": {"queue": "email"},
-        "app.worker.tasks.git_tasks.*": {"queue": "git_ops"},
-        "app.worker.tasks.ai_tasks.*": {"queue": "ai_ops"},
+        "app.worker.tasks.git_tasks.*":   {"queue": "git_ops"},
+        "app.worker.tasks.ai_tasks.*":    {"queue": "ai_ops"},
+        "app.worker.tasks.rag_tasks.*":   {"queue": "ai_ops"},  # shares ai_ops queue
+        "app.worker.tasks.crc_tasks.*":   {"queue": "ai_ops"},  # classifier / benchmark tasks
     },
     # Retry policy for transient failures (SMTP server hiccup, etc.) --
     # applied per-task via @celery_app.task(max_retries=..., default_retry_delay=...)

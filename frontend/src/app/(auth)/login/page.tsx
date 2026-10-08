@@ -266,7 +266,7 @@ function LoginPageContent() {
 <div className="w-full border-t border-white/10"></div>
 </div>
 <div className="relative flex justify-center text-xs">
-<span className="px-3 bg-transparent text-outline font-label backdrop-blur-sm">Or continue with</span>
+<span className="px-3 bg-transparent text-outline font-label">Or continue with</span>
 </div>
 </div>
 <div className="mt-6 grid grid-cols-2 gap-4">

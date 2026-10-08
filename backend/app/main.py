@@ -13,7 +13,7 @@ from pathlib import Path
 from fastapi import FastAPI
 from fastapi.middleware.cors import CORSMiddleware
 
-from app.api.v1 import auth, repos, git, issues, pulls, orgs, startups, messages, pages, error_logs
+from app.api.v1 import auth, repos, git, issues, pulls, orgs, startups, messages, pages, error_logs, ai
 from app.api import ws
 from app.core.config import get_settings
 from app.core.exceptions import register_exception_handlers
@@ -183,6 +183,8 @@ app.include_router(messages.router, prefix=f"{settings.API_V1_PREFIX}/messages",
 app.include_router(pages.router, prefix=settings.API_V1_PREFIX)
 # Admin error log — superuser-only, exposes the in-memory error buffer
 app.include_router(error_logs.router, prefix=settings.API_V1_PREFIX)
+# AI Intelligence layer — Module 11 routing, telemetry, and evaluation
+app.include_router(ai.router, prefix=settings.API_V1_PREFIX)
 # Git transport routes are NOT under /api/v1 — they use the /git/ prefix
 # that nginx routes separately (proxy_request_buffering off, long timeouts).
 # The .git URL convention is a well-known client expectation that must not

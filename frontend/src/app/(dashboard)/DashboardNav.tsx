@@ -1,4 +1,4 @@
-"use client";
+﻿"use client";
 import { useState, useEffect, useRef } from 'react';
 import { useRouter, usePathname } from 'next/navigation';
 import Link from 'next/link';
@@ -66,8 +66,8 @@ export default function DashboardNav() {
             <div className="flex items-center gap-2 font-bold text-[16px] tracking-tight" style={{ color: 'var(--text-primary)' }}>
               <div
                 className="flex items-center justify-center text-[15px]"
-                style={{ width:28, height:28, borderRadius:8, background:'linear-gradient(135deg,#0A84FF,#6d28d9)', boxShadow:'0 3px 10px rgba(10,132,255,0.3)' }}
-              >🐼</div>
+                style={{ width:28, height:28, borderRadius:8, background:'#18181b', border:'1px solid #333333', boxShadow:'none' }}
+              >ðŸ¼</div>
               PandaHub
             </div>
             <button onClick={() => setMobileNavOpen(false)} className="btn-icon p-2" aria-label="Close menu" style={{ color: 'var(--text-secondary)' }}>
@@ -105,8 +105,8 @@ export default function DashboardNav() {
         background: scrolled
           ? 'rgba(255,255,255,0.88)'
           : 'rgba(255,255,255,0.72)',
-        backdropFilter: 'blur(20px) saturate(1.6)',
-        WebkitBackdropFilter: 'blur(20px) saturate(1.6)',
+        backdropFilter: '(20px) saturate(1.6)',
+        WebkitBackdropFilter: '(20px) saturate(1.6)',
         borderBottom: scrolled
           ? '1px solid rgba(15,23,42,0.1)'
           : '1px solid rgba(15,23,42,0.06)',
@@ -129,11 +129,11 @@ export default function DashboardNav() {
             className="flex items-center justify-center text-[17px] transition-transform duration-300 group-hover:scale-110 group-hover:rotate-[-6deg]"
             style={{
               width: 32, height: 32, borderRadius: 9,
-              background: 'linear-gradient(135deg, #0A84FF, #6d28d9)',
+              background: '#18181b', border: '1px solid #333333',
               boxShadow: '0 4px 12px rgba(10,132,255,0.3)',
             }}
           >
-            🐼
+            ðŸ¼
           </div>
           <span
             className="font-bold text-[17px] tracking-tight transition-colors duration-200 group-hover:text-blue-600"
@@ -143,7 +143,7 @@ export default function DashboardNav() {
           </span>
         </Link>
 
-        {/* Centre nav links — desktop only */}
+        {/* Centre nav links â€” desktop only */}
         <div className="hidden md:flex items-center gap-1">
           {NAV_LINKS.map(link => {
             const isActive = pathname === link.href;
@@ -163,7 +163,7 @@ export default function DashboardNav() {
 
         {/* Right side */}
         <div className="flex items-center gap-1 sm:gap-2">
-          {/* Notifications — desktop only */}
+          {/* Notifications â€” desktop only */}
           <button
             className="hidden md:inline-flex btn-icon p-2"
             data-tooltip="Notifications"
@@ -173,7 +173,7 @@ export default function DashboardNav() {
             <span className="material-symbols-outlined text-[20px]">notifications</span>
           </button>
 
-          {/* New repo shortcut — desktop only */}
+          {/* New repo shortcut â€” desktop only */}
           <Link
             href="/new"
             className="hidden md:flex btn-glass items-center gap-1.5 px-3 py-1.5 text-[13px]"
@@ -191,7 +191,7 @@ export default function DashboardNav() {
                 className="relative flex items-center justify-center rounded-full font-bold text-[13px] text-white transition-all duration-200 hover:scale-110 focus:outline-none"
                 style={{
                   width: 34, height: 34,
-                  background: 'linear-gradient(135deg, #0A84FF, #6d28d9)',
+                  background: '#18181b', border: '1px solid #333333',
                   boxShadow: isProfileOpen
                     ? '0 0 0 3px rgba(10,132,255,0.35), 0 0 0 1px rgba(10,132,255,0.8)'
                     : '0 0 0 2px rgba(10,132,255,0)',
@@ -214,8 +214,8 @@ export default function DashboardNav() {
                   className="dropdown absolute right-0 mt-2 w-56 rounded-2xl overflow-hidden z-50"
                   style={{
                     background: 'rgba(255,255,255,0.96)',
-                    backdropFilter: 'blur(20px)',
-                    WebkitBackdropFilter: 'blur(20px)',
+                    backdropFilter: '(20px)',
+                    WebkitBackdropFilter: '(20px)',
                     border: '1px solid rgba(15,23,42,0.09)',
                     boxShadow: '0 16px 50px rgba(15,23,42,0.14), 0 0 0 1px rgba(255,255,255,0.8) inset',
                     maxWidth: 'calc(100vw - 24px)',
@@ -229,7 +229,7 @@ export default function DashboardNav() {
                     <div className="flex items-center gap-3">
                       <div
                         className="w-9 h-9 rounded-full flex items-center justify-center text-white font-bold text-[14px] shrink-0"
-                        style={{ background: 'linear-gradient(135deg,#0A84FF,#6d28d9)', boxShadow: '0 4px 10px rgba(10,132,255,0.3)' }}
+                        style={{ background: '#18181b', border: '1px solid #333333', boxShadow: 'none' }}
                       >
                         {initial}
                       </div>
@@ -273,7 +273,7 @@ export default function DashboardNav() {
                     <button
                       onClick={handleLogout}
                       className="sidebar-item w-full text-[13px] text-red-500 hover:text-red-600"
-                      style={{ borderRadius: 9, color: '#ef4444' }}
+                      style={{ borderRadius: 9, color: '#A6A6A6' }}
                     >
                       <span className="material-symbols-outlined icon text-[17px]">logout</span>
                       Sign out
@@ -283,7 +283,7 @@ export default function DashboardNav() {
               )}
             </div>
           )}
-          {/* Hamburger — mobile only */}
+          {/* Hamburger â€” mobile only */}
           <button
             className="md:hidden btn-icon p-2"
             aria-label="Open navigation"
@@ -299,3 +299,5 @@ export default function DashboardNav() {
     </>
   );
 }
+
+

@@ -12,12 +12,12 @@ const Card = React.forwardRef<HTMLDivElement, CardProps>(
     const variantClasses = {
       "glass-panel": "glass-panel rounded-2xl",
       "glass-card": "glass-card rounded-2xl",
-      "default": "bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-800 shadow-sm rounded-xl",
+      "default": "bg-[#0d0d0f] border border-[#27272a] shadow-sm rounded-xl text-white",
     }
 
     const interactiveClasses = {
-      lift: "card-lift card-motion-blur cursor-pointer",
-      glow: "card-glow card-motion-blur cursor-pointer",
+      lift: "card-lift card-motion- cursor-pointer",
+      glow: "card-glow card-motion- cursor-pointer",
       none: "",
     }
 

@@ -1,4 +1,4 @@
-'use client';
+﻿'use client';
 
 import React from 'react';
 
@@ -18,7 +18,7 @@ const SIZES = {
 };
 
 /**
- * PandaLoader — Single, unified, ultra-premium loading animation.
+ * PandaLoader â€” Single, unified, ultra-premium loading animation.
  *
  * Implements a single photonic orbital comet with velocity-based stroke stretch,
  * soft phosphorescent wake, and precision cubic-bezier acceleration.
@@ -49,7 +49,7 @@ export default function PandaLoader({
         {/* Ambient photonic bloom behind the loader */}
         {glow && (
           <div
-            className="absolute inset-0 rounded-full bg-gradient-to-tr from-[#0A84FF]/25 via-[#7c3aed]/20 to-[#06b6d4]/25 blur-md pointer-events-none transform-gpu animate-glow-pulse"
+            className="absolute inset-0 rounded-full bg-gradient-to-tr from-[#E6E6E6]/25 via-[#A8A8A8]/20 to-[#B8B8B8]/25 pointer-events-none transform-gpu animate-glow-pulse"
             style={{ transform: 'scale(1.2)' }}
           />
         )}
@@ -61,21 +61,21 @@ export default function PandaLoader({
           viewBox={`0 0 ${box} ${box}`}
           fill="none"
           xmlns="http://www.w3.org/2000/svg"
-          className="relative z-10 animate-spin-blur"
+          className="relative z-10 animate-spin-"
           style={{ willChange: 'transform, filter' }}
         >
           <defs>
             <linearGradient id={`${gradientId}-orbit`} x1="0%" y1="0%" x2="100%" y2="100%">
-              <stop offset="0%" stopColor="#0A84FF" />
-              <stop offset="50%" stopColor="#7c3aed" />
-              <stop offset="100%" stopColor="#06b6d4" />
+              <stop offset="0%" stopColor="#E6E6E6" />
+              <stop offset="50%" stopColor="#A8A8A8" />
+              <stop offset="100%" stopColor="#B8B8B8" />
             </linearGradient>
 
             {/* Subtle background track glow filter */}
             <filter id={`${gradientId}-glow`} x="-20%" y="-20%" width="140%" height="140%">
-              <feGaussianBlur stdDeviation="0.8" result="blur" />
+              <feGaussianBlur stdDeviation="0.8" result="" />
               <feMerge>
-                <feMergeNode in="blur" />
+                <feMergeNode in="" />
                 <feMergeNode in="SourceGraphic" />
               </feMerge>
             </filter>
@@ -109,7 +109,7 @@ export default function PandaLoader({
         {/* Central photonic micro-dot for depth & focus */}
         {size !== 'xs' && (
           <div
-            className="absolute rounded-full bg-gradient-to-r from-[#0A84FF] to-[#7c3aed] shadow-[0_0_8px_rgba(10,132,255,0.6)] animate-pulse"
+            className="absolute rounded-full bg-gradient-to-r from-[#E6E6E6] to-[#A8A8A8] shadow-[0_0_8px_rgba(10,132,255,0.6)] animate-pulse"
             style={{
               width: Math.max(3, box * 0.08),
               height: Math.max(3, box * 0.08),
@@ -126,3 +126,5 @@ export default function PandaLoader({
     </div>
   );
 }
+
+

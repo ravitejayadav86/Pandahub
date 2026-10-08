@@ -18,7 +18,7 @@ export function DashboardNav({ onMenuClick }: DashboardNavProps) {
   const router = useRouter()
 
   return (
-    <header className="sticky top-0 z-50 h-[64px] bg-white/90 dark:bg-slate-900/90 backdrop-blur-md border-b border-slate-200 dark:border-slate-800 flex items-center justify-between px-4 md:px-6" style={{ transform: 'translateZ(0)', willChange: 'transform' }}>
+    <header className="sticky top-0 z-50 h-[64px] bg-white/90 dark:bg-slate-900/90 border-b border-slate-200 dark:border-slate-800 flex items-center justify-between px-4 md:px-6" style={{ transform: 'translateZ(0)', willChange: 'transform' }}>
       
       {/* Left section: Logo & Context */}
       <div className="flex items-center gap-4 md:gap-6">

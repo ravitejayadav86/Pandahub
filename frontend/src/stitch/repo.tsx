@@ -5,7 +5,7 @@ export default function GeneratedPage() {
     <main className="min-h-screen text-on-surface bg-background font-body">
 
 
-<nav className="hidden md:flex h-screen w-72 flex-col border-r border-outline-variant/20 shadow-2xl shadow-surface-container-lowest/50 bg-surface/60 backdrop-blur-3xl fixed left-0 top-0 p-4 z-40">
+<nav className="hidden md:flex h-screen w-72 flex-col border-r border-outline-variant/20 shadow-2xl shadow-surface-container-lowest/50 bg-surface/60 fixed left-0 top-0 p-4 z-40">
 
 <div className="flex items-center gap-4 px-4 py-6 mb-4">
 <div className="h-10 w-10 rounded-xl overflow-hidden bg-surface-container-high border border-outline-variant/20 flex items-center justify-center shadow-inner">
@@ -22,7 +22,7 @@ export default function GeneratedPage() {
 <span className="material-symbols-outlined text-xl" data-icon="dashboard">dashboard</span>
 <span>Dashboard</span>
 </a>
-<a className="flex items-center gap-3 px-4 py-3 bg-primary-container/30 backdrop-blur-md text-on-primary-container rounded-xl shadow-[inset_0_1px_1px_rgba(255,255,255,0.1)] transition-all duration-300 font-body text-label-sm font-medium tracking-tight hover:scale-[1.02] active:scale-[0.98]" href="/explore">
+<a className="flex items-center gap-3 px-4 py-3 bg-primary-container/30 text-on-primary-container rounded-xl shadow-[inset_0_1px_1px_rgba(255,255,255,0.1)] transition-all duration-300 font-body text-label-sm font-medium tracking-tight hover:scale-[1.02] active:scale-[0.98]" href="/explore">
 <span className="material-symbols-outlined text-xl" data-icon="code" data-weight="fill" style={{fontVariationSettings: '"FILL" 1'}}>code</span>
 <span>Repositories</span>
 </a>
@@ -60,7 +60,7 @@ export default function GeneratedPage() {
 
 <main className="flex-1 flex flex-col md:ml-72 min-h-screen relative overflow-x-hidden">
 
-<header className="w-full h-16 sticky top-0 z-30 bg-surface/40 backdrop-blur-2xl border-b border-outline-variant/10 shadow-sm flex justify-between items-center px-6 gap-8 transition-all duration-500 md:hidden">
+<header className="w-full h-16 sticky top-0 z-30 bg-surface/40 border-b border-outline-variant/10 shadow-sm flex justify-between items-center px-6 gap-8 transition-all duration-500 md:hidden">
 <div className="flex items-center gap-3">
 <span className="text-lg font-black text-on-surface tracking-tighter">PandaHub</span>
 </div>
@@ -86,7 +86,7 @@ export default function GeneratedPage() {
 <a className="text-2xl font-headline font-bold text-on-surface hover:text-primary transition-colors tracking-tight" href="/explore">PandaHub</a>
 <span className="text-on-surface-variant font-light text-2xl">/</span>
 <a className="text-2xl font-headline font-bold text-on-surface hover:text-primary transition-colors tracking-tight" href="/explore">core-engine</a>
-<span className="px-2.5 py-0.5 rounded-full border border-outline-variant/30 text-xs font-label text-on-surface-variant bg-surface-container/50 backdrop-blur-sm ml-2">Public</span>
+<span className="px-2.5 py-0.5 rounded-full border border-outline-variant/30 text-xs font-label text-on-surface-variant bg-surface-container/50 ml-2">Public</span>
 </div>
 <p className="text-on-surface-variant text-sm max-w-2xl">High-performance liquid glass rendering engine for futuristic UI frameworks.</p>
 </div>
@@ -241,7 +241,7 @@ export default function GeneratedPage() {
 </div>
 
 <div className="glass-panel rounded-2xl p-6 md:p-8 mt-4 border border-outline-variant/10 shadow-lg relative overflow-hidden">
-<div className="absolute top-0 right-0 w-64 h-64 bg-primary/5 blur-3xl rounded-full -mr-20 -mt-20 pointer-events-none"></div>
+<div className="absolute top-0 right-0 w-64 h-64 bg-primary/5 rounded-full -mr-20 -mt-20 pointer-events-none"></div>
 <div className="flex items-center gap-2 mb-6 pb-4 border-b border-outline-variant/10">
 <span className="material-symbols-outlined text-on-surface-variant">book</span>
 <h2 className="text-lg font-headline font-semibold text-on-surface">README.md</h2>

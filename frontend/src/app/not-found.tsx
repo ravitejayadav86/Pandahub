@@ -11,8 +11,8 @@ export default function NotFound() {
     <div className="min-h-screen bg-[#0d1117] flex items-center justify-center p-6 font-sans">
       {/* Background */}
       <div className="fixed inset-0 pointer-events-none overflow-hidden">
-        <div className="absolute top-0 right-0 w-[600px] h-[600px] bg-violet-600/6 rounded-full blur-3xl" />
-        <div className="absolute bottom-0 left-0 w-[500px] h-[500px] bg-blue-600/6 rounded-full blur-3xl" />
+        <div className="absolute top-0 right-0 w-[600px] h-[600px] bg-violet-600/6 rounded-full" />
+        <div className="absolute bottom-0 left-0 w-[500px] h-[500px] bg-blue-600/6 rounded-full" />
         {/* Grid pattern */}
         <svg className="absolute inset-0 w-full h-full opacity-[0.03]" xmlns="http://www.w3.org/2000/svg">
           <defs>

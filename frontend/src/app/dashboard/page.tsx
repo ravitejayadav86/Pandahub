@@ -142,10 +142,10 @@ export default function DashboardPage() {
       <div className="fixed inset-0 flex flex-col items-center justify-center bg-[#F8F9FB] dark:bg-[#0f172a] z-[9999] overflow-hidden">
         {/* Static ambient background — zero GPU cost, same premium look */}
         <div className="fixed inset-0 pointer-events-none" aria-hidden>
-          <div className="absolute top-[-10%] left-[-5%] w-[45%] h-[45%] rounded-full bg-blue-500/6 blur-[80px]" />
-          <div className="absolute bottom-[-10%] right-[-5%] w-[40%] h-[40%] rounded-full bg-purple-500/6 blur-[80px]" />
+          <div className="absolute top-[-10%] left-[-5%] w-[45%] h-[45%] rounded-full bg-blue-500/6 -[80px]" />
+          <div className="absolute bottom-[-10%] right-[-5%] w-[40%] h-[40%] rounded-full bg-purple-500/6 -[80px]" />
         </div>
-        <div className="relative z-10 flex flex-col items-center motion-blur-scale p-8 rounded-3xl bg-white/60 dark:bg-slate-900/60 backdrop-blur-md border border-slate-200/50 dark:border-slate-800/60 shadow-[0_24px_60px_rgba(0,0,0,0.12)]">
+        <div className="relative z-10 flex flex-col items-center motion- p-8 rounded-3xl bg-white/60 dark:bg-slate-900/60 border border-slate-200/50 dark:border-slate-800/60 shadow-[0_24px_60px_rgba(0,0,0,0.12)]">
           <PandaLoader size="xl" glow={true} label="Initializing Workspace..." />
         </div>
       </div>
@@ -155,7 +155,7 @@ export default function DashboardPage() {
   const renderSlideOutMenu = () => (
     isMenuOpen && (
       <div className="fixed inset-0 z-[100] flex">
-        <div className="absolute inset-0 bg-black/40 backdrop-blur-sm transition-opacity" onClick={() => setIsMenuOpen(false)}></div>
+        <div className="absolute inset-0 bg-black/40 transition-opacity" onClick={() => setIsMenuOpen(false)}></div>
         <div className="relative w-80 max-w-[85vw] h-full bg-white dark:bg-slate-900 shadow-2xl animate-[slide-in-left_0.3s_ease-out] border-r border-slate-200 dark:border-slate-800 flex flex-col">
           <div className="p-4 border-b border-slate-100 dark:border-slate-800 flex items-center justify-between bg-slate-50 dark:bg-slate-900">
             <div className="flex items-center gap-2 text-slate-900 dark:text-white font-black text-xl tracking-tighter">
@@ -197,7 +197,7 @@ export default function DashboardPage() {
   )
 
   const renderSidebar = () => (
-    <div className="hidden md:flex w-full md:w-64 flex-col gap-2 shrink-0 motion-blur-right">
+    <div className="hidden md:flex w-full md:w-64 flex-col gap-2 shrink-0 motion-">
       <div className="text-xs font-semibold text-slate-400 uppercase tracking-wider mb-2 pl-3">Menu</div>
       <Button variant="ghost" className="justify-start text-slate-700 font-medium bg-slate-100 dark:bg-slate-800 dark:text-slate-200" onClick={() => router.push('/dashboard')}>
         <LayoutDashboard className="w-4 h-4 mr-2" /> Home
@@ -224,7 +224,7 @@ export default function DashboardPage() {
     }
     if (activity.length === 0) {
       return (
-        <div className="flex flex-col items-center justify-center py-16 text-center motion-blur-zoom-in">
+        <div className="flex flex-col items-center justify-center py-16 text-center motion--in">
           <Clock className="w-12 h-12 text-slate-300 mb-4" />
           <h3 className="font-semibold text-slate-700 dark:text-slate-200 mb-1">No recent activity</h3>
           <p className="text-sm text-slate-500">Push code, open issues, or create pull requests to see your activity here.</p>
@@ -238,7 +238,7 @@ export default function DashboardPage() {
             key={act.id}
             variant="glass-panel"
             interactive="glow"
-            className={`flex flex-row items-center gap-4 p-4 card-motion-blur motion-stagger-${Math.min(i+1, 8)}`}
+            className={`flex flex-row items-center gap-4 p-4 card-motion- motion-stagger-${Math.min(i+1, 8)}`}
           >
             <div className="p-2 bg-blue-50 dark:bg-blue-900/30 rounded-full text-blue-500 shrink-0">
               <ActivityIcon type={act.type} />
@@ -270,7 +270,7 @@ export default function DashboardPage() {
     }
     if (repos.length === 0) {
       return (
-        <div className="flex flex-col items-center justify-center py-16 text-center motion-blur-zoom-in">
+        <div className="flex flex-col items-center justify-center py-16 text-center motion--in">
           <Bookmark className="w-12 h-12 text-slate-300 mb-4" />
           <h3 className="font-semibold text-slate-700 dark:text-slate-200 mb-1">No repositories yet</h3>
           <p className="text-sm text-slate-500 mb-4">Create your first repository to get started.</p>
@@ -287,7 +287,7 @@ export default function DashboardPage() {
             key={repo.id}
             variant="default"
             interactive="lift"
-            className={`card-motion-blur motion-stagger-${Math.min(i+1, 8)} p-5`}
+            className={`card-motion- motion-stagger-${Math.min(i+1, 8)} p-5`}
           >
             <div className="flex justify-between items-start mb-2">
               <Link href={`/${repo.owner_username || user?.username}/${repo.name}`} className="font-semibold text-blue-600 hover:underline text-lg truncate">
@@ -313,7 +313,7 @@ export default function DashboardPage() {
   }
 
   const renderWidgets = () => (
-    <div className="w-full md:w-80 flex flex-col gap-6 shrink-0 motion-blur-left" style={{ animationDelay: '0.15s' }}>
+    <div className="w-full md:w-80 flex flex-col gap-6 shrink-0 motion-" style={{ animationDelay: '0.15s' }}>
       <Card variant="glass-card">
         <CardHeader className="pb-3">
           <CardTitle className="text-sm flex items-center justify-between">
@@ -343,13 +343,13 @@ export default function DashboardPage() {
         </CardContent>
       </Card>
 
-      <Card variant="default" className="bg-gradient-to-br from-blue-50 to-indigo-50 dark:from-slate-800 dark:to-slate-900 border-blue-100 dark:border-slate-700">
+      <Card variant="default" className="bg-[#121214] border border-[#27272a]">
         <CardContent className="p-5 flex flex-col items-start gap-2">
-          <div className="p-2 bg-white dark:bg-slate-800 rounded-xl shadow-sm mb-1">
-            <Rocket className="w-5 h-5 text-blue-500" />
+          <div className="p-2 bg-[#18181b] border border-[#333333] rounded-xl shadow-sm mb-1">
+            <Rocket className="w-5 h-5 text-white" />
           </div>
-          <h3 className="font-semibold text-slate-900 dark:text-white">Upgrade to Pro</h3>
-          <p className="text-xs text-slate-600 dark:text-slate-400 mb-2">Get advanced AI code reviews and private startup metrics.</p>
+          <h3 className="font-semibold text-white">Upgrade to Pro</h3>
+          <p className="text-xs text-zinc-400 mb-2">Get advanced AI code reviews and private startup metrics.</p>
           <Button variant="primary" className="w-full text-xs h-8" onClick={() => router.push('/settings')}>View Plans</Button>
         </CardContent>
       </Card>
@@ -357,14 +357,14 @@ export default function DashboardPage() {
   )
 
   return (
-    <div className="min-h-screen bg-slate-50/50 dark:bg-[#0f172a]">
+    <div className="min-h-screen bg-[#000000] text-white">
       {renderSlideOutMenu()}
       <DashboardNav onMenuClick={() => setIsMenuOpen(true)} />
 
       {/* Ambient gradient background — static, zero GPU cost */}
       <div className="fixed inset-0 pointer-events-none" aria-hidden>
-        <div className="absolute top-[-10%] left-[-5%] w-[50%] h-[50%] rounded-full bg-blue-400/5 blur-[80px]" />
-        <div className="absolute bottom-[-10%] right-[-5%] w-[40%] h-[40%] rounded-full bg-purple-400/5 blur-[80px]" />
+        <div className="absolute top-[-10%] left-[-5%] w-[50%] h-[50%] rounded-full bg-white/[0.02] -[80px]" />
+        <div className="absolute bottom-[-10%] right-[-5%] w-[40%] h-[40%] rounded-full bg-white/[0.015] -[80px]" />
       </div>
 
       <main className="max-w-7xl mx-auto p-4 md:p-6 lg:p-8 flex flex-col md:flex-row gap-8 relative z-10">
@@ -372,32 +372,32 @@ export default function DashboardPage() {
 
         <div className="flex-1 flex flex-col min-w-0">
           <div className="flex items-center justify-between mb-6">
-            <h1 className="text-2xl font-bold tracking-tight text-slate-900 dark:text-white motion-blur-hero">Dashboard</h1>
+            <h1 className="text-2xl font-bold tracking-tight text-white motion-">Dashboard</h1>
             <Button variant="primary" className="h-9 text-sm" onClick={() => window.location.href = '/new'}>
               <Plus className="w-4 h-4 mr-1" /> New Repository
             </Button>
           </div>
 
-          <div className="mb-6 motion-blur-up">
+          <div className="mb-6 motion-">
             <div className="overflow-x-auto pb-1 -mx-1 px-1">
               <div className="flex items-center gap-3 mb-4" style={{ minWidth: 'max-content' }}>
                 <button
                   onClick={() => router.push(repos[0] ? `/${user?.username}/${repos[0].name}/issues` : '/new')}
-                  className="px-4 py-2 rounded-full bg-white dark:bg-slate-800 border border-slate-200 dark:border-slate-700 shadow-sm text-sm font-medium flex items-center gap-2 hover:bg-slate-50 transition-all text-slate-700 dark:text-slate-200 whitespace-nowrap btn-motion-blur"
+                  className="px-4 py-2 rounded-full bg-[#18181b] border border-[#333333] shadow-sm text-sm font-medium flex items-center gap-2 hover:bg-[#27272a] transition-all text-white whitespace-nowrap btn-motion-"
                 >
-                  <CircleDot className="w-4 h-4 text-red-500" /> Create issue
+                  <CircleDot className="w-4 h-4 text-zinc-300" /> Create issue
                 </button>
                 <button
                   onClick={() => router.push(repos[0] ? `/${user?.username}/${repos[0].name}/pulls` : '/new')}
-                  className="px-4 py-2 rounded-full bg-white dark:bg-slate-800 border border-slate-200 dark:border-slate-700 shadow-sm text-sm font-medium flex items-center gap-2 hover:bg-slate-50 transition-all text-slate-700 dark:text-slate-200 whitespace-nowrap btn-motion-blur"
+                  className="px-4 py-2 rounded-full bg-[#18181b] border border-[#333333] shadow-sm text-sm font-medium flex items-center gap-2 hover:bg-[#27272a] transition-all text-white whitespace-nowrap btn-motion-"
                 >
-                  <GitMerge className="w-4 h-4 text-green-500" /> Pull requests
+                  <GitMerge className="w-4 h-4 text-zinc-300" /> Pull requests
                 </button>
                 <button
                   onClick={() => router.push('/new')}
-                  className="px-4 py-2 rounded-full bg-white dark:bg-slate-800 border border-slate-200 dark:border-slate-700 shadow-sm text-sm font-medium flex items-center gap-2 hover:bg-slate-50 transition-all text-slate-700 dark:text-slate-200 whitespace-nowrap btn-motion-blur"
+                  className="px-4 py-2 rounded-full bg-[#18181b] border border-[#333333] shadow-sm text-sm font-medium flex items-center gap-2 hover:bg-[#27272a] transition-all text-white whitespace-nowrap btn-motion-"
                 >
-                  <Plus className="w-4 h-4 text-blue-500" /> New repository
+                  <Plus className="w-4 h-4 text-zinc-300" /> New repository
                 </button>
               </div>
             </div>

@@ -1,4 +1,4 @@
-import type { Config } from "tailwindcss";
+﻿import type { Config } from "tailwindcss";
 
 // Full design token set (brand colors, typography scale) is finalized in
 // Module 6 (Frontend Foundation) alongside the UI component library.
@@ -15,11 +15,11 @@ const config: Config = {
       colors: {
         // Brand
         panda: {
-          black: "#0d1117",
+          black: "#050505",
           white: "#ffffff",
-          accent: "#2f9e44", // bamboo green — primary brand accent
+          accent: "#D7FF4F", // bamboo green â€” primary brand accent
         },
-        // Semantic surface tokens — backed by CSS vars in globals.css
+        // Semantic surface tokens â€” backed by CSS vars in globals.css
         primary: "var(--color-primary, #0A84FF)",
         "on-surface": "var(--text-primary)",
         "on-surface-variant": "var(--text-secondary)",
@@ -49,3 +49,4 @@ const config: Config = {
 };
 
 export default config;
+

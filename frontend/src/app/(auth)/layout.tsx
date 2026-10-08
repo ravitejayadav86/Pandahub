@@ -20,7 +20,7 @@ export default function AuthLayout({ children }: { children: React.ReactNode }) 
         borderBottom: '1px solid var(--border-color)',
         display: 'flex', alignItems: 'center',
         background: 'rgba(13, 17, 23, 0.8)',
-        backdropFilter: 'blur(20px)',
+        backdropFilter: '(20px)',
       }}>
         <Link href="/" style={{
           display: 'flex', alignItems: 'center', gap: 10, textDecoration: 'none',

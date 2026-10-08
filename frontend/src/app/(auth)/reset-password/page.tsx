@@ -1,4 +1,4 @@
-"use client";
+﻿"use client";
 
 import { useState, Suspense } from 'react';
 import { useRouter, useSearchParams } from 'next/navigation';
@@ -7,7 +7,7 @@ import api from '@/lib/api';
 
 const SpaceBackground = dynamic(() => import('../../SpaceBackground'), { ssr: false });
 
-/* ─── Step 1: Request reset email ─────────────────────────────────────────── */
+/* â”€â”€â”€ Step 1: Request reset email â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€ */
 function RequestResetStep({
   onSent,
 }: {
@@ -22,7 +22,7 @@ function RequestResetStep({
     setError('');
     setLoading(true);
     try {
-      // Always returns 204 — no enumeration signal even for unknown emails
+      // Always returns 204 â€” no enumeration signal even for unknown emails
       await api.post('/auth/password-reset/request', { email });
       onSent(email);
     } catch {
@@ -56,7 +56,7 @@ function RequestResetStep({
 
       {error && (
         <div className="mb-4 p-3 rounded-xl text-sm text-center flex items-center gap-2 justify-center animate-bounce-in"
-          style={{ background: 'rgba(239,68,68,0.12)', border: '1px solid rgba(239,68,68,0.3)', color: '#ef4444' }}>
+          style={{ background: 'rgba(239,68,68,0.12)', border: '1px solid rgba(239,68,68,0.3)', color: '#A6A6A6' }}>
           <span className="material-symbols-outlined" style={{ fontSize: 16 }}>error</span>
           {error}
         </div>
@@ -99,7 +99,7 @@ function RequestResetStep({
                 <circle className="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" strokeWidth="4" />
                 <path className="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4z" />
               </svg>
-              Sending…
+              Sendingâ€¦
             </>
           ) : (
             <>
@@ -112,14 +112,14 @@ function RequestResetStep({
 
       <div className="mt-6 text-center">
         <a href="/login" className="text-sm font-semibold transition-colors" style={{ color: 'var(--color-primary)' }}>
-          ← Back to sign in
+          â† Back to sign in
         </a>
       </div>
     </div>
   );
 }
 
-/* ─── Step 2: Email sent confirmation ─────────────────────────────────────── */
+/* â”€â”€â”€ Step 2: Email sent confirmation â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€ */
 function EmailSentStep({ email }: { email: string }) {
   return (
     <div className="p-8 sm:p-10 flex flex-col items-center text-center animate-fade-in-scale">
@@ -132,7 +132,7 @@ function EmailSentStep({ email }: { email: string }) {
       >
         <span
           className="material-symbols-outlined animate-bounce-in"
-          style={{ fontSize: 40, color: '#22c55e', fontVariationSettings: '"FILL" 1' }}
+          style={{ fontSize: 40, color: '#BDBDBD', fontVariationSettings: '"FILL" 1' }}
         >
           mark_email_read
         </span>
@@ -161,7 +161,7 @@ function EmailSentStep({ email }: { email: string }) {
   );
 }
 
-/* ─── Step 3: Set new password (arrived via email link ?token=...) ─────────── */
+/* â”€â”€â”€ Step 3: Set new password (arrived via email link ?token=...) â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€ */
 function SetNewPasswordStep({ token }: { token: string }) {
   const router = useRouter();
   const [password, setPassword]     = useState('');
@@ -184,7 +184,7 @@ function SetNewPasswordStep({ token }: { token: string }) {
   })();
 
   const strengthLabel = ['', 'Weak', 'Fair', 'Good', 'Strong', 'Very strong'][strength] ?? '';
-  const strengthColor = ['', '#ef4444', '#f59e0b', '#3b82f6', '#22c55e', '#10b981'][strength] ?? '';
+  const strengthColor = ['', '#A6A6A6', '#f59e0b', '#C8C8C8', '#BDBDBD', '#B8B8B8'][strength] ?? '';
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
@@ -225,7 +225,7 @@ function SetNewPasswordStep({ token }: { token: string }) {
         >
           <span
             className="material-symbols-outlined"
-            style={{ fontSize: 44, color: '#22c55e', fontVariationSettings: '"FILL" 1' }}
+            style={{ fontSize: 44, color: '#BDBDBD', fontVariationSettings: '"FILL" 1' }}
           >
             check_circle
           </span>
@@ -234,7 +234,7 @@ function SetNewPasswordStep({ token }: { token: string }) {
           Password updated!
         </h2>
         <p className="text-sm" style={{ color: 'var(--text-secondary)' }}>
-          Redirecting you to sign in…
+          Redirecting you to sign inâ€¦
         </p>
       </div>
     );
@@ -264,7 +264,7 @@ function SetNewPasswordStep({ token }: { token: string }) {
 
       {error && (
         <div className="mb-4 p-3 rounded-xl text-sm text-center flex items-center gap-2 justify-center animate-bounce-in"
-          style={{ background: 'rgba(239,68,68,0.12)', border: '1px solid rgba(239,68,68,0.3)', color: '#ef4444' }}>
+          style={{ background: 'rgba(239,68,68,0.12)', border: '1px solid rgba(239,68,68,0.3)', color: '#A6A6A6' }}>
           <span className="material-symbols-outlined" style={{ fontSize: 16 }}>error</span>
           {error}
         </div>
@@ -362,10 +362,10 @@ function SetNewPasswordStep({ token }: { token: string }) {
             </button>
           </div>
           {confirm.length > 0 && confirm !== password && (
-            <p className="text-xs ml-1 mt-0.5" style={{ color: '#ef4444' }}>Passwords do not match</p>
+            <p className="text-xs ml-1 mt-0.5" style={{ color: '#A6A6A6' }}>Passwords do not match</p>
           )}
           {confirm.length > 0 && confirm === password && (
-            <p className="text-xs ml-1 mt-0.5 flex items-center gap-1" style={{ color: '#22c55e' }}>
+            <p className="text-xs ml-1 mt-0.5 flex items-center gap-1" style={{ color: '#BDBDBD' }}>
               <span className="material-symbols-outlined" style={{ fontSize: 13 }}>check_circle</span>
               Passwords match
             </p>
@@ -383,7 +383,7 @@ function SetNewPasswordStep({ token }: { token: string }) {
                 <circle className="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" strokeWidth="4" />
                 <path className="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4z" />
               </svg>
-              Saving…
+              Savingâ€¦
             </>
           ) : (
             <>
@@ -397,7 +397,7 @@ function SetNewPasswordStep({ token }: { token: string }) {
   );
 }
 
-/* ─── Page shell ──────────────────────────────────────────────────────────── */
+/* â”€â”€â”€ Page shell â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€ */
 function ResetPasswordContent() {
   const searchParams = useSearchParams();
   const token = searchParams.get('token');
@@ -405,9 +405,9 @@ function ResetPasswordContent() {
   const [sentEmail, setSentEmail] = useState<string | null>(null);
 
   // Decide which step to render:
-  // 1. ?token=... in URL   → arrived from email → SetNewPasswordStep
-  // 2. sentEmail set       → just submitted the request form → EmailSentStep
-  // 3. otherwise           → show the request form → RequestResetStep
+  // 1. ?token=... in URL   â†’ arrived from email â†’ SetNewPasswordStep
+  // 2. sentEmail set       â†’ just submitted the request form â†’ EmailSentStep
+  // 3. otherwise           â†’ show the request form â†’ RequestResetStep
   const step: 'request' | 'sent' | 'set' =
     token ? 'set' : sentEmail ? 'sent' : 'request';
 
@@ -461,8 +461,8 @@ function ResetPasswordContent() {
           className="w-full max-w-md rounded-3xl overflow-hidden shadow-2xl animate-fade-in-up"
           style={{
             background: 'var(--glass-bg-3)',
-            backdropFilter: 'blur(28px) saturate(1.9)',
-            WebkitBackdropFilter: 'blur(28px) saturate(1.9)',
+            backdropFilter: '(28px) saturate(1.9)',
+            WebkitBackdropFilter: '(28px) saturate(1.9)',
             border: '1px solid var(--glass-border)',
             boxShadow: '0 24px 64px rgba(0,0,0,0.15), inset 0 1px 0 rgba(255,255,255,0.35)',
           }}
@@ -487,3 +487,4 @@ export default function ResetPasswordPage() {
     </Suspense>
   );
 }
+

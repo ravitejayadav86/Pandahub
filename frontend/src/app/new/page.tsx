@@ -45,10 +45,10 @@ export default function NewRepoPage() {
   if (createdRepo) {
     return (
       <main className="min-h-screen text-on-surface bg-background font-body transition-colors duration-300 relative">
-        <div className="fixed top-[-20%] left-[-10%] w-[50%] h-[50%] rounded-full bg-primary-container/5 blur-[120px] pointer-events-none" />
-        <div className="fixed bottom-[-20%] right-[-10%] w-[40%] h-[40%] rounded-full bg-secondary-container/10 blur-[100px] pointer-events-none" />
+        <div className="fixed top-[-20%] left-[-10%] w-[50%] h-[50%] rounded-full bg-primary-container/5 -[120px] pointer-events-none" />
+        <div className="fixed bottom-[-20%] right-[-10%] w-[40%] h-[40%] rounded-full bg-secondary-container/10 -[100px] pointer-events-none" />
 
-        <header className="bg-surface/80 backdrop-blur-2xl w-full h-16 sticky top-0 z-50 border-b border-outline-variant/20 shadow-sm flex items-center px-6 gap-3">
+        <header className="bg-surface/80 w-full h-16 sticky top-0 z-50 border-b border-outline-variant/20 shadow-sm flex items-center px-6 gap-3">
           <Link href={`/${user?.username}/${createdRepo.name}`} className="flex items-center gap-2 text-on-surface-variant hover:text-on-surface transition-colors font-medium text-sm">
             <span className="material-symbols-outlined text-[18px]">arrow_back</span>
             {user?.username}/{createdRepo.name}
@@ -89,11 +89,11 @@ export default function NewRepoPage() {
   return (
     <main className="min-h-screen text-on-surface bg-background font-body transition-colors duration-300 relative">
       {/* Background Orbs */}
-      <div className="fixed top-[-20%] left-[-10%] w-[50%] h-[50%] rounded-full bg-primary-container/5 blur-[120px] pointer-events-none"></div>
-      <div className="fixed bottom-[-20%] right-[-10%] w-[40%] h-[40%] rounded-full bg-secondary-container/10 blur-[100px] pointer-events-none"></div>
+      <div className="fixed top-[-20%] left-[-10%] w-[50%] h-[50%] rounded-full bg-primary-container/5 -[120px] pointer-events-none"></div>
+      <div className="fixed bottom-[-20%] right-[-10%] w-[40%] h-[40%] rounded-full bg-secondary-container/10 -[100px] pointer-events-none"></div>
 
       {/* Header */}
-      <header className="bg-surface/80 backdrop-blur-2xl w-full h-16 sticky top-0 z-50 border-b border-outline-variant/20 shadow-sm flex items-center px-6 gap-3">
+      <header className="bg-surface/80 w-full h-16 sticky top-0 z-50 border-b border-outline-variant/20 shadow-sm flex items-center px-6 gap-3">
         <Link href="/dashboard" className="flex items-center gap-2 text-on-surface-variant hover:text-on-surface transition-colors font-medium text-sm">
           <span className="material-symbols-outlined text-[18px]">arrow_back</span>
           Dashboard

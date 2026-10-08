@@ -147,12 +147,12 @@ export default function AdminErrorsPage() {
     <div className="min-h-screen bg-[#0d1117] text-slate-100 antialiased">
       {/* Background */}
       <div className="fixed inset-0 pointer-events-none">
-        <div className="absolute top-0 right-0 w-96 h-96 bg-red-600/6 rounded-full blur-3xl" />
-        <div className="absolute bottom-0 left-0 w-96 h-96 bg-violet-600/6 rounded-full blur-3xl" />
+        <div className="absolute top-0 right-0 w-96 h-96 bg-red-600/6 rounded-full" />
+        <div className="absolute bottom-0 left-0 w-96 h-96 bg-violet-600/6 rounded-full" />
       </div>
 
       {/* Header */}
-      <header className="sticky top-0 z-30 border-b border-white/8 bg-[#0d1117]/90 backdrop-blur-xl">
+      <header className="sticky top-0 z-30 border-b border-white/8 bg-[#0d1117]/90">
         <div className="max-w-7xl mx-auto px-4 h-14 flex items-center justify-between">
           <div className="flex items-center gap-3">
             <button

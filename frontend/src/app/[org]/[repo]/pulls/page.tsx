@@ -1,6 +1,7 @@
 'use client';
 import { useState } from 'react';
 import { useParams } from 'next/navigation';
+import Link from 'next/link';
 import { useRepo, useBranches } from '@/hooks/useRepo';
 import { usePulls, createPullRequest, mergePullRequest, PullRequest } from '@/hooks/usePulls';
 import RepoHeader from '@/components/shared/RepoHeader';
@@ -40,7 +41,7 @@ export default function PullsPage() {
     setSubmitting(false);
   };
 
-  const stateColor = (state: string) => state === 'open' ? '#22c55e' : state === 'merged' ? '#8b5cf6' : '#94a3b8';
+  const stateColor = (state: string) => state === 'open' ? '#BDBDBD' : state === 'merged' ? '#A8A8A8' : '#94a3b8';
   const stateIcon = (state: string) => state === 'open' ? 'alt_route' : state === 'merged' ? 'merge' : 'close';
 
   return (
@@ -50,19 +51,19 @@ export default function PullsPage() {
 
         {/* Controls */}
         <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', marginBottom: 24, flexWrap: 'wrap', gap: 12 }}>
-          <div style={{ display: 'flex', gap: 4, background: 'var(--glass-bg-2)', borderRadius: 12, padding: 4, border: '1px solid var(--glass-border)', backdropFilter: 'blur(12px)' }}>
+          <div style={{ display: 'flex', gap: 4, background: 'var(--glass-bg-2)', borderRadius: 12, padding: 4, border: '1px solid var(--glass-border)', backdropFilter: '(12px)' }}>
             {(['open', 'closed', 'merged'] as const).map(s => (
               <button key={s} onClick={() => setFilter(s)} style={{
                 padding: '7px 18px', borderRadius: 9, border: 'none', cursor: 'pointer', fontSize: 13, fontWeight: 600,
                 background: filter === s ? 'var(--glass-bg-4)' : 'transparent',
-                color: filter === s ? '#3b82f6' : 'var(--text-secondary)',
+                color: filter === s ? '#C8C8C8' : 'var(--text-secondary)',
                 boxShadow: filter === s ? 'var(--glass-shadow)' : 'none',
                 textTransform: 'capitalize', transition: 'all 0.15s',
               }}>{s}</button>
             ))}
           </div>
           {user && (
-            <button onClick={() => setShowNew(!showNew)} style={{ padding: '10px 22px', borderRadius: 12, background: 'linear-gradient(135deg, #22c55e, #16a34a)', color: '#fff', fontWeight: 700, fontSize: 14, border: 'none', cursor: 'pointer', display: 'flex', alignItems: 'center', gap: 8, boxShadow: '0 4px 14px rgba(34,197,94,0.3)' }}>
+            <button onClick={() => setShowNew(!showNew)} style={{ padding: '10px 22px', borderRadius: 12, background: '#ffffff', color: '#000000', fontWeight: 700, fontSize: 14, border: '1px solid #ffffff', cursor: 'pointer', display: 'flex', alignItems: 'center', gap: 8, boxShadow: '0 4px 14px rgba(255,255,255,0.18)' }}>
               <span className="material-symbols-outlined" style={{ fontSize: 18 }}>add</span>
               New pull request
             </button>
@@ -80,7 +81,7 @@ export default function PullsPage() {
                   <select value={form.head_branch} onChange={e => setForm({...form, head_branch: e.target.value})} required
                     className="glass-input"
                     style={{ width: '100%', padding: '10px 14px', borderRadius: 12, fontSize: 13, outline: 'none', fontFamily: 'Inter, sans-serif' }}>
-                    <option value="">Select branch…</option>
+                    <option value="">Select branchâ€¦</option>
                     {branches.map(b => <option key={b.name} value={b.name}>{b.name}</option>)}
                   </select>
                 </div>
@@ -106,10 +107,10 @@ export default function PullsPage() {
                   style={{ width: '100%', padding: '10px 14px', borderRadius: 12, fontSize: 14, outline: 'none', fontFamily: 'Inter, sans-serif', resize: 'vertical', boxSizing: 'border-box' }} />
               </div>
               <div style={{ display: 'flex', gap: 10 }}>
-                <button type="submit" disabled={submitting} style={{ padding: '10px 24px', borderRadius: 12, background: 'linear-gradient(135deg, #22c55e, #16a34a)', color: '#fff', fontWeight: 700, fontSize: 14, border: 'none', cursor: 'pointer', boxShadow: '0 4px 14px rgba(34,197,94,0.3)' }}>
-                  {submitting ? 'Creating…' : 'Create pull request'}
+                <button type="submit" disabled={submitting} style={{ padding: '10px 24px', borderRadius: 12, background: '#ffffff', color: '#000000', fontWeight: 700, fontSize: 14, border: '1px solid #ffffff', cursor: 'pointer', boxShadow: '0 4px 14px rgba(255,255,255,0.18)' }}>
+                  {submitting ? 'Creating...' : 'Create pull request'}
                 </button>
-                <button type="button" onClick={() => setShowNew(false)} className="glass-card" style={{ padding: '10px 20px', borderRadius: 12, border: '1px solid var(--glass-border)', fontWeight: 600, fontSize: 14, cursor: 'pointer', color: 'var(--text-secondary)' }}>Cancel</button>
+                <button type="button" onClick={() => setShowNew(false)} style={{ padding: '10px 20px', borderRadius: 12, background: '#18181b', border: '1px solid #333333', fontWeight: 600, fontSize: 14, cursor: 'pointer', color: '#f4f4f5' }}>Cancel</button>
               </div>
             </form>
           </div>
@@ -125,24 +126,55 @@ export default function PullsPage() {
           ) : (
             <div className="glass-card" style={{ borderRadius: 20, border: '1px solid var(--glass-border)', overflow: 'hidden' }}>
               {pulls.map((pr, i) => (
-                <div key={pr.id} style={{ display: 'flex', gap: 16, padding: '18px 24px', borderBottom: i < pulls.length - 1 ? '1px solid var(--glass-border)' : 'none', alignItems: 'flex-start', transition: 'background 0.15s', cursor: 'pointer' }}
-                  onMouseEnter={e => (e.currentTarget as HTMLElement).style.background = 'var(--glass-bg-2)'}
-                  onMouseLeave={e => (e.currentTarget as HTMLElement).style.background = 'transparent'}>
-                  <span className="material-symbols-outlined" style={{ fontSize: 20, color: stateColor(pr.state), flexShrink: 0, marginTop: 2 }}>{stateIcon(pr.state)}</span>
-                  <div style={{ flex: 1, minWidth: 0 }}>
-                    <div style={{ fontSize: 15, fontWeight: 600, marginBottom: 4, display: 'flex', alignItems: 'center', gap: 8, color: 'var(--text-primary)' }}>
-                      {pr.title}
-                      <span style={{ fontSize: 12, color: 'var(--text-muted)', fontWeight: 400 }}>#{pr.number}</span>
-                    </div>
-                    <div style={{ display: 'flex', alignItems: 'center', gap: 8, fontSize: 12, color: 'var(--text-muted)', flexWrap: 'wrap' }}>
-                      <span style={{ padding: '2px 8px', borderRadius: 6, background: 'var(--glass-bg-2)', border: '1px solid var(--glass-border)', fontFamily: 'monospace' }}>{pr.head_branch}</span>
-                      <span className="material-symbols-outlined" style={{ fontSize: 14 }}>arrow_forward</span>
-                      <span style={{ padding: '2px 8px', borderRadius: 6, background: 'var(--glass-bg-2)', border: '1px solid var(--glass-border)', fontFamily: 'monospace' }}>{pr.base_branch}</span>
-                      <span>opened {relativeTime(pr.created_at)}</span>
-                      {pr.comment_count > 0 && <span style={{ display: 'flex', alignItems: 'center', gap: 4 }}><span className="material-symbols-outlined" style={{ fontSize: 13 }}>chat_bubble</span>{pr.comment_count}</span>}
+                <Link
+                  key={pr.id}
+                  href={`/${owner}/${repoName}/pulls/${pr.number}`}
+                  style={{ textDecoration: 'none', color: 'inherit', display: 'block' }}
+                >
+                  <div
+                    style={{
+                      display: 'flex', gap: 16, padding: '18px 24px',
+                      borderBottom: i < pulls.length - 1 ? '1px solid var(--glass-border)' : 'none',
+                      alignItems: 'flex-start', transition: 'background 0.15s', cursor: 'pointer'
+                    }}
+                    onMouseEnter={e => (e.currentTarget as HTMLElement).style.background = 'var(--glass-bg-2)'}
+                    onMouseLeave={e => (e.currentTarget as HTMLElement).style.background = 'transparent'}
+                  >
+                    <span className="material-symbols-outlined" style={{ fontSize: 20, color: stateColor(pr.state), flexShrink: 0, marginTop: 2 }}>
+                      {stateIcon(pr.state)}
+                    </span>
+                    <div style={{ flex: 1, minWidth: 0 }}>
+                      <div style={{ fontSize: 15, fontWeight: 600, marginBottom: 4, display: 'flex', alignItems: 'center', gap: 8, color: 'var(--text-primary)' }}>
+                        {pr.title}
+                        <span style={{ fontSize: 12, color: 'var(--text-muted)', fontWeight: 400 }}>#{pr.number}</span>
+                        <span style={{
+                          marginLeft: 'auto', fontSize: 11, padding: '2px 8px', borderRadius: 999,
+                          background: 'rgba(99, 102, 241, 0.12)', color: '#818cf8', border: '1px solid rgba(129, 140, 248, 0.3)',
+                          display: 'inline-flex', alignItems: 'center', gap: 4
+                        }}>
+                          <span className="material-symbols-outlined" style={{ fontSize: 13 }}>psychology</span>
+                          AI Expert Routed
+                        </span>
+                      </div>
+                      <div style={{ display: 'flex', alignItems: 'center', gap: 8, fontSize: 12, color: 'var(--text-muted)', flexWrap: 'wrap' }}>
+                        <span style={{ padding: '2px 8px', borderRadius: 6, background: 'var(--glass-bg-2)', border: '1px solid var(--glass-border)', fontFamily: 'monospace' }}>
+                          {pr.head_branch}
+                        </span>
+                        <span className="material-symbols-outlined" style={{ fontSize: 14 }}>arrow_forward</span>
+                        <span style={{ padding: '2px 8px', borderRadius: 6, background: 'var(--glass-bg-2)', border: '1px solid var(--glass-border)', fontFamily: 'monospace' }}>
+                          {pr.base_branch}
+                        </span>
+                        <span>opened {relativeTime(pr.created_at)}</span>
+                        {pr.comment_count > 0 && (
+                          <span style={{ display: 'flex', alignItems: 'center', gap: 4 }}>
+                            <span className="material-symbols-outlined" style={{ fontSize: 13 }}>chat_bubble</span>
+                            {pr.comment_count}
+                          </span>
+                        )}
+                      </div>
                     </div>
                   </div>
-                </div>
+                </Link>
               ))}
             </div>
           )}

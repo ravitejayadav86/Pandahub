@@ -144,9 +144,9 @@ export default function OnboardingPage() {
   return (
     <main className="min-h-screen bg-background text-on-surface font-body overflow-hidden relative">
       {/* Ambient orbs */}
-      <div className="fixed top-[-15%] left-[-10%] w-[55%] h-[55%] rounded-full bg-primary/8 blur-[140px] pointer-events-none animate-pulse" />
-      <div className="fixed bottom-[-20%] right-[-10%] w-[45%] h-[45%] rounded-full bg-secondary/10 blur-[120px] pointer-events-none" />
-      <div className="fixed top-[40%] right-[15%] w-[25%] h-[25%] rounded-full bg-tertiary/5 blur-[100px] pointer-events-none" />
+      <div className="fixed top-[-15%] left-[-10%] w-[55%] h-[55%] rounded-full bg-primary/8 -[140px] pointer-events-none animate-pulse" />
+      <div className="fixed bottom-[-20%] right-[-10%] w-[45%] h-[45%] rounded-full bg-secondary/10 -[120px] pointer-events-none" />
+      <div className="fixed top-[40%] right-[15%] w-[25%] h-[25%] rounded-full bg-tertiary/5 -[100px] pointer-events-none" />
 
       <div className="relative z-10 flex flex-col items-center justify-center min-h-screen px-4 py-12">
         {/* Logo / Brand */}

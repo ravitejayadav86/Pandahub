@@ -28,8 +28,8 @@ export default function RepoHeader({ owner, repoName, repo, activeTab = 'code' }
   return (
     <div style={{
       background: 'var(--glass-bg-4)',
-      backdropFilter: 'blur(20px) saturate(1.8)',
-      WebkitBackdropFilter: 'blur(20px) saturate(1.8)',
+      backdropFilter: '(20px) saturate(1.8)',
+      WebkitBackdropFilter: '(20px) saturate(1.8)',
       borderBottom: '1px solid var(--glass-border)',
       boxShadow: 'var(--glass-shadow)',
     }}>

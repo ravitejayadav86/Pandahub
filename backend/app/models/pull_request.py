@@ -9,7 +9,8 @@ PR from a fork doesn't require modeling source/target as always identical.
 from app.models import User
 import uuid
 
-from sqlalchemy import String, Boolean, Integer, ForeignKey, UniqueConstraint, DateTime
+import sqlalchemy as sa
+from sqlalchemy import String, Boolean, Integer, SmallInteger, ForeignKey, UniqueConstraint, DateTime
 from sqlalchemy.dialects.postgresql import UUID, JSONB
 from sqlalchemy.orm import Mapped, mapped_column, relationship
 
@@ -95,11 +96,41 @@ class AIReviewResult(Base, UUIDPKMixin):
     and costs money per call, and the PR diff doesn't change until a new
     commit is pushed — so we only regenerate when `pull_request.updated_at`
     advances past this row's created_at.
+
+    Extended columns (Module 11 — Hybrid Expert Routing):
+      diff_category   — semantic category the classifier assigned to the diff
+                        (functional | refactoring | documentation | discussion
+                         | false_positive)
+      severity        — majority-vote severity across k expert samples
+                        (low | medium | high | critical)
+      k_samples       — number of successful expert calls that contributed
+      routing_metadata — full provenance dict (model, k, votes, etc.)
     """
     __tablename__ = "ai_review_results"
 
-    pull_request_id: Mapped[uuid.UUID] = mapped_column(UUID(as_uuid=True), ForeignKey("pull_requests.id", ondelete="CASCADE"), nullable=False, index=True)
+    pull_request_id: Mapped[uuid.UUID] = mapped_column(
+        UUID(as_uuid=True),
+        ForeignKey("pull_requests.id", ondelete="CASCADE"),
+        nullable=False,
+        index=True,
+    )
     summary: Mapped[str] = mapped_column(String(10000), nullable=False)
     suggestions: Mapped[dict] = mapped_column(JSONB, nullable=False, default=dict)
-    model_used: Mapped[str] = mapped_column(String(100), nullable=False)
-    created_at: Mapped[object] = mapped_column(DateTime(timezone=True), server_default="now()", nullable=False)
+    model_used: Mapped[str] = mapped_column(String(200), nullable=False)
+    created_at: Mapped[object] = mapped_column(
+        DateTime(timezone=True), server_default="now()", nullable=False
+    )
+
+    # ── Hybrid routing provenance (added Module 11 router) ─────────────────
+    diff_category: Mapped[str] = mapped_column(
+        String(50), nullable=False, server_default="functional"
+    )
+    severity: Mapped[str] = mapped_column(
+        String(20), nullable=False, server_default="medium"
+    )
+    k_samples: Mapped[int] = mapped_column(
+        SmallInteger, nullable=False, server_default="1"
+    )
+    routing_metadata: Mapped[dict] = mapped_column(
+        JSONB, nullable=False, default=dict, server_default=sa.text("'{}'::jsonb")
+    )

@@ -1,4 +1,4 @@
-'use client';
+﻿'use client';
 import { useState, useEffect } from 'react';
 import api from '@/lib/api';
 import { User } from '@/types';
@@ -60,9 +60,9 @@ export default function AdminPage() {
   const filtered = users;
 
   const statCards = [
-    { label: 'Total Users',   value: stats?.total_users ?? 0,   icon: 'group',        color: '#6366f1' },
-    { label: 'Active Users',  value: stats?.active_users ?? 0,  icon: 'person_check', color: '#22c55e' },
-    { label: 'Repositories',  value: stats?.total_repos ?? 0,   icon: 'folder_open',  color: '#0A84FF' },
+    { label: 'Total Users',   value: stats?.total_users ?? 0,   icon: 'group',        color: '#AFAFAF' },
+    { label: 'Active Users',  value: stats?.active_users ?? 0,  icon: 'person_check', color: '#BDBDBD' },
+    { label: 'Repositories',  value: stats?.total_repos ?? 0,   icon: 'folder_open',  color: '#E6E6E6' },
     { label: 'Open Issues',   value: stats?.total_issues ?? 0,  icon: 'bug_report',   color: '#f59e0b' },
   ];
 
@@ -70,7 +70,7 @@ export default function AdminPage() {
     <div style={{ minHeight: '100vh', background: 'var(--bg-primary)', fontFamily: 'Inter, sans-serif', color: 'var(--text-primary)' }}>
       {/* Top Bar */}
       <header style={{
-        height: 64, background: 'var(--glass-bg-4)', backdropFilter: 'blur(20px) saturate(1.8)',
+        height: 64, background: 'var(--glass-bg-4)', backdropFilter: '(20px) saturate(1.8)',
         borderBottom: '1px solid var(--glass-border)', boxShadow: 'var(--glass-shadow)',
         display: 'flex', alignItems: 'center', justifyContent: 'space-between',
         padding: '0 32px', position: 'sticky', top: 0, zIndex: 40,
@@ -80,7 +80,7 @@ export default function AdminPage() {
             <span className="material-symbols-outlined" style={{ fontSize: 20 }}>arrow_back</span>
           </button>
           <div style={{ display: 'flex', alignItems: 'center', gap: 10 }}>
-            <div style={{ width: 34, height: 34, borderRadius: 10, background: 'linear-gradient(135deg, #6366f1, #8b5cf6)', display: 'flex', alignItems: 'center', justifyContent: 'center', boxShadow: '0 4px 12px rgba(99,102,241,0.3)' }}>
+            <div style={{ width: 34, height: 34, borderRadius: 10, background: 'linear-gradient(135deg, #AFAFAF, #A8A8A8)', display: 'flex', alignItems: 'center', justifyContent: 'center', boxShadow: '0 4px 12px rgba(99,102,241,0.3)' }}>
               <span className="material-symbols-outlined" style={{ fontSize: 18, color: '#fff' }}>admin_panel_settings</span>
             </div>
             <div>
@@ -99,19 +99,19 @@ export default function AdminPage() {
             fontSize: 12, fontWeight: 600, cursor: 'pointer',
           }}
         >
-          <span style={{ width: 6, height: 6, borderRadius: '50%', background: '#ef4444', display: 'inline-block' }} />
+          <span style={{ width: 6, height: 6, borderRadius: '50%', background: '#A6A6A6', display: 'inline-block' }} />
           Error Log
         </button>
       </header>
 
       <div style={{ maxWidth: 1200, margin: '0 auto', padding: '32px 24px', opacity: mounted ? 1 : 0, transition: 'opacity 0.4s' }}>
         {/* Tabs */}
-        <div style={{ display: 'flex', gap: 4, marginBottom: 32, background: 'var(--glass-bg-2)', borderRadius: 14, padding: 4, width: 'fit-content', border: '1px solid var(--glass-border)', backdropFilter: 'blur(12px)' }}>
+        <div style={{ display: 'flex', gap: 4, marginBottom: 32, background: 'var(--glass-bg-2)', borderRadius: 14, padding: 4, width: 'fit-content', border: '1px solid var(--glass-border)', backdropFilter: '(12px)' }}>
           {(['overview', 'users'] as const).map(tab => (
             <button key={tab} onClick={() => setActiveTab(tab)} style={{
               padding: '8px 22px', borderRadius: 10, border: 'none', cursor: 'pointer', fontSize: 13, fontWeight: 600,
               background: activeTab === tab ? 'var(--glass-bg-4)' : 'transparent',
-              color: activeTab === tab ? '#3b82f6' : 'var(--text-secondary)',
+              color: activeTab === tab ? '#C8C8C8' : 'var(--text-secondary)',
               boxShadow: activeTab === tab ? 'var(--glass-shadow)' : 'none',
               transition: 'all 0.15s', textTransform: 'capitalize',
             }}>{tab === 'overview' ? 'Overview' : 'Users'}</button>
@@ -135,15 +135,15 @@ export default function AdminPage() {
             </div>
             <div className="glass-card" style={{ borderRadius: 20, padding: 28, border: '1px solid var(--glass-border)' }}>
               <h2 style={{ fontSize: 16, fontWeight: 700, marginBottom: 20, display: 'flex', alignItems: 'center', gap: 8, color: 'var(--text-primary)' }}>
-                <span className="material-symbols-outlined" style={{ fontSize: 20, color: '#22c55e' }}>health_and_safety</span>
+                <span className="material-symbols-outlined" style={{ fontSize: 20, color: '#BDBDBD' }}>health_and_safety</span>
                 System Status
               </h2>
               {[
-                { name: 'API Server', status: 'Operational', color: '#22c55e' },
-                { name: 'Database', status: 'Operational', color: '#22c55e' },
-                { name: 'Object Storage', status: 'Operational', color: '#22c55e' },
-                { name: 'Message Queue', status: 'Operational', color: '#22c55e' },
-                { name: 'Email Service', status: 'Operational', color: '#22c55e' },
+                { name: 'API Server', status: 'Operational', color: '#BDBDBD' },
+                { name: 'Database', status: 'Operational', color: '#BDBDBD' },
+                { name: 'Object Storage', status: 'Operational', color: '#BDBDBD' },
+                { name: 'Message Queue', status: 'Operational', color: '#BDBDBD' },
+                { name: 'Email Service', status: 'Operational', color: '#BDBDBD' },
               ].map(svc => (
                 <div key={svc.name} style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', padding: '12px 0', borderBottom: '1px solid var(--glass-border)' }}>
                   <span style={{ fontSize: 14, fontWeight: 500, color: 'var(--text-primary)' }}>{svc.name}</span>
@@ -161,7 +161,7 @@ export default function AdminPage() {
           <div className="glass-card" style={{ borderRadius: 20, border: '1px solid var(--glass-border)', overflow: 'hidden' }}>
             <div style={{ padding: '20px 24px', borderBottom: '1px solid var(--glass-border)', display: 'flex', alignItems: 'center', gap: 12, background: 'var(--glass-bg-2)' }}>
               <span className="material-symbols-outlined" style={{ fontSize: 20, color: 'var(--text-muted)' }}>search</span>
-              <input type="text" placeholder="Search users by username or email…" value={search} onChange={e => setSearch(e.target.value)}
+              <input type="text" placeholder="Search users by username or emailâ€¦" value={search} onChange={e => setSearch(e.target.value)}
                 style={{ flex: 1, border: 'none', outline: 'none', fontSize: 14, background: 'transparent', color: 'var(--text-primary)', fontFamily: 'Inter, sans-serif' }} />
               <span style={{ fontSize: 12, color: 'var(--text-muted)', fontWeight: 500 }}>{filtered.length} users</span>
             </div>
@@ -171,7 +171,7 @@ export default function AdminPage() {
               ))}
             </div>
             {loading ? (
-              <div style={{ padding: '60px', textAlign: 'center', color: 'var(--text-muted)' }}>Loading users…</div>
+              <div style={{ padding: '60px', textAlign: 'center', color: 'var(--text-muted)' }}>Loading usersâ€¦</div>
             ) : filtered.length === 0 ? (
               <div style={{ padding: '60px', textAlign: 'center', color: 'var(--text-muted)' }}>
                 <span className="material-symbols-outlined" style={{ fontSize: 48, display: 'block', marginBottom: 12 }}>group_off</span>
@@ -180,7 +180,7 @@ export default function AdminPage() {
             ) : filtered.map((u, i) => (
               <div key={u.id} style={{ display: 'grid', gridTemplateColumns: '1fr 1fr 100px 100px 80px', padding: '14px 24px', borderBottom: i < filtered.length - 1 ? '1px solid var(--glass-border)' : 'none', alignItems: 'center' }}>
                 <div style={{ display: 'flex', alignItems: 'center', gap: 10 }}>
-                  <div style={{ width: 34, height: 34, borderRadius: '50%', background: 'linear-gradient(135deg, #6366f1, #8b5cf6)', display: 'flex', alignItems: 'center', justifyContent: 'center', flexShrink: 0 }}>
+                  <div style={{ width: 34, height: 34, borderRadius: '50%', background: 'linear-gradient(135deg, #AFAFAF, #A8A8A8)', display: 'flex', alignItems: 'center', justifyContent: 'center', flexShrink: 0 }}>
                     {u.avatar_url
                       ? <img src={u.avatar_url} alt="" style={{ width: '100%', height: '100%', borderRadius: '50%', objectFit: 'cover' }} />
                       : <span style={{ fontSize: 14, fontWeight: 700, color: '#fff' }}>{u.username.charAt(0).toUpperCase()}</span>
@@ -188,9 +188,9 @@ export default function AdminPage() {
                   </div>
                   <span style={{ fontSize: 14, fontWeight: 600, color: 'var(--text-primary)' }}>{u.username}</span>
                 </div>
-                <span style={{ fontSize: 13, color: 'var(--text-secondary)', overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap' }}>{u.email || '—'}</span>
-                <span style={{ fontSize: 12, fontWeight: 600, color: u.is_verified ? '#22c55e' : '#f59e0b' }}>{u.is_verified ? '✓ Yes' : '✗ No'}</span>
-                <span style={{ fontSize: 12, fontWeight: 600, color: u.is_active ? '#22c55e' : '#ef4444' }}>{u.is_active ? '● Active' : '○ Inactive'}</span>
+                <span style={{ fontSize: 13, color: 'var(--text-secondary)', overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap' }}>{u.email || 'â€”'}</span>
+                <span style={{ fontSize: 12, fontWeight: 600, color: u.is_verified ? '#BDBDBD' : '#f59e0b' }}>{u.is_verified ? 'âœ“ Yes' : 'âœ— No'}</span>
+                <span style={{ fontSize: 12, fontWeight: 600, color: u.is_active ? '#BDBDBD' : '#A6A6A6' }}>{u.is_active ? 'â— Active' : 'â—‹ Inactive'}</span>
                 <span style={{ fontSize: 12, color: 'var(--text-muted)' }}>{new Date(u.created_at).toLocaleDateString('en', { month: 'short', day: 'numeric', year: '2-digit' })}</span>
               </div>
             ))}
@@ -200,3 +200,5 @@ export default function AdminPage() {
     </div>
   );
 }
+
+

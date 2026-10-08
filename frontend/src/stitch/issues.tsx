@@ -6,11 +6,11 @@ export default function GeneratedPage() {
 
 
 <div className="fixed inset-0 z-0 pointer-events-none overflow-hidden">
-<div className="absolute top-[-10%] left-[-10%] w-[40%] h-[40%] rounded-full bg-primary/20 blur-[120px] opacity-50 mix-blend-screen"></div>
-<div className="absolute bottom-[-10%] right-[-10%] w-[50%] h-[50%] rounded-full bg-secondary/10 blur-[150px] opacity-30 mix-blend-screen"></div>
+<div className="absolute top-[-10%] left-[-10%] w-[40%] h-[40%] rounded-full bg-primary/20 -[120px] opacity-50 mix-blend-screen"></div>
+<div className="absolute bottom-[-10%] right-[-10%] w-[50%] h-[50%] rounded-full bg-secondary/10 -[150px] opacity-30 mix-blend-screen"></div>
 </div>
 
-<nav className="hidden md:flex fixed left-0 top-0 h-full p-4 w-72 flex-col bg-surface/60 backdrop-blur-3xl border-r border-outline-variant/20 shadow-2xl shadow-surface-container-lowest/50 z-50">
+<nav className="hidden md:flex fixed left-0 top-0 h-full p-4 w-72 flex-col bg-surface/60 border-r border-outline-variant/20 shadow-2xl shadow-surface-container-lowest/50 z-50">
 
 <div className="flex items-center gap-4 px-2 mb-8">
 <div className="relative w-12 h-12 rounded-xl overflow-hidden glass-panel shrink-0">
@@ -31,7 +31,7 @@ export default function GeneratedPage() {
 <span className="material-symbols-outlined" style={{fontVariationSettings: '"FILL" 0'}}>code</span>
 <span className="font-body text-label-sm font-medium tracking-tight">Repositories</span>
 </a>
-<a className="flex items-center gap-3 px-4 py-3 bg-primary-container/30 backdrop-blur-md text-on-primary-container rounded-xl shadow-[inset_0_1px_1px_rgba(255,255,255,0.1)] transition-all duration-300 hover:scale-[1.02] active:scale-[0.98]" href="/explore">
+<a className="flex items-center gap-3 px-4 py-3 bg-primary-container/30 text-on-primary-container rounded-xl shadow-[inset_0_1px_1px_rgba(255,255,255,0.1)] transition-all duration-300 hover:scale-[1.02] active:scale-[0.98]" href="/explore">
 <span className="material-symbols-outlined text-primary" style={{fontVariationSettings: '"FILL" 1'}}>adjust</span>
 <span className="font-body text-label-sm font-medium tracking-tight text-primary">Issues</span>
 </a>
@@ -65,7 +65,7 @@ export default function GeneratedPage() {
 
 <main className="md:ml-72 relative z-10 flex flex-col min-h-screen">
 
-<header className="w-full h-16 sticky top-0 z-40 bg-surface/40 backdrop-blur-2xl flex justify-between items-center px-6 gap-8 shadow-sm transition-all duration-500 border-b border-outline-variant/10">
+<header className="w-full h-16 sticky top-0 z-40 bg-surface/40 flex justify-between items-center px-6 gap-8 shadow-sm transition-all duration-500 border-b border-outline-variant/10">
 
 <div className="flex items-center gap-4">
 <button className="md:hidden text-on-surface-variant hover:text-on-surface hover:bg-surface-variant/30 rounded-full p-2 transition-all">
@@ -81,7 +81,7 @@ export default function GeneratedPage() {
 </nav>
 
 <div className="flex items-center gap-4">
-<div className="hidden sm:flex items-center bg-surface-container-highest/50 backdrop-blur-md rounded-full px-4 py-1.5 border border-outline-variant/20 focus-within:border-primary/50 focus-within:ring-1 focus-within:ring-primary/50 transition-all">
+<div className="hidden sm:flex items-center bg-surface-container-highest/50 rounded-full px-4 py-1.5 border border-outline-variant/20 focus-within:border-primary/50 focus-within:ring-1 focus-within:ring-primary/50 transition-all">
 <span className="material-symbols-outlined text-on-surface-variant text-sm mr-2">search</span>
 <input className="bg-transparent border-none text-sm text-on-surface focus:ring-0 p-0 w-32 focus:w-48 transition-all duration-300 placeholder:text-on-surface-variant/50" placeholder="Search..." type="text"/>
 </div>
@@ -142,15 +142,15 @@ export default function GeneratedPage() {
 
 <div className="flex flex-col gap-3">
 
-<div className="bg-surface/40 backdrop-blur-2xl rounded-2xl border border-white/5 shadow-lg p-5 flex flex-col sm:flex-row sm:items-start gap-4 hover:border-white/10 hover:bg-surface/60 transition-all duration-300 group cursor-pointer">
+<div className="bg-surface/40 rounded-2xl border border-white/5 shadow-lg p-5 flex flex-col sm:flex-row sm:items-start gap-4 hover:border-white/10 hover:bg-surface/60 transition-all duration-300 group cursor-pointer">
 <div className="shrink-0 pt-1">
 <span className="material-symbols-outlined text-error" style={{fontVariationSettings: '"FILL" 1'}}>error</span>
 </div>
 <div className="flex-1 flex flex-col gap-2">
 <h3 className="text-lg font-semibold text-on-surface group-hover:text-primary transition-colors leading-tight">Implement dark mode toggle in navigation</h3>
 <div className="flex flex-wrap items-center gap-2">
-<span className="px-2 py-0.5 rounded-md text-xs font-medium bg-[#1a4a2a]/40 border border-[#1a4a2a] text-[#4ade80] backdrop-blur-sm">enhancement</span>
-<span className="px-2 py-0.5 rounded-md text-xs font-medium bg-[#4a1a4a]/40 border border-[#4a1a4a] text-[#e879f9] backdrop-blur-sm">ui/ux</span>
+<span className="px-2 py-0.5 rounded-md text-xs font-medium bg-[#1a4a2a]/40 border border-[#1a4a2a] text-[#4ade80]">enhancement</span>
+<span className="px-2 py-0.5 rounded-md text-xs font-medium bg-[#4a1a4a]/40 border border-[#4a1a4a] text-[#e879f9]">ui/ux</span>
 </div>
 <div className="text-sm text-on-surface-variant mt-1 flex items-center gap-2 flex-wrap">
 <span>#142 opened 2 hours ago by</span>
@@ -168,15 +168,15 @@ export default function GeneratedPage() {
 </div>
 </div>
 
-<div className="bg-surface/40 backdrop-blur-2xl rounded-2xl border border-white/5 shadow-lg p-5 flex flex-col sm:flex-row sm:items-start gap-4 hover:border-white/10 hover:bg-surface/60 transition-all duration-300 group cursor-pointer">
+<div className="bg-surface/40 rounded-2xl border border-white/5 shadow-lg p-5 flex flex-col sm:flex-row sm:items-start gap-4 hover:border-white/10 hover:bg-surface/60 transition-all duration-300 group cursor-pointer">
 <div className="shrink-0 pt-1">
 <span className="material-symbols-outlined text-error" style={{fontVariationSettings: '"FILL" 1'}}>error</span>
 </div>
 <div className="flex-1 flex flex-col gap-2">
 <h3 className="text-lg font-semibold text-on-surface group-hover:text-primary transition-colors leading-tight">Crash on startup when offline mode is enabled</h3>
 <div className="flex flex-wrap items-center gap-2">
-<span className="px-2 py-0.5 rounded-md text-xs font-medium bg-[#4a1a1a]/40 border border-[#4a1a1a] text-error backdrop-blur-sm">bug</span>
-<span className="px-2 py-0.5 rounded-md text-xs font-medium bg-[#4a2a1a]/40 border border-[#4a2a1a] text-tertiary backdrop-blur-sm">critical</span>
+<span className="px-2 py-0.5 rounded-md text-xs font-medium bg-[#4a1a1a]/40 border border-[#4a1a1a] text-error">bug</span>
+<span className="px-2 py-0.5 rounded-md text-xs font-medium bg-[#4a2a1a]/40 border border-[#4a2a1a] text-tertiary">critical</span>
 </div>
 <div className="text-sm text-on-surface-variant mt-1 flex items-center gap-2 flex-wrap">
 <span>#141 opened 5 hours ago by</span>
@@ -194,14 +194,14 @@ export default function GeneratedPage() {
 </div>
 </div>
 
-<div className="bg-surface/40 backdrop-blur-2xl rounded-2xl border border-white/5 shadow-lg p-5 flex flex-col sm:flex-row sm:items-start gap-4 hover:border-white/10 hover:bg-surface/60 transition-all duration-300 group cursor-pointer">
+<div className="bg-surface/40 rounded-2xl border border-white/5 shadow-lg p-5 flex flex-col sm:flex-row sm:items-start gap-4 hover:border-white/10 hover:bg-surface/60 transition-all duration-300 group cursor-pointer">
 <div className="shrink-0 pt-1">
 <span className="material-symbols-outlined text-primary" style={{fontVariationSettings: '"FILL" 0'}}>error</span>
 </div>
 <div className="flex-1 flex flex-col gap-2">
 <h3 className="text-lg font-semibold text-on-surface group-hover:text-primary transition-colors leading-tight">Update dependency versions for Q3 release</h3>
 <div className="flex flex-wrap items-center gap-2">
-<span className="px-2 py-0.5 rounded-md text-xs font-medium bg-[#1a3a4a]/40 border border-[#1a3a4a] text-[#38bdf8] backdrop-blur-sm">maintenance</span>
+<span className="px-2 py-0.5 rounded-md text-xs font-medium bg-[#1a3a4a]/40 border border-[#1a3a4a] text-[#38bdf8]">maintenance</span>
 </div>
 <div className="text-sm text-on-surface-variant mt-1 flex items-center gap-2 flex-wrap">
 <span>#140 opened yesterday by</span>
@@ -221,7 +221,7 @@ export default function GeneratedPage() {
 </div>
 
 <div className="flex justify-center mt-6">
-<div className="flex items-center gap-1 bg-surface-container-highest/30 backdrop-blur-md rounded-full p-1 border border-outline-variant/20">
+<div className="flex items-center gap-1 bg-surface-container-highest/30 rounded-full p-1 border border-outline-variant/20">
 <button className="w-8 h-8 flex items-center justify-center rounded-full text-on-surface-variant hover:bg-surface-variant/50 hover:text-on-surface transition-colors">
 <span className="material-symbols-outlined text-sm">chevron_left</span>
 </button>

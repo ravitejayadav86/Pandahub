@@ -22,7 +22,7 @@ interface PATToken {
   created_at: string;
 }
 
-// ─── Small helper components ──────────────────────────────────────────────────
+// â”€â”€â”€ Small helper components â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
 
 function SettingSection({
   title, description, children,
@@ -86,7 +86,7 @@ function InfoRow({ label, value, icon }: { label: string; value: string; icon: s
   );
 }
 
-// ─── Page ────────────────────────────────────────────────────────────────────
+// â”€â”€â”€ Page â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
 
 export default function SettingsPage() {
   const { user, setUser, clearAuth } = useAuthStore();
@@ -98,30 +98,30 @@ export default function SettingsPage() {
   const [error, setError] = useState('');
   const avatarInputRef = useRef<HTMLInputElement>(null);
 
-  // ── Profile ───────────────────────────────────────────────────────────────
+  // â”€â”€ Profile â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
   const [profile, setProfile] = useState({
     username: '', first_name: '', last_name: '', full_name: '',
     bio: '', website_url: '', location: '',
   });
 
-  // ── Education ─────────────────────────────────────────────────────────────
+  // â”€â”€ Education â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
   const [education, setEducation] = useState({
     institution: '', degree: '', field_of_study: '', graduation_year: '',
   });
 
-  // ── Password ──────────────────────────────────────────────────────────────
+  // â”€â”€ Password â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
   const [passwords, setPasswords] = useState({
     current_password: '', new_password: '', confirm_password: '',
   });
 
-  // ── 2FA ───────────────────────────────────────────────────────────────────
+  // â”€â”€ 2FA â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
   const [twoFaSetup, setTwoFaSetup] = useState<{ secret: string; provisioning_uri: string } | null>(null);
   const [totpCode, setTotpCode] = useState('');
   const [twoFaError, setTwoFaError] = useState('');
   const [isTwoFaLoading, setIsTwoFaLoading] = useState(false);
   const [disablePassword, setDisablePassword] = useState('');
 
-  // ── PAT tokens ────────────────────────────────────────────────────────────
+  // â”€â”€ PAT tokens â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
   const [tokens, setTokens] = useState<PATToken[]>([]);
   const [newTokenName, setNewTokenName] = useState('');
   const [newTokenDays, setNewTokenDays] = useState('30');
@@ -130,7 +130,7 @@ export default function SettingsPage() {
   const [tokenLoading, setTokenLoading] = useState(false);
   const [tokenError, setTokenError] = useState('');
 
-  // ── Notifications ─────────────────────────────────────────────────────────
+  // â”€â”€ Notifications â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
   type NotifKey = 'commits' | 'issues' | 'pr_reviews' | 'pr_merges' | 'mentions' | 'stars' | 'followers';
   const DEFAULT_NOTIF: Record<NotifKey, boolean> = {
     commits: true, issues: true, pr_reviews: true,
@@ -138,11 +138,11 @@ export default function SettingsPage() {
   };
   const [notifPrefs, setNotifPrefs] = useState<Record<NotifKey, boolean>>(DEFAULT_NOTIF);
 
-  // ── Danger ────────────────────────────────────────────────────────────────
+  // â”€â”€ Danger â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
   const [deleteConfirm, setDeleteConfirm] = useState('');
   const [showDeleteModal, setShowDeleteModal] = useState(false);
 
-  // ── Init ──────────────────────────────────────────────────────────────────
+  // â”€â”€ Init â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
   useEffect(() => {
     setMounted(true);
     try {
@@ -181,7 +181,7 @@ export default function SettingsPage() {
 
   const showSaved = () => { setSaved(true); setTimeout(() => setSaved(false), 3000); };
 
-  // ── Handlers ──────────────────────────────────────────────────────────────
+  // â”€â”€ Handlers â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
   const saveProfile = async (e: React.FormEvent) => {
     e.preventDefault(); setError(''); setSaving(true);
     try {
@@ -308,10 +308,10 @@ export default function SettingsPage() {
 
   const inp = 'gh-inp';
 
-  // ── Render ────────────────────────────────────────────────────────────────
+  // â”€â”€ Render â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
   return (
     <>
-      {/* ── scoped styles ─────────────────────────────────────────────────── */}
+      {/* â”€â”€ scoped styles â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€ */}
       <style>{`
         /* root */
         .gh-root { min-height:100vh; background:var(--bg-primary); color:var(--text-primary);
@@ -331,15 +331,15 @@ export default function SettingsPage() {
           font-size:13.5px; font-weight:500; color:var(--text-secondary); cursor:pointer; transition:all .15s ease;
           width:100%; text-align:left; border:1px solid transparent; background:none; font-family:inherit; }
         .gh-nav-btn:hover { background:var(--glass-bg-2); color:var(--text-primary); border-color:var(--glass-border); }
-        .gh-nav-btn.active { background:var(--glass-bg-3); color:#3b82f6; font-weight:600; border-color:var(--glass-border); box-shadow:var(--glass-shadow); }
-        .gh-nav-btn.danger { color:#ef4444; }
+        .gh-nav-btn.active { background:var(--glass-bg-3); color:#C8C8C8; font-weight:600; border-color:var(--glass-border); box-shadow:var(--glass-shadow); }
+        .gh-nav-btn.danger { color:#A6A6A6; }
         .gh-nav-btn.danger:hover { background:rgba(239,68,68,.08); }
-        .gh-nav-btn.danger.active { background:rgba(239,68,68,.12); color:#ef4444; font-weight:600; border-color:rgba(239,68,68,.3); }
+        .gh-nav-btn.danger.active { background:rgba(239,68,68,.12); color:#A6A6A6; font-weight:600; border-color:rgba(239,68,68,.3); }
         .gh-nav-btn .material-symbols-outlined { font-size:18px; flex-shrink:0; }
         .gh-nav-divider { height:1px; background:var(--glass-border); margin:10px 0; }
 
         /* panel */
-        .gh-panel { background:var(--glass-bg-3); backdrop-filter:blur(24px); -webkit-backdrop-filter:blur(24px);
+        .gh-panel { background:var(--glass-bg-3); backdrop-filter:(24px); -webkit-backdrop-filter:(24px);
           border:1px solid var(--glass-border); border-radius:20px; box-shadow:var(--glass-shadow); overflow:hidden; }
 
         /* section */
@@ -357,19 +357,19 @@ export default function SettingsPage() {
         .gh-inp { background:var(--glass-bg-2); border:1px solid var(--glass-border); border-radius:12px;
           color:var(--text-primary); font-size:14px; padding:6px 14px; height:38px; width:100%;
           outline:none; transition:border-color .15s,box-shadow .15s; font-family:inherit; }
-        .gh-inp:focus { border-color:#3b82f6; box-shadow:0 0 0 3px rgba(59,130,246,.25); }
+        .gh-inp:focus { border-color:#C8C8C8; box-shadow:0 0 0 3px rgba(59,130,246,.25); }
         .gh-inp::placeholder { color:var(--text-muted); }
         .gh-textarea { background:var(--glass-bg-2); border:1px solid var(--glass-border); border-radius:12px;
           color:var(--text-primary); font-size:14px; padding:10px 14px; width:100%; outline:none;
           resize:vertical; font-family:inherit; transition:border-color .15s,box-shadow .15s; }
-        .gh-textarea:focus { border-color:#3b82f6; box-shadow:0 0 0 3px rgba(59,130,246,.25); }
+        .gh-textarea:focus { border-color:#C8C8C8; box-shadow:0 0 0 3px rgba(59,130,246,.25); }
         .gh-textarea::placeholder { color:var(--text-muted); }
         .gh-select { background:var(--glass-bg-2); border:1px solid var(--glass-border); border-radius:12px;
           color:var(--text-primary); font-size:14px; padding:6px 32px 6px 14px; height:38px; width:100%;
           outline:none; cursor:pointer; font-family:inherit; appearance:none;
           background-image:url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='10' height='6'%3E%3Cpath fill='%237d8590' d='M0 0l5 6 5-6'/%3E%3C/svg%3E");
           background-repeat:no-repeat; background-position:right 12px center; }
-        .gh-select:focus { border-color:#3b82f6; box-shadow:0 0 0 3px rgba(59,130,246,.25); }
+        .gh-select:focus { border-color:#C8C8C8; box-shadow:0 0 0 3px rgba(59,130,246,.25); }
 
         /* prefix input */
         .gh-prefix-wrap { position:relative; }
@@ -382,13 +382,13 @@ export default function SettingsPage() {
           cursor:pointer; transition:all .15s ease; border:1px solid transparent;
           font-family:inherit; white-space:nowrap; outline:none; }
         .gh-btn:disabled { opacity:.5; cursor:not-allowed; }
-        .gh-btn-primary { background:linear-gradient(135deg, #2563eb, #4f46e5); color:#fff; box-shadow:0 4px 14px rgba(37,99,235,.25); }
-        .gh-btn-primary:hover:not(:disabled) { background:linear-gradient(135deg, #1d4ed8, #4338ca); transform:translateY(-1px); }
-        .gh-btn-default { background:var(--glass-bg-2); border-color:var(--glass-border); color:var(--text-primary); }
-        .gh-btn-default:hover:not(:disabled) { background:var(--glass-bg-4); }
-        .gh-btn-danger { background:#ef4444; color:#fff; box-shadow:0 4px 14px rgba(239,68,68,.25); }
-        .gh-btn-danger:hover:not(:disabled) { background:#dc2626; }
-        .gh-btn-outline-danger { background:transparent; border-color:rgba(239,68,68,.4); color:#ef4444; }
+        .gh-btn-primary { background:#ffffff !important; color:#000000 !important; border:1px solid #ffffff !important; font-weight:700 !important; box-shadow:0 2px 10px rgba(255,255,255,.18) !important; }
+        .gh-btn-primary:hover:not(:disabled) { background:#e4e4e7 !important; color:#000000 !important; transform:translateY(-1px); }
+        .gh-btn-default { background:#18181b !important; border:1px solid #333333 !important; color:#f4f4f5 !important; }
+        .gh-btn-default:hover:not(:disabled) { background:#27272a !important; border-color:#52525b !important; color:#ffffff !important; }
+        .gh-btn-danger { background:#18181b !important; border:1px solid rgba(239,68,68,0.4) !important; color:#f87171 !important; box-shadow:0 2px 6px rgba(0,0,0,.4); }
+        .gh-btn-danger:hover:not(:disabled) { background:rgba(239,68,68,0.15) !important; color:#ffffff !important; }
+        .gh-btn-outline-danger { background:transparent; border-color:rgba(239,68,68,.4); color:#f87171; }
         .gh-btn-outline-danger:hover:not(:disabled) { background:rgba(239,68,68,.1); }
 
         /* form actions */
@@ -410,10 +410,10 @@ export default function SettingsPage() {
           display:flex; align-items:center; justify-content:center;
           font-size:30px; font-weight:700; color:var(--text-primary); transition:all .15s;
           box-shadow:var(--glass-shadow); }
-        .gh-avatar:hover { border-color:#3b82f6; transform:scale(1.03); }
+        .gh-avatar:hover { border-color:#C8C8C8; transform:scale(1.03); }
         .gh-avatar img { width:100%; height:100%; object-fit:cover; }
         .gh-avatar-name { font-weight:700; font-size:16px; margin-bottom:4px; color:var(--text-primary); }
-        .gh-avatar-link { color:#3b82f6; font-size:13px; cursor:pointer; font-weight:600; }
+        .gh-avatar-link { color:#C8C8C8; font-size:13px; cursor:pointer; font-weight:600; }
         .gh-avatar-link:hover { text-decoration:underline; }
         .gh-avatar-sub { color:var(--text-muted); font-size:12px; margin-top:4px; }
 
@@ -427,11 +427,11 @@ export default function SettingsPage() {
         /* error */
         .gh-error-banner { display:flex; align-items:center; gap:8px; padding:12px 16px;
           background:rgba(239,68,68,.1); border:1px solid rgba(239,68,68,.3);
-          border-radius:12px; color:#ef4444; font-size:13px; font-weight:500; }
+          border-radius:12px; color:#A6A6A6; font-size:13px; font-weight:500; }
 
         /* save ok */
         .gh-save-ok { display:inline-flex; align-items:center; gap:5px;
-          color:#10b981; font-size:13px; font-weight:600;
+          color:#B8B8B8; font-size:13px; font-weight:600;
           animation:ghFadeIn .2s ease; }
         @keyframes ghFadeIn { from{opacity:0;transform:translateY(4px)} to{opacity:1;transform:none} }
 
@@ -445,7 +445,7 @@ export default function SettingsPage() {
         .gh-pill { display:inline-flex; align-items:center; gap:5px; padding:4px 12px;
           border-radius:999px; border:1px solid; font-size:12px; font-weight:600;
           cursor:pointer; transition:all .15s; user-select:none; }
-        .gh-pill.on { background:rgba(59,130,246,.15); border-color:#3b82f6; color:#3b82f6; }
+        .gh-pill.on { background:rgba(59,130,246,.15); border-color:#C8C8C8; color:#C8C8C8; }
         .gh-pill.off { background:var(--glass-bg-1); border-color:var(--glass-border); color:var(--text-secondary); }
         .gh-pill.off:hover { border-color:var(--text-muted); color:var(--text-primary); }
 
@@ -453,7 +453,7 @@ export default function SettingsPage() {
         .gh-token-created { display:flex; flex-direction:column; gap:8px; padding:14px;
           background:rgba(16,185,129,.1); border:1px solid rgba(16,185,129,.3);
           border-radius:12px; margin-top:4px; }
-        .gh-token-created-lbl { color:#10b981; font-size:12px; font-weight:600; }
+        .gh-token-created-lbl { color:#B8B8B8; font-size:12px; font-weight:600; }
         .gh-token-row { display:flex; align-items:center; gap:8px; }
         .gh-token-code { font-family:'SFMono-Regular',Consolas,'Liberation Mono',Menlo,monospace;
           font-size:12px; background:var(--glass-bg-1); border:1px solid var(--glass-border); border-radius:8px;
@@ -478,7 +478,7 @@ export default function SettingsPage() {
         .gh-toggle-desc { font-size:12px; color:var(--text-muted); margin-top:2px; }
         .gh-toggle { width:44px; height:24px; border-radius:999px; border:none;
           cursor:pointer; flex-shrink:0; position:relative; transition:background .2s; outline:none; }
-        .gh-toggle.on { background:#2563eb; }
+        .gh-toggle.on { background:#C8C8C8; }
         .gh-toggle.off { background:var(--glass-border); }
         .gh-toggle-thumb { position:absolute; top:3px; width:18px; height:18px;
           border-radius:50%; background:#fff; transition:left .2s; box-shadow:0 1px 3px rgba(0,0,0,.3); }
@@ -488,7 +488,7 @@ export default function SettingsPage() {
         /* danger box */
         .gh-danger-box { border:1px solid rgba(239,68,68,.3); border-radius:16px; overflow:hidden; background:rgba(239,68,68,.03); }
         .gh-danger-box-hdr { background:rgba(239,68,68,.1); padding:14px 18px;
-          font-size:13px; font-weight:600; color:#ef4444; border-bottom:1px solid rgba(239,68,68,.2); }
+          font-size:13px; font-weight:600; color:#A6A6A6; border-bottom:1px solid rgba(239,68,68,.2); }
         .gh-danger-item { display:flex; align-items:center; justify-content:space-between;
           gap:16px; padding:16px 18px; border-bottom:1px solid rgba(239,68,68,.15); }
         .gh-danger-item:last-child { border-bottom:none; }
@@ -496,14 +496,14 @@ export default function SettingsPage() {
         .gh-danger-sub { font-size:12px; color:var(--text-muted); }
 
         /* 2FA OK badge */
-        .gh-2fa-ok { display:flex; align-items:center; gap:6px; color:#10b981;
+        .gh-2fa-ok { display:flex; align-items:center; gap:6px; color:#B8B8B8;
           font-size:13px; font-weight:600; padding:6px 0; margin-bottom:12px; }
 
         /* modal */
-        .gh-overlay { position:fixed; inset:0; background:rgba(0,0,0,.6); backdrop-filter:blur(8px);
+        .gh-overlay { position:fixed; inset:0; background:rgba(0,0,0,.6); backdrop-filter:(8px);
           display:flex; align-items:center; justify-content:center; z-index:999; padding:16px; }
         .gh-modal { background:var(--glass-bg-4); border:1px solid var(--glass-border); border-radius:20px;
-          backdrop-filter:blur(24px); padding:24px; max-width:440px; width:100%; box-shadow:var(--glass-shadow); }
+          backdrop-filter:(24px); padding:24px; max-width:440px; width:100%; box-shadow:var(--glass-shadow); }
         .gh-modal-title { font-size:16px; font-weight:700; color:var(--text-primary); margin:0 0 8px; }
         .gh-modal-body { font-size:13.5px; color:var(--text-secondary); line-height:1.6; margin:0 0 16px; }
         .gh-modal-actions { display:flex; gap:10px; }
@@ -554,7 +554,7 @@ export default function SettingsPage() {
           {/* ===== CONTENT ===== */}
           <div style={{ display: 'flex', flexDirection: 'column', gap: 16 }}>
 
-            {/* ─── PROFILE ─────────────────────────────────────────────────── */}
+            {/* â”€â”€â”€ PROFILE â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€ */}
             {activeSection === 'profile' && (
               <div className="gh-panel">
                 <SettingSection
@@ -654,12 +654,12 @@ export default function SettingsPage() {
               </div>
             )}
 
-            {/* ─── EDUCATION ───────────────────────────────────────────────── */}
+            {/* â”€â”€â”€ EDUCATION â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€ */}
             {activeSection === 'education' && (
               <div className="gh-panel">
                 <SettingSection
                   title="Education"
-                  description="Your academic background — shown on your public profile."
+                  description="Your academic background â€” shown on your public profile."
                 >
                   <form onSubmit={saveEducation} style={{ display: 'flex', flexDirection: 'column', gap: 16 }}>
                     <FormGroup label="Institution / University" htmlFor="set-institution">
@@ -711,19 +711,19 @@ export default function SettingsPage() {
               </div>
             )}
 
-            {/* ─── ACCOUNT & SECURITY ──────────────────────────────────────── */}
+            {/* â”€â”€â”€ ACCOUNT & SECURITY â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€ */}
             {activeSection === 'account' && (
               <>
                 {/* Account info */}
                 <div className="gh-panel">
                   <SettingSection title="Account" description="Your account details.">
-                    <InfoRow label="Email address" value={user?.email || '—'} icon="mail" />
+                    <InfoRow label="Email address" value={user?.email || 'â€”'} icon="mail" />
                     <InfoRow
                       label="Member since"
-                      value={user?.created_at ? new Date(user.created_at).toLocaleDateString('en-US', { year: 'numeric', month: 'long', day: 'numeric' }) : '—'}
+                      value={user?.created_at ? new Date(user.created_at).toLocaleDateString('en-US', { year: 'numeric', month: 'long', day: 'numeric' }) : 'â€”'}
                       icon="calendar_today"
                     />
-                    <InfoRow label="Email verified" value={user?.is_verified ? 'Verified ✓' : 'Not verified — check your inbox'} icon="verified_user" />
+                    <InfoRow label="Email verified" value={user?.is_verified ? 'Verified âœ“' : 'Not verified â€” check your inbox'} icon="verified_user" />
                   </SettingSection>
                 </div>
 
@@ -828,14 +828,14 @@ export default function SettingsPage() {
               </>
             )}
 
-            {/* ─── DEVELOPER SETTINGS ──────────────────────────────────────── */}
+            {/* â”€â”€â”€ DEVELOPER SETTINGS â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€ */}
             {activeSection === 'tokens' && (
               <>
                 {/* Generate token */}
                 <div className="gh-panel">
                   <SettingSection
                     title="Personal access tokens"
-                    description="Use tokens to authenticate with the panda CLI or Git over HTTPS. Tokens work like passwords — keep them secret."
+                    description="Use tokens to authenticate with the panda CLI or Git over HTTPS. Tokens work like passwords â€” keep them secret."
                   >
                     <div className="gh-box">
                       <div className="gh-box-hdr">
@@ -942,7 +942,7 @@ export default function SettingsPage() {
               </>
             )}
 
-            {/* ─── NOTIFICATIONS ───────────────────────────────────────────── */}
+            {/* â”€â”€â”€ NOTIFICATIONS â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€ */}
             {activeSection === 'notifications' && (
               <div className="gh-panel">
                 <SettingSection
@@ -987,7 +987,7 @@ export default function SettingsPage() {
               </div>
             )}
 
-            {/* ─── DANGER ZONE ─────────────────────────────────────────────── */}
+            {/* â”€â”€â”€ DANGER ZONE â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€ */}
             {activeSection === 'danger' && (
               <div className="gh-panel">
                 <SettingSection
@@ -1019,7 +1019,7 @@ export default function SettingsPage() {
           </div>{/* /content */}
         </div>{/* /layout */}
 
-        {/* ─── DELETE CONFIRMATION MODAL ───────────────────────────────────── */}
+        {/* â”€â”€â”€ DELETE CONFIRMATION MODAL â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€ */}
         {showDeleteModal && (
           <div className="gh-overlay">
             <div className="gh-modal">

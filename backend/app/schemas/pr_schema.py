@@ -142,6 +142,10 @@ class AIReviewResultOut(BaseModel):
 
     id: uuid.UUID
     summary: str
-    suggestions: dict
+    suggestions: Any
     model_used: str
     created_at: datetime
+    diff_category: Optional[str] = "functional"
+    severity: Optional[str] = "medium"
+    k_samples: Optional[int] = 1
+    routing_metadata: Optional[dict] = None

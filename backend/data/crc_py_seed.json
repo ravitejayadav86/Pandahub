@@ -1,0 +1,50 @@
+[
+  {
+    "diff_text": "--- a/src/auth.py\n+++ b/src/auth.py\n@@ -12,6 +12,7 @@ def authenticate(user, password):\n-    if user.password == password:\n+    if check_password_hash(user.password_hash, password):\n         return True\n     return False",
+    "review_comment": "[critical] auth.py: Comparing plaintext password to stored value. Use a constant-time hash comparison (e.g. bcrypt.checkpw) to prevent timing attacks and ensure passwords at rest are never stored in plaintext.",
+    "category": "functional",
+    "severity": "critical"
+  },
+  {
+    "diff_text": "--- a/utils/db.py\n+++ b/utils/db.py\n@@ -8,4 +8,5 @@ def get_users():\n-    return db.execute('SELECT * FROM users WHERE id=' + user_id)\n+    return db.execute('SELECT * FROM users WHERE id = %s', (user_id,))",
+    "review_comment": "[critical] db.py: SQL injection vulnerability. Never concatenate user input into raw SQL strings. Use parameterized queries as shown in the fix.",
+    "category": "functional",
+    "severity": "critical"
+  },
+  {
+    "diff_text": "--- a/api/handlers.py\n+++ b/api/handlers.py\n@@ -44,6 +44,14 @@ class UserHandler:\n+def get_user(user_id: int) -> Optional[User]:\n+    \"\"\"\n+    Fetch a single user by ID.\n+\n+    Args:\n+        user_id: Primary key of the user record.\n+\n+    Returns:\n+        User object or None if not found.\n+    \"\"\"\n+    return db.session.get(User, user_id)",
+    "review_comment": "[low] handlers.py: Good addition of docstring. Consider also documenting raised exceptions (e.g. SQLAlchemyError on DB failure).",
+    "category": "documentation",
+    "severity": "low"
+  },
+  {
+    "diff_text": "--- a/services/payment.py\n+++ b/services/payment.py\n@@ -20,10 +20,6 @@ def charge(amount, user):\n-    for item in cart.items:\n-        for discount in user.discounts:\n-            if discount.applies_to(item):\n-                amount -= discount.value\n+    applicable = [d for d in user.discounts if any(d.applies_to(i) for i in cart.items)]\n+    amount -= sum(d.value for d in applicable)",
+    "review_comment": "[medium] payment.py: Refactoring reduces nesting but introduces a subtle bug — a discount that applies to multiple items is now deducted only once. The original double-loop applied it per item. Add a test case for multi-item discounts before merging.",
+    "category": "refactoring",
+    "severity": "medium"
+  },
+  {
+    "diff_text": "--- a/requirements.txt\n+++ b/requirements.txt\n@@ -3,1 +3,2 @@ flask==2.3.0\n+requests==2.31.0\n+urllib3==2.0.7",
+    "review_comment": "[low] requirements.txt: Pin exact versions when adding new dependencies to ensure reproducible builds. Consider using pip-compile or poetry for lock file management.",
+    "category": "discussion",
+    "severity": "low"
+  },
+  {
+    "diff_text": "--- a/models/user.py\n+++ b/models/user.py\n@@ -5,5 +5,10 @@ class User(Base):\n     id = Column(Integer, primary_key=True)\n     email = Column(String)\n+    email_verified = Column(Boolean, default=False)\n+    created_at = Column(DateTime, server_default=func.now())\n+    last_login = Column(DateTime, nullable=True)\n+    failed_login_attempts = Column(Integer, default=0)\n+    locked_until = Column(DateTime, nullable=True)",
+    "review_comment": "[medium] models/user.py: Good security additions. Ensure `email` column has a unique constraint and index. Also consider adding `__repr__` that excludes sensitive fields to prevent accidental logging of PII.",
+    "category": "functional",
+    "severity": "medium"
+  },
+  {
+    "diff_text": "--- a/tests/test_api.py\n+++ b/tests/test_api.py\n@@ -1,4 +1,22 @@\n+import pytest\n+from app import create_app\n+\n+@pytest.fixture\n+def client():\n+    app = create_app({'TESTING': True, 'DATABASE_URL': 'sqlite:///:memory:'})\n+    with app.test_client() as client:\n+        yield client\n+\n+def test_health_check(client):\n+    response = client.get('/health')\n+    assert response.status_code == 200\n+\n+def test_create_user_missing_email(client):\n+    response = client.post('/users', json={'username': 'alice'})\n+    assert response.status_code == 422",
+    "review_comment": "[low] tests/test_api.py: Good test coverage additions. Consider adding tests for authentication boundary conditions (expired tokens, wrong credentials) and using factory_boy for fixture data to avoid brittle hardcoded values.",
+    "category": "documentation",
+    "severity": "low"
+  },
+  {
+    "diff_text": "--- a/cache/redis_client.py\n+++ b/cache/redis_client.py\n@@ -8,3 +8,8 @@ def get(key):\n-    return redis.get(key)\n+    try:\n+        value = redis.get(key)\n+        return json.loads(value) if value else None\n+    except redis.ConnectionError:\n+        logger.warning('Redis unavailable, cache miss for key=%s', key)\n+        return None",
+    "review_comment": "[medium] redis_client.py: Good resilience improvement. Consider also catching `redis.TimeoutError` and `json.JSONDecodeError`. Add a metric/counter for cache miss vs. Redis error to distinguish them in monitoring.",
+    "category": "functional",
+    "severity": "medium"
+  }
+]

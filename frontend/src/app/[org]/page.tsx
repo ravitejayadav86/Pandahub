@@ -188,7 +188,7 @@ export default function UserProfilePage() {
     return (
       <div className="min-h-screen bg-[var(--bg-primary)] flex flex-col">
         <Navbar />
-        <div className="flex-1 flex items-center justify-center motion-blur-scale">
+        <div className="flex-1 flex items-center justify-center motion-">
           <PandaLoader size="lg" glow={true} label="Loading profile..." />
         </div>
       </div>
@@ -240,7 +240,7 @@ export default function UserProfilePage() {
       <Navbar />
       
       {/* ── Sticky Tab Bar ── */}
-      <div className="sticky top-[60px] z-40 bg-[var(--glass-bg-4)] backdrop-blur-xl border-b border-[var(--glass-border)] mt-4">
+      <div className="sticky top-[60px] z-40 bg-[var(--glass-bg-4)] border-b border-[var(--glass-border)] mt-4">
         <div className="max-w-[1280px] w-full mx-auto px-4 md:px-8 flex items-end">
           <div className="hidden md:block w-[296px] shrink-0 mr-6" /> {/* Spacer for sidebar */}
           <nav className="flex gap-2 overflow-x-auto no-scrollbar">
@@ -276,7 +276,7 @@ export default function UserProfilePage() {
         
         {/* ── Left Sidebar ── */}
         <div className="w-full md:w-[296px] shrink-0 -mt-10 md:mt-0 relative z-10">
-          <div className="relative w-full max-w-[296px] aspect-square rounded-full border border-[var(--glass-border)] overflow-hidden bg-[var(--glass-bg-3)] backdrop-blur-xl mb-4 shadow-xl z-10">
+          <div className="relative w-full max-w-[296px] aspect-square rounded-full border border-[var(--glass-border)] overflow-hidden bg-[var(--glass-bg-3)] mb-4 shadow-xl z-10">
             {profile.avatar_url ? (
               <img src={profile.avatar_url} alt={profile.username} className="w-full h-full object-cover" />
             ) : (
@@ -316,7 +316,7 @@ export default function UserProfilePage() {
               </button>
               <button
                 onClick={handleOpenChat}
-                className="flex-1 py-2 text-center text-sm font-semibold text-white bg-gradient-to-r from-blue-600 to-indigo-600 hover:from-blue-700 hover:to-indigo-700 rounded-xl transition-all shadow-lg shadow-blue-500/20"
+                className="flex-1 py-2 text-center text-sm font-bold text-black bg-white hover:bg-zinc-200 rounded-xl transition-all shadow-md"
               >
                 Message
               </button>
@@ -445,7 +445,7 @@ export default function UserProfilePage() {
                   </button>
                 </div>
                 {isOwner && (
-                  <Link href="/new" className="flex items-center gap-1 px-4 py-2 text-sm font-semibold bg-gradient-to-r from-blue-600 to-indigo-600 text-white rounded-xl shadow-md hover:from-blue-700 hover:to-indigo-700 transition-all">
+                  <Link href="/new" className="flex items-center gap-1 px-4 py-2 text-sm font-bold bg-white text-black rounded-xl shadow-md hover:bg-zinc-200 transition-all">
                     <BookMarked className="w-4 h-4" /> New
                   </Link>
                 )}
@@ -554,7 +554,7 @@ export default function UserProfilePage() {
 
       {/* ── Delete Repository Confirmation Modal ──────────────────────── */}
       {repoToDelete && (
-        <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/60 backdrop-blur-md p-4 animate-fade-in">
+        <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/60 p-4 animate-fade-in">
           <div className="w-full max-w-md rounded-2xl glass-panel border border-red-500/30 shadow-2xl overflow-hidden">
             {/* Header */}
             <div className="px-6 py-4 border-b border-red-500/20 bg-red-500/10 flex items-center justify-between">

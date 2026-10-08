@@ -1,4 +1,4 @@
-"use client";
+﻿"use client";
 import { useEffect, useRef } from 'react';
 
 interface Particle {
@@ -38,9 +38,9 @@ interface DepthOrb {
 }
 
 const THEMES: Record<string, string[]> = {
-  multicolor: ['#0A84FF', '#5E5CE6', '#30D158', '#64D2FF', '#BF5AF2'],
+  multicolor: ['#E6E6E6', '#5E5CE6', '#30D158', '#64D2FF', '#BF5AF2'],
   emerald:    ['#30D158', '#34C759', '#00C7BE', '#32D74B'],
-  ocean:      ['#0A84FF', '#64D2FF', '#0040DD', '#007AFF'],
+  ocean:      ['#E6E6E6', '#64D2FF', '#0040DD', '#007AFF'],
   cyberpunk:  ['#BF5AF2', '#FF2D55', '#FF375F', '#D30DF2'],
   mono:       ['#64748B', '#475569', '#334155', '#94A3B8'],
 };
@@ -70,9 +70,9 @@ export default function SpaceBackground() {
     };
 
     const getColors = (): string[] => {
-      if (typeof window === 'undefined') return THEMES.multicolor ?? ['#0A84FF'];
+      if (typeof window === 'undefined') return THEMES.multicolor ?? ['#E6E6E6'];
       const themeId = document.documentElement.getAttribute('data-bg-theme') || 'multicolor';
-      return THEMES[themeId] ?? THEMES.multicolor ?? ['#0A84FF'];
+      return THEMES[themeId] ?? THEMES.multicolor ?? ['#E6E6E6'];
     };
 
     const isDark = () => {
@@ -88,7 +88,7 @@ export default function SpaceBackground() {
       return `${r},${g},${b}`;
     };
 
-    /* ── Initialise particles ── */
+    /* â”€â”€ Initialise particles â”€â”€ */
     const init = () => {
       const colors = getColors();
       const count = Math.min(Math.floor((canvas.width * canvas.height) / 7500), 110);
@@ -97,7 +97,7 @@ export default function SpaceBackground() {
         const vx = (Math.random() - 0.5) * 0.14;
         const vy = -Math.random() * 0.22 - 0.08;
         const depth = Math.random(); // 0 = far, 1 = near
-        const colorHex = colors[Math.floor(Math.random() * colors.length)] ?? '#0A84FF';
+        const colorHex = colors[Math.floor(Math.random() * colors.length)] ?? '#E6E6E6';
         return {
           x: Math.random() * canvas.width,
           y: Math.random() * canvas.height,
@@ -113,7 +113,7 @@ export default function SpaceBackground() {
         };
       });
 
-      /* ── Depth orbs — large diffuse blobs (Spatial Glassmorphism) ── */
+      /* â”€â”€ Depth orbs â€” large diffuse blobs (Spatial Glassmorphism) â”€â”€ */
       depthOrbs = [
         {
           x: canvas.width * 0.15,
@@ -121,8 +121,8 @@ export default function SpaceBackground() {
           vx:  0.18,
           vy:  0.10,
           radius: Math.min(canvas.width, canvas.height) * 0.28,
-          color: '#0A84FF',
-          colorRgb: hexToRgb('#0A84FF'),
+          color: '#E6E6E6',
+          colorRgb: hexToRgb('#E6E6E6'),
           opacity: isDark() ? 0.040 : 0.025,
         },
         {
@@ -148,7 +148,7 @@ export default function SpaceBackground() {
       ];
     };
 
-    /* ── Shooting star spawn ── */
+    /* â”€â”€ Shooting star spawn â”€â”€ */
     const spawnShootingStar = () => {
       shootingStars.push({
         x: Math.random() * canvas.width * 0.65,
@@ -160,30 +160,30 @@ export default function SpaceBackground() {
       });
     };
 
-    /* ── Resize ── */
+    /* â”€â”€ Resize â”€â”€ */
     const resize = () => {
       canvas.width  = window.innerWidth;
       canvas.height = window.innerHeight;
       init();
     };
 
-    /* ── Mouse events ── */
+    /* â”€â”€ Mouse events â”€â”€ */
     const onMouseMove  = (e: MouseEvent) => { mouse.targetX = e.clientX; mouse.targetY = e.clientY; };
     const onMouseLeave = ()               => { mouse.targetX = -2000;    mouse.targetY = -2000; };
 
-    /* ── Update particle colors on theme change ── */
+    /* â”€â”€ Update particle colors on theme change â”€â”€ */
     const updateColors = () => {
       const colors = getColors();
       for (const p of particles) {
-        const newColor = colors[Math.floor(Math.random() * colors.length)] ?? '#0A84FF';
+        const newColor = colors[Math.floor(Math.random() * colors.length)] ?? '#E6E6E6';
         p.color = newColor;
         p.colorRgb = hexToRgb(newColor);
       }
     };
 
-    /* ══════════════════════════════════════════════
+    /* â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•
        MAIN DRAW LOOP
-    ══════════════════════════════════════════════ */
+    â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â• */
     const draw = () => {
       const dark = isDark();
 
@@ -205,7 +205,7 @@ export default function SpaceBackground() {
       frame++;
       if (frame % 180 === 0 && Math.random() > 0.35) spawnShootingStar();
 
-      /* ── 1. Depth Orbs (Spatial glow layers behind everything) ── */
+      /* â”€â”€ 1. Depth Orbs (Spatial glow layers behind everything) â”€â”€ */
       for (const orb of depthOrbs) {
         const grad = ctx.createRadialGradient(orb.x, orb.y, 0, orb.x, orb.y, orb.radius);
         grad.addColorStop(0,   `rgba(${orb.colorRgb},${orb.opacity})`);
@@ -228,7 +228,7 @@ export default function SpaceBackground() {
         if (orb.y > canvas.height + orb.radius) { orb.y = canvas.height + orb.radius; orb.vy *= -1; }
       }
 
-      /* ── 2. Particle connections (depth-aware alpha) ── */
+      /* â”€â”€ 2. Particle connections (depth-aware alpha) â”€â”€ */
       const maxDist = 120;
       const maxDistSq = maxDist * maxDist;
       
@@ -257,7 +257,7 @@ export default function SpaceBackground() {
         }
       }
 
-      /* ── 3. Particles (Spatial — depth-scaled) ── */
+      /* â”€â”€ 3. Particles (Spatial â€” depth-scaled) â”€â”€ */
       for (const p of particles) {
         p.pulse += p.pulseSpeed;
         const pulsedOpacity = Math.min(p.opacity + Math.sin(p.pulse) * 0.14, 1);
@@ -308,7 +308,7 @@ export default function SpaceBackground() {
         if (p.y > canvas.height) { p.y = 0; p.x = Math.random() * canvas.width; }
       }
 
-      /* ── 4. Shooting stars ── */
+      /* â”€â”€ 4. Shooting stars â”€â”€ */
       shootingStars = shootingStars.filter(s => s.opacity > 0);
       for (const s of shootingStars) {
         const tailX = s.x - Math.cos(s.angle) * s.length;
@@ -346,7 +346,7 @@ export default function SpaceBackground() {
         s.opacity -= 0.011;
       }
 
-      /* ── 5. Mouse ambient glow ── */
+      /* â”€â”€ 5. Mouse ambient glow â”€â”€ */
       if (mouse.x > -1000) {
         const aGlow = ctx.createRadialGradient(mouse.x, mouse.y, 0, mouse.x, mouse.y, 140);
         aGlow.addColorStop(0,   dark ? 'rgba(10,132,255,0.06)'  : 'rgba(10,132,255,0.04)');
@@ -401,3 +401,5 @@ export default function SpaceBackground() {
     />
   );
 }
+
+

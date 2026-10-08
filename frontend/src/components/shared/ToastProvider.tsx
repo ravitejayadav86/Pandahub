@@ -256,7 +256,7 @@ function ToastItem({
     <div
       role="alert"
       className={`
-        relative rounded-2xl border backdrop-blur-xl overflow-hidden
+        relative rounded-2xl border  overflow-hidden
         transition-all duration-300 ease-out
         ${cfg.borderColor} ${cfg.bgColor}
         ${visible ? 'opacity-100 translate-y-0 scale-100' : 'opacity-0 translate-y-4 scale-95'}

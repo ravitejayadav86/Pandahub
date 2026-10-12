@@ -152,8 +152,8 @@ def _extract_changed_files(diff_text: str) -> List[str]:
 
 def _count_changed_lines(diff_text: str) -> Tuple[int, int]:
     """Return (added, removed) line counts."""
-    added = sum(1 for l in diff_text.splitlines() if l.startswith("+") and not l.startswith("+++"))
-    removed = sum(1 for l in diff_text.splitlines() if l.startswith("-") and not l.startswith("---"))
+    added = sum(1 for line in diff_text.splitlines() if line.startswith("+") and not line.startswith("+++"))
+    removed = sum(1 for line in diff_text.splitlines() if line.startswith("-") and not line.startswith("---"))
     return added, removed
 
 
@@ -175,7 +175,6 @@ def classify_diff(diff_text: str) -> DiffCategory:
 
     files = _extract_changed_files(diff_text)
     added, removed = _count_changed_lines(diff_text)
-    diff_lower = diff_text.lower()
 
     # ── Early exit: detect auto-generated / whitespace-only diffs ──
     all_files_generated = files and all(
@@ -187,11 +186,11 @@ def classify_diff(diff_text: str) -> DiffCategory:
 
     # Whitespace-only diff (formatting commits)
     content_lines = [
-        l for l in diff_text.splitlines()
-        if (l.startswith("+") and not l.startswith("+++"))
-        or (l.startswith("-") and not l.startswith("---"))
+        line for line in diff_text.splitlines()
+        if (line.startswith("+") and not line.startswith("+++"))
+        or (line.startswith("-") and not line.startswith("---"))
     ]
-    if content_lines and all(not l[1:].strip() for l in content_lines):
+    if content_lines and all(not line[1:].strip() for line in content_lines):
         return DiffCategory.FALSE_POSITIVE
 
     # ── Score each category ──

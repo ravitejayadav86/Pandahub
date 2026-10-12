@@ -16,13 +16,13 @@ from __future__ import annotations
 import logging
 from typing import Any, Dict
 
-from fastapi import APIRouter, Depends, status
+from fastapi import APIRouter, Depends
 from sqlalchemy.ext.asyncio import AsyncSession
 from sqlalchemy import select, func
 
 from app.api.dependencies import get_current_active_user
 from app.db.session import get_db
-from app.models.pull_request import AIReviewResult, PullRequest
+from app.models.pull_request import AIReviewResult
 from app.models.user import User
 from app.services.classifier import (
     CONFIDENCE_THRESHOLD,

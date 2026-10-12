@@ -20,10 +20,9 @@ from __future__ import annotations
 from typing import Annotated, Optional
 import logging
 
-logger = logging.getLogger("app.api.v1.pulls")
-
 from fastapi import APIRouter, Depends, Query, Response, status
 from sqlalchemy.ext.asyncio import AsyncSession
+from sqlalchemy import select
 
 from app.api.dependencies import (
     get_current_active_user,
@@ -33,6 +32,7 @@ from app.api.dependencies import (
 )
 from app.db.session import get_db
 from app.models.enums import PullRequestState, PermissionLevel
+from app.models.pull_request import AIReviewResult
 from app.models.repo import Repository
 from app.models.user import User
 from app.schemas.pr_schema import (
@@ -47,9 +47,9 @@ from app.schemas.pr_schema import (
     AIReviewResultOut,
 )
 from app.services import pr_service
-from app.models.pull_request import AIReviewResult
-from sqlalchemy import select
 from app.worker.tasks.ai_tasks import generate_pr_review_task
+
+logger = logging.getLogger("app.api.v1.pulls")
 
 router = APIRouter(tags=["pulls"])
 

@@ -35,7 +35,6 @@ import asyncio
 import json
 import logging
 import re
-import uuid
 from datetime import datetime, timezone
 from pathlib import Path
 from typing import Any, Dict, List, Optional
@@ -142,7 +141,7 @@ def sanitize_record(record: Dict[str, Any]) -> Optional[Dict[str, Any]]:
             len(diff_text), MAX_DIFF_CHARS,
         )
         return None
-    diff_lines = [l for l in diff_text.splitlines() if l.startswith(("+", "-"))]
+    diff_lines = [line for line in diff_text.splitlines() if line.startswith(("+", "-"))]
     if len(diff_lines) < MIN_DIFF_LINES:
         logger.debug("Record excluded: diff too small (%d change lines)", len(diff_lines))
         return None
@@ -204,7 +203,7 @@ def train_classifier_task(include_self_training: bool = True) -> None:
                                fitting on labelled data.
     """
     from app.services.classifier import (
-        build_classifier, run_self_training, LabelledSample, SelfTrainingClassifier,
+        build_classifier, run_self_training, LabelledSample,
         CATEGORIES,
     )
 

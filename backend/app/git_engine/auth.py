@@ -41,13 +41,12 @@ from app.models.user import PersonalAccessToken, User
 
 logger = get_logger("app.git_engine.auth")
 
-# PATs used for git must carry the "repo" scope.
-_GIT_REQUIRED_SCOPE = "repo"
 
 
 async def authenticate_git_request(
     request: Request,
     db: AsyncSession,
+    required_scope: str = "repo:read",
 ) -> Optional[User]:
     """
     Resolve the ``Authorization`` header of a git HTTP request to a ``User``.
@@ -114,11 +113,21 @@ async def authenticate_git_request(
             logger.warning("git: PAT expired", extra={"pat_id": str(pat.id)})
             return None
 
-        # Scope check: PAT must carry the "repo" scope
-        if _GIT_REQUIRED_SCOPE not in (pat.scopes or []):
+        # Enforce permissions for the requested Git operation.
+        scopes = set(pat.scopes or [])
+
+        if (
+            "repo" not in scopes
+            and "repo:admin" not in scopes
+            and required_scope not in scopes
+        ):
             logger.warning(
-                "git: PAT missing 'repo' scope",
-                extra={"pat_id": str(pat.id), "scopes": pat.scopes},
+                "git: PAT missing required scope",
+                extra={
+                    "pat_id": str(pat.id),
+                    "required_scope": required_scope,
+                    "scopes": pat.scopes,
+                },
             )
             return None
 

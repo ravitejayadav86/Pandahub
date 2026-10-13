@@ -321,8 +321,6 @@ async def info_refs(
     query parameter.  We dispatch based on that value and gate permissions
     accordingly.
     """
-    user = await authenticate_git_request(request, db)
-
     try:
         service_type = GitServiceType(service)
     except ValueError:
@@ -330,6 +328,15 @@ async def info_refs(
             status_code=status.HTTP_403_FORBIDDEN,
             content=f"Unsupported git service: {service}",
         )
+
+    required_scope = (
+        "repo:read"
+        if service_type == GitServiceType.UPLOAD_PACK
+        else "repo:write"
+    )
+    user = await authenticate_git_request(
+        request, db, required_scope=required_scope
+    )
 
     # Permission: upload-pack needs READ, receive-pack needs WRITE
     required = (
@@ -377,7 +384,7 @@ async def upload_pack(
 
     Permission: READ (public repos: anonymous ok; private: auth required).
     """
-    user = await authenticate_git_request(request, db)
+    user = await authenticate_git_request(request, db, required_scope="repo:read")
 
     try:
         repo = await _resolve_and_check(
@@ -424,7 +431,7 @@ async def receive_pack(
     After the push completes, fires the ``post_receive_hook`` Celery task
     which syncs the Branch cache, updates repo size, and fires webhooks.
     """
-    user = await authenticate_git_request(request, db)
+    user = await authenticate_git_request(request, db, required_scope="repo:write")
 
     if user is None:
         # Push always requires auth ÃƒÂ¢Ã¢â€šÂ¬Ã¢â‚¬Â don't even try anonymous

@@ -23,9 +23,4 @@ USER appuser
 
 ENV PORT=8000
 
-CMD alembic upgrade head && \
-    uvicorn app.main:app \
-    --host 0.0.0.0 \
-    --port $PORT \
-    --workers 1 \
-    --log-level info
+CMD ["sh", "-c", "set -eu; echo '[boot] PHASE 1: starting Alembic'; alembic upgrade head; echo '[boot] PHASE 2: migrations completed; starting Uvicorn'; exec uvicorn app.main:app --host 0.0.0.0 --port ${PORT:-10000} --workers 1 --log-level info"]

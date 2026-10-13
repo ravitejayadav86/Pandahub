@@ -56,17 +56,21 @@ from app.core.exceptions import AppError
 
 logger = logging.getLogger("app.services.ai_router")
 
-# RAG store — imported lazily inside route_and_review to avoid circular imports
-# and to allow the module to load even when qdrant-client is not installed.
-_RAG_AVAILABLE = False
+# Check optional RAG dependencies without loading the ML runtime.
+from importlib.util import find_spec
+
 try:
-    import qdrant_client  # noqa: F401  -- presence check only
-    import sentence_transformers  # noqa: F401
-    _RAG_AVAILABLE = True
-except ImportError:
-    logger.debug("qdrant-client or sentence-transformers not installed — RAG disabled.")
+    _RAG_AVAILABLE = (
+        find_spec("qdrant_client") is not None
+        and find_spec("sentence_transformers") is not None
+    )
+except (ImportError, ValueError):
+    _RAG_AVAILABLE = False
 
-
+if not _RAG_AVAILABLE:
+    logger.debug(
+        "qdrant-client or sentence-transformers not installed - RAG disabled."
+    )
 # ─────────────────────────────────────────────────────────────────────────────
 # Semantic category definitions
 # ─────────────────────────────────────────────────────────────────────────────

@@ -44,6 +44,7 @@ from __future__ import annotations
 import asyncio
 import json
 import logging
+from importlib.util import find_spec
 import re
 from dataclasses import dataclass, field
 from enum import Enum
@@ -57,7 +58,6 @@ from app.core.exceptions import AppError
 logger = logging.getLogger("app.services.ai_router")
 
 # Check optional RAG dependencies without loading the ML runtime.
-from importlib.util import find_spec
 
 try:
     _RAG_AVAILABLE = (

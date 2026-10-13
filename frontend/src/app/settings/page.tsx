@@ -6,7 +6,7 @@ import { useAuthStore } from '@/store/authStore';
 import { User } from '@/types';
 import Navbar from '@/components/shared/Navbar';
 import { QRCodeSVG } from 'qrcode.react';
-
+import { motion, AnimatePresence } from 'framer-motion';
 type Section = 'profile' | 'education' | 'account' | 'tokens' | 'notifications' | 'danger';
 
 const DEGREES = [
@@ -320,23 +320,13 @@ export default function SettingsPage() {
 
         /* layout */
         .gh-layout { max-width:1012px; margin:0 auto; padding:32px 16px 80px;
-          display:grid; grid-template-columns:230px 1fr; gap:28px; align-items:start; }
-        @media(max-width:768px){ .gh-layout{grid-template-columns:1fr;} .gh-sidebar{display:flex;flex-wrap:wrap;gap:6px;} }
+          display:grid; grid-template-columns:80px 1fr; gap:40px; align-items:start; }
+        @media(max-width:768px){ .gh-layout{grid-template-columns:1fr;} .gh-sidebar{flex-direction:row;} }
 
         /* sidebar */
-        .gh-sidebar { position:sticky; top:80px; }
-        .gh-sidebar-heading { font-size:11px; font-weight:700; color:var(--text-muted); text-transform:uppercase;
-          letter-spacing:.08em; padding:6px 12px; margin-bottom:6px; }
-        .gh-nav-btn { display:flex; align-items:center; gap:10px; padding:10px 14px; border-radius:12px;
-          font-size:13.5px; font-weight:500; color:var(--text-secondary); cursor:pointer; transition:all .15s ease;
-          width:100%; text-align:left; border:1px solid transparent; background:none; font-family:inherit; }
-        .gh-nav-btn:hover { background:var(--glass-bg-2); color:var(--text-primary); border-color:var(--glass-border); }
-        .gh-nav-btn.active { background:var(--glass-bg-3); color:#C8C8C8; font-weight:600; border-color:var(--glass-border); box-shadow:var(--glass-shadow); }
-        .gh-nav-btn.danger { color:#A6A6A6; }
-        .gh-nav-btn.danger:hover { background:rgba(239,68,68,.08); }
-        .gh-nav-btn.danger.active { background:rgba(239,68,68,.12); color:#A6A6A6; font-weight:600; border-color:rgba(239,68,68,.3); }
-        .gh-nav-btn .material-symbols-outlined { font-size:18px; flex-shrink:0; }
-        .gh-nav-divider { height:1px; background:var(--glass-border); margin:10px 0; }
+        .gh-sidebar { position:sticky; top:100px; display:flex; flex-direction:column; align-items:center; gap:16px; padding:24px 0; background:#0a0a0c; border:1px solid #27272a; border-radius:2rem; box-shadow:0 10px 30px rgba(0,0,0,0.5); z-index:50; }
+        .gh-sidebar-heading { display:none; }
+        .gh-nav-divider { width: 40px; height: 1px; background: #27272a; margin: 4px 0; }
 
         /* panel */
         .gh-panel { background:var(--glass-bg-3); backdrop-filter:(24px); -webkit-backdrop-filter:(24px);
@@ -519,40 +509,64 @@ export default function SettingsPage() {
         >
           {/* ===== SIDEBAR ===== */}
           <nav className="gh-sidebar">
-            <div className="gh-sidebar-heading">User settings</div>
-
             {SECTIONS.filter((s) => !s.danger).map((s) => (
-              <button
-                key={s.id}
-                onClick={() => { setActiveSection(s.id); setError(''); }}
-                className={`gh-nav-btn${activeSection === s.id ? ' active' : ''}`}
-              >
-                <span
-                  className="material-symbols-outlined"
-                  style={{ fontVariationSettings: activeSection === s.id ? '"FILL" 1' : '"FILL" 0' }}
+              <div key={s.id} className="relative group flex items-center justify-center w-full">
+                <div className="absolute left-20 px-3 py-1.5 rounded-lg bg-[#1a1a1a] border border-white/10 text-white text-xs font-medium opacity-0 group-hover:opacity-100 transition-opacity whitespace-nowrap pointer-events-none z-50">
+                  {s.label}
+                  <div className="absolute top-1/2 -left-1 -translate-y-1/2 w-2 h-2 bg-[#1a1a1a] border-b border-l border-white/10 rotate-45" />
+                </div>
+                <motion.button
+                  onClick={() => { setActiveSection(s.id); setError(''); }}
+                  whileHover={{ scale: 1.15, y: -2 }}
+                  whileTap={{ scale: 0.9 }}
+                  transition={{ type: "spring", stiffness: 400, damping: 20 }}
+                  className={`w-12 h-12 flex items-center justify-center rounded-2xl transition-colors duration-200 ${
+                    activeSection === s.id 
+                      ? 'bg-white/10 text-white border border-white/20' 
+                      : 'bg-[#18181b] text-zinc-400 border border-[#333333] hover:text-white hover:bg-[#27272a]'
+                  }`}
                 >
-                  {s.icon}
-                </span>
-                {s.label}
-              </button>
+                  <span className="material-symbols-outlined" style={{ fontSize: 20, fontVariationSettings: activeSection === s.id ? '"FILL" 1' : '"FILL" 0' }}>{s.icon}</span>
+                </motion.button>
+              </div>
             ))}
 
             <div className="gh-nav-divider" />
 
             {SECTIONS.filter((s) => s.danger).map((s) => (
-              <button
-                key={s.id}
-                onClick={() => { setActiveSection(s.id); setError(''); }}
-                className={`gh-nav-btn danger${activeSection === s.id ? ' active' : ''}`}
-              >
-                <span className="material-symbols-outlined">{s.icon}</span>
-                {s.label}
-              </button>
+              <div key={s.id} className="relative group flex items-center justify-center w-full">
+                <div className="absolute left-20 px-3 py-1.5 rounded-lg bg-[#1a1a1a] border border-white/10 text-white text-xs font-medium opacity-0 group-hover:opacity-100 transition-opacity whitespace-nowrap pointer-events-none z-50">
+                  {s.label}
+                  <div className="absolute top-1/2 -left-1 -translate-y-1/2 w-2 h-2 bg-[#1a1a1a] border-b border-l border-white/10 rotate-45" />
+                </div>
+                <motion.button
+                  onClick={() => { setActiveSection(s.id); setError(''); }}
+                  whileHover={{ scale: 1.15, y: -2 }}
+                  whileTap={{ scale: 0.9 }}
+                  transition={{ type: "spring", stiffness: 400, damping: 20 }}
+                  className={`w-12 h-12 flex items-center justify-center rounded-2xl transition-colors duration-200 ${
+                    activeSection === s.id 
+                      ? 'bg-red-500/20 text-red-400 border border-red-500/30' 
+                      : 'bg-[#18181b] text-red-500/70 border border-[#333333] hover:text-red-400 hover:bg-[#27272a]'
+                  }`}
+                >
+                  <span className="material-symbols-outlined" style={{ fontSize: 20 }}>{s.icon}</span>
+                </motion.button>
+              </div>
             ))}
           </nav>
 
           {/* ===== CONTENT ===== */}
           <div style={{ display: 'flex', flexDirection: 'column', gap: 16 }}>
+            <AnimatePresence mode="wait">
+              <motion.div
+                key={activeSection}
+                initial={{ opacity: 0, x: -10 }}
+                animate={{ opacity: 1, x: 0 }}
+                exit={{ opacity: 0, x: 10 }}
+                transition={{ type: "spring", stiffness: 350, damping: 30 }}
+                style={{ display: 'flex', flexDirection: 'column', gap: 16 }}
+              >
 
             {/* â”€â”€â”€ PROFILE â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€ */}
             {activeSection === 'profile' && (
@@ -1016,6 +1030,8 @@ export default function SettingsPage() {
               </div>
             )}
 
+              </motion.div>
+            </AnimatePresence>
           </div>{/* /content */}
         </div>{/* /layout */}
 

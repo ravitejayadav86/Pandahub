@@ -13,6 +13,7 @@ import { useAuthStore } from '@/store/authStore'
 import Navbar from '@/components/shared/Navbar'
 import ChatBox from '@/components/shared/ChatBox'
 import PandaLoader from '@/components/ui/PandaLoader'
+import { motion, AnimatePresence } from 'framer-motion'
 
 // â”€â”€ Types â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
 interface UserProfile {
@@ -239,135 +240,142 @@ export default function UserProfilePage() {
     <div className="min-h-screen bg-[var(--bg-primary)] flex flex-col font-sans text-[var(--text-primary)]">
       <Navbar />
       
-      {/* ── Sticky Tab Bar ── */}
-      <div className="sticky top-[60px] z-40 bg-[var(--glass-bg-4)] border-b border-[var(--glass-border)] mt-4">
-        <div className="max-w-[1280px] w-full mx-auto px-4 md:px-8 flex items-end">
-          <div className="hidden md:block w-[296px] shrink-0 mr-6" /> {/* Spacer for sidebar */}
-          <nav className="flex gap-2 overflow-x-auto no-scrollbar">
+      <main className="flex-1 max-w-[1280px] w-full mx-auto px-4 md:px-8 py-12 flex flex-col md:flex-row gap-8 relative z-10">
+        
+        {/* ── Left Dock (Navigation) ── */}
+        <div className="hidden md:flex flex-col shrink-0 w-20 sticky top-24 h-fit">
+          <div className="flex flex-col items-center gap-4 py-6 bg-[#0a0a0c] border border-[#27272a] rounded-[2rem] shadow-xl">
             {TABS.map((tab) => {
               const active = activeTab === tab.id
               return (
-                <button
-                  key={tab.id}
-                  onClick={() => setActiveTab(tab.id as TabType)}
-                  className={`
-                    flex items-center gap-2 px-4 py-3 text-sm transition-all border-b-2 whitespace-nowrap
-                    ${active 
-                      ? 'border-blue-500 font-semibold text-[var(--text-primary)] bg-[var(--glass-bg-2)] rounded-t-lg' 
-                      : 'border-transparent text-[var(--text-secondary)] hover:bg-[var(--glass-bg-1)] rounded-t-lg hover:text-[var(--text-primary)]'
-                    }
-                  `}
-                >
-                  <tab.icon className={`w-4 h-4 ${active ? 'text-blue-500' : 'text-slate-400'}`} />
-                  {tab.label}
-                  {'count' in tab && tab.count !== undefined && (
-                    <span className="ml-1 bg-[var(--glass-bg-2)] border border-[var(--glass-border)] text-[var(--text-secondary)] text-xs font-medium px-2 py-0.5 rounded-full">
-                      {tab.count}
-                    </span>
-                  )}
-                </button>
+                <div key={tab.id} className="relative group flex items-center justify-center w-full">
+                  <div className="absolute left-20 px-3 py-1.5 rounded-lg bg-[#1a1a1a] border border-white/10 text-white text-xs font-medium opacity-0 group-hover:opacity-100 transition-opacity whitespace-nowrap pointer-events-none z-50">
+                    {tab.label} {tab.count !== undefined ? `(${tab.count})` : ''}
+                    <div className="absolute top-1/2 -left-1 -translate-y-1/2 w-2 h-2 bg-[#1a1a1a] border-b border-l border-white/10 rotate-45" />
+                  </div>
+                  <motion.button
+                    onClick={() => setActiveTab(tab.id as TabType)}
+                    whileHover={{ scale: 1.15, y: -2 }}
+                    whileTap={{ scale: 0.9 }}
+                    transition={{ type: "spring", stiffness: 400, damping: 20 }}
+                    className={`w-12 h-12 flex items-center justify-center rounded-2xl transition-colors duration-200 ${
+                      active 
+                        ? 'bg-white/10 text-white border border-white/20' 
+                        : 'bg-[#18181b] text-zinc-400 border border-[#333333] hover:text-white hover:bg-[#27272a]'
+                    }`}
+                  >
+                    <tab.icon className="w-5 h-5" />
+                  </motion.button>
+                </div>
               )
             })}
-          </nav>
+          </div>
         </div>
-      </div>
 
-      <main className="flex-1 max-w-[1280px] w-full mx-auto px-4 md:px-8 py-8 flex flex-col md:flex-row gap-8">
-        
-        {/* ── Left Sidebar ── */}
-        <div className="w-full md:w-[296px] shrink-0 -mt-10 md:mt-0 relative z-10">
-          <div className="relative w-full max-w-[296px] aspect-square rounded-full border border-[var(--glass-border)] overflow-hidden bg-[var(--glass-bg-3)] mb-4 shadow-xl z-10">
-            {profile.avatar_url ? (
-              <img src={profile.avatar_url} alt={profile.username} className="w-full h-full object-cover" />
-            ) : (
-              <div className="w-full h-full bg-gradient-to-br from-blue-600 to-purple-600 flex items-center justify-center text-white text-7xl font-bold">
-                {profile.username.charAt(0).toUpperCase()}
-              </div>
-            )}
-            
-            {/* Mock "Set Status" badge */}
-            {isOwner && (
-              <button className="absolute bottom-6 right-6 w-10 h-10 glass-panel rounded-full flex items-center justify-center shadow-lg hover:text-blue-500 transition-colors z-20 border border-[var(--glass-border)]" aria-label="Set status">
-                <Smile className="w-5 h-5 text-slate-400" />
-              </button>
-            )}
-          </div>
-
-          <h1 className="text-2xl font-bold text-[var(--text-primary)] leading-tight">
-            {profile.full_name || profile.username}
-          </h1>
-          <h2 className="text-xl font-light text-[var(--text-secondary)] mb-4">
-            {profile.username}
-          </h2>
-
-          {isOwner ? (
-            <Link href="/settings" className="block w-full py-2 text-center text-sm font-semibold text-[var(--text-primary)] glass-card hover:bg-[var(--glass-bg-4)] rounded-xl mb-4 transition-all border border-[var(--glass-border)]">
-              Edit profile
-            </Link>
-          ) : (
-            <div className="flex gap-2 mb-4">
-              <button
-                onClick={handleFollowToggle}
-                disabled={followLoading}
-                className="flex-1 py-2 text-center text-sm font-semibold text-[var(--text-primary)] glass-card hover:bg-[var(--glass-bg-4)] rounded-xl transition-all disabled:opacity-60 flex items-center justify-center gap-1.5 border border-[var(--glass-border)]"
-              >
-                {followLoading && <span className="w-3 h-3 border-2 border-slate-400 border-t-transparent rounded-full animate-spin" />}
-                {isFollowing ? 'Unfollow' : 'Follow'}
-              </button>
-              <button
-                onClick={handleOpenChat}
-                className="flex-1 py-2 text-center text-sm font-bold text-black bg-white hover:bg-zinc-200 rounded-xl transition-all shadow-md"
-              >
-                Message
-              </button>
+        {/* ── Profile Sidebar ── */}
+        <div className="w-full md:w-[296px] shrink-0 relative z-10 sticky top-24 h-fit">
+          <div className="p-6 bg-[#0a0a0c] border border-[#27272a] rounded-[2rem] shadow-xl">
+            <div className="relative w-full aspect-square rounded-[1.5rem] border border-[var(--glass-border)] overflow-hidden bg-[var(--glass-bg-3)] mb-6 shadow-lg z-10">
+              {profile.avatar_url ? (
+                <img src={profile.avatar_url} alt={profile.username} className="w-full h-full object-cover" />
+              ) : (
+                <div className="w-full h-full bg-gradient-to-br from-blue-600 to-purple-600 flex items-center justify-center text-white text-7xl font-bold">
+                  {profile.username.charAt(0).toUpperCase()}
+                </div>
+              )}
+              
+              {/* Mock "Set Status" badge */}
+              {isOwner && (
+                <button className="absolute bottom-4 right-4 w-10 h-10 bg-[#1a1a1a]/80 backdrop-blur-md rounded-full flex items-center justify-center shadow-lg hover:text-blue-500 transition-colors z-20 border border-white/10" aria-label="Set status">
+                  <Smile className="w-5 h-5 text-slate-400" />
+                </button>
+              )}
             </div>
-          )}
 
-          <div className="flex items-center gap-4 text-sm mb-4">
-            <Link href={`/${profile.username}/followers`} className="hover:text-blue-500 transition-colors flex items-center gap-1.5">
-              <Users className="w-4 h-4 text-slate-400" />
-              <span className="font-semibold text-[var(--text-primary)]">{profile.follower_count}</span>
-              <span className="text-[var(--text-secondary)]">followers</span>
-            </Link>
-            <Link href={`/${profile.username}/following`} className="hover:text-blue-500 transition-colors flex items-center gap-1.5">
-              <span className="font-semibold text-[var(--text-primary)]">{profile.following_count}</span>
-              <span className="text-[var(--text-secondary)]">following</span>
-            </Link>
-          </div>
+            <h1 className="text-2xl font-bold text-[var(--text-primary)] leading-tight">
+              {profile.full_name || profile.username}
+            </h1>
+            <h2 className="text-lg font-medium text-[var(--text-secondary)] mb-6">
+              {profile.username}
+            </h2>
 
-          {profile.bio && (
-            <p className="text-[15px] text-[var(--text-secondary)] mb-4 leading-relaxed">{profile.bio}</p>
-          )}
-
-          <div className="flex flex-col gap-2 text-sm text-[var(--text-secondary)]">
-            {profile.location && (
-              <div className="flex items-center gap-2">
-                <MapPin className="w-4 h-4 text-slate-400" />
-                {profile.location}
+            {isOwner ? (
+              <Link href="/settings" className="block w-full py-2.5 text-center text-sm font-semibold text-[var(--text-primary)] bg-[#18181b] hover:bg-[#27272a] rounded-xl mb-6 transition-all border border-[#333333]">
+                Edit profile
+              </Link>
+            ) : (
+              <div className="flex gap-2 mb-6">
+                <button
+                  onClick={handleFollowToggle}
+                  disabled={followLoading}
+                  className="flex-1 py-2.5 text-center text-sm font-semibold text-[var(--text-primary)] bg-[#18181b] hover:bg-[#27272a] rounded-xl transition-all disabled:opacity-60 flex items-center justify-center gap-1.5 border border-[#333333]"
+                >
+                  {followLoading && <span className="w-3 h-3 border-2 border-slate-400 border-t-transparent rounded-full animate-spin" />}
+                  {isFollowing ? 'Unfollow' : 'Follow'}
+                </button>
+                <button
+                  onClick={handleOpenChat}
+                  className="flex-1 py-2.5 text-center text-sm font-bold text-black bg-white hover:bg-zinc-200 rounded-xl transition-all shadow-md"
+                >
+                  Message
+                </button>
               </div>
             )}
-            {profile.website_url && (
-              <div className="flex items-center gap-2">
-                <LinkIcon className="w-4 h-4 text-slate-400" />
-                <a href={profile.website_url} target="_blank" rel="noopener noreferrer" className="font-semibold hover:text-blue-500 hover:underline">
-                  {profile.website_url.replace(/^https?:\/\//, '')}
-                </a>
-              </div>
+
+            <div className="flex items-center gap-4 text-sm mb-6 pb-6 border-b border-[#27272a]">
+              <Link href={`/${profile.username}/followers`} className="hover:text-blue-500 transition-colors flex items-center gap-1.5">
+                <Users className="w-4 h-4 text-slate-400" />
+                <span className="font-semibold text-[var(--text-primary)]">{profile.follower_count}</span>
+                <span className="text-[var(--text-secondary)]">followers</span>
+              </Link>
+              <Link href={`/${profile.username}/following`} className="hover:text-blue-500 transition-colors flex items-center gap-1.5">
+                <span className="font-semibold text-[var(--text-primary)]">{profile.following_count}</span>
+                <span className="text-[var(--text-secondary)]">following</span>
+              </Link>
+            </div>
+
+            {profile.bio && (
+              <p className="text-[14px] text-[var(--text-secondary)] mb-6 leading-relaxed">{profile.bio}</p>
             )}
-            {profile.created_at && (
-              <div className="flex items-center gap-2">
-                <Calendar className="w-4 h-4 text-slate-400" />
-                Joined {new Date(profile.created_at).toLocaleDateString('en-US', { month: 'long', year: 'numeric' })}
-              </div>
-            )}
+
+            <div className="flex flex-col gap-3 text-sm text-[var(--text-secondary)]">
+              {profile.location && (
+                <div className="flex items-center gap-2">
+                  <MapPin className="w-4 h-4 text-slate-400" />
+                  {profile.location}
+                </div>
+              )}
+              {profile.website_url && (
+                <div className="flex items-center gap-2">
+                  <LinkIcon className="w-4 h-4 text-slate-400" />
+                  <a href={profile.website_url} target="_blank" rel="noopener noreferrer" className="font-semibold hover:text-blue-500 hover:underline">
+                    {profile.website_url.replace(/^https?:\/\//, '')}
+                  </a>
+                </div>
+              )}
+              {profile.created_at && (
+                <div className="flex items-center gap-2">
+                  <Calendar className="w-4 h-4 text-slate-400" />
+                  Joined {new Date(profile.created_at).toLocaleDateString('en-US', { month: 'long', year: 'numeric' })}
+                </div>
+              )}
+            </div>
           </div>
         </div>
 
         {/* ── Main Content Area ── */}
         <div className="flex-1 min-w-0">
+          <AnimatePresence mode="wait">
+            <motion.div
+              key={activeTab}
+              initial={{ opacity: 0, x: -10 }}
+              animate={{ opacity: 1, x: 0 }}
+              exit={{ opacity: 0, x: 10 }}
+              transition={{ type: "spring", stiffness: 350, damping: 30 }}
+            >
           
           {activeTab === 'overview' && (
-            <div className="space-y-8 animate-fade-in">
+            <div className="space-y-8">
               {/* Pinned Repos */}
               <div>
                 <div className="flex items-center justify-between mb-4 text-sm">
@@ -542,6 +550,8 @@ export default function UserProfilePage() {
             </div>
           )}
 
+            </motion.div>
+          </AnimatePresence>
         </div>
       </main>
 

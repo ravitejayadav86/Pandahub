@@ -54,7 +54,7 @@ export default function SpaceBackground() {
     const ctx = canvas.getContext('2d');
     if (!ctx) return;
 
-    let animationId: number;
+    let animationId: number | null = null;
     let particles: Particle[]     = [];
     let shootingStars: ShootingStar[] = [];
     let depthOrbs: DepthOrb[]     = [];
@@ -365,8 +365,6 @@ export default function SpaceBackground() {
     resize();
     ctx.fillStyle = isDark() ? '#060810' : '#eef2f7';
     ctx.fillRect(0, 0, canvas.width, canvas.height);
-    draw();
-
     window.addEventListener('resize',     resize);
     window.addEventListener('mousemove',  onMouseMove);
     window.addEventListener('mouseleave', onMouseLeave);
@@ -384,12 +382,41 @@ export default function SpaceBackground() {
     });
     observer.observe(document.documentElement, { attributes: true, attributeFilter: ['class', 'data-bg-theme'] });
 
+    // Freeze the decorative canvas while the user scrolls; resume it afterward.
+    const reducedMotionQuery = window.matchMedia('(prefers-reduced-motion: reduce)');
+    const syncAnimationLoop = () => {
+      const shouldPause =
+        document.documentElement.classList.contains('is-scrolling') ||
+        document.hidden ||
+        reducedMotionQuery.matches;
+
+      if (shouldPause) {
+        if (animationId !== null) window.cancelAnimationFrame(animationId);
+        animationId = null;
+      } else if (animationId === null) {
+        animationId = window.requestAnimationFrame(draw);
+      }
+    };
+
+    const scrollStateObserver = new MutationObserver(syncAnimationLoop);
+    scrollStateObserver.observe(document.documentElement, {
+      attributes: true,
+      attributeFilter: ['class'],
+    });
+    const onMotionPreferenceChange = () => syncAnimationLoop();
+    reducedMotionQuery.addEventListener('change', onMotionPreferenceChange);
+    document.addEventListener('visibilitychange', syncAnimationLoop);
+    syncAnimationLoop();
+
     return () => {
       window.removeEventListener('resize',     resize);
       window.removeEventListener('mousemove',  onMouseMove);
       window.removeEventListener('mouseleave', onMouseLeave);
       observer.disconnect();
-      cancelAnimationFrame(animationId);
+      scrollStateObserver.disconnect();
+      reducedMotionQuery.removeEventListener('change', onMotionPreferenceChange);
+      document.removeEventListener('visibilitychange', syncAnimationLoop);
+      if (animationId !== null) window.cancelAnimationFrame(animationId);
     };
   }, []);
 

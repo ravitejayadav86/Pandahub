@@ -15,6 +15,7 @@ import { useAuthStore } from '@/store/authStore'
 import api from '@/lib/api'
 import { Repository } from '@/types'
 import PandaLoader from '@/components/ui/PandaLoader'
+import { motion } from 'framer-motion'
 
 // Activity event shape returned by GET /auth/me/activity
 interface ActivityEvent {
@@ -72,6 +73,7 @@ export default function DashboardPage() {
   const [activity, setActivity] = useState<ActivityEvent[]>([])
   const [activityLoading, setActivityLoading] = useState(true)
   const [suggestedStartups, setSuggestedStartups] = useState<StartupSuggestion[]>([])
+
 
   useEffect(() => {
     if (sessionStorage.getItem('dashboard_animated') === 'true') {
@@ -196,23 +198,44 @@ export default function DashboardPage() {
     )
   )
 
-  const renderSidebar = () => (
-    <div className="hidden md:flex w-full md:w-64 flex-col gap-2 shrink-0 motion-">
-      <div className="text-xs font-semibold text-slate-400 uppercase tracking-wider mb-2 pl-3">Menu</div>
-      <Button variant="ghost" className="justify-start text-slate-700 font-medium bg-slate-100 dark:bg-slate-800 dark:text-slate-200" onClick={() => router.push('/dashboard')}>
-        <LayoutDashboard className="w-4 h-4 mr-2" /> Home
-      </Button>
-      <Button variant="ghost" className="justify-start text-slate-500 hover:text-slate-700" onClick={() => router.push(repos[0] ? `/${user?.username}/${repos[0].name}/issues` : '/new')}>
-        <CircleDot className="w-4 h-4 mr-2" /> Issues
-      </Button>
-      <Button variant="ghost" className="justify-start text-slate-500 hover:text-slate-700" onClick={() => router.push(repos[0] ? `/${user?.username}/${repos[0].name}/pulls` : '/new')}>
-        <GitMerge className="w-4 h-4 mr-2" /> Pull Requests
-      </Button>
-      <Button variant="ghost" className="justify-start text-slate-500 hover:text-slate-700" onClick={() => router.push('/startups')}>
-        <Rocket className="w-4 h-4 mr-2" /> Startup Hub
-      </Button>
-    </div>
-  )
+  const renderSidebar = () => {
+    const navItems = [
+      { id: 'home', label: 'Home', icon: LayoutDashboard, path: '/dashboard', active: true },
+      { id: 'issues', label: 'Issues', icon: CircleDot, path: repos[0] ? `/${user?.username}/${repos[0].name}/issues` : '/new' },
+      { id: 'pulls', label: 'Pull Requests', icon: GitMerge, path: repos[0] ? `/${user?.username}/${repos[0].name}/pulls` : '/new' },
+      { id: 'startups', label: 'Startup Hub', icon: Rocket, path: '/startups' },
+    ];
+
+    return (
+      <div className="hidden md:flex flex-col shrink-0 w-20 sticky top-24">
+        <div className="flex flex-col items-center gap-4 py-6 bg-[#0a0a0c] border border-[#27272a] rounded-[2rem] shadow-xl">
+          {navItems.map((item) => (
+            <div key={item.id} className="relative group flex items-center justify-center w-full">
+              {/* Tooltip */}
+              <div className="absolute left-16 px-3 py-1.5 rounded-lg bg-[#1a1a1a] border border-white/10 text-white text-xs font-medium opacity-0 group-hover:opacity-100 transition-opacity whitespace-nowrap pointer-events-none z-50">
+                {item.label}
+                <div className="absolute top-1/2 -left-1 -translate-y-1/2 w-2 h-2 bg-[#1a1a1a] border-b border-l border-white/10 rotate-45" />
+              </div>
+
+              <motion.button
+                onClick={() => router.push(item.path)}
+                whileHover={{ scale: 1.15, y: -2 }}
+                whileTap={{ scale: 0.9 }}
+                transition={{ type: "spring", stiffness: 400, damping: 20 }}
+                className={`w-12 h-12 flex items-center justify-center rounded-2xl transition-colors duration-200 ${
+                  item.active 
+                    ? 'bg-white/10 text-white border border-white/20' 
+                    : 'bg-[#18181b] text-zinc-400 border border-[#333333] hover:text-white hover:bg-[#27272a]'
+                }`}
+              >
+                <item.icon className="w-5 h-5" />
+              </motion.button>
+            </div>
+          ))}
+        </div>
+      </div>
+    )
+  }
 
   const renderActivityFeed = () => {
     if (activityLoading) {
@@ -363,58 +386,85 @@ export default function DashboardPage() {
 
       {/* Ambient gradient background — static, zero GPU cost */}
       <div className="fixed inset-0 pointer-events-none" aria-hidden>
-        <div className="absolute top-[-10%] left-[-5%] w-[50%] h-[50%] rounded-full bg-white/[0.02] -[80px]" />
-        <div className="absolute bottom-[-10%] right-[-5%] w-[40%] h-[40%] rounded-full bg-white/[0.015] -[80px]" />
+        <div className="absolute top-[-10%] left-[-5%] w-[50%] h-[50%] rounded-full bg-white/[0.02] blur-[120px] -[80px]" />
+        <div className="absolute bottom-[-10%] right-[-5%] w-[40%] h-[40%] rounded-full bg-white/[0.015] blur-[120px] -[80px]" />
       </div>
 
       <main className="max-w-7xl mx-auto p-4 md:p-6 lg:p-8 flex flex-col md:flex-row gap-8 relative z-10">
-        {renderSidebar()}
+        <motion.div 
+          initial={{ opacity: 0, x: -20 }}
+          animate={{ opacity: 1, x: 0 }}
+          transition={{ type: "spring", stiffness: 300, damping: 25 }}
+        >
+          {renderSidebar()}
+        </motion.div>
 
         <div className="flex-1 flex flex-col min-w-0">
-          <div className="flex items-center justify-between mb-6">
+          <motion.div 
+            initial={{ opacity: 0, y: 10 }}
+            animate={{ opacity: 1, y: 0 }}
+            transition={{ type: "spring", stiffness: 300, damping: 25 }}
+            className="flex items-center justify-between mb-6"
+          >
             <h1 className="text-2xl font-bold tracking-tight text-white motion-">Dashboard</h1>
             <Button variant="primary" className="h-9 text-sm" onClick={() => window.location.href = '/new'}>
               <Plus className="w-4 h-4 mr-1" /> New Repository
             </Button>
-          </div>
+          </motion.div>
 
-          <div className="mb-6 motion-">
+          <motion.div 
+            initial={{ opacity: 0, scale: 0.98 }}
+            animate={{ opacity: 1, scale: 1 }}
+            transition={{ type: "spring", stiffness: 300, damping: 25, delay: 0.05 }}
+            className="mb-6 motion-"
+          >
             <div className="overflow-x-auto pb-1 -mx-1 px-1">
               <div className="flex items-center gap-3 mb-4" style={{ minWidth: 'max-content' }}>
                 <button
                   onClick={() => router.push(repos[0] ? `/${user?.username}/${repos[0].name}/issues` : '/new')}
-                  className="px-4 py-2 rounded-full bg-[#18181b] border border-[#333333] shadow-sm text-sm font-medium flex items-center gap-2 hover:bg-[#27272a] transition-all text-white whitespace-nowrap btn-motion-"
+                  className="px-4 py-2 rounded-full bg-[#18181b] border border-[#333333] shadow-sm text-sm font-medium flex items-center gap-2 hover:bg-[#27272a] transition-all text-white whitespace-nowrap"
                 >
                   <CircleDot className="w-4 h-4 text-zinc-300" /> Create issue
                 </button>
                 <button
                   onClick={() => router.push(repos[0] ? `/${user?.username}/${repos[0].name}/pulls` : '/new')}
-                  className="px-4 py-2 rounded-full bg-[#18181b] border border-[#333333] shadow-sm text-sm font-medium flex items-center gap-2 hover:bg-[#27272a] transition-all text-white whitespace-nowrap btn-motion-"
+                  className="px-4 py-2 rounded-full bg-[#18181b] border border-[#333333] shadow-sm text-sm font-medium flex items-center gap-2 hover:bg-[#27272a] transition-all text-white whitespace-nowrap"
                 >
                   <GitMerge className="w-4 h-4 text-zinc-300" /> Pull requests
                 </button>
                 <button
                   onClick={() => router.push('/new')}
-                  className="px-4 py-2 rounded-full bg-[#18181b] border border-[#333333] shadow-sm text-sm font-medium flex items-center gap-2 hover:bg-[#27272a] transition-all text-white whitespace-nowrap btn-motion-"
+                  className="px-4 py-2 rounded-full bg-[#18181b] border border-[#333333] shadow-sm text-sm font-medium flex items-center gap-2 hover:bg-[#27272a] transition-all text-white whitespace-nowrap"
                 >
                   <Plus className="w-4 h-4 text-zinc-300" /> New repository
                 </button>
               </div>
             </div>
-          </div>
+          </motion.div>
 
-          <Tabs
-            className="w-full"
-            tabs={[
-              { id: 'activity', label: 'Activity Feed', content: renderActivityFeed() },
-              { id: 'repos', label: 'Your Repositories', content: renderRepos() }
-            ]}
-          />
+          <motion.div
+            initial={{ opacity: 0, y: 20 }}
+            animate={{ opacity: 1, y: 0 }}
+            transition={{ type: "spring", stiffness: 300, damping: 25, delay: 0.1 }}
+          >
+            <Tabs
+              className="w-full"
+              tabs={[
+                { id: 'activity', label: 'Activity Feed', content: renderActivityFeed() },
+                { id: 'repos', label: 'Your Repositories', content: renderRepos() }
+              ]}
+            />
+          </motion.div>
         </div>
 
-        <div className="hidden lg:block">
+        <motion.div 
+          initial={{ opacity: 0, x: 20 }}
+          animate={{ opacity: 1, x: 0 }}
+          transition={{ type: "spring", stiffness: 300, damping: 25, delay: 0.15 }}
+          className="hidden lg:block"
+        >
           {renderWidgets()}
-        </div>
+        </motion.div>
       </main>
     </div>
   )

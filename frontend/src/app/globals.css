@@ -103,8 +103,8 @@
     -webkit-font-smoothing: antialiased;
     -moz-osx-font-smoothing: grayscale;
     transition: background-color 0.4s var(--ease-smooth), color 0.4s var(--ease-smooth);
-    /* Promote body to its own GPU layer */
-    transform: translateZ(0);
+    /* Do not promote the entire long document to one GPU layer: that can
+       increase memory pressure and interfere with viewport-fixed elements. */
     isolation: isolate;
   }
 
@@ -4322,4 +4322,42 @@ a:active,
   font-style: normal;
   color: #ffffff !important;
   background: transparent !important;
+}
+
+
+/* Scroll performance: temporarily pause decorative work while native scrolling is active. */
+html.is-scrolling *,
+html.is-scrolling *::before,
+html.is-scrolling *::after {
+  animation-play-state: paused !important;
+}
+
+/* These are decorative, not interactive, so do not spend frames on entry motion while scrolling. */
+html.is-scrolling .phx-content-reveal,
+html.is-scrolling [class*="motion-blur"] {
+  transition: none !important;
+  filter: none !important;
+}
+
+/* The landing scene no longer parallax-transforms these layers on every scroll frame. */
+.phx-camera,
+.phx-beam,
+.phx-frame3d,
+.phx-ring,
+.phx-slab,
+.phx-gridfloor,
+.phx-streak,
+.phx-scan,
+.phx-console-back,
+.phx-console-main,
+.phx-chip,
+.phx-layer-card,
+.core,
+.orb-ring,
+.phx-terminal {
+  will-change: auto !important;
+}
+
+@media (prefers-reduced-motion: reduce) {
+  html { scroll-behavior: auto; }
 }

@@ -32,10 +32,11 @@ export default function MotionDetectiveBackground() {
     const ctx = canvas.getContext("2d");
     if (!ctx) return;
 
-    let animId: number;
+    let animId: number | null = null;
     let width = (canvas.width = window.innerWidth);
     let height = (canvas.height = window.innerHeight);
-    const dpr = Math.min(window.devicePixelRatio || 1, 2);
+    // Keep a restrained backing-store size; a full-screen 2x canvas is expensive on high-DPI displays.
+    const dpr = Math.min(window.devicePixelRatio || 1, 1.5);
 
     // ── Pre-rendered Static Coordinate Crosses Offscreen Canvas ──
     let offscreenGrid: HTMLCanvasElement | null = null;
@@ -393,10 +394,39 @@ export default function MotionDetectiveBackground() {
       }
     };
 
-    animId = requestAnimationFrame(loop);
+    const reducedMotionQuery = window.matchMedia("(prefers-reduced-motion: reduce)");
+
+    const syncAnimationLoop = () => {
+      const shouldPause =
+        document.documentElement.classList.contains("is-scrolling") ||
+        document.hidden ||
+        reducedMotionQuery.matches;
+
+      if (shouldPause) {
+        if (animId !== null) window.cancelAnimationFrame(animId);
+        animId = null;
+      } else if (animId === null) {
+        lastFrameTime = performance.now();
+        animId = window.requestAnimationFrame(loop);
+      }
+    };
+
+    const scrollStateObserver = new MutationObserver(syncAnimationLoop);
+    scrollStateObserver.observe(document.documentElement, {
+      attributes: true,
+      attributeFilter: ["class"],
+    });
+
+    const onMotionPreferenceChange = () => syncAnimationLoop();
+    reducedMotionQuery.addEventListener("change", onMotionPreferenceChange);
+    document.addEventListener("visibilitychange", syncAnimationLoop);
+    syncAnimationLoop();
 
     return () => {
-      cancelAnimationFrame(animId);
+      if (animId !== null) window.cancelAnimationFrame(animId);
+      scrollStateObserver.disconnect();
+      reducedMotionQuery.removeEventListener("change", onMotionPreferenceChange);
+      document.removeEventListener("visibilitychange", syncAnimationLoop);
       window.removeEventListener("resize", resize);
       window.removeEventListener("pointermove", onPointerMove);
       window.removeEventListener("touchmove", onTouchMove);

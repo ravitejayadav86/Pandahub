@@ -66,7 +66,11 @@ def _view(run: CIRun) -> dict:
         "started_at": run.started_at.isoformat() if run.started_at else None,
         "completed_at": run.completed_at.isoformat() if run.completed_at else None,
         "lease_expires_at": run.lease_expires_at.isoformat() if getattr(run, "lease_expires_at", None) else None,
-        "attestation": "repository_admin_reported",
+        "attestation": (
+            "repository_scoped_runner_reported"
+            if getattr(run, "runner_credential_id", None)
+            else "repository_admin_reported"
+        ),
         "trusted_for_deployment": False,
     }
 

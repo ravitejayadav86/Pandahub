@@ -7,7 +7,7 @@ ADVISORY ONLY: never treat them as trusted protection or deployment approval.
 from __future__ import annotations
 
 import uuid
-from datetime import datetime, timezone
+from datetime import datetime, timedelta, timezone
 from typing import Literal
 
 from fastapi import APIRouter, Depends, HTTPException, Query
@@ -22,6 +22,19 @@ from app.models.enums import PermissionLevel
 from app.models.repo import Repository
 
 router = APIRouter(tags=["native-ci"])
+
+# A local runner has a 120-second execution limit; allow ample time for
+# startup/export/cleanup before an administrator can resolve a stranded job.
+STALE_CI_AFTER = timedelta(minutes=10)
+
+
+def ci_run_is_stale(status: str, started_at: datetime | None, now: datetime) -> bool:
+    """A missing timestamp is NOT evidence that a runner is stale."""
+    if status != "running" or started_at is None:
+        return False
+    if started_at.tzinfo is None or now.tzinfo is None:
+        return False
+    return now >= started_at + STALE_CI_AFTER
 
 
 class CISettingsChange(BaseModel):
@@ -155,6 +168,51 @@ async def complete_ci_run(
     run.conclusion = payload.conclusion
     run.log_excerpt = payload.log_excerpt
     run.completed_at = datetime.now(timezone.utc)
+    await db.commit()
+    await db.refresh(run)
+    return _view(run)
+
+
+@router.post("/{owner}/{repo}/ci/runs/{run_id}/timeout")
+async def mark_stale_ci_run_timed_out(
+    run_id: uuid.UUID,
+    repository: Repository = Depends(get_repository),
+    db: AsyncSession = Depends(get_db),
+    _perm: PermissionLevel = Depends(
+        require_repo_permission(PermissionLevel.ADMIN, allow_anonymous=False)
+    ),
+) -> dict:
+    """Explicit administrative resolution of a stranded CI runner.
+
+    Never report success, impersonate a runner, or replay a commit. The row
+    lock makes completion and timeout mutually exclusive. A repo admin can
+    only resolve their own run after it has been running at least 10 minutes.
+    """
+    run = await db.scalar(
+        select(CIRun).where(
+            CIRun.id == run_id,
+            CIRun.repository_id == repository.id,
+        ).with_for_update()
+    )
+    if run is None:
+        raise HTTPException(status_code=404, detail="CI run not found")
+
+    now = datetime.now(timezone.utc)
+    if not ci_run_is_stale(run.status, run.started_at, now):
+        raise HTTPException(
+            status_code=409,
+            detail="Only a running CI job older than 10 minutes may be marked timed out",
+        )
+
+    run.status = "completed"
+    run.conclusion = "timed_out"
+    run.completed_at = now
+    run.log_excerpt = (
+        "Administrative timeout: runner completion was not received within "
+        "10 minutes of starting. This is not a verified Docker timeout and "
+        "does not attest that the container has stopped. Inspect the runner "
+        "host and its containers before starting another job."
+    )
     await db.commit()
     await db.refresh(run)
     return _view(run)

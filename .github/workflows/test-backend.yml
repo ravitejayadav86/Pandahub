@@ -4,6 +4,8 @@ on:
   pull_request:
     paths:
       - "backend/**"
+      - "scripts/panda_ci_runner.py"
+      - "scripts/tests/test_ci_runner_execution.py"
   push:
     branches: [main]
     paths:
@@ -74,3 +76,24 @@ jobs:
         env:
           PANDAHUB_RUN_DB_INTEGRATION_TESTS: "1"
         run: pytest -v --cov=app --cov-report=term-missing
+
+  runner-sandbox-smoke:
+    # A disposable GitHub-hosted VM, never the PandaHub backend/worker.
+    # Only synthetic test code runs inside Docker with no network or tokens.
+    runs-on: ubuntu-latest
+    timeout-minutes: 15
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Set up Python for Docker smoke orchestration
+        uses: actions/setup-python@v5
+        with:
+          python-version: "3.12"
+
+      - name: Prepare explicitly pinned runner image
+        run: docker pull python:3.12-slim
+
+      - name: Verify genuine Docker PASS, FAIL and missing-test outcomes
+        env:
+          PANDAHUB_RUN_CI_DOCKER_TESTS: "1"
+        run: python -m unittest discover -s scripts/tests -p 'test_ci_runner_execution.py' -v

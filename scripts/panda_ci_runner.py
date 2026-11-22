@@ -162,6 +162,21 @@ def _docker_command(workspace: Path, name: str) -> list[str]:
     ]
 
 
+def _force_remove_container(name: str) -> bool:
+    """Best-effort Docker daemon cleanup. Do not claim timeout if unconfirmed."""
+    try:
+        result = subprocess.run(
+            ["docker", "rm", "-f", name],
+            stdout=subprocess.DEVNULL,
+            stderr=subprocess.DEVNULL,
+            timeout=20,
+            check=False,
+        )
+        return result.returncode == 0
+    except (OSError, subprocess.TimeoutExpired):
+        return False
+
+
 def run_docker(workspace: Path) -> tuple[str, str]:
     checked(["docker", "image", "inspect", IMAGE], timeout=15)
     name = "pandahub-ci-" + secrets.token_hex(6)
@@ -186,17 +201,25 @@ def run_docker(workspace: Path) -> tuple[str, str]:
     thread = threading.Thread(target=consume, daemon=True)
     thread.start()
     timed_out = False
+    cleanup_confirmed = False
     try:
         process.wait(timeout=TIMEOUT_SECONDS)
     except subprocess.TimeoutExpired:
         timed_out = True
-        subprocess.run(
-            ["docker", "rm", "-f", name],
-            stdout=subprocess.DEVNULL, stderr=subprocess.DEVNULL, timeout=20,
-            check=False,
-        )
-        process.kill()
+        try:
+            cleanup_confirmed = _force_remove_container(name)
+        finally:
+            # A failed or blocked Docker daemon must not leave this host
+            # process waiting forever. The container may still be alive.
+            if process.poll() is None:
+                process.kill()
+            process.wait()
+    except BaseException:
+        _force_remove_container(name)
+        if process.poll() is None:
+            process.kill()
         process.wait()
+        raise
     finally:
         thread.join(timeout=5)
 
@@ -204,7 +227,13 @@ def run_docker(workspace: Path) -> tuple[str, str]:
     if len(output) == MAX_LOG:
         text += "\n[Output truncated]"
     if timed_out:
-        return "timed_out", text + "\nCI container exceeded time limit"
+        if not cleanup_confirmed:
+            return (
+                "error",
+                text + "\nContainer cleanup could not be confirmed. "
+                "Inspect Docker on the runner host before starting another CI job.",
+            )
+        return "timed_out", text + "\nCI container exceeded time limit; Docker removal confirmed"
     return ("success" if process.returncode == 0 else "failure"), text
 
 

@@ -13,11 +13,41 @@ export interface CIRun {
   status: CIRunStatus;
   conclusion: CIConclusion;
   log_excerpt: string | null;
+  /** Persisted count of runner claims, available on 0009+ servers. */
+  attempt_count?: number;
   created_at: string | null;
   started_at: string | null;
   completed_at: string | null;
   attestation: "repository_admin_reported" | string;
   trusted_for_deployment: boolean;
+}
+
+/** Read-only persisted audit from GET /ci/runs/{id}/attempts (0009+). */
+export interface CIAttempt {
+  attempt_number: number;
+  started_at: string | null;
+  completed_at: string | null;
+  conclusion: CIConclusion;
+  end_reason: string | null;
+  log_excerpt: string | null;
+  retry_requested_at: string | null;
+  retry_reason: string | null;
+  trusted_for_deployment: boolean;
+}
+
+/** Never infer a passing attempt from missing or malformed API data. */
+export function ciAttemptVisualState(attempt: CIAttempt): CIVisualState {
+  if (!attempt.completed_at) return "running";
+  if (
+    attempt.conclusion === "success" || attempt.conclusion === "failure" ||
+    attempt.conclusion === "error" || attempt.conclusion === "timed_out"
+  ) return attempt.conclusion;
+  return "unknown";
+}
+
+export function ciAttemptCountLabel(count: number | undefined): string {
+  return count === undefined || !Number.isInteger(count) || count < 0
+    ? "—" : String(count);
 }
 
 export interface CISummary {

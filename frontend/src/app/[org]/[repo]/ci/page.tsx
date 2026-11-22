@@ -12,13 +12,20 @@ import {
 import api from "@/lib/api";
 import {
   ciApiError, ciCanResolveStaleRun, ciDuration, ciStateLabel, ciSummary, ciTime,
-  ciVisualState, filterCiRuns, type CIRun, type CIVisualState,
+  ciVisualState, ciAttemptVisualState, ciAttemptCountLabel, filterCiRuns,
+  type CIAttempt, type CIRun, type CIVisualState,
 } from "@/lib/native-ci";
 
 const MAX_RUNS = 100;
 const PAGE_SIZE = 10;
 type Filter = "all" | "active" | "success" | "failed";
 type Clip = "sha" | "logs" | "command" | null;
+type AttemptLoad = {
+  runId: string;
+  state: "loading" | "ready" | "error";
+  records: CIAttempt[];
+  error?: string;
+};
 
 function StatusIcon({ state, className = "h-4 w-4" }: {
   state: CIVisualState; className?: string;
@@ -88,6 +95,8 @@ export default function NativeCIDashboard() {
   const [query, setQuery] = useState("");
   const [page, setPage] = useState(1);
   const [copied, setCopied] = useState<Clip>(null);
+  const [attemptLoad, setAttemptLoad] = useState<AttemptLoad | null>(null);
+  const [attemptRefresh, setAttemptRefresh] = useState(0);
   const requestRef = useRef<AbortController | null>(null);
 
   const load = useCallback(async (first = false) => {
@@ -110,6 +119,9 @@ export default function NativeCIDashboard() {
       const recorded = Array.isArray(history.data) ? history.data : [];
       setEnabled(settings.data.enabled === true);
       setRuns(recorded);
+      // Refresh the selected run's audit when the main list refreshes,
+      // including when a runner completes without changing selection.
+      setAttemptRefresh((version) => version + 1);
       setSelectedId((previous) =>
         previous && recorded.some((run) => run.id === previous)
           ? previous : (recorded[0]?.id ?? null)
@@ -151,6 +163,42 @@ export default function NativeCIDashboard() {
     () => filteredRuns.find((run) => run.id === selectedId) ?? filteredRuns[0] ?? null,
     [filteredRuns, selectedId],
   );
+  const selectedRunId = selected?.id ?? null;
+  const visibleAttemptLoad =
+    attemptLoad?.runId === selectedRunId ? attemptLoad : null;
+
+  useEffect(() => {
+    if (!selectedRunId) {
+      setAttemptLoad(null);
+      return;
+    }
+    const controller = new AbortController();
+    setAttemptLoad({
+      runId: selectedRunId, state: "loading", records: [],
+    });
+    // Read-only, scoped to ONE selected CI run. Never fetch every run's logs
+    // or mutate the queue just by opening the dashboard.
+    void api.get<CIAttempt[]>(
+      `${apiBase}/runs/${encodeURIComponent(selectedRunId)}/attempts`,
+      { signal: controller.signal },
+    ).then(({ data }) => {
+      if (controller.signal.aborted) return;
+      setAttemptLoad({
+        runId: selectedRunId,
+        state: "ready",
+        records: Array.isArray(data) ? data : [],
+      });
+    }).catch((exc: unknown) => {
+      if (controller.signal.aborted) return;
+      setAttemptLoad({
+        runId: selectedRunId,
+        state: "error",
+        records: [],
+        error: ciApiError(exc),
+      });
+    });
+    return () => controller.abort();
+  }, [apiBase, selectedRunId, attemptRefresh]);
 
   // Only poll while a job is actually pending. No perpetual animation or polling.
   useEffect(() => {
@@ -456,6 +504,9 @@ export default function NativeCIDashboard() {
                             <span className="truncate">{run.branch}</span>
                           </span>
                           <span>{ciTime(run.created_at)}</span>
+                          {run.attempt_count !== undefined && (
+                            <span>{ciAttemptCountLabel(run.attempt_count)} attempt{run.attempt_count === 1 ? "" : "s"}</span>
+                          )}
                         </div>
                       </div>
                       <ChevronRight className={`h-4 w-4 shrink-0 ${active ? "text-white" : "text-zinc-600"}`} aria-hidden="true" />
@@ -517,6 +568,10 @@ export default function NativeCIDashboard() {
                     )}
                     <div className="space-y-3">
                       <div className="flex items-start justify-between gap-3">
+                        <span className="text-xs text-zinc-500">Attempts</span>
+                        <span className="font-mono text-xs text-zinc-300">{ciAttemptCountLabel(selected.attempt_count)}</span>
+                      </div>
+                      <div className="flex items-start justify-between gap-3">
                         <span className="text-xs text-zinc-500">Commit</span>
                         <button type="button" onClick={() => void copy(selected.sha, "sha")}
                           className="flex min-w-0 items-center gap-1.5 font-mono text-xs text-zinc-200 hover:text-white">
@@ -559,11 +614,88 @@ export default function NativeCIDashboard() {
                   </div>
                   <div className="flex items-start gap-2 px-5 py-4 text-[11px] leading-5 text-zinc-500">
                     <LockKeyhole className="mt-0.5 h-4 w-4 shrink-0" aria-hidden="true" />
-                    Administrator-reported result. Not independently attested and not valid as deployment approval.
+                    Runner- or administrator-reported advisory result. Not independently attested and not valid as deployment approval.
                   </div>
                 </>
               )}
             </div>
+
+            <section aria-label="CI attempt history" className="overflow-hidden rounded-2xl border border-white/10 bg-[#111111]">
+              <div className="flex items-center justify-between gap-3 border-b border-white/10 px-5 py-4">
+                <div className="flex items-center gap-2.5">
+                  <Workflow className="h-4 w-4 text-zinc-400" aria-hidden="true" />
+                  <h2 className="text-sm font-semibold text-white">Attempt history</h2>
+                </div>
+                <span className="font-mono text-[11px] text-zinc-500">
+                  {selected ? ciAttemptCountLabel(selected.attempt_count) : "—"} recorded
+                </span>
+              </div>
+              {!selected ? (
+                <p className="p-5 text-xs text-zinc-500">Select a run to inspect its attempts.</p>
+              ) : !visibleAttemptLoad || visibleAttemptLoad.state === "loading" ? (
+                <div role="status" className="p-5 text-xs text-zinc-500">Loading saved attempts…</div>
+              ) : visibleAttemptLoad.state === "error" ? (
+                <div role="alert" className="space-y-2 p-5 text-xs text-zinc-400">
+                  <p>{visibleAttemptLoad.error}</p>
+                  <p>Attempt history requires PandaHub backend migration 0009.</p>
+                </div>
+              ) : visibleAttemptLoad.records.length === 0 ? (
+                <p className="p-5 text-xs text-zinc-500">
+                  No runner attempt has been recorded for this run yet.
+                </p>
+              ) : (
+                <ol className="max-h-[520px] divide-y divide-white/[0.07] overflow-y-auto">
+                  {visibleAttemptLoad.records.map((attempt) => {
+                    const state = ciAttemptVisualState(attempt);
+                    return (
+                      <li key={attempt.attempt_number} className="space-y-3 px-5 py-4">
+                        <div className="flex flex-wrap items-center justify-between gap-2">
+                          <span className="font-mono text-xs font-semibold text-white">
+                            Attempt #{attempt.attempt_number}
+                          </span>
+                          <StatusPill state={state} />
+                        </div>
+                        <div className="space-y-1 font-mono text-[10px] text-zinc-500">
+                          <div>Started: {ciTime(attempt.started_at)}</div>
+                          <div>Finished: {ciTime(attempt.completed_at)}</div>
+                          <div>Duration: {ciDuration(attempt.started_at, attempt.completed_at)}</div>
+                        </div>
+                        {attempt.end_reason === "admin_unverified_timeout" && (
+                          <p className="rounded-lg border border-white/15 bg-[#181818] p-2 text-[11px] leading-5 text-zinc-300">
+                            Administrative timeout is not proof that the Docker container stopped.
+                          </p>
+                        )}
+                        {attempt.retry_reason && (
+                          <div className="space-y-1 rounded-lg border border-white/10 bg-[#0a0a0a] p-3">
+                            <p className="text-[10px] font-semibold uppercase tracking-widest text-zinc-400">
+                              Operator-authorized retry
+                            </p>
+                            <p className="break-words text-xs leading-5 text-zinc-300">
+                              {attempt.retry_reason}
+                            </p>
+                            <span className="text-[10px] text-zinc-600">
+                              {ciTime(attempt.retry_requested_at)}
+                            </span>
+                          </div>
+                        )}
+                        <details className="rounded-lg border border-white/10 bg-[#080808]">
+                          <summary className="cursor-pointer select-none px-3 py-2 text-xs text-zinc-300 hover:text-white">
+                            Saved test output
+                          </summary>
+                          <pre className="max-h-52 overflow-auto whitespace-pre-wrap break-all border-t border-white/10 px-3 py-3 font-mono text-[10px] leading-5 text-zinc-400">
+                            {attempt.log_excerpt || "No output was saved for this attempt."}
+                          </pre>
+                        </details>
+                      </li>
+                    );
+                  })}
+                </ol>
+              )}
+              <p className="border-t border-white/10 px-5 py-3 text-[10px] leading-5 text-zinc-500">
+                Read-only audit. CI results are advisory, not deployment approvals.
+                Retries require separate operator verification of Docker shutdown.
+              </p>
+            </section>
 
             <div className="rounded-2xl border border-white/10 bg-[#111111] p-5">
               <div className="flex items-start justify-between gap-3">

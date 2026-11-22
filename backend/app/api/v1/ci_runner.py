@@ -149,7 +149,7 @@ async def runner_claim_next(
     repository: Repository = Depends(get_repository),
     db: AsyncSession = Depends(get_db),
     token: str | None = Header(default=None, alias="X-PandaHub-CI-Token"),
-) -> dict | Response:
+) -> dict:
     credential = await authenticate_runner(db, repository.id, token)
     if not repository.auto_ci_enabled:
         raise HTTPException(status_code=409, detail="CI job creation disabled for repository")

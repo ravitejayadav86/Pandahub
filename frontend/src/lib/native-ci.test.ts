@@ -1,6 +1,6 @@
 import { describe, expect, it } from "vitest";
 import {
-  ciApiError, ciDuration, ciStateLabel, ciSummary, ciTime,
+  ciApiError, ciCanResolveStaleRun, ciDuration, ciStateLabel, ciSummary, ciTime,
   ciVisualState, filterCiRuns, type CIRun,
 } from "./native-ci";
 
@@ -58,6 +58,24 @@ describe("advisory CI dashboard presentation logic", () => {
     expect(ciDuration("invalid", null)).toBe("—");
     expect(ciDuration("2026-11-22T10:01:00Z", "2026-11-22T10:00:00Z")).toBe("—");
     expect(ciTime("invalid")).toBe("—");
+  });
+
+  it("only offers manual recovery for a running job older than ten minutes", () => {
+    const now = Date.parse("2026-11-22T11:00:00Z");
+    const stale = makeRun({
+      status: "running", conclusion: null,
+      started_at: "2026-11-22T10:49:59Z", completed_at: null,
+    });
+    expect(ciCanResolveStaleRun(stale, now)).toBe(true);
+    expect(ciCanResolveStaleRun(makeRun({
+      ...stale, started_at: "2026-11-22T10:59:00Z",
+    }), now)).toBe(false);
+    expect(ciCanResolveStaleRun(makeRun({
+      ...stale, started_at: null,
+    }), now)).toBe(false);
+    expect(ciCanResolveStaleRun(makeRun({
+      ...stale, status: "completed", conclusion: "success",
+    }), now)).toBe(false);
   });
 
   it("surfaces permission failures and missing CI endpoints accurately", () => {

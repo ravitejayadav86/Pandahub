@@ -33,8 +33,10 @@ or repository CI setting is enabled by these commits.
    available job. The response contains commit SHA, branch, run ID, and
    a random opaque lease UUID.
 3. A runner's lease lasts **3 minutes**. Heartbeat requests every 20
-   seconds extend the server-side lease. Only the same repository-scoped
-   credential + current lease ID can complete or heartbeat the job.
+   seconds extend the server-side lease, up to an absolute 10-minute run
+   deadline. A runner cannot renew leases indefinitely. Only the same
+   repository-scoped credential + current lease ID can complete or heartbeat
+   the job.
 4. Completion stores the actual `success/failure/error/timed_out`
    conclusion, bounded output, and clears the lease. Revoked, mismatched,
    expired, or completed leases are rejected. Old user-JWT-only CI claim

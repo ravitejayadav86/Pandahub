@@ -143,3 +143,11 @@ export function ciApiError(error: unknown): string {
   if (typeof data?.error?.message === "string") return data.error.message;
   return "Could not reach PandaHub CI. Check the backend and try again.";
 }
+
+/** UI hint only: the backend's own clock and ADMIN auth are authoritative. */
+export function ciCanResolveStaleRun(run: CIRun, now = Date.now()): boolean {
+  if (run.status !== "running" || !run.started_at) return false;
+  const started = Date.parse(run.started_at);
+  return Number.isFinite(started) &&
+    now - started >= 10 * 60 * 1000;
+}

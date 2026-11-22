@@ -34,20 +34,20 @@ def test_disabled_repository_creates_no_jobs():
 
 def test_enabled_repository_queues_one_durable_record():
     db, factory = _session_factory(
-        SimpleNamespace(auto_ci_enabled=True), None,
+        SimpleNamespace(auto_ci_enabled=True), uuid.uuid4(),
     )
     assert queue_ci_runs(uuid.uuid4(), [_update()], factory) == 1
-    job = db.add.call_args.args[0]
-    assert job.commit_sha == VALID_SHA
-    assert job.branch_name == "qa"
-    assert job.status == "queued"
-    assert job.conclusion is None
+    assert db.scalar.call_count == 2
+    statement = db.scalar.call_args.args[0]
+    assert "ON CONFLICT DO NOTHING" in str(statement)
+    assert "ci_runs" in str(statement)
+    db.add.assert_not_called()
     db.commit.assert_called_once()
 
 
 def test_same_commit_branch_is_idempotent():
     db, factory = _session_factory(
-        SimpleNamespace(auto_ci_enabled=True), uuid.uuid4(),
+        SimpleNamespace(auto_ci_enabled=True), None,
     )
     assert queue_ci_runs(uuid.uuid4(), [_update()], factory) == 0
     db.add.assert_not_called()

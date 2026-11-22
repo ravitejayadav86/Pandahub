@@ -141,3 +141,29 @@ def test_container_cleanup_failure_is_not_a_success(runner):
         side_effect=subprocess.TimeoutExpired(cmd="docker rm", timeout=20),
     ):
         assert runner._force_remove_container("test-job") is False
+
+
+@pytest.mark.parametrize("exit_code,expected", [
+    (0, "success"),
+    (1, "failure"),
+    (125, "error"),
+    (126, "error"),
+    (127, "error"),
+])
+def test_real_unit_failure_vs_docker_daemon_failure(runner, tmp_path, exit_code, expected):
+    class ExitedDocker:
+        returncode = exit_code
+        stdout = io.BytesIO(b"Docker CLI or test output")
+
+        def wait(self, timeout=None):
+            return self.returncode
+
+        def poll(self):
+            return self.returncode
+
+    with patch.object(runner, "checked", return_value=b""), \
+         patch.object(runner.subprocess, "Popen", return_value=ExitedDocker()):
+        result, logs = runner.run_docker(tmp_path)
+    assert result == expected
+    if expected == "error":
+        assert "Docker could not start" in logs

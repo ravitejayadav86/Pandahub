@@ -249,13 +249,6 @@ def process_one(base: str, token: str, spec: str, run: dict) -> None:
     sha = run["sha"]
     run_id = run["id"]
     lease_id = run["lease_id"]
-    if (
-        not re.fullmatch(r"[A-Za-z0-9][A-Za-z0-9._/-]{0,200}", branch)
-        or ".." in branch or "//" in branch
-        or branch.endswith("/") or branch.endswith(".lock")
-        or not re.fullmatch(r"[0-9a-f]{40}", sha)
-    ):
-        raise RunnerError("Unsafe CI branch/SHA from API")
     try:
         lease_id = str(uuid.UUID(lease_id))
         run_id = str(uuid.UUID(run_id))
@@ -285,6 +278,13 @@ def process_one(base: str, token: str, spec: str, run: dict) -> None:
     pulse.start()
     outcome, logs = "error", "Runner did not complete"
     try:
+        if (
+            not re.fullmatch(r"[A-Za-z0-9][A-Za-z0-9._/-]{0,200}", branch)
+            or ".." in branch or "//" in branch
+            or branch.endswith("/") or branch.endswith(".lock")
+            or not re.fullmatch(r"[0-9a-f]{40}", sha)
+        ):
+            raise RunnerError("Unsafe CI branch/SHA from API")
         with tempfile.TemporaryDirectory(prefix="pandahub-ci-") as tmp:
             root = Path(tmp)
             checkout = root / "git"

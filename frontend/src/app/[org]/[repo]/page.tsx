@@ -22,6 +22,7 @@ import {
   Compass,
   Plus,
   Sliders,
+  Workflow,
 } from "lucide-react";
 
 interface UserProfile {
@@ -500,6 +501,11 @@ export default function RepoDashboardPage() {
       label: "Commits",
       icon: GitCommit,
       href: `${repoBase}/commits`,
+    },
+    {
+      label: "CI Runs",
+      icon: Workflow,
+      href: `${repoBase}/ci`,
     },
     {
       label: "Issues",
@@ -1037,6 +1043,7 @@ export default function RepoDashboardPage() {
                 {[
                   { label: "Overview", href: repoBase },
                   { label: "Commits", href: `${repoBase}/commits` },
+                  { label: "CI Runs", href: `${repoBase}/ci` },
                   { label: "Issues", href: `${repoBase}/issues` },
                   { label: "Pull Requests", href: `${repoBase}/pulls` },
                   { label: "Security", href: `${repoBase}/security` },

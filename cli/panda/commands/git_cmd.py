@@ -10,6 +10,7 @@ from panda.core import config
 from panda.core.api_client import ApiError, request
 from panda.core.gitutil import (
     GIT_HOST,
+    GIT_SCHEME,
     build_repo_url,
     ensure_credential_helper,
 )
@@ -371,7 +372,7 @@ def git_credential(action: str):
     if not username or not token:
         return
 
-    click.echo("protocol=https")
+    click.echo(f"protocol={GIT_SCHEME}")
     click.echo(f"host={GIT_HOST}")
     click.echo(f"username={username}")
     click.echo(f"password={token}")

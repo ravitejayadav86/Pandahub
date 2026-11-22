@@ -43,3 +43,6 @@ class CIRunAttempt(Base, UUIDPKMixin):
     conclusion: Mapped[str | None] = mapped_column(String(20))
     end_reason: Mapped[str | None] = mapped_column(String(35))
     log_excerpt: Mapped[str | None] = mapped_column(String(10000))
+    # Set only if an administrator later authorizes a manual retry.
+    retry_requested_at: Mapped[datetime | None] = mapped_column(DateTime(timezone=True))
+    retry_reason: Mapped[str | None] = mapped_column(String(300))

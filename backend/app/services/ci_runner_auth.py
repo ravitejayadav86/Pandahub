@@ -50,7 +50,7 @@ async def authenticate_runner(
         CIRunnerCredential.id == credential_id,
         CIRunnerCredential.repository_id == repository_id,
         CIRunnerCredential.revoked_at.is_(None),
-    ))
+    ).with_for_update())
     digest = hashlib.sha256(raw.encode("utf-8")).hexdigest()
     if credential is None or not hmac.compare_digest(digest, credential.token_sha256):
         raise HTTPException(status_code=401, detail="Valid repository CI runner token required")

@@ -62,7 +62,7 @@ def show(repository: str, run_id: str):
     row = _call("GET", f"/{target}/ci/runs/{run_id}")
     click.echo(f'CI {row["id"]}  {row["sha"]}  [{row["conclusion"] or row["status"]}]')
     click.echo(row.get("log_excerpt") or "No test output recorded.")
-    click.echo("This is an admin-reported advisory result, NOT a trusted deployment check.")
+    click.echo("Runner- or legacy admin-reported advisory result; NOT a trusted deployment check.")
 
 
 @ci.command("timeout")

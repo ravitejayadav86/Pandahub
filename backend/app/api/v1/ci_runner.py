@@ -26,6 +26,7 @@ router = APIRouter(tags=["native-ci-runner"])
 
 # Heartbeats extend the lease; an expired lease cannot produce a new success.
 LEASE_DURATION = timedelta(minutes=3)
+MAX_RUN_DURATION = timedelta(minutes=10)
 MAX_ACTIVE_RUNNERS_PER_REPO = 5
 
 
@@ -60,6 +61,9 @@ def _lease_valid(run: CIRun, credential_id: uuid.UUID, lease_id: uuid.UUID,
         run.lease_id == lease_id and
         run.lease_expires_at is not None and
         run.lease_expires_at.tzinfo is not None and
+        run.started_at is not None and
+        run.started_at.tzinfo is not None and
+        now < run.started_at + MAX_RUN_DURATION and
         now < run.lease_expires_at
     )
 

@@ -238,6 +238,8 @@ def run_docker(workspace: Path) -> tuple[str, str]:
                 "Inspect Docker on the runner host before starting another CI job.",
             )
         return "timed_out", text + "\nCI container exceeded time limit; Docker removal confirmed"
+    if process.returncode in (125, 126, 127):
+        return "error", text + "\nDocker could not start the CI test container"
     return ("success" if process.returncode == 0 else "failure"), text
 
 

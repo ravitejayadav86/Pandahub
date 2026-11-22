@@ -59,3 +59,7 @@ landing-backups/
 *.auditfix-backup
 PandaHub_18_Modules_Implementation_Report.pdf
 frontend-before-*
+
+# Generated source safety copies: keep locally, never commit.
+*.backup-*
+*.safety-*

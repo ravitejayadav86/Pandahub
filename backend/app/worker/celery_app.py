@@ -27,6 +27,7 @@ celery_app = Celery(
         "app.worker.tasks.git_tasks",
         "app.worker.tasks.pages_tasks",
         "app.worker.tasks.ai_tasks",
+        "app.worker.tasks.commit_ai_tasks",
         "app.worker.tasks.rag_tasks",
         "app.worker.tasks.crc_tasks",
     ],
@@ -48,6 +49,7 @@ celery_app.conf.update(
         "app.worker.tasks.email_tasks.*": {"queue": "email"},
         "app.worker.tasks.git_tasks.*":   {"queue": "git_ops"},
         "app.worker.tasks.ai_tasks.*":    {"queue": "ai_ops"},
+        "app.worker.tasks.commit_ai_tasks.*": {"queue": "ai_ops"},
         "app.worker.tasks.rag_tasks.*":   {"queue": "ai_ops"},  # shares ai_ops queue
         "app.worker.tasks.crc_tasks.*":   {"queue": "ai_ops"},  # classifier / benchmark tasks
     },

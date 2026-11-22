@@ -14,6 +14,7 @@ import {
   CircleDot,
   GitPullRequest,
   ShieldCheck,
+  BrainCircuit,
   Globe,
   Settings as SettingsIcon,
   FolderTree,
@@ -514,6 +515,11 @@ export default function RepoDashboardPage() {
       label: "Security",
       icon: ShieldCheck,
       href: `${repoBase}/security`,
+    },
+    {
+      label: "AI Insights",
+      icon: BrainCircuit,
+      href: `${repoBase}/insights`,
     },
     {
       label: "Pages",
@@ -1034,6 +1040,7 @@ export default function RepoDashboardPage() {
                   { label: "Issues", href: `${repoBase}/issues` },
                   { label: "Pull Requests", href: `${repoBase}/pulls` },
                   { label: "Security", href: `${repoBase}/security` },
+                  { label: "AI Insights", href: `${repoBase}/insights` },
                   { label: "Settings", href: `${repoBase}#settings` },
                 ].map((item) => {
                   const isSettings = item.label === 'Settings';

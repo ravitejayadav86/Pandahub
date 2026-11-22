@@ -55,6 +55,7 @@ from app.models.security_alert import SecurityAlert  # noqa: F401
 from app.models.pages import RepositoryPages  # noqa: F401
 from app.models.code_analysis import CodeAnalysisReport  # noqa: F401
 from app.models.code_analysis_feedback import CodeAnalysisFeedback  # noqa: F401
+from app.models.commit_ai_analysis import CommitAIAnalysis  # noqa: F401
 from app.models.startup import (  # noqa: F401
     Startup,
     StartupMember,
@@ -78,7 +79,7 @@ __all__ = [
     "Message",
     "SecurityAlert",
     "RepositoryPages",
-    "CodeAnalysisReport", "CodeAnalysisFeedback",
+    "CodeAnalysisReport", "CodeAnalysisFeedback", "CommitAIAnalysis",
     "Startup", "StartupMember", "StartupOpenRole", "StartupCollaborationRequest",
     "StartupProject", "StartupInvestor",
 ]

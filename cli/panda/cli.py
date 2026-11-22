@@ -6,6 +6,8 @@ import click
 from panda.commands import auth as auth_commands
 from panda.commands import repo as repo_commands
 from panda.commands import git_cmd
+from panda.commands import insights as insights_commands
+from panda.commands import pages as pages_commands
 
 
 @click.group()
@@ -23,6 +25,8 @@ main.add_command(auth_commands.token)
 
 # Repository management
 main.add_command(repo_commands.repo)
+main.add_command(insights_commands.insights)
+main.add_command(pages_commands.pages)
 
 # Top-level Git/Panda commands
 main.add_command(git_cmd.clone)

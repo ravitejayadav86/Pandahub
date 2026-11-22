@@ -57,6 +57,9 @@ class Repository(Base, UUIDPKMixin, TimestampMixin):
     is_archived: Mapped[bool] = mapped_column(Boolean, default=False, nullable=False)
     is_template: Mapped[bool] = mapped_column(Boolean, default=False, nullable=False)
 
+    # Only enable after repository admins consent to external AI code analysis.
+    auto_ai_analysis_enabled: Mapped[bool] = mapped_column(Boolean, default=False, nullable=False)
+
     # Absolute path to the bare repo on the shared git_storage volume, e.g.
     # /data/repositories/<uuid>.git — NOT derived from name, so renaming a
     # repo never requires moving files on disk or breaking existing clone URLs.

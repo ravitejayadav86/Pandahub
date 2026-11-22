@@ -107,6 +107,8 @@ class Settings(BaseSettings):
     # Set OPENROUTER_API_KEY to enable Qwen2.5-Coder-32B / Mistral-7B routing.
     # When unset, the system transparently falls back to Claude (Anthropic).
     OPENROUTER_API_KEY: str | None = None
+    # Admin/deployment opt-in for external AI re-review of pushed PR branches.
+    AUTO_AI_REVIEW_PR_ON_PUSH: bool = False
     OPENROUTER_BASE_URL: str = "https://openrouter.ai/api/v1/chat/completions"
 
     # ---- RAG Vector Database (Qdrant) ----

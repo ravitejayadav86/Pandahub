@@ -1,0 +1,155 @@
+"""Actual PostgreSQL regression for native CI runner token isolation and leases.
+
+Never runs outside an explicitly configured *_test database; no Docker,
+network Git clones, AI providers, or real repo data are involved.
+"""
+from __future__ import annotations
+
+import os
+import uuid
+from datetime import datetime, timezone
+
+import pytest
+from fastapi import HTTPException
+from sqlalchemy import select
+from sqlalchemy.engine import make_url
+from sqlalchemy.ext.asyncio import async_sessionmaker, create_async_engine
+
+pytestmark = pytest.mark.skipif(
+    os.getenv("PANDAHUB_RUN_DB_INTEGRATION_TESTS") != "1",
+    reason="Requires isolated migrated PostgreSQL *_test database",
+)
+
+
+@pytest.mark.asyncio
+async def test_real_postgres_runner_scope_and_lease_lifecycle():
+    from app.api.v1.ci_runner import (
+        RunnerConclusion, RunnerLeaseProof,
+        revoke_runner_credential, runner_claim_next,
+        runner_complete, runner_heartbeat,
+    )
+    from app.core.config import get_settings
+    from app.models.ci_run import CIRun
+    from app.models.ci_runner_credential import CIRunnerCredential
+    from app.models.repo import Repository
+    from app.models.user import User
+    from app.services.ci_runner_auth import authenticate_runner, mint_runner_token
+
+    db_url = get_settings().DATABASE_URL
+    if not (make_url(db_url).database or "").endswith("_test"):
+        pytest.fail("Refusing CI runner integration test outside *_test database")
+    engine = create_async_engine(db_url, pool_pre_ping=True)
+    sessions = async_sessionmaker(engine, expire_on_commit=False)
+
+    owner_id = None
+    runner_id, raw_token, hashed = mint_runner_token()
+    unique = uuid.uuid4().hex[:12]
+
+    try:
+        async with sessions() as db:
+            user = User(username=f"phci{unique}", email=f"phci{unique}@example.invalid")
+            db.add(user)
+            await db.flush()
+            owner_id = user.id
+
+            repo = Repository(
+                owner_user_id=user.id, name=f"qa-ci-{unique}",
+                disk_path=f"/tmp/qa-ci-{unique}.git",
+                default_branch="main",
+                auto_ci_enabled=True, auto_ai_analysis_enabled=False,
+            )
+            other_repo = Repository(
+                owner_user_id=user.id, name=f"qa-other-{unique}",
+                disk_path=f"/tmp/qa-other-{unique}.git",
+                default_branch="main",
+                auto_ci_enabled=True, auto_ai_analysis_enabled=False,
+            )
+            db.add_all([repo, other_repo])
+            await db.flush()
+            repo_id, other_id = repo.id, other_repo.id
+
+            db.add(CIRunnerCredential(
+                id=runner_id, repository_id=repo_id,
+                name="Ephemeral Postgres QA", token_sha256=hashed,
+            ))
+            job = CIRun(
+                repository_id=repo_id, branch_name="qa",
+                commit_sha="e" * 40, status="queued",
+            )
+            db.add(job)
+            await db.commit()
+            job_id = job.id
+
+        async with sessions() as db:
+            # One repo's token must NOT authenticate against another repo's UUID.
+            with pytest.raises(HTTPException) as exc:
+                await authenticate_runner(db, other_id, raw_token)
+            assert exc.value.status_code == 401
+            await db.rollback()
+
+        async with sessions() as db:
+            repo = await db.get(Repository, repo_id)
+            claimed = await runner_claim_next(
+                repository=repo, db=db, token=raw_token,
+            )
+            assert uuid.UUID(claimed["id"]) == job_id
+            assert uuid.UUID(claimed["lease_id"])
+            assert claimed["trusted_for_deployment"] is False
+
+            # A second attempt cannot create a duplicate job or steal a lease.
+            none_left = await runner_claim_next(
+                repository=repo, db=db, token=raw_token,
+            )
+            assert none_left.status_code == 204
+
+        async with sessions() as db:
+            repo = await db.get(Repository, repo_id)
+            hb = await runner_heartbeat(
+                job_id, RunnerLeaseProof(lease_id=uuid.UUID(claimed["lease_id"])),
+                repository=repo, db=db, token=raw_token,
+            )
+            assert hb["status"] == "running"
+
+        async with sessions() as db:
+            repo = await db.get(Repository, repo_id)
+            result = await runner_complete(
+                job_id, RunnerConclusion(
+                    lease_id=uuid.UUID(claimed["lease_id"]),
+                    conclusion="failure",
+                    log_excerpt="1 test failed (synthetic)",
+                ),
+                repository=repo, db=db, token=raw_token,
+            )
+            assert result["conclusion"] == "failure"
+            assert result["trusted_for_deployment"] is False
+
+        async with sessions() as db:
+            record = await db.scalar(select(CIRun).where(CIRun.id == job_id))
+            assert record.status == "completed"
+            assert record.conclusion == "failure"
+            assert record.lease_expires_at is None
+            assert record.runner_credential_id == runner_id
+            cred = await db.get(CIRunnerCredential, runner_id)
+            assert cred.token_sha256 == hashed
+            assert cred.token_sha256 != raw_token
+            assert cred.last_used_at is not None
+
+        async with sessions() as db:
+            repo = await db.get(Repository, repo_id)
+            await revoke_runner_credential(
+                runner_id, repository=repo, db=db, _perm=None,
+            )
+        async with sessions() as db:
+            with pytest.raises(HTTPException) as exc:
+                await authenticate_runner(db, repo_id, raw_token)
+            assert exc.value.status_code == 401
+            await db.rollback()
+
+    finally:
+        if owner_id:
+            async with sessions() as db:
+                user = await db.get(User, owner_id)
+                if user is not None:
+                    await db.delete(user)
+                    await db.commit()
+        await engine.dispose()

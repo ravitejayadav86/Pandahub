@@ -204,7 +204,7 @@ export default function NativeCIDashboard() {
     }
   };
 
-  const terminalCommand = `python scripts/panda_ci_runner.py --repo ${owner}/${repo}`;
+  const terminalCommand = `python scripts/panda_ci_runner.py --repo ${owner}/${repo} --token-file <path-to-private-runner-token>`;
   const selectedState = selected ? ciVisualState(selected) : null;
 
   const selectFilter = (value: Filter) => {

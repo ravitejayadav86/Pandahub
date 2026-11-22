@@ -73,7 +73,7 @@ def test_ci_results_are_explicitly_untrusted():
     from pydantic import ValidationError
     job = SimpleNamespace(
         id=uuid.uuid4(), branch_name="qa", commit_sha=VALID_SHA,
-        status="completed", conclusion="success", log_excerpt="1 test passed",
+        status="completed", attempt_count=1, conclusion="success", log_excerpt="1 test passed",
         created_at=None, started_at=None, completed_at=None,
     )
     record = _view(job)

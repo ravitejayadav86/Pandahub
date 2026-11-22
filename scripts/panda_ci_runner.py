@@ -45,7 +45,7 @@ if not files:
     print("FAIL: no Python source files", flush=True)
     sys.exit(5)
 for path in files:
-    ast.parse(path.read_text(encoding="utf-8"), filename=str(path))
+    ast.parse(path.read_text(encoding="utf-8-sig"), filename=str(path))
 print(f"PASS: parsed {len(files)} Python file(s)", flush=True)
 
 tests = root / "tests"

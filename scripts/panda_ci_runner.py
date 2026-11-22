@@ -314,7 +314,7 @@ def process_one(base: str, token: str, spec: str, run: dict) -> None:
         pulse.join(timeout=25)
 
     if lease_errors:
-        logs += "\\n[Runner heartbeat warnings: check lease expiry and network]"
+        logs += "\n[Runner heartbeat warnings: check lease expiry and network]"
     # Completion may return 409 if the lease expired or an admin timed it
     # out; never claim a PASS locally without a successful server response.
     result = api_call(base, token, "POST", endpoint + "/complete", {

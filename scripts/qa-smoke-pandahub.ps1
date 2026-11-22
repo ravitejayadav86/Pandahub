@@ -74,7 +74,24 @@ def authenticate(value):
     return True
 '@ | Set-Content -Encoding utf8 app.py
 
-    git add README.md app.py
+    # Include real stdlib tests so native CI can prove a passing run.
+    New-Item -ItemType Directory -Path tests -Force | Out-Null
+    @'
+import unittest
+
+from app import authenticate
+
+
+class AuthenticationTests(unittest.TestCase):
+    def test_valid_input(self):
+        self.assertTrue(authenticate("synthetic-test"))
+
+    def test_empty_input_rejected(self):
+        with self.assertRaises(ValueError):
+            authenticate("")
+'@ | Set-Content -Encoding utf8 tests/test_app.py
+
+    git add README.md app.py tests/test_app.py
     if ($LASTEXITCODE -ne 0) { throw 'Could not stage QA files' }
     git commit -qm 'QA: verify PandaHub Git and AI pipeline'
     if ($LASTEXITCODE -ne 0) { throw 'Could not commit QA files' }

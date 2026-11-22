@@ -11,7 +11,7 @@ import {
 } from "lucide-react";
 import api from "@/lib/api";
 import {
-  ciApiError, ciDuration, ciStateLabel, ciSummary, ciTime,
+  ciApiError, ciCanResolveStaleRun, ciDuration, ciStateLabel, ciSummary, ciTime,
   ciVisualState, filterCiRuns, type CIRun, type CIVisualState,
 } from "@/lib/native-ci";
 
@@ -79,6 +79,7 @@ export default function NativeCIDashboard() {
   const [loading, setLoading] = useState(true);
   const [refreshing, setRefreshing] = useState(false);
   const [saving, setSaving] = useState(false);
+  const [resolvingStale, setResolvingStale] = useState(false);
   const [error, setError] = useState<string | null>(null);
   const [actionError, setActionError] = useState<string | null>(null);
   const [selectedId, setSelectedId] = useState<string | null>(null);
@@ -173,6 +174,23 @@ export default function NativeCIDashboard() {
       setActionError(ciApiError(exc));
     } finally {
       setSaving(false);
+    }
+  };
+
+  const resolveStaleRun = async () => {
+    if (!selected || !ciCanResolveStaleRun(selected) || resolvingStale) return;
+    if (!window.confirm(
+      "Mark this stalled CI run as timed out? This does NOT stop Docker on the runner host. Inspect the runner host first."
+    )) return;
+    setResolvingStale(true);
+    setActionError(null);
+    try {
+      await api.post(`${apiBase}/runs/${encodeURIComponent(selected.id)}/timeout`);
+      await load();
+    } catch (exc) {
+      setActionError(ciApiError(exc));
+    } finally {
+      setResolvingStale(false);
     }
   };
 
@@ -480,6 +498,23 @@ export default function NativeCIDashboard() {
                       {selectedState && <StatusPill state={selectedState} />}
                       <span className="text-[11px] text-zinc-500">{ciDuration(selected.started_at, selected.completed_at)} execution</span>
                     </div>
+                    {ciCanResolveStaleRun(selected) && (
+                      <div className="space-y-2 rounded-xl border border-white/20 bg-[#191919] p-3">
+                        <p className="text-xs leading-5 text-zinc-400">
+                          This run has been active for at least 10 minutes.
+                          A repository administrator may record an unverified timeout.
+                          Doing so will not terminate Docker on the runner host.
+                        </p>
+                        <button
+                          type="button"
+                          disabled={resolvingStale}
+                          onClick={() => void resolveStaleRun()}
+                          className="rounded-lg border border-white/30 px-3 py-2 text-xs font-semibold text-white hover:bg-white/10 disabled:opacity-50"
+                        >
+                          {resolvingStale ? "Resolving…" : "Mark stale run timed out"}
+                        </button>
+                      </div>
+                    )}
                     <div className="space-y-3">
                       <div className="flex items-start justify-between gap-3">
                         <span className="text-xs text-zinc-500">Commit</span>

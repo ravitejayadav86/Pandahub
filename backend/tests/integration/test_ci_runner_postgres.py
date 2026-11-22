@@ -30,6 +30,8 @@ async def test_real_postgres_runner_scope_and_lease_lifecycle():
     )
     from app.core.config import get_settings
     from app.models.ci_run import CIRun
+    from app.models.ci_run_attempt import CIRunAttempt
+    from app.api.v1.ci import CIRetryRequest, request_ci_retry
     from app.models.ci_runner_credential import CIRunnerCredential
     from app.models.repo import Repository
     from app.models.user import User
@@ -133,6 +135,74 @@ async def test_real_postgres_runner_scope_and_lease_lifecycle():
             assert cred.token_sha256 == hashed
             assert cred.token_sha256 != raw_token
             assert cred.last_used_at is not None
+
+        # Operator-inspected manual retry creates a new claim/lease on the
+        # SAME branch/SHA, without erasing the failed first attempt.
+        async with sessions() as db:
+            repo = await db.get(Repository, repo_id)
+            retried = await request_ci_retry(
+                job_id,
+                CIRetryRequest(
+                    operator_confirmed_runner_stopped=True,
+                    reason="Synthetic QA confirmed old Docker process exited",
+                ),
+                repository=repo, db=db, _perm=None,
+            )
+            assert retried["status"] == "queued"
+            assert retried["attempt_count"] == 1
+
+        async with sessions() as db:
+            repo = await db.get(Repository, repo_id)
+            claimed_again = await runner_claim_next(
+                repository=repo, db=db, token=raw_token,
+            )
+            assert uuid.UUID(claimed_again["id"]) == job_id
+            assert claimed_again["attempt_number"] == 2
+            assert claimed_again["lease_id"] != claimed["lease_id"]
+
+        async with sessions() as db:
+            repo = await db.get(Repository, repo_id)
+            # A *late* response from attempt 1 must fail, even though the
+            # runner identity and commit SHA are unchanged.
+            with pytest.raises(HTTPException) as late:
+                await runner_complete(
+                    job_id, RunnerConclusion(
+                        lease_id=uuid.UUID(claimed["lease_id"]),
+                        conclusion="success",
+                        log_excerpt="FAKE OLD LEASE SUCCESS",
+                    ),
+                    repository=repo, db=db, token=raw_token,
+                )
+            assert late.value.status_code == 409
+            await db.rollback()
+
+        async with sessions() as db:
+            repo = await db.get(Repository, repo_id)
+            completed = await runner_complete(
+                job_id, RunnerConclusion(
+                    lease_id=uuid.UUID(claimed_again["lease_id"]),
+                    conclusion="success",
+                    log_excerpt="Synthetic repeat passed",
+                ),
+                repository=repo, db=db, token=raw_token,
+            )
+            assert completed["conclusion"] == "success"
+            assert completed["attempt_number"] == 2
+
+        async with sessions() as db:
+            persisted = await db.get(CIRun, job_id)
+            assert persisted.attempt_count == 2
+            assert persisted.conclusion == "success"
+            previous = (await db.scalars(select(CIRunAttempt).where(
+                CIRunAttempt.run_id == job_id,
+            ).order_by(CIRunAttempt.attempt_number))).all()
+            assert len(previous) == 2
+            assert [v.conclusion for v in previous] == ["failure", "success"]
+            assert previous[0].log_excerpt == "1 test failed (synthetic)"
+            assert previous[0].retry_requested_at is not None
+            assert previous[0].retry_reason is not None
+            assert previous[1].lease_id != previous[0].lease_id
+            assert previous[1].end_reason == "runner_reported"
 
         async with sessions() as db:
             repo = await db.get(Repository, repo_id)

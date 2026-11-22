@@ -135,6 +135,7 @@ export default function NativeCIDashboard() {
   }, [load]);
 
   const summary = useMemo(() => ciSummary(runs), [runs]);
+  const latestRun = runs[0];
   const branches = useMemo(
     () => [...new Set(runs.map((run) => run.branch))].sort(),
     [runs],
@@ -277,8 +278,8 @@ export default function NativeCIDashboard() {
 
         <section aria-label="CI summary" className="mt-9 grid grid-cols-2 gap-3 lg:grid-cols-4">
           <Metric caption="Latest run" icon={GitCommitHorizontal}
-            number={loading && runs.length === 0 ? "…" : runs.length ? ciStateLabel(ciVisualState(runs[0])) : "—"}
-            note={runs.length ? `Commit ${runs[0].sha.slice(0, 10)}` : "No recorded runs"} />
+            number={loading && runs.length === 0 ? "…" : latestRun ? ciStateLabel(ciVisualState(latestRun)) : "—"}
+            note={latestRun ? `Commit ${latestRun.sha.slice(0, 10)}` : "No recorded runs"} />
           <Metric caption="Passed" icon={CheckCircle2} number={loading && !runs.length ? "…" : summary.passed}
             note="Recorded successful runs" />
           <Metric caption="Failed" icon={XCircle} number={loading && !runs.length ? "…" : summary.failed}

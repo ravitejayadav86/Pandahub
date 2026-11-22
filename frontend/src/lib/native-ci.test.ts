@@ -140,7 +140,7 @@ describe("CI attempt history display remains advisory and read-only", () => {
       makeAttempt({ attempt_number: 2, retry_reason: null, retry_requested_at: null }),
     ];
     expect(original.map(ciAttemptVisualState)).toEqual(["failure", "failure"]);
-    expect(original[0].retry_reason).toContain("Docker");
+    expect(original[0]?.retry_reason).toContain("Docker");
     expect(original.every((attempt) => attempt.trusted_for_deployment === false)).toBe(true);
 
     const fixedCommit = makeAttempt({

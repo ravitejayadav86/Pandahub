@@ -2,9 +2,7 @@
 AI Service for Code Reviews (Module 11).
 
 Provides a lightweight wrapper around Anthropic's Claude API via httpx,
-falling back to a mocked response if ANTHROPIC_API_KEY is not configured
-in the environment. This allows testing the UI and database flow locally
-without incurring API costs.
+raising an explicit unavailable error if Anthropic is not configured.
 """
 import json
 import logging
@@ -34,26 +32,6 @@ Return ONLY the raw JSON object, without markdown code blocks, backticks, or any
 """
 
 
-def _generate_mock_review(diff_text: str) -> Dict[str, Any]:
-    """Fallback review generator for when no API key is provided."""
-    files_changed = []
-    for line in diff_text.splitlines():
-        if line.startswith("+++ b/"):
-            files_changed.append(line[6:])
-    
-    suggestions = []
-    for f in files_changed:
-        suggestions.append({
-            "file": f,
-            "comment": f"Mock review: Consider checking for edge cases in `{f}`."
-        })
-        
-    return {
-        "summary": "### Mock Review\n\nNo API key was provided, so this is a simulated response. The PR modifies the following files:\n" + "\n".join(f"- `{f}`" for f in files_changed),
-        "suggestions": suggestions,
-    }
-
-
 async def generate_code_review(diff_text: str) -> Dict[str, Any]:
     """
     Sends the diff to the configured LLM and returns the structured review.
@@ -65,11 +43,8 @@ async def generate_code_review(diff_text: str) -> Dict[str, Any]:
             "summary": "No code changes detected in this pull request.",
             "suggestions": []
         }
-
-    # If no key is set, use the mock fallback
     if not settings.ANTHROPIC_API_KEY or settings.ANTHROPIC_API_KEY == "test-key":
-        logger.info("No valid ANTHROPIC_API_KEY found, using mock AI review.")
-        return _generate_mock_review(diff_text)
+        raise AppError("AI review unavailable: Anthropic API key is not configured.")
 
     try:
         async with httpx.AsyncClient(timeout=60.0) as client:

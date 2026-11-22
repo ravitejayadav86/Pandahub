@@ -55,8 +55,8 @@ function CopyButton({ text }: { text: string }) {
 function CodeBlock({ lines, copyText }: { lines: React.ReactNode[]; copyText: string }) {
   return (
     <div style={{
-      background: '#010409',
-      border: '1px solid #21262d',
+      background: '#E8F9FF',
+      border: '1px solid #C4D9FF',
       borderRadius: 6,
       padding: '14px 16px',
       position: 'relative',
@@ -83,14 +83,14 @@ function Cmd({ children }: { children: string }) {
   const [cmd, ...rest] = parts;
   return (
     <span>
-      <span style={{ color: '#58a6ff' }}>{cmd}</span>
-      {rest.length > 0 && <span style={{ color: '#e6edf3' }}> {rest.join(' ')}</span>}
+      <span style={{ color: '#66599F' }}>{cmd}</span>
+      {rest.length > 0 && <span style={{ color: '#334155' }}> {rest.join(' ')}</span>}
     </span>
   );
 }
 
 function Comment({ children }: { children: string }) {
-  return <span style={{ color: '#7d8590', fontStyle: 'italic' }}>{children}</span>;
+  return <span style={{ color: '#64748B', fontStyle: 'italic' }}>{children}</span>;
 }
 
 // ── main component ────────────────────────────────────────────────────────────
@@ -157,19 +157,19 @@ export default function QuickSetup({ owner, repoName, baseUrl }: QuickSetupProps
 
   return (
     <div style={{
-      background: '#0d1117',
-      border: '1px solid #21262d',
+      background: '#E8F9FF',
+      border: '1px solid #C4D9FF',
       borderRadius: 6,
       overflow: 'hidden',
       fontFamily: "-apple-system, BlinkMacSystemFont, 'Segoe UI', Helvetica, Arial, sans-serif",
-      color: '#e6edf3',
+      color: '#334155',
       fontSize: 14,
     }}>
 
       {/* ── Quick setup header ───────────────────────────────────────────── */}
       <div style={{
         padding: '14px 20px',
-        borderBottom: '1px solid #21262d',
+        borderBottom: '1px solid #C4D9FF',
         display: 'flex',
         alignItems: 'center',
         gap: 12,
@@ -177,21 +177,21 @@ export default function QuickSetup({ owner, repoName, baseUrl }: QuickSetupProps
       }}>
         <span style={{ fontWeight: 700, fontSize: 15, flexShrink: 0 }}>
           Quick setup
-          <span style={{ color: '#7d8590', fontWeight: 400, fontSize: 13, marginLeft: 8 }}>
+          <span style={{ color: '#64748B', fontWeight: 400, fontSize: 13, marginLeft: 8 }}>
             — if you&apos;ve done this kind of thing before
           </span>
         </span>
       </div>
 
       {/* ── Clone URL bar ────────────────────────────────────────────────── */}
-      <div style={{ padding: '14px 20px', borderBottom: '1px solid #21262d' }}>
+      <div style={{ padding: '14px 20px', borderBottom: '1px solid #C4D9FF' }}>
         <div style={{ display: 'flex', alignItems: 'center', gap: 8, flexWrap: 'wrap' }}>
 
           {/* Protocol toggle */}
           <div style={{
             display: 'flex',
-            background: '#161b22',
-            border: '1px solid #30363d',
+            background: '#C4D9FF',
+            border: '1px solid #C4D9FF',
             borderRadius: 6,
             overflow: 'hidden',
             flexShrink: 0,
@@ -207,7 +207,7 @@ export default function QuickSetup({ owner, repoName, baseUrl }: QuickSetupProps
                   fontFamily: 'inherit',
                   fontSize: 12,
                   fontWeight: 600,
-                  background: protocol === p ? '#21262d' : 'transparent',
+                  background: protocol === p ? '#C4D9FF' : 'transparent',
                   color: protocol === p ? '#e6edf3' : '#7d8590',
                   transition: 'background .15s, color .15s',
                   textTransform: 'uppercase',
@@ -223,8 +223,8 @@ export default function QuickSetup({ owner, repoName, baseUrl }: QuickSetupProps
           <div style={{
             flex: 1, minWidth: 200,
             display: 'flex', alignItems: 'center',
-            background: '#010409',
-            border: '1px solid #30363d',
+            background: '#E8F9FF',
+            border: '1px solid #C4D9FF',
             borderRadius: 6,
             overflow: 'hidden',
           }}>
@@ -235,7 +235,7 @@ export default function QuickSetup({ owner, repoName, baseUrl }: QuickSetupProps
                 flex: 1,
                 background: 'transparent',
                 border: 'none',
-                color: '#58a6ff',
+                color: '#66599F',
                 fontFamily: "'SFMono-Regular', Consolas, 'Liberation Mono', Menlo, monospace",
                 fontSize: 13,
                 padding: '5px 12px',
@@ -243,31 +243,31 @@ export default function QuickSetup({ owner, repoName, baseUrl }: QuickSetupProps
               }}
               onClick={(e) => (e.target as HTMLInputElement).select()}
             />
-            <div style={{ borderLeft: '1px solid #21262d' }}>
+            <div style={{ borderLeft: '1px solid #C4D9FF' }}>
               <CopyButton text={cloneUrl} />
             </div>
           </div>
         </div>
 
-        <p style={{ color: '#7d8590', fontSize: 12, marginTop: 10, marginBottom: 0 }}>
+        <p style={{ color: '#64748B', fontSize: 12, marginTop: 10, marginBottom: 0 }}>
           Get started by{' '}
-          <Link href={`/${owner}/${repoName}/new/main?filename=README.md`} style={{ color: '#58a6ff', textDecoration: 'none' }}>
+          <Link href={`/${owner}/${repoName}/new/main?filename=README.md`} style={{ color: '#66599F', textDecoration: 'none' }}>
             creating a new file
           </Link>
           {' '}or{' '}
-          <Link href={`/${owner}/${repoName}/upload`} style={{ color: '#58a6ff', textDecoration: 'none' }}>
+          <Link href={`/${owner}/${repoName}/upload`} style={{ color: '#66599F', textDecoration: 'none' }}>
             uploading an existing file
           </Link>
           . We recommend every repository include a{' '}
-          <span style={{ color: '#58a6ff', cursor: 'pointer' }}>README</span>,{' '}
-          <span style={{ color: '#58a6ff', cursor: 'pointer' }}>LICENSE</span>, and{' '}
-          <span style={{ color: '#58a6ff', cursor: 'pointer' }}>.gitignore</span>.
+          <span style={{ color: '#66599F', cursor: 'pointer' }}>README</span>,{' '}
+          <span style={{ color: '#66599F', cursor: 'pointer' }}>LICENSE</span>, and{' '}
+          <span style={{ color: '#66599F', cursor: 'pointer' }}>.gitignore</span>.
         </p>
       </div>
 
       {/* ── Create a new repository on the command line ───────────────────── */}
       <div style={{ padding: '20px 20px 0' }}>
-        <h3 style={{ fontSize: 15, fontWeight: 700, margin: '0 0 12px', color: '#e6edf3' }}>
+        <h3 style={{ fontSize: 15, fontWeight: 700, margin: '0 0 12px', color: '#334155' }}>
           ...or create a new repository on the command line
         </h3>
         <CodeBlock lines={createNewLines} copyText={createNewText} />
@@ -275,7 +275,7 @@ export default function QuickSetup({ owner, repoName, baseUrl }: QuickSetupProps
 
       {/* ── Push an existing repository ──────────────────────────────────── */}
       <div style={{ padding: '20px 20px 0' }}>
-        <h3 style={{ fontSize: 15, fontWeight: 700, margin: '0 0 12px', color: '#e6edf3' }}>
+        <h3 style={{ fontSize: 15, fontWeight: 700, margin: '0 0 12px', color: '#334155' }}>
           ...or push an existing repository from the command line
         </h3>
         <CodeBlock lines={pushExistingLines} copyText={pushExistingText} />
@@ -284,28 +284,28 @@ export default function QuickSetup({ owner, repoName, baseUrl }: QuickSetupProps
       {/* ── panda CLI ────────────────────────────────────────────────────── */}
       <div style={{ padding: '20px 20px 24px' }}>
         <h3 style={{
-          fontSize: 15, fontWeight: 700, margin: '0 0 6px', color: '#e6edf3',
+          fontSize: 15, fontWeight: 700, margin: '0 0 6px', color: '#334155',
           display: 'flex', alignItems: 'center', gap: 8,
         }}>
           <span style={{ fontSize: 20 }}>🐼</span>
           ...or use the panda CLI
         </h3>
-        <p style={{ fontSize: 12, color: '#7d8590', margin: '0 0 12px' }}>
+        <p style={{ fontSize: 12, color: '#64748B', margin: '0 0 12px' }}>
           Install with{' '}
           <code style={{
-            background: '#161b22', border: '1px solid #30363d', borderRadius: 4,
+            background: '#C4D9FF', border: '1px solid #C4D9FF', borderRadius: 4,
             padding: '1px 6px',
             fontFamily: "'SFMono-Regular', Consolas, 'Liberation Mono', Menlo, monospace",
-            fontSize: 12, color: '#e6edf3',
+            fontSize: 12, color: '#334155',
           }}>
             pip install panda-cli
           </code>
           {' '}then authenticate once with{' '}
           <code style={{
-            background: '#161b22', border: '1px solid #30363d', borderRadius: 4,
+            background: '#C4D9FF', border: '1px solid #C4D9FF', borderRadius: 4,
             padding: '1px 6px',
             fontFamily: "'SFMono-Regular', Consolas, 'Liberation Mono', Menlo, monospace",
-            fontSize: 12, color: '#e6edf3',
+            fontSize: 12, color: '#334155',
           }}>
             panda auth login
           </code>.
@@ -315,18 +315,18 @@ export default function QuickSetup({ owner, repoName, baseUrl }: QuickSetupProps
         {/* panda CLI quick-reference table */}
         <div style={{
           marginTop: 16,
-          border: '1px solid #21262d',
+          border: '1px solid #C4D9FF',
           borderRadius: 6,
           overflow: 'hidden',
           fontSize: 12,
         }}>
           <div style={{
-            background: '#161b22',
+            background: '#C4D9FF',
             padding: '8px 14px',
             fontWeight: 600,
             fontSize: 12,
-            color: '#7d8590',
-            borderBottom: '1px solid #21262d',
+            color: '#64748B',
+            borderBottom: '1px solid #C4D9FF',
             textTransform: 'uppercase',
             letterSpacing: '.05em',
           }}>
@@ -351,20 +351,20 @@ export default function QuickSetup({ owner, repoName, baseUrl }: QuickSetupProps
                 alignItems: 'center',
                 gap: 12,
                 padding: '7px 14px',
-                borderBottom: i < 9 ? '1px solid #21262d' : 'none',
-                background: i % 2 === 0 ? 'transparent' : '#0d1117',
+                borderBottom: i < 9 ? '1px solid #C4D9FF' : 'none',
+                background: i % 2 === 0 ? 'transparent' : '#E8F9FF',
               }}
             >
               <code style={{
                 fontFamily: "'SFMono-Regular', Consolas, 'Liberation Mono', Menlo, monospace",
-                color: '#58a6ff',
+                color: '#66599F',
                 fontSize: 12,
                 flexShrink: 0,
                 minWidth: 280,
               }}>
                 {row.cmd}
               </code>
-              <span style={{ color: '#7d8590' }}>{row.desc}</span>
+              <span style={{ color: '#64748B' }}>{row.desc}</span>
             </div>
           ))}
         </div>

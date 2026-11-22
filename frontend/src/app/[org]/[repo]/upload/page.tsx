@@ -75,7 +75,7 @@ export default function UploadFilesPage() {
               <path d="M4 4a4 4 0 0 1 8 0v2h.25c.966 0 1.75.784 1.75 1.75v5.5A1.75 1.75 0 0 1 12.25 15h-8.5A1.75 1.75 0 0 1 2 13.25v-5.5C2 6.784 2.784 6 3.75 6H4Zm8.25 3.5h-8.5a.25.25 0 0 0-.25.25v5.5c0 .138.112.25.25.25h8.5a.25.25 0 0 0 .25-.25v-5.5a.25.25 0 0 0-.25-.25ZM10.5 4a2.5 2.5 0 0 0-5 0v2h5Z" />
             </svg>
           </div>
-          <h1 style={{ fontSize: 20, fontWeight: 700, color: '#e6edf3', margin: '0 0 10px' }}>
+          <h1 style={{ fontSize: 20, fontWeight: 700, color: '#334155', margin: '0 0 10px' }}>
             Access restricted
           </h1>
           <p style={{ color: '#7d8590', fontSize: 14, margin: '0 0 28px', lineHeight: 1.6 }}>
@@ -176,7 +176,7 @@ export default function UploadFilesPage() {
                 <path d="M13.78 4.22a.75.75 0 0 1 0 1.06l-7.25 7.25a.75.75 0 0 1-1.06 0L2.22 9.28a.75.75 0 0 1 1.06-1.06L6 10.94l6.72-6.72a.75.75 0 0 1 1.06 0Z" />
               </svg>
             </div>
-            <h2 style={{ fontSize: 20, fontWeight: 700, color: '#e6edf3', margin: '0 0 8px' }}>
+            <h2 style={{ fontSize: 20, fontWeight: 700, color: '#334155', margin: '0 0 8px' }}>
               Upload committed successfully!
             </h2>
             <p style={{ color: '#7d8590', margin: '0 0 20px', fontSize: 14 }}>
@@ -212,7 +212,7 @@ export default function UploadFilesPage() {
       <PageHeader owner={owner} repoName={repoName} repoBase={repoBase} />
 
       <div style={{ maxWidth: 860, margin: '0 auto', padding: '32px 20px 80px' }}>
-        <h1 style={{ fontSize: 22, fontWeight: 700, color: '#e6edf3', margin: '0 0 4px' }}>
+        <h1 style={{ fontSize: 22, fontWeight: 700, color: '#334155', margin: '0 0 4px' }}>
           Upload files
         </h1>
         <p style={{ color: '#7d8590', fontSize: 13, margin: '0 0 28px' }}>
@@ -269,26 +269,26 @@ export default function UploadFilesPage() {
 
         {/* File list */}
         {files.length > 0 && (
-          <div style={{ margin: '20px 0', border: '1px solid #21262d', borderRadius: 6, overflow: 'hidden' }}>
+          <div style={{ margin: '20px 0', border: '1px solid #C4D9FF', borderRadius: 6, overflow: 'hidden' }}>
             <div style={{
-              background: '#161b22', padding: '10px 16px',
+              background: '#C4D9FF', padding: '10px 16px',
               display: 'flex', justifyContent: 'space-between', alignItems: 'center',
-              fontSize: 13, fontWeight: 600, borderBottom: '1px solid #21262d',
+              fontSize: 13, fontWeight: 600, borderBottom: '1px solid #C4D9FF',
             }}>
-              <span style={{ color: '#e6edf3' }}>{files.length} file{files.length > 1 ? 's' : ''} selected</span>
+              <span style={{ color: '#334155' }}>{files.length} file{files.length > 1 ? 's' : ''} selected</span>
               <span style={{ color: '#7d8590' }}>{fmtSize(totalSize)} total</span>
             </div>
             <div style={{ maxHeight: 260, overflowY: 'auto' }}>
               {files.map((f, i) => (
                 <div key={i} style={{
                   display: 'flex', alignItems: 'center', gap: 12,
-                  padding: '8px 16px', borderBottom: i < files.length - 1 ? '1px solid #21262d' : 'none',
+                  padding: '8px 16px', borderBottom: i < files.length - 1 ? '1px solid #C4D9FF' : 'none',
                   fontSize: 13,
                 }}>
                   <svg width="14" height="14" viewBox="0 0 16 16" fill="#7d8590" style={{ flexShrink: 0 }}>
                     <path d="M2 1.75C2 .784 2.784 0 3.75 0h6.586c.464 0 .909.184 1.237.513l2.914 2.914c.329.328.513.773.513 1.237v9.586A1.75 1.75 0 0 1 13.25 16h-9.5A1.75 1.75 0 0 1 2 14.25Zm1.75-.25a.25.25 0 0 0-.25.25v12.5c0 .138.112.25.25.25h9.5a.25.25 0 0 0 .25-.25V6h-2.75A1.75 1.75 0 0 1 8.75 4.25V1.5Zm6.75.062V4.25c0 .138.112.25.25.25h2.688Z" />
                   </svg>
-                  <span style={{ flex: 1, color: '#e6edf3', wordBreak: 'break-all', fontFamily: 'monospace', fontSize: 12 }}>
+                  <span style={{ flex: 1, color: '#334155', wordBreak: 'break-all', fontFamily: 'monospace', fontSize: 12 }}>
                     {f.relativePath}
                   </span>
                   <span style={{ color: '#7d8590', flexShrink: 0, fontSize: 11 }}>{fmtSize(f.file.size)}</span>
@@ -356,7 +356,7 @@ export default function UploadFilesPage() {
             </div>
           )}
 
-          <div style={{ display: 'flex', gap: 10, alignItems: 'center', paddingTop: 8, borderTop: '1px solid #21262d' }}>
+          <div style={{ display: 'flex', gap: 10, alignItems: 'center', paddingTop: 8, borderTop: '1px solid #C4D9FF' }}>
             <button
               type="submit"
               disabled={uploading || files.length === 0}
@@ -384,8 +384,8 @@ export default function UploadFilesPage() {
 function PageHeader({ owner, repoName, repoBase }: { owner: string; repoName: string; repoBase: string }) {
   return (
     <header style={{
-      background: '#161b22',
-      borderBottom: '1px solid #21262d',
+      background: '#C4D9FF',
+      borderBottom: '1px solid #C4D9FF',
       padding: '12px 24px',
       display: 'flex',
       alignItems: 'center',
@@ -404,7 +404,7 @@ function PageHeader({ owner, repoName, repoBase }: { owner: string; repoName: st
         {repoName}
       </Link>
       <span style={{ color: '#484f58' }}>/</span>
-      <span style={{ color: '#e6edf3', fontSize: 14 }}>upload</span>
+      <span style={{ color: '#334155', fontSize: 14 }}>upload</span>
     </header>
   );
 }
@@ -414,13 +414,13 @@ function PageHeader({ owner, repoName, repoBase }: { owner: string; repoName: st
 const styles = {
   root: {
     minHeight: '100vh',
-    background: '#0d1117',
-    color: '#e6edf3',
+    background: '#E8F9FF',
+    color: '#334155',
     fontFamily: "-apple-system,BlinkMacSystemFont,'Segoe UI',Helvetica,Arial,sans-serif",
     fontSize: 14,
   } as React.CSSProperties,
   dropZone: {
-    border: '2px dashed #30363d',
+    border: '2px dashed #C4D9FF',
     borderRadius: 6,
     padding: '48px 24px',
     textAlign: 'center' as const,
@@ -441,13 +441,13 @@ const styles = {
   label: {
     fontSize: 13.5,
     fontWeight: 600,
-    color: '#e6edf3',
+    color: '#334155',
   } as React.CSSProperties,
   input: {
-    background: '#010409',
-    border: '1px solid #30363d',
+    background: '#E8F9FF',
+    border: '1px solid #C4D9FF',
     borderRadius: 6,
-    color: '#e6edf3',
+    color: '#334155',
     fontSize: 14,
     padding: '5px 12px',
     height: 32,
@@ -467,7 +467,7 @@ const styles = {
     cursor: 'pointer',
     border: '1px solid rgba(240,246,252,.1)',
     background: '#238636',
-    color: '#fff',
+    color: '#1F2937',
     textDecoration: 'none',
     whiteSpace: 'nowrap' as const,
     fontFamily: 'inherit',
@@ -483,7 +483,7 @@ const styles = {
     borderRadius: 6,
     cursor: 'pointer',
     border: '1px solid rgba(240,246,252,.1)',
-    background: '#21262d',
+    background: '#C4D9FF',
     color: '#cdd9e5',
     textDecoration: 'none',
     whiteSpace: 'nowrap' as const,
@@ -502,7 +502,7 @@ const styles = {
     fontWeight: 500,
   } as React.CSSProperties,
   successBox: {
-    background: '#161b22',
+    background: '#C4D9FF',
     border: '1px solid rgba(63,185,80,.35)',
     borderRadius: 6,
     padding: '40px 32px',
@@ -520,11 +520,11 @@ const styles = {
   } as React.CSSProperties,
   code: {
     fontFamily: "'SFMono-Regular',Consolas,'Liberation Mono',Menlo,monospace",
-    background: '#161b22',
-    border: '1px solid #30363d',
+    background: '#C4D9FF',
+    border: '1px solid #C4D9FF',
     borderRadius: 4,
     padding: '1px 6px',
     fontSize: 12,
-    color: '#e6edf3',
+    color: '#334155',
   } as React.CSSProperties,
 };

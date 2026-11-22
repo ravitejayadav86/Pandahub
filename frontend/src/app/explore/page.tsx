@@ -1,49 +1,62 @@
 'use client';
-import { useEffect, useState } from 'react';
+
+import PageSkeleton from '@/components/ui/PageSkeleton';
+import { Suspense, useEffect, useState } from 'react';
 import Link from 'next/link';
+import { useSearchParams } from 'next/navigation';
 import api from '@/lib/api';
 import { Repository, User } from '@/types';
 
 import Navbar from '@/components/shared/Navbar';
 
-export default function ExplorePage() {
+function ExploreResultsPage() {
+  const searchParams = useSearchParams();
+  const urlQuery = searchParams.get('q')?.trim() || '';
   const [repos, setRepos] = useState<Repository[]>([]);
   const [users, setUsers] = useState<Partial<User>[]>([]);
-  const [query, setQuery] = useState('');
+  const [query, setQuery] = useState(urlQuery);
   const [sort, setSort] = useState<'updated' | 'stars' | 'forks'>('updated');
   const [loading, setLoading] = useState(true);
+  const [submittedQuery, setSubmittedQuery] = useState(urlQuery);
+  const [requestError, setRequestError] = useState('');
+  const [retryKey, setRetryKey] = useState(0);
 
-  const loadData = async () => {
+  // Keep the visible input and result set in sync with the global search URL.
+  useEffect(() => {
+    setQuery(urlQuery);
+    setSubmittedQuery(urlQuery);
+  }, [urlQuery]);
+
+  // PANDAHUB_EXPLORE_REQUEST_FIX: abort old searches when the filter changes.
+  useEffect(() => {
+    const controller = new AbortController();
     setLoading(true);
-    try {
-      const [reposRes, usersRes] = await Promise.all([
-        api.get<Repository[]>(`/explore/repos`, {
-          params: { q: query || undefined, sort, limit: 24 },
-        }),
-        api.get<Partial<User>[]>(`/auth/explore/users`, {
-          params: { q: query || undefined, limit: 12 },
-        })
-      ]);
+    setRequestError('');
+    Promise.all([
+      api.get<Repository[]>('/explore/repos', { params: { q: submittedQuery || undefined, sort, limit: 24 }, signal: controller.signal }),
+      api.get<Partial<User>[]>('/auth/explore/users', { params: { q: submittedQuery || undefined, limit: 12 }, signal: controller.signal }),
+    ]).then(([reposRes, usersRes]) => {
+      if (controller.signal.aborted) return;
       setRepos(reposRes.data);
       setUsers(usersRes.data);
-    } catch {}
-    setLoading(false);
-  };
-
-  useEffect(() => { loadData(); }, [sort]);
+    }).catch(() => {
+      if (!controller.signal.aborted) { setRepos([]); setUsers([]); setRequestError('Could not load results. Check your connection and try again.'); }
+    }).finally(() => { if (!controller.signal.aborted) setLoading(false); });
+    return () => controller.abort();
+  }, [sort, submittedQuery, retryKey]);
 
   const handleSearch = (e: React.FormEvent) => {
     e.preventDefault();
-    loadData();
+    setSubmittedQuery(query.trim());
   };
 
   return (
     <div style={{ minHeight: '100vh', background: 'var(--bg-primary)', color: 'var(--text-primary)' }}>
       <Navbar />
       {/* Header */}
-      <div style={{
+      <div className="ph-explore-hero" style={{
         background: 'var(--glass-bg-3)',
-        backdropFilter: '(20px)',
+        backdropFilter: 'blur(20px)',
         borderBottom: '1px solid var(--glass-border)',
         padding: '40px 0 32px',
         position: 'relative', overflow: 'hidden',
@@ -62,7 +75,7 @@ export default function ExplorePage() {
           <form onSubmit={handleSearch} style={{ display: 'flex', gap: 10, maxWidth: 560 }}>
             <input
               type="text"
-              placeholder="Search repositories and usersâ€¦"
+              placeholder="Search repositories and users..."
               value={query}
               onChange={(e) => setQuery(e.target.value)}
               className="glass-input"
@@ -74,9 +87,9 @@ export default function ExplorePage() {
             />
             <button type="submit" style={{
               padding: '12px 24px', borderRadius: 14,
-              background: '#ffffff',
-              color: '#000000', fontWeight: 700, border: '1px solid #ffffff', cursor: 'pointer',
-              boxShadow: '0 4px 14px rgba(255,255,255,0.18)',
+              background: '#C5BAFF',
+              color: '#342B60', fontWeight: 700, border: '1px solid #AFA0E8', cursor: 'pointer',
+              boxShadow: '0 6px 17px rgba(137,119,210,0.16)',
             }}>
               Search
             </button>
@@ -95,9 +108,9 @@ export default function ExplorePage() {
               style={{
                 padding: '6px 16px', borderRadius: 999, border: '1px solid var(--glass-border)',
                 background: sort === s ? 'var(--glass-bg-4)' : 'var(--glass-bg-2)',
-                color: sort === s ? '#C8C8C8' : 'var(--text-secondary)',
+                color: sort === s ? '#51477F' : 'var(--text-secondary)',
                 fontWeight: sort === s ? 600 : 500,
-                backdropFilter: '(10px)',
+                backdropFilter: 'blur(10px)',
                 cursor: 'pointer', fontSize: 13, transition: 'all 0.15s ease',
               }}
             >
@@ -106,18 +119,12 @@ export default function ExplorePage() {
           ))}
         </div>
 
+        {requestError && <div role="alert" className="mb-4 flex flex-wrap items-center gap-3 rounded-xl border border-red-200 bg-red-50 px-4 py-3 text-sm text-red-700"><span>{requestError}</span><button type="button" className="rounded-lg border border-red-200 px-3 py-1.5 font-semibold hover:bg-white" onClick={() => setRetryKey(v => v + 1)}>Retry</button></div>}
         {loading ? (
-          <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fill, minmax(320px, 1fr))', gap: 20 }}>
-            {[1, 2, 3, 4, 5, 6].map((i) => (
-              <div key={i} className="glass-card" style={{ padding: 24, opacity: 0.5, borderRadius: 20, border: '1px solid var(--glass-border)' }}>
-                <div style={{ width: 180, height: 16, background: 'var(--glass-bg-4)', borderRadius: 6, marginBottom: 12 }} />
-                <div style={{ width: '70%', height: 12, background: 'var(--glass-bg-3)', borderRadius: 6 }} />
-              </div>
-            ))}
-          </div>
+          <PageSkeleton variant="grid" label="Discovering repositories and developers" />
         ) : (repos.length === 0 && users.length === 0) ? (
           <div style={{ textAlign: 'center', padding: '80px', color: 'var(--text-secondary)' }}>
-            <div style={{ fontSize: 48, marginBottom: 12 }}>ðŸ”</div>
+            <div style={{ fontSize: 48, marginBottom: 12 }}>🔍</div>
             <p>No repositories or users found. Try a different search.</p>
           </div>
         ) : (
@@ -155,27 +162,22 @@ export default function ExplorePage() {
 }
 
 function ExploreUserCard({ user }: { user: Partial<User> }) {
-  const [hovered, setHovered] = useState(false);
   return (
     <Link
       href={`/${user.username}`}
-      className="glass-card animate-fade-in"
+      className="glass-card animate-fade-in ph-explore-hover"
       style={{
         display: 'flex', alignItems: 'center', gap: 16, padding: '18px 20px',
         textDecoration: 'none', color: 'inherit', borderRadius: 20,
         border: '1px solid var(--glass-border)',
         transition: 'all 0.2s ease',
-        transform: hovered ? 'translateY(-3px)' : 'translateY(0)',
-        boxShadow: hovered ? 'var(--glass-shadow)' : 'none',
       }}
-      onMouseEnter={() => setHovered(true)}
-      onMouseLeave={() => setHovered(false)}
     >
       <div style={{
         width: 48, height: 48, borderRadius: '50%',
         background: 'linear-gradient(135deg, #C8C8C8, #A8A8A8)',
         display: 'flex', alignItems: 'center', justifyContent: 'center',
-        fontSize: 18, fontWeight: 700, color: '#fff', flexShrink: 0,
+        fontSize: 18, fontWeight: 700, color: '#1F2937', flexShrink: 0,
         overflow: 'hidden', border: '1px solid var(--glass-border)',
       }}>
         {user.avatar_url ? (
@@ -193,30 +195,25 @@ function ExploreUserCard({ user }: { user: Partial<User> }) {
 }
 
 function ExploreRepoCard({ repo }: { repo: Repository }) {
-  const [hovered, setHovered] = useState(false);
   const owner = repo.owner_username || repo.slug.split('/')[0];
   const name = repo.name;
   return (
     <Link
       href={`/${owner}/${name}`}
-      className="glass-card animate-fade-in"
+      className="glass-card animate-fade-in ph-explore-hover"
       style={{
         display: 'block', padding: '20px 24px', borderRadius: 20,
         border: '1px solid var(--glass-border)',
         textDecoration: 'none', color: 'inherit',
         transition: 'all 0.2s ease',
-        transform: hovered ? 'translateY(-3px)' : 'translateY(0)',
-        boxShadow: hovered ? 'var(--glass-shadow)' : 'none',
       }}
-      onMouseEnter={() => setHovered(true)}
-      onMouseLeave={() => setHovered(false)}
     >
       <div style={{ display: 'flex', alignItems: 'center', gap: 10, marginBottom: 8 }}>
         <div style={{
           width: 28, height: 28, borderRadius: '50%',
           background: 'linear-gradient(135deg, #C8C8C8, #A8A8A8)',
           display: 'flex', alignItems: 'center', justifyContent: 'center',
-          fontSize: 13, fontWeight: 700, color: '#fff', flexShrink: 0,
+          fontSize: 13, fontWeight: 700, color: '#1F2937', flexShrink: 0,
         }}>
           {owner?.[0]?.toUpperCase() || 'U'}
         </div>
@@ -245,3 +242,11 @@ function ExploreRepoCard({ repo }: { repo: Repository }) {
   );
 }
 
+
+
+// useSearchParams must be under Suspense so /explore can be prerendered by Next.js.
+export default function ExplorePage() {
+  return <Suspense fallback={<PageSkeleton variant="grid" label="Loading Explore" />}>
+    <ExploreResultsPage />
+  </Suspense>;
+}

@@ -1,5 +1,7 @@
 'use client';
 
+
+import PageSkeleton from '@/components/ui/PageSkeleton';
 import { useState, useEffect, useCallback } from 'react';
 import { useParams, useRouter } from 'next/navigation';
 import api from '@/lib/api';
@@ -181,20 +183,13 @@ export default function PagesSettingsPage() {
      Render
   ───────────────────────────────────────────────────────────────────────── */
   if (loading) {
-    return (
-      <div className="min-h-screen flex items-center justify-center bg-[#0d1117]">
-        <div className="flex flex-col items-center gap-4">
-          <div className="w-12 h-12 rounded-full border-4 border-blue-500/30 border-t-blue-500 animate-spin" />
-          <p className="text-slate-400 text-sm">Loading Pages settings…</p>
-        </div>
-      </div>
-    );
+    return <PageSkeleton variant="form" label="Loading Pages settings" />;
   }
 
   const statusInfo = pages ? statusConfig[pages.status] : null;
 
   return (
-    <div className="min-h-screen bg-[#0d1117] text-slate-100 antialiased">
+    <div className="min-h-screen bg-[#E8F9FF] text-slate-100 antialiased">
       {/* ── Background gradient ── */}
       <div className="fixed inset-0 pointer-events-none">
         <div className="absolute top-0 left-1/4 w-96 h-96 bg-violet-600/10 rounded-full" />
@@ -341,7 +336,7 @@ export default function PagesSettingsPage() {
                 className="w-full px-4 py-2.5 rounded-xl bg-white/6 border border-white/10 text-slate-100 text-sm focus:outline-none focus:border-violet-500/50 focus:ring-2 focus:ring-violet-500/20 transition-all appearance-none"
               >
                 {branches.map((b) => (
-                  <option key={b} value={b} className="bg-[#0d1117]">{b}</option>
+                  <option key={b} value={b} className="bg-[#E8F9FF]">{b}</option>
                 ))}
               </select>
               <p className="text-xs text-slate-500 mt-1.5">

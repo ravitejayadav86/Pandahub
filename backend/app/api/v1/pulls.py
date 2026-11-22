@@ -297,7 +297,7 @@ async def evaluate_ai_review_with_judge(
     Run Semantic Judge Evaluation (LLM-as-a-Judge) on the PR review.
     Evaluates candidate review against gold reference across 5 axes:
     accuracy, completeness, actionability, severity, and style.
-    Validated against senior engineers (κ = 0.78 inter-annotator agreement).
+    Judge scores are model-generated assessments, not independently validated human metrics.
     """
     pr = await pr_service.get_pull_request(db, repository.id, number)
     result = await db.execute(

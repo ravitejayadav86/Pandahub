@@ -6,7 +6,7 @@ import Link from 'next/link'
 import api from '@/lib/api'
 import { 
   MapPin, Link as LinkIcon, Calendar, BookMarked, GitMerge, Star, Users, 
-  Smile, Search, ChevronDown, Activity, Package, Layout, Book, Trophy, Hexagon,
+  Search, ChevronDown, Activity, Package, Layout, Book, Trophy, Hexagon,
   Settings, Trash2, AlertTriangle, X, Loader2
 } from 'lucide-react'
 import { useAuthStore } from '@/store/authStore'
@@ -110,7 +110,7 @@ export default function UserProfilePage() {
             avatar_url: orgData.avatar_url || null,
             location: null,
             website_url: orgData.website_url || null,
-            is_verified: true,
+            is_verified: orgData.is_verified === true,
             created_at: orgData.created_at || null,
             repo_count: Array.isArray(orgRepos) ? orgRepos.length : 0,
             follower_count: 0,
@@ -244,14 +244,14 @@ export default function UserProfilePage() {
         
         {/* ── Left Dock (Navigation) ── */}
         <div className="hidden md:flex flex-col shrink-0 w-20 sticky top-24 h-fit">
-          <div className="flex flex-col items-center gap-4 py-6 bg-[#0a0a0c] border border-[#27272a] rounded-[2rem] shadow-xl">
+          <div className="flex flex-col items-center gap-4 py-6 bg-[#E8F9FF] border border-[#C4D9FF] rounded-[2rem] shadow-xl">
             {TABS.map((tab) => {
               const active = activeTab === tab.id
               return (
                 <div key={tab.id} className="relative group flex items-center justify-center w-full">
-                  <div className="absolute left-20 px-3 py-1.5 rounded-lg bg-[#1a1a1a] border border-white/10 text-white text-xs font-medium opacity-0 group-hover:opacity-100 transition-opacity whitespace-nowrap pointer-events-none z-50">
+                  <div className="absolute left-20 px-3 py-1.5 rounded-lg bg-[#E8F9FF] border border-white/10 text-white text-xs font-medium opacity-0 group-hover:opacity-100 transition-opacity whitespace-nowrap pointer-events-none z-50">
                     {tab.label} {tab.count !== undefined ? `(${tab.count})` : ''}
-                    <div className="absolute top-1/2 -left-1 -translate-y-1/2 w-2 h-2 bg-[#1a1a1a] border-b border-l border-white/10 rotate-45" />
+                    <div className="absolute top-1/2 -left-1 -translate-y-1/2 w-2 h-2 bg-[#E8F9FF] border-b border-l border-white/10 rotate-45" />
                   </div>
                   <motion.button
                     onClick={() => setActiveTab(tab.id as TabType)}
@@ -261,7 +261,7 @@ export default function UserProfilePage() {
                     className={`w-12 h-12 flex items-center justify-center rounded-2xl transition-colors duration-200 ${
                       active 
                         ? 'bg-white/10 text-white border border-white/20' 
-                        : 'bg-[#18181b] text-zinc-400 border border-[#333333] hover:text-white hover:bg-[#27272a]'
+                        : 'bg-[#E8F9FF] text-zinc-400 border border-[#C4D9FF] hover:text-white hover:bg-[#C4D9FF]'
                     }`}
                   >
                     <tab.icon className="w-5 h-5" />
@@ -274,7 +274,7 @@ export default function UserProfilePage() {
 
         {/* ── Profile Sidebar ── */}
         <div className="w-full md:w-[296px] shrink-0 relative z-10 sticky top-24 h-fit">
-          <div className="p-6 bg-[#0a0a0c] border border-[#27272a] rounded-[2rem] shadow-xl">
+          <div className="p-6 bg-[#E8F9FF] border border-[#C4D9FF] rounded-[2rem] shadow-xl">
             <div className="relative w-full aspect-square rounded-[1.5rem] border border-[var(--glass-border)] overflow-hidden bg-[var(--glass-bg-3)] mb-6 shadow-lg z-10">
               {profile.avatar_url ? (
                 <img src={profile.avatar_url} alt={profile.username} className="w-full h-full object-cover" />
@@ -282,13 +282,6 @@ export default function UserProfilePage() {
                 <div className="w-full h-full bg-gradient-to-br from-blue-600 to-purple-600 flex items-center justify-center text-white text-7xl font-bold">
                   {profile.username.charAt(0).toUpperCase()}
                 </div>
-              )}
-              
-              {/* Mock "Set Status" badge */}
-              {isOwner && (
-                <button className="absolute bottom-4 right-4 w-10 h-10 bg-[#1a1a1a]/80 backdrop-blur-md rounded-full flex items-center justify-center shadow-lg hover:text-blue-500 transition-colors z-20 border border-white/10" aria-label="Set status">
-                  <Smile className="w-5 h-5 text-slate-400" />
-                </button>
               )}
             </div>
 
@@ -300,7 +293,7 @@ export default function UserProfilePage() {
             </h2>
 
             {isOwner ? (
-              <Link href="/settings" className="block w-full py-2.5 text-center text-sm font-semibold text-[var(--text-primary)] bg-[#18181b] hover:bg-[#27272a] rounded-xl mb-6 transition-all border border-[#333333]">
+              <Link href="/settings" className="block w-full py-2.5 text-center text-sm font-semibold text-[var(--text-primary)] bg-[#E8F9FF] hover:bg-[#C4D9FF] rounded-xl mb-6 transition-all border border-[#C4D9FF]">
                 Edit profile
               </Link>
             ) : (
@@ -308,7 +301,7 @@ export default function UserProfilePage() {
                 <button
                   onClick={handleFollowToggle}
                   disabled={followLoading}
-                  className="flex-1 py-2.5 text-center text-sm font-semibold text-[var(--text-primary)] bg-[#18181b] hover:bg-[#27272a] rounded-xl transition-all disabled:opacity-60 flex items-center justify-center gap-1.5 border border-[#333333]"
+                  className="flex-1 py-2.5 text-center text-sm font-semibold text-[var(--text-primary)] bg-[#E8F9FF] hover:bg-[#C4D9FF] rounded-xl transition-all disabled:opacity-60 flex items-center justify-center gap-1.5 border border-[#C4D9FF]"
                 >
                   {followLoading && <span className="w-3 h-3 border-2 border-slate-400 border-t-transparent rounded-full animate-spin" />}
                   {isFollowing ? 'Unfollow' : 'Follow'}
@@ -322,7 +315,7 @@ export default function UserProfilePage() {
               </div>
             )}
 
-            <div className="flex items-center gap-4 text-sm mb-6 pb-6 border-b border-[#27272a]">
+            <div className="flex items-center gap-4 text-sm mb-6 pb-6 border-b border-[#C4D9FF]">
               <Link href={`/${profile.username}/followers`} className="hover:text-blue-500 transition-colors flex items-center gap-1.5">
                 <Users className="w-4 h-4 text-slate-400" />
                 <span className="font-semibold text-[var(--text-primary)]">{profile.follower_count}</span>
@@ -380,7 +373,7 @@ export default function UserProfilePage() {
               <div>
                 <div className="flex items-center justify-between mb-4 text-sm">
                   <span className="font-semibold text-[var(--text-primary)]">Pinned Repositories</span>
-                  {isOwner && <a href="#" className="text-slate-400 hover:text-blue-500 text-xs">Customize your pins</a>}
+                  
                 </div>
                 <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
                   {pinnedRepos.length > 0 ? pinnedRepos.map(repo => (
@@ -564,7 +557,7 @@ export default function UserProfilePage() {
 
       {/* ── Delete Repository Confirmation Modal ──────────────────────── */}
       {repoToDelete && (
-        <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/60 p-4 animate-fade-in">
+        <div className="fixed inset-0 z-50 flex items-center justify-center bg-[#9B94C0]/25 p-4 animate-fade-in">
           <div className="w-full max-w-md rounded-2xl glass-panel border border-red-500/30 shadow-2xl overflow-hidden">
             {/* Header */}
             <div className="px-6 py-4 border-b border-red-500/20 bg-red-500/10 flex items-center justify-between">

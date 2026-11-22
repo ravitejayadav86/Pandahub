@@ -15,9 +15,7 @@ Instead of sending every PR diff to a single monolithic model, this module:
 3. **Merges** results from k=3 parallel expert calls (majority-vote on
    severity, union of unique suggestions) into a single structured review.
 
-Performance characteristics (from research literature):
-   Hybrid routed approach: +13.2% net gain over zero-shot baseline
-   Hybrid vs single best standalone model: +7.7% gain
+Performance claims must be measured on an independent labelled benchmark.
 
 Semantic Categories
 ───────────────────
@@ -693,10 +691,6 @@ async def route_and_review(
                     "raw_suggestion_count": len(all_suggestions),
                     "deduped_suggestion_count": len(deduped),
                     "diff_text_snippet": diff_snippet,
-                    "performance_gain": {
-                        "hybrid_vs_zero_shot": "+13.2%",
-                        "hybrid_vs_single_best": "+7.7%",
-                    },
                     "context_collapse_guard": {
                         "k_effective": k,
                         "protected": True,
@@ -736,10 +730,6 @@ async def route_and_review(
             "fallback": True,
             "reason": "openrouter_unavailable_or_failed",
             "diff_text_snippet": diff_snippet,
-            "performance_gain": {
-                "hybrid_vs_zero_shot": "+13.2%",
-                "hybrid_vs_single_best": "+7.7%",
-            },
             "context_collapse_guard": {
                 "k_effective": 1,
                 "protected": True,

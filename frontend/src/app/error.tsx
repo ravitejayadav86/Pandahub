@@ -27,7 +27,7 @@ export default function ErrorPage({
   const digest = error?.digest || 'unknown';
 
   return (
-    <div className="min-h-screen bg-[#0d1117] flex items-center justify-center p-6 font-sans">
+    <div className="min-h-screen bg-[#E8F9FF] flex items-center justify-center p-6 font-sans">
       {/* Glow */}
       <div className="fixed inset-0 pointer-events-none">
         <div className="absolute inset-0 bg-[radial-gradient(ellipse_at_center,rgba(239,68,68,0.06)_0%,transparent_70%)]" />
@@ -46,34 +46,34 @@ export default function ErrorPage({
               </span>
               <span className="text-slate-500 text-xs">Internal Error</span>
             </div>
-            <h1 className="text-2xl font-bold text-white">Something broke</h1>
+            <h1 className="text-2xl font-bold text-[#1F2937]">Something broke</h1>
           </div>
         </div>
 
         {/* Main card */}
         <div className="rounded-2xl border border-white/8 bg-white/3 overflow-hidden mb-4">
           <div className="p-6">
-            <p className="text-slate-300 text-sm leading-relaxed mb-4">
+            <p className="text-[#475569] text-sm leading-relaxed mb-4">
               A server-side error occurred while rendering this page.
               This is our fault — you haven&apos;t done anything wrong.
             </p>
 
             {error.message && (
-              <div className="p-3 rounded-xl bg-black/40 border border-white/6 mb-5">
-                <p className="text-xs text-slate-400 font-mono break-all">{error.message}</p>
+              <div className="p-3 rounded-xl bg-[#E8F9FF] border border-white/6 mb-5">
+                <p className="text-xs text-[#64748B] font-mono break-all">{error.message}</p>
               </div>
             )}
 
             <div className="flex gap-3">
               <button
                 onClick={reset}
-                className="flex-1 py-2.5 px-4 rounded-xl bg-white text-black text-sm font-bold hover:bg-zinc-200 transition-all shadow-md active:scale-95"
+                className="flex-1 py-2.5 px-4 rounded-xl bg-[#C5BAFF] text-[#26213F] text-sm font-bold hover:bg-[#B9ACF5] transition-all shadow-md active:scale-95"
               >
                 ↺ Try again
               </button>
               <button
                 onClick={() => { window.location.href = '/dashboard'; }}
-                className="flex-1 py-2.5 px-4 rounded-xl border border-zinc-700 bg-zinc-900 text-zinc-100 text-sm font-semibold hover:bg-zinc-800 transition-all"
+                className="flex-1 py-2.5 px-4 rounded-xl border border-[#C4D9FF] bg-[#C4D9FF] text-[#1F2937] text-sm font-semibold hover:bg-[#B8D0FB] transition-all"
               >
                 🏠 Dashboard
               </button>
@@ -81,10 +81,10 @@ export default function ErrorPage({
           </div>
 
           {/* Error digest */}
-          <div className="px-6 py-3 border-t border-white/6 bg-black/20 flex items-center justify-between">
+          <div className="px-6 py-3 border-t border-white/6 bg-[#E8F9FF] flex items-center justify-between">
             <div>
               <p className="text-xs text-slate-500">Error digest</p>
-              <p className="text-xs font-mono text-slate-400">{digest}</p>
+              <p className="text-xs font-mono text-[#64748B]">{digest}</p>
             </div>
             <button
               onClick={() => {
@@ -92,7 +92,7 @@ export default function ErrorPage({
                 setCopied(true);
                 setTimeout(() => setCopied(false), 2000);
               }}
-              className="text-xs px-3 py-1.5 rounded-lg bg-white/6 text-slate-400 hover:bg-white/10 transition-all border border-white/8"
+              className="text-xs px-3 py-1.5 rounded-lg bg-white/6 text-[#64748B] hover:bg-white/10 transition-all border border-white/8"
             >
               {copied ? '✓ Copied' : 'Copy'}
             </button>
@@ -105,7 +105,7 @@ export default function ErrorPage({
             href="https://github.com/mrteji/pandahub/issues/new"
             target="_blank"
             rel="noopener noreferrer"
-            className="text-slate-500 hover:text-slate-300 transition-colors"
+            className="text-slate-500 hover:text-[#475569] transition-colors"
           >
             Report on GitHub ↗
           </a>

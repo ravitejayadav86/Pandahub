@@ -47,7 +47,7 @@ export default function MotionDetectiveBackground() {
       const oCtx = offscreenGrid.getContext("2d");
       if (!oCtx) return;
       oCtx.scale(dpr, dpr);
-      oCtx.strokeStyle = "rgba(255, 255, 255, 0.035)";
+      oCtx.strokeStyle = "rgba(117, 101, 183, 0.035)";
       oCtx.lineWidth = 1;
       const cols = Math.ceil(width / GRID_SIZE);
       const rows = Math.ceil(height / GRID_SIZE);
@@ -186,7 +186,7 @@ export default function MotionDetectiveBackground() {
         const rStart = Math.max(0, Math.floor((mouseY - 180) / GRID_SIZE));
         const rEnd = Math.min(Math.ceil(height / GRID_SIZE), Math.ceil((mouseY + 180) / GRID_SIZE));
 
-        ctx.strokeStyle = "rgba(255, 255, 255, 0.12)";
+        ctx.strokeStyle = "rgba(117, 101, 183, 0.12)";
         ctx.lineWidth = 1;
         ctx.beginPath();
         for (let c = cStart; c <= cEnd; c++) {
@@ -211,11 +211,11 @@ export default function MotionDetectiveBackground() {
       const scanY = scanLineY - 50;
       if (scanY >= 0 && scanY <= height) {
         const grad = ctx.createLinearGradient(0, scanY, width, scanY);
-        grad.addColorStop(0, "rgba(255, 255, 255, 0)");
-        grad.addColorStop(0.3, "rgba(255, 255, 255, 0.05)");
-        grad.addColorStop(0.5, "rgba(255, 255, 255, 0.12)");
-        grad.addColorStop(0.7, "rgba(255, 255, 255, 0.05)");
-        grad.addColorStop(1, "rgba(255, 255, 255, 0)");
+        grad.addColorStop(0, "rgba(117, 101, 183, 0)");
+        grad.addColorStop(0.3, "rgba(117, 101, 183, 0.05)");
+        grad.addColorStop(0.5, "rgba(117, 101, 183, 0.12)");
+        grad.addColorStop(0.7, "rgba(117, 101, 183, 0.05)");
+        grad.addColorStop(1, "rgba(117, 101, 183, 0)");
 
         ctx.strokeStyle = grad;
         ctx.lineWidth = 1;
@@ -233,7 +233,7 @@ export default function MotionDetectiveBackground() {
           p.r += 2.2;
           p.alpha *= 0.96;
 
-          ctx.strokeStyle = `rgba(255, 255, 255, ${p.alpha * 0.5})`;
+          ctx.strokeStyle = `rgba(117, 101, 183, ${p.alpha * 0.5})`;
           ctx.lineWidth = 1;
           ctx.beginPath();
           ctx.arc(p.x, p.y, p.r, 0, Math.PI * 2);
@@ -272,7 +272,7 @@ export default function MotionDetectiveBackground() {
       }
 
       // Batch all line strokes into 1 single call
-      ctx.strokeStyle = "rgba(255, 255, 255, 0.07)";
+      ctx.strokeStyle = "rgba(117, 101, 183, 0.07)";
       ctx.lineWidth = 0.75;
       ctx.beginPath();
       for (let i = 0; i < nodes.length; i++) {
@@ -291,7 +291,7 @@ export default function MotionDetectiveBackground() {
       ctx.stroke();
 
       // Batch all node points into 1 single call
-      ctx.fillStyle = "rgba(255, 255, 255, 0.35)";
+      ctx.fillStyle = "rgba(117, 101, 183, 0.35)";
       ctx.beginPath();
       for (let i = 0; i < nodes.length; i++) {
         const n = nodes[i];
@@ -311,8 +311,8 @@ export default function MotionDetectiveBackground() {
         // Rotating outer segmented brackets
         ctx.rotate(reticleAngle);
         ctx.strokeStyle = isTracking
-          ? "rgba(255, 255, 255, 0.45)"
-          : "rgba(255, 255, 255, 0.20)";
+          ? "rgba(117, 101, 183, 0.45)"
+          : "rgba(117, 101, 183, 0.20)";
         ctx.lineWidth = 1;
 
         // 4 Segmented Ring Arcs
@@ -329,8 +329,8 @@ export default function MotionDetectiveBackground() {
         // Center Crosshair
         ctx.rotate(-reticleAngle); // unrotate crosshair
         ctx.strokeStyle = isTracking
-          ? "rgba(255, 255, 255, 0.65)"
-          : "rgba(255, 255, 255, 0.25)";
+          ? "rgba(117, 101, 183, 0.65)"
+          : "rgba(117, 101, 183, 0.25)";
         ctx.lineWidth = 1;
 
         const chGap = 4;
@@ -354,8 +354,8 @@ export default function MotionDetectiveBackground() {
         const boxSize = reticleR + 10;
         const bCorner = 6;
         ctx.strokeStyle = isTracking
-          ? "rgba(255, 255, 255, 0.4)"
-          : "rgba(255, 255, 255, 0.15)";
+          ? "rgba(117, 101, 183, 0.4)"
+          : "rgba(117, 101, 183, 0.15)";
         ctx.beginPath();
         // Top-left
         ctx.moveTo(-boxSize, -boxSize + bCorner);
@@ -378,8 +378,8 @@ export default function MotionDetectiveBackground() {
         // Telemetry readout (crisp monochrome monospace font)
         ctx.font = "9px 'JetBrains Mono', monospace";
         ctx.fillStyle = isTracking
-          ? "rgba(255, 255, 255, 0.70)"
-          : "rgba(255, 255, 255, 0.35)";
+          ? "rgba(117, 101, 183, 0.70)"
+          : "rgba(117, 101, 183, 0.35)";
 
         const textX = boxSize + 8;
         const statusText = isTracking ? "MOTION: ACTIVE" : "IDLE SCAN";

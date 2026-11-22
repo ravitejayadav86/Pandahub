@@ -6,6 +6,7 @@ import Link from "next/link";
 import api from '@/lib/api';
 import { useAuthStore } from '@/store/authStore';
 import PandaLoader from '@/components/ui/PandaLoader';
+import { SkeletonCard } from '@/components/ui/Skeleton';
 
 interface SecurityAlert {
   id: string;
@@ -101,7 +102,7 @@ export default function SecurityPage() {
             </Link>
             <button
               onClick={triggerScan}
-              className="flex items-center gap-2 px-4 py-2 rounded-xl text-sm font-bold bg-white text-black shadow-md hover:bg-zinc-200 transition-all"
+              className="flex items-center gap-2 px-4 py-2 rounded-xl text-sm font-bold bg-[#3b82f6] text-white shadow-md hover:bg-[#2563eb] transition-all active:scale-[0.98]"
             >
               <span className="material-symbols-outlined text-[18px]">radar</span>
               Run Full Scan
@@ -135,8 +136,10 @@ export default function SecurityPage() {
         )}
 
         {loading ? (
-          <div className="flex justify-center items-center py-12 motion-">
-            <PandaLoader size="lg" glow={true} label="Scanning security alerts..." />
+          <div className="space-y-4">
+            {[1, 2, 3].map((i) => (
+              <SkeletonCard key={i} />
+            ))}
           </div>
         ) : alerts.length === 0 ? (
           <div className="glass-card rounded-2xl border border-[var(--glass-border)] p-12 text-center shadow-sm">
@@ -151,7 +154,7 @@ export default function SecurityPage() {
         ) : (
           <div className="space-y-4">
             {alerts.map(alert => (
-              <div key={alert.id} className="glass-card rounded-2xl border border-[var(--glass-border)] p-5 shadow-sm hover:scale-[1.005] transition-all">
+              <div key={alert.id} className="glass-card rounded-2xl border border-[var(--glass-border)] p-5 shadow-sm hover:-translate-y-0.5 hover:border-[#3b82f6]/40 transition-all duration-200">
                 <div className="flex items-start justify-between">
                   <div>
                     <div className="flex items-center gap-3 mb-2">
@@ -167,7 +170,7 @@ export default function SecurityPage() {
                       <p className="text-sm text-[var(--text-secondary)] mb-4 whitespace-pre-wrap leading-relaxed">{alert.description}</p>
                     )}
                     {alert.raw_finding && (
-                      <div className="bg-[var(--glass-bg-4)] border border-[var(--glass-border)] text-slate-200 text-xs font-mono p-3.5 rounded-xl overflow-x-auto whitespace-pre">
+                      <div className="bg-[var(--glass-bg-4)] border border-[var(--glass-border)] text-[#334155] text-xs font-mono p-3.5 rounded-xl overflow-x-auto whitespace-pre">
                         {alert.raw_finding}
                       </div>
                     )}

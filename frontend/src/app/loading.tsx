@@ -1,13 +1,6 @@
-﻿export default function Loading() {
-  return (
-    <main className="ph-route-loading" aria-label="Loading PandaHub">
-      <div className="ph-route-loader">
-        <div className="ph-route-ring ph-route-ring-outer" />
-        <div className="ph-route-ring ph-route-ring-inner" />
-        <div className="ph-route-core">P</div>
-      </div>
-      <div className="ph-route-wordmark">PANDAHUB</div>
-      <div className="ph-route-caption">Preparing workspace</div>
-    </main>
-  );
+/* PANDAHUB_SHIMMER_UI_V2: route fallback */
+import PageSkeleton from '@/components/ui/PageSkeleton';
+
+export default function Loading() {
+  return <PageSkeleton variant="dashboard" label="Loading PandaHub workspace" />;
 }

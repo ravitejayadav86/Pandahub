@@ -1,0 +1,94 @@
+/* PandaHub V4: scoped repairs based on the 2026-11-22 complete frontend export.
+   No global utility-class recolouring or scroll-tied animation. */
+.ph-startup-detail {
+  min-height: 80vh;
+  padding: clamp(24px, 4vw, 56px) clamp(16px, 4vw, 36px) 110px;
+  background: #FBFBFB;
+  color: #1F2937;
+}
+.ph-startup-detail-inner { max-width: 1050px; margin: 0 auto; }
+.ph-startup-back, .ph-startup-link { display: inline-flex; align-items: center; gap: 9px; font-size: 13px; font-weight: 700; color: #6759A7; text-decoration: none; }
+.ph-startup-back { margin-bottom: 22px; }
+.ph-startup-back:hover, .ph-startup-link:hover { color: #51477F; text-decoration: underline; text-underline-offset: 4px; }
+.ph-startup-detail-hero {
+  display: flex; align-items: center; gap: 24px; flex-wrap: wrap;
+  background: linear-gradient(124deg, #E8F9FF 0%, #C4D9FF 78%, #E8F9FF 100%);
+  border: 1px solid #C4D9FF; border-radius: 24px;
+  padding: clamp(22px, 4vw, 38px); box-shadow: 0 12px 32px rgba(100,115,161,.08);
+}
+.ph-startup-logo { width: 78px; height: 78px; flex: 0 0 78px; display: grid; place-items: center; border-radius: 22px; background: #FBFBFB; border: 1px solid rgba(136,123,213,.3); color: #66599F; font-size: 34px; font-weight: 850; box-shadow: 0 10px 24px rgba(103,86,170,.12); }
+.ph-startup-detail-identity { min-width: 0; flex: 1 1 260px; }
+.ph-startup-eyebrow { color: #66599F; font-weight: 750; font-size: 11px; letter-spacing: .1em; text-transform: uppercase; }
+.ph-startup-detail h1 { color: #1F2937; font-size: clamp(27px, 4vw, 40px); font-weight: 820; letter-spacing: -.035em; line-height: 1.16; margin: 10px 0; overflow-wrap: anywhere; }
+.ph-startup-detail-identity p { color: #475569; font-size: 15px; line-height: 1.65; }
+.ph-startup-detail-actions { display: flex; flex-wrap: wrap; align-items: center; gap: 14px; margin-top: 25px; }
+.ph-startup-button { display: inline-flex; justify-content: center; align-items: center; gap: 9px; min-height: 43px; padding: 10px 18px; border: 1px solid #A99AE8; border-radius: 12px; font-size: 13px; font-weight: 800; color: #342B60; background: #C5BAFF; box-shadow: 0 5px 14px rgba(137,119,210,.14); text-decoration: none; cursor: pointer; transition: transform .16s ease, box-shadow .16s ease, background-color .16s ease; }
+.ph-startup-button:not(:disabled):hover { transform: translateY(-1px); background: #B8ABF5; box-shadow: 0 9px 20px rgba(137,119,210,.19); }
+.ph-startup-button:not(:disabled):active { transform: translateY(0) scale(.985); }
+.ph-startup-button:disabled { opacity: .6; cursor: not-allowed; }
+.ph-startup-detail-columns { display: grid; grid-template-columns: minmax(0,1.65fr) minmax(260px,.85fr); gap: 18px; margin-top: 20px; align-items: start; }
+.ph-startup-detail-card { min-width: 0; background: #E8F9FF; border: 1px solid #C4D9FF; border-radius: 21px; padding: clamp(20px, 3vw, 28px); box-shadow: 0 6px 20px rgba(100,115,161,.06); }
+.ph-startup-detail-card h2 { color: #1F2937; font-size: 18px; font-weight: 800; margin-bottom: 16px; }
+.ph-startup-description { color: #475569; white-space: pre-wrap; overflow-wrap: anywhere; line-height: 1.8; font-size: 14px; }
+.ph-startup-detail-info p { display: flex; align-items: center; gap: 10px; border-top: 1px solid rgba(121,144,192,.19); padding: 14px 0; color: #64748B; font-size: 13px; }
+.ph-startup-detail-info p svg { color: #7766B6; flex: 0 0 17px; }
+.ph-startup-detail-info p span { flex: 1; }
+.ph-startup-detail-info p strong { color: #334155; font-size: 12px; text-align: right; }
+.ph-startup-detail-center { display: flex; justify-content: center; align-items: flex-start; padding-top: clamp(50px, 12vw, 120px); }
+.ph-startup-detail-center > .ph-startup-detail-card { width: min(100%, 620px); }
+.ph-startup-detail-center .ph-startup-detail-card p { font-size: 14px; color: #64748B; }
+.ph-startup-detail-form .ph-startup-detail-inner { max-width: 680px; }
+.ph-startup-form-heading { padding: 23px 0; }
+.ph-startup-form-heading > svg { color: #7666AD; }
+.ph-startup-form-heading p { color: #64748B; font-size: 14px; }
+.ph-startup-form { display: flex; flex-direction: column; gap: 18px; background: #E8F9FF; border: 1px solid #C4D9FF; padding: clamp(19px, 4vw, 32px); border-radius: 22px; }
+.ph-startup-form label { display: flex; flex-direction: column; gap: 9px; color: #334155; font-size: 13px; font-weight: 750; }
+.ph-startup-form label > span { color: #7354AA; }
+.ph-startup-form :is(input, textarea, select) { width: 100%; min-width: 0; padding: 11px 13px; background: #FBFBFB !important; border: 1px solid #BED0F1 !important; border-radius: 11px; color: #1F2937; font-weight: 500; font-size: 14px; line-height: 1.5; }
+.ph-startup-form :is(input, textarea, select):focus-visible { outline: 2px solid #917DD8; outline-offset: 1px; }
+.ph-startup-form small { color: #64748B; font-size: 11px; font-weight: 500; }
+.ph-startup-form-error { padding: 11px 14px; border: 1px solid #FBC6C6; border-radius: 10px; background: #FFF2F2; color: #991B1B; font-size: 13px; }
+/* A lightweight top toolbar; the left rail owns the navigation destinations. */
+.ph-dashboard-toolbar { display: flex; align-items: center; gap: 24px; min-height: 64px; padding: 10px clamp(14px, 3vw, 32px); position: relative; z-index: 48; background: rgba(232,249,255,.94); border-bottom: 1px solid #C4D9FF; }
+.ph-dashboard-toolbar-title { display: flex; align-items: center; gap: 9px; color: #475569; font-size: 12px; white-space: nowrap; }
+.ph-dashboard-toolbar-title strong { color: #334155; font-size: 14px; }
+.ph-dashboard-toolbar-title > span:first-child { color: #7766B6; }
+.ph-dashboard-toolbar-divider { color: #9BA9C4; }
+.ph-dashboard-toolbar-search { flex: 1; display: flex; justify-content: center; min-width: 0; }
+.ph-dashboard-toolbar-actions { display: flex; align-items: center; gap: 10px; margin-left: auto; }
+.ph-dashboard-toolbar-create, .ph-dashboard-toolbar-icon { display: inline-flex; justify-content: center; align-items: center; gap: 7px; border-radius: 11px; border: 1px solid #C4D9FF; min-height: 36px; min-width: 36px; padding: 6px 10px; color: #51477F; text-decoration: none; font-weight: 750; font-size: 12px; background: #FBFBFB; }
+.ph-dashboard-toolbar-create { background: #C5BAFF; }
+.ph-dashboard-toolbar-create:hover, .ph-dashboard-toolbar-icon:hover { background: #C4D9FF; }
+.ph-dashboard-toolbar-avatar { display: grid; place-items: center; background: none; border: 0; border-radius: 50%; cursor: pointer; }
+/* Prevent the old profile navbar from forcing white labels on lavender. */
+.ph-topbar { min-width: 0; }
+.ph-top-search { min-width: 0; }
+.ph-top-quick-links { display: flex; align-items: center; gap: 4px; }
+.ph-topbar :is(a, button):focus-visible, .ph-dashboard-toolbar :is(a,button):focus-visible, .ph-startup-detail :is(a,button,input,select,textarea):focus-visible { outline: 2px solid #917DD8; outline-offset: 3px; }
+@media (max-width: 950px) { .ph-dashboard-toolbar { gap: 12px; } .ph-dashboard-toolbar-title { display: none; } .ph-top-quick-links { display: none !important; } }
+@media (max-width: 600px) { .ph-startup-detail-columns { grid-template-columns: 1fr; } .ph-startup-detail-hero { gap: 15px; } .ph-startup-logo { width: 56px; height: 56px; flex-basis: 56px; font-size: 26px; border-radius: 15px; } .ph-topbar { padding-inline: 10px !important; gap: 8px; } .ph-top-search { margin: 0 4px !important; } .ph-dashboard-toolbar-create span { display: none; } .ph-dashboard-toolbar { padding: 9px 12px; gap: 8px; } }
+@media (prefers-reduced-motion: reduce) { .ph-startup-button { transition: none; } .ph-startup-button:hover { transform: none !important; } }
+/* Repository issues: the list API is paginated and links to detail pages. */
+.ph-issue-detail { min-height: 80vh; background: #FBFBFB; color: #1F2937; padding: clamp(20px,4vw,46px) clamp(16px,3vw,30px) 110px; }
+.ph-issue-detail-inner { max-width: 1100px; margin: 0 auto; }
+.ph-issue-heading { margin: 3px 0 24px; }
+.ph-issue-heading h1 { margin: 6px 0 13px; font-size: clamp(24px,3.3vw,34px); font-weight: 800; line-height: 1.2; letter-spacing: -.02em; color: #1F2937; overflow-wrap: anywhere; }
+.ph-issue-number { color: #7669B5; font-size: 13px; font-weight: 800; }
+.ph-issue-meta { display: flex; align-items: center; flex-wrap: wrap; gap: 10px; color: #64748B; font-size: 12px; }
+.ph-issue-state-open, .ph-issue-state-closed { display: inline-flex; align-items: center; gap: 5px; padding: 6px 10px; border-radius: 99px; font-weight: 800; border: 1px solid #B7D2BD; color: #285C42; background: #E4F3E9; text-transform: capitalize; }
+.ph-issue-state-closed { border-color: #CEC5F5; color: #62529C; background: #F0ECFF; }
+.ph-issue-layout { display: grid; grid-template-columns: minmax(0,1.7fr) minmax(220px,.7fr); gap: 18px; align-items: start; }
+.ph-issue-main { min-width: 0; display: flex; flex-direction: column; gap: 18px; }
+.ph-issue-comments-title { display: flex; align-items: center; gap: 9px; }
+.ph-issue-comments-title svg { color: #7669B5; }
+.ph-issue-comment { padding: 15px 0; border-bottom: 1px solid #D6E3FC; }
+.ph-issue-comment header { display: flex; justify-content: space-between; gap: 10px; color: #334155; margin-bottom: 10px; font-size: 12px; }
+.ph-issue-comment header time { color: #64748B; }
+.ph-issue-empty, .ph-issue-sidebar p { color: #64748B; font-size: 13px; }
+.ph-issue-sidebar .ph-issue-label { display: inline-flex; margin: 0 5px 6px 0; padding: 5px 9px; background: #C5BAFF; color: #433570; border: 1px solid #B3A4EE; border-radius: 99px; font-size: 11px; font-weight: 800; }
+.ph-issue-comment-form { display: flex; flex-direction: column; align-items: start; gap: 11px; margin-top: 18px; }
+.ph-issue-comment-form label { font-size: 13px; font-weight: 800; color: #334155; }
+.ph-issue-comment-form textarea { width: 100%; background: #FBFBFB !important; color: #1F2937 !important; border: 1px solid #C4D9FF !important; border-radius: 12px; padding: 13px 15px; resize: vertical; }
+.ph-inline-error { color: #991B1B; background: #FFF3F3; border: 1px solid #FBC5C5; border-radius: 12px; padding: 12px 14px; font-size: 13px; }
+.ph-retry-button { color: #51477F; text-decoration: underline; margin-left: 8px; font-weight: 800; }
+@media (max-width: 700px) { .ph-issue-layout { grid-template-columns: 1fr; } }

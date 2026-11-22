@@ -1,5 +1,7 @@
 'use client';
 
+
+import PageSkeleton from '@/components/ui/PageSkeleton';
 import { useState, useEffect, useCallback, useRef } from 'react';
 import { useRouter } from 'next/navigation';
 import api from '@/lib/api';
@@ -144,7 +146,7 @@ export default function AdminErrorsPage() {
 
   /* ── Render ── */
   return (
-    <div className="min-h-screen bg-[#0d1117] text-slate-100 antialiased">
+    <div className="min-h-screen bg-[#E8F9FF] text-slate-800 antialiased">
       {/* Background */}
       <div className="fixed inset-0 pointer-events-none">
         <div className="absolute top-0 right-0 w-96 h-96 bg-red-600/6 rounded-full" />
@@ -152,7 +154,7 @@ export default function AdminErrorsPage() {
       </div>
 
       {/* Header */}
-      <header className="sticky top-0 z-30 border-b border-white/8 bg-[#0d1117]/90">
+      <header className="sticky top-0 z-30 border-b border-white/8 bg-[#E8F9FF]/90">
         <div className="max-w-7xl mx-auto px-4 h-14 flex items-center justify-between">
           <div className="flex items-center gap-3">
             <button
@@ -165,7 +167,7 @@ export default function AdminErrorsPage() {
               <span className="text-base">🚨</span>
             </div>
             <div>
-              <h1 className="text-sm font-semibold text-white">Error Log</h1>
+              <h1 className="text-sm font-semibold text-slate-900">Error Log</h1>
               <p className="text-xs text-slate-500">In-memory · last 500 events</p>
             </div>
           </div>
@@ -207,7 +209,7 @@ export default function AdminErrorsPage() {
         {/* Summary strip */}
         <div className="grid grid-cols-2 sm:grid-cols-4 gap-3 mb-6">
           {[
-            { label: 'Total errors',  value: total,                                             color: 'text-white' },
+            { label: 'Total errors',  value: total,                                             color: 'text-slate-900' },
             { label: 'Critical',      value: records.filter((r) => r.severity === 'critical').length, color: 'text-purple-400' },
             { label: 'Error',         value: records.filter((r) => r.severity === 'error').length,    color: 'text-red-400' },
             { label: 'Warning',       value: records.filter((r) => r.severity === 'warning').length,  color: 'text-amber-400' },
@@ -227,7 +229,7 @@ export default function AdminErrorsPage() {
               onClick={() => setActiveTab(tab)}
               className={`px-4 py-1.5 rounded-lg text-sm font-medium transition-all ${
                 activeTab === tab
-                  ? 'bg-white/10 text-white'
+                  ? 'bg-white/10 text-slate-900'
                   : 'text-slate-500 hover:text-slate-300'
               }`}
             >
@@ -246,16 +248,16 @@ export default function AdminErrorsPage() {
                 placeholder="Filter by code…"
                 value={filterCode}
                 onChange={(e) => setFilterCode(e.target.value.toUpperCase())}
-                className="px-3 py-2 rounded-xl bg-white/6 border border-white/10 text-slate-100 text-xs placeholder-slate-600 focus:outline-none focus:border-violet-500/50 w-44"
+                className="px-3 py-2 rounded-xl bg-white/6 border border-white/10 text-slate-800 text-xs placeholder-slate-600 focus:outline-none focus:border-violet-500/50 w-44"
               />
               <select
                 value={filterSeverity}
                 onChange={(e) => setFilterSeverity(e.target.value)}
-                className="px-3 py-2 rounded-xl bg-white/6 border border-white/10 text-slate-100 text-xs focus:outline-none focus:border-violet-500/50 appearance-none"
+                className="px-3 py-2 rounded-xl bg-white/6 border border-white/10 text-slate-800 text-xs focus:outline-none focus:border-violet-500/50 appearance-none"
               >
                 <option value="">All severities</option>
                 {['debug', 'info', 'warning', 'error', 'critical'].map((s) => (
-                  <option key={s} value={s} className="bg-[#0d1117]">{s}</option>
+                  <option key={s} value={s} className="bg-[#E8F9FF]">{s}</option>
                 ))}
               </select>
               {(filterCode || filterSeverity) && (
@@ -270,9 +272,7 @@ export default function AdminErrorsPage() {
 
             {/* Table */}
             {loading ? (
-              <div className="flex items-center justify-center py-20">
-                <div className="w-8 h-8 rounded-full border-2 border-violet-500/30 border-t-violet-500 animate-spin" />
-              </div>
+              <PageSkeleton variant="table" label="Loading admin error log" />
             ) : records.length === 0 ? (
               <div className="flex flex-col items-center justify-center py-20 text-center">
                 <div className="text-5xl mb-4">✨</div>
@@ -282,7 +282,7 @@ export default function AdminErrorsPage() {
             ) : (
               <div className="rounded-2xl border border-white/8 overflow-hidden">
                 {/* Column headers */}
-                <div className="grid grid-cols-[24px_1fr_120px_80px_100px_90px_80px] gap-3 px-4 py-2.5 border-b border-white/6 bg-white/2 text-xs text-slate-600 font-medium uppercase tracking-wider">
+                <div className="grid grid-cols-[24px_1fr_120px_80px_100px_90px_80px] gap-3 px-4 py-2.5 border-b border-[#C4D9FF] bg-white/2 text-xs text-slate-600 font-medium uppercase tracking-wider">
                   <div />
                   <div>Error</div>
                   <div>Code</div>
@@ -296,7 +296,7 @@ export default function AdminErrorsPage() {
                   const sev  = SEVERITY_STYLES[record.severity] ?? DEFAULT_SEV_STYLE;
                   const isExpanded = expandedId === record.id;
                   return (
-                    <div key={record.id} className={`border-b border-white/4 last:border-0 ${sev.row}`}>
+                    <div key={record.id} className={`border-b border-[#C4D9FF] last:border-0 ${sev.row}`}>
                       {/* Main row */}
                       <div
                         className="grid grid-cols-[24px_1fr_120px_80px_100px_90px_80px] gap-3 px-4 py-3 items-start cursor-pointer hover:bg-white/3 transition-colors"
@@ -359,8 +359,8 @@ export default function AdminErrorsPage() {
 
                       {/* Expanded detail */}
                       {isExpanded && (
-                        <div className="px-4 pb-4 bg-black/20 border-t border-white/4">
-                          <div className="mt-3 rounded-xl bg-black/40 border border-white/6 p-4">
+                        <div className="px-4 pb-4 bg-[#E8F9FF] border-t border-[#C4D9FF]">
+                          <div className="mt-3 rounded-xl bg-[#E8F9FF] border border-[#C4D9FF] p-4">
                             <pre className="text-xs text-slate-400 font-mono whitespace-pre-wrap break-all leading-relaxed">
                               {JSON.stringify(record, null, 2)}
                             </pre>
@@ -389,9 +389,7 @@ export default function AdminErrorsPage() {
         {activeTab === 'stats' && (
           <>
             {statsLoading ? (
-              <div className="flex items-center justify-center py-20">
-                <div className="w-8 h-8 rounded-full border-2 border-violet-500/30 border-t-violet-500 animate-spin" />
-              </div>
+              <PageSkeleton variant="table" label="Loading admin statistics" />
             ) : stats.length === 0 ? (
               <div className="flex flex-col items-center justify-center py-20 text-center">
                 <div className="text-5xl mb-4">📊</div>
@@ -416,7 +414,7 @@ export default function AdminErrorsPage() {
                               </span>
                             </div>
                             <div className="text-right">
-                              <span className="text-lg font-bold text-white">{stat.count}</span>
+                              <span className="text-lg font-bold text-slate-900">{stat.count}</span>
                               <span className="text-xs text-slate-600 ml-1">hits</span>
                             </div>
                           </div>

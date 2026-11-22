@@ -53,6 +53,8 @@ from app.models.audit import AuditLog  # noqa: F401
 from app.models.message import Message  # noqa: F401
 from app.models.security_alert import SecurityAlert  # noqa: F401
 from app.models.pages import RepositoryPages  # noqa: F401
+from app.models.code_analysis import CodeAnalysisReport  # noqa: F401
+from app.models.code_analysis_feedback import CodeAnalysisFeedback  # noqa: F401
 from app.models.startup import (  # noqa: F401
     Startup,
     StartupMember,
@@ -76,6 +78,7 @@ __all__ = [
     "Message",
     "SecurityAlert",
     "RepositoryPages",
+    "CodeAnalysisReport", "CodeAnalysisFeedback",
     "Startup", "StartupMember", "StartupOpenRole", "StartupCollaborationRequest",
     "StartupProject", "StartupInvestor",
 ]

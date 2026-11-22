@@ -201,7 +201,7 @@ export default function GeneratedPage() {
 <div className="flex-1 flex flex-col gap-2">
 <h3 className="text-lg font-semibold text-on-surface group-hover:text-primary transition-colors leading-tight">Update dependency versions for Q3 release</h3>
 <div className="flex flex-wrap items-center gap-2">
-<span className="px-2 py-0.5 rounded-md text-xs font-medium bg-[#1a3a4a]/40 border border-[#1a3a4a] text-[#38bdf8]">maintenance</span>
+<span className="px-2 py-0.5 rounded-md text-xs font-medium bg-[#1a3a4a]/40 border border-[#1a3a4a] text-[#66599F]">maintenance</span>
 </div>
 <div className="text-sm text-on-surface-variant mt-1 flex items-center gap-2 flex-wrap">
 <span>#140 opened yesterday by</span>

@@ -195,7 +195,7 @@ const buttonStyle: React.CSSProperties = {
   width: '100%', padding: '12px',
   background: 'var(--gradient-brand)',
   border: 'none', borderRadius: 8,
-  color: '#fff', fontWeight: 700, fontSize: 15,
+  color: '#1F2937', fontWeight: 700, fontSize: 15,
   boxShadow: '0 4px 16px rgba(124,58,237,0.35)',
   transition: 'opacity 0.15s',
 };

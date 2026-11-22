@@ -8,6 +8,7 @@ import FileTree from '@/components/repo/FileTree';
 import CodeViewer from '@/components/repo/CodeViewer';
 import LoadingSpinner from '@/components/shared/LoadingSpinner';
 import EmptyState from '@/components/shared/EmptyState';
+import { SkeletonListItem } from '@/components/ui/Skeleton';
 
 export default function TreePage() {
   const params = useParams<{ org: string; repo: string; path: string[] }>();
@@ -71,7 +72,7 @@ export default function TreePage() {
         <div style={{ display: 'flex', alignItems: 'center', gap: 12, marginBottom: 20, flexWrap: 'wrap' }}>
           <div style={{ position: 'relative' }}>
             <select value={ref} onChange={e => handleBranchChange(e.target.value)}
-              style={{ padding: '7px 32px 7px 12px', borderRadius: 8, border: '1px solid var(--border-color)', fontSize: 13, fontWeight: 600, background: '#fff', cursor: 'pointer', outline: 'none', fontFamily: 'Inter, sans-serif', appearance: 'none' }}>
+              style={{ padding: '7px 32px 7px 12px', borderRadius: 8, border: '1px solid #283344', fontSize: 13, fontWeight: 600, background: '#1e2634', color: '#e2e8f0', cursor: 'pointer', outline: 'none', fontFamily: 'Inter, sans-serif', appearance: 'none' }}>
               {branches.map(b => <option key={b.name} value={b.name}>{b.name}</option>)}
               {branches.length === 0 && <option value={ref}>{ref}</option>}
             </select>
@@ -91,7 +92,13 @@ export default function TreePage() {
           </div>
         </div>
 
-        {isLoading ? <LoadingSpinner label="Loading..." />
+        {isLoading ? (
+          <div className="glass-card" style={{ borderRadius: 16, border: '1px solid var(--glass-border)', overflow: 'hidden' }}>
+            {[1, 2, 3, 4, 5, 6].map((i) => (
+              <SkeletonListItem key={i} />
+            ))}
+          </div>
+        )
           : isEmptyRepo ? (
             <div style={{ textAlign: 'center', padding: '64px 24px' }}>
               <span className="material-symbols-outlined" style={{ fontSize: 64, color: 'var(--text-muted)', display: 'block', marginBottom: 16 }}>source</span>

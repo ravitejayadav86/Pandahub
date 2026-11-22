@@ -1,5 +1,5 @@
 'use client';
-import { useState, useEffect, useRef, useCallback } from 'react';
+import { useState, useEffect, useRef } from 'react';
 import { useRouter } from 'next/navigation';
 import api from '@/lib/api';
 import { useAuthStore } from '@/store/authStore';
@@ -23,9 +23,9 @@ interface Startup {
 const STAGES = [
   { key: 'all',            label: 'All',           color: '#6b7280', glow: 'rgba(107,114,128,0.25)' },
   { key: 'idea',           label: 'Idea',          color: '#a78bfa', glow: 'rgba(167,139,250,0.28)' },
-  { key: 'mvp',            label: 'MVP',           color: '#E6E6E6', glow: 'rgba(10,132,255,0.28)'  },
-  { key: 'early_traction', label: 'Early Traction',color: '#B8B8B8', glow: 'rgba(6,182,212,0.28)'  },
-  { key: 'growth',         label: 'Growth',        color: '#BDBDBD', glow: 'rgba(34,197,94,0.28)'   },
+  { key: 'mvp',            label: 'MVP',           color: '#526D9B', glow: 'rgba(82,109,155,0.18)'  },
+  { key: 'early_traction', label: 'Early Traction',color: '#4F7591', glow: 'rgba(79,117,145,0.18)'  },
+  { key: 'growth',         label: 'Growth',        color: '#4B766B', glow: 'rgba(75,118,107,0.18)'   },
   { key: 'scaling',        label: 'Scale',         color: '#f59e0b', glow: 'rgba(245,158,11,0.28)'  },
 ];
 
@@ -60,7 +60,7 @@ function SkeletonCard() {
       borderRadius: 20, overflow: 'hidden',
       background: 'var(--glass-bg-3)',
       border: '1px solid var(--glass-border)',
-      backdropFilter: '(12px)',
+      backdropFilter: 'blur(12px)',
     }}>
       <div style={{ height: 80, background: 'var(--glass-bg-1)' }}>
         <div style={{ margin: '20px 24px', display: 'flex', alignItems: 'center', gap: 10 }}>
@@ -87,38 +87,30 @@ function StartupCard({ startup, index }: { startup: Startup; index: number }) {
   const stage  = stageInfo(startup.stage);
   const cardRef = useRef<HTMLDivElement>(null);
 
-  /* 3D tilt on mouse move */
-  const handleMouseMove = (e: React.MouseEvent<HTMLDivElement>) => {
-    const el   = cardRef.current;
-    if (!el) return;
-    const rect = el.getBoundingClientRect();
-    const x    = (e.clientX - rect.left) / rect.width  - 0.5;
-    const y    = (e.clientY - rect.top)  / rect.height - 0.5;
-    el.style.transform = `translate3d(0,-8px,0) scale3d(1.012,1.012,1) rotateX(${-y * 6}deg) rotateY(${x * 6}deg)`;
-    el.style.boxShadow = `
-      0 2px 4px rgba(0,0,0,0.04),
-      0 14px 32px rgba(15,23,42,0.16),
-      0 36px 72px ${stage.glow},
-      0 0 0 1px rgba(255,255,255,0.06) inset`;
-  };
+  /* Low-cost hover transform: no pointermove-driven layouts or repaints. */
   const handleMouseLeave = () => {
     const el = cardRef.current;
-    if (!el) return;
-    el.style.transform = '';
-    el.style.boxShadow = '';
+    if (el) { el.style.transform = ''; el.style.boxShadow = ''; }
   };
 
   return (
     <div
       ref={cardRef}
-      className={`glass-card card-motion- motion-stagger-${Math.min(index + 1, 8)}`}
+      className={`glass-card ph-startup-card motion-stagger-${Math.min(index + 1, 8)}`}
       style={{
         borderRadius: 20, overflow: 'hidden', cursor: 'pointer',
         transformStyle: 'preserve-3d',
         transition: 'transform 0.28s cubic-bezier(0.22,1,0.36,1), box-shadow 0.28s cubic-bezier(0.22,1,0.36,1)',
       }}
-      onMouseMove={handleMouseMove}
       onMouseLeave={handleMouseLeave}
+      role="link"
+      tabIndex={0}
+      aria-label={`Open startup ${startup.name}`}
+      /* PANDAHUB_STARTUP_KEYBOARD_FIX */
+      onKeyDown={(e) => {
+        if (e.target !== e.currentTarget) return;
+        if (e.key === 'Enter' || e.key === ' ') { e.preventDefault(); router.push(`/startups/${startup.slug}`); }
+      }}
       onClick={() => router.push(`/startups/${startup.slug}`)}
     >
       {/* Card Header */}
@@ -131,11 +123,11 @@ function StartupCard({ startup, index }: { startup: Startup; index: number }) {
         position: 'relative', overflow: 'hidden',
       }}>
         {/* Subtle scan-line shimmer on header */}
-        <div style={{
+        <div className="ph-startup-scanline" style={{
           position: 'absolute', inset: 0,
           background: `linear-gradient(90deg, transparent 0%, ${stage.color}08 50%, transparent 100%)`,
           backgroundSize: '200% 100%',
-          animation: 'shimmer 3s linear infinite',
+          animation: 'none',
           pointerEvents: 'none',
         }} />
 
@@ -150,7 +142,7 @@ function StartupCard({ startup, index }: { startup: Startup; index: number }) {
         }}>
           {startup.logo_url
             ? <img src={startup.logo_url} alt="" style={{ width: '100%', height: '100%', objectFit: 'cover' }} />
-            : <span style={{ fontSize: 20, fontWeight: 900, color: '#fff', lineHeight: 1 }}>{startup.name[0]}</span>
+            : <span style={{ fontSize: 20, fontWeight: 900, color: '#1F2937', lineHeight: 1 }}>{startup.name[0]}</span>
           }
         </div>
 
@@ -196,7 +188,7 @@ function StartupCard({ startup, index }: { startup: Startup; index: number }) {
             </span>
             {(startup.open_roles_count || 0) > 0 && (
               <span style={{
-                fontSize: 11, fontWeight: 700, color: '#BDBDBD',
+                fontSize: 11, fontWeight: 700, color: '#4B766B',
                 display: 'flex', alignItems: 'center', gap: 4,
                 background: 'rgba(34,197,94,0.1)', border: '1px solid rgba(34,197,94,0.2)',
                 borderRadius: 99, padding: '2px 8px',
@@ -235,6 +227,8 @@ export default function StartupsPage() {
   const [error,       setError]       = useState<string | null>(null);
   const [search,      setSearch]      = useState('');
   const [stageFilter, setStageFilter] = useState('all');
+  const [submittedSearch, setSubmittedSearch] = useState('');
+  const [retryKey, setRetryKey] = useState(0);
   const [mounted,     setMounted]     = useState(false);
 
   // Animated stats
@@ -245,31 +239,38 @@ export default function StartupsPage() {
 
   useEffect(() => { setMounted(true); }, []);
 
-  const loadStartups = useCallback(async (q?: string, stage?: string) => {
-    setLoading(true); setError(null);
-    try {
-      const params: Record<string, string> = {};
-      if ((stage ?? stageFilter) !== 'all') params.stage = stage ?? stageFilter;
-      if (q ?? search) params.q = q ?? search;
-      const res = await api.get<Startup[]>('/startups', { params });
-      setStartups(res.data);
-    } catch {
-      setError('Failed to load startups. Please try again.');
-      setStartups([]);
-    }
-    setLoading(false);
-  }, [stageFilter, search]);
+  // Only the submitted query triggers a request. Aborting earlier requests prevents
+  // older results replacing newer filters when users switch stages quickly.
+  useEffect(() => {
+    const controller = new AbortController();
+    setLoading(true);
+    setError(null);
+    const params: Record<string, string> = {};
+    if (stageFilter !== 'all') params.stage = stageFilter;
+    if (submittedSearch) params.q = submittedSearch;
 
-  useEffect(() => { loadStartups(); }, [stageFilter]);
+    api.get<Startup[]>('/startups', { params, signal: controller.signal })
+      .then(({ data }) => { if (!controller.signal.aborted) setStartups(Array.isArray(data) ? data : []); })
+      .catch(() => {
+        if (controller.signal.aborted) return;
+        setError('Failed to load startups. Please try again.');
+        setStartups([]);
+      })
+      .finally(() => { if (!controller.signal.aborted) setLoading(false); });
+    return () => controller.abort();
+  }, [stageFilter, submittedSearch, retryKey]);
 
   const handleSearch = (e: React.FormEvent) => {
     e.preventDefault();
-    loadStartups(search, stageFilter);
+    const trimmed = search.trim();
+    if (submittedSearch === trimmed) setRetryKey((value) => value + 1);
+    else setSubmittedSearch(trimmed);
   };
 
   const clearSearch = () => {
     setSearch('');
-    loadStartups('', stageFilter);
+    if (submittedSearch) setSubmittedSearch('');
+    else setRetryKey((value) => value + 1);
   };
 
   const STATS = [
@@ -283,8 +284,8 @@ export default function StartupsPage() {
     <div style={{ minHeight: '100vh', background: 'var(--bg-primary)', fontFamily: 'Space Grotesk, Inter, sans-serif' }}>
 
       {/* â”€â”€ Hero â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€ */}
-      <div style={{
-        background: '#000000',
+      <div className="ph-startup-hero" style={{
+        background: '#FBFBFB',
         padding: 'clamp(48px,9vw,88px) 20px clamp(56px,11vw,110px)',
         position: 'relative', overflow: 'hidden',
       }}>
@@ -294,19 +295,19 @@ export default function StartupsPage() {
             position: 'absolute', width: '50vw', height: '50vw', maxWidth: 600, maxHeight: 600,
             top: '-10%', left: '-8%',
             background: 'radial-gradient(circle, rgba(99,102,241,0.18) 0%, transparent 65%)',
-            animation: 'spatialDrift 10s ease-in-out infinite',
+            animation: 'none',
           }} />
           <div style={{
             position: 'absolute', width: '40vw', height: '40vw', maxWidth: 500, maxHeight: 500,
             bottom: '-15%', right: '-5%',
             background: 'radial-gradient(circle, rgba(6,182,212,0.14) 0%, transparent 65%)',
-            animation: 'spatialDrift 14s ease-in-out infinite reverse',
+            animation: 'none',
           }} />
           <div style={{
             position: 'absolute', width: '30vw', height: '30vw', maxWidth: 360, maxHeight: 360,
             top: '30%', left: '50%',
             background: 'radial-gradient(circle, rgba(167,139,250,0.10) 0%, transparent 65%)',
-            animation: 'spatialDrift 8s ease-in-out infinite 2s',
+            animation: 'none',
           }} />
           {/* Subtle grid overlay */}
           <div style={{
@@ -330,29 +331,29 @@ export default function StartupsPage() {
           {/* Eyebrow pill */}
           <div className="motion-" style={{
             display: 'inline-flex', alignItems: 'center', gap: 7,
-            background: 'rgba(99,102,241,0.15)',
-            border: '1px solid rgba(99,102,241,0.28)',
+            background: 'rgba(197,186,255,0.3)',
+            border: '1px solid rgba(144,126,211,0.35)',
             borderRadius: 99, padding: '6px 16px', marginBottom: 22,
             boxShadow: 'inset 0 1px 0 rgba(255,255,255,0.07)',
           }}>
-            <span className="material-symbols-outlined" style={{ fontSize: 15, color: '#818cf8', fontVariationSettings: "'FILL' 1" }}>rocket_launch</span>
-            <span style={{ fontSize: 11, fontWeight: 700, color: '#a5b4fc', letterSpacing: '0.08em' }}>STARTUP HUB</span>
+            <span className="material-symbols-outlined" style={{ fontSize: 15, color: '#7669B5', fontVariationSettings: "'FILL' 1" }}>rocket_launch</span>
+            <span style={{ fontSize: 11, fontWeight: 700, color: '#62539B', letterSpacing: '0.08em' }}>STARTUP HUB</span>
           </div>
 
           {/* Headline */}
           <h1 className="motion-" style={{
             fontSize: 'clamp(30px, 6.5vw, 52px)',
-            fontWeight: 900, color: '#fff', margin: '0 0 14px',
+            fontWeight: 900, color: '#1F2937', margin: '0 0 14px',
             lineHeight: 1.06, letterSpacing: '-0.035em',
             fontFamily: 'Space Grotesk, Inter, sans-serif',
           }}>
             Find Your Next
             <br />
             <span style={{
-              background: 'linear-gradient(120deg, #818cf8 0%, #38bdf8 50%, #34d399 100%)',
+              background: 'linear-gradient(120deg, #7662B1 0%, #7386C4 60%, #7662B1 100%)',
               WebkitBackgroundClip: 'text', WebkitTextFillColor: 'transparent',
               backgroundClip: 'text', backgroundSize: '200% 200%',
-              animation: 'gradient-shift 5s ease infinite',
+              animation: 'none',
               display: 'inline-block',
             }}>Big Venture</span>
           </h1>
@@ -360,7 +361,7 @@ export default function StartupsPage() {
           {/* Sub */}
           <p className="motion-" style={{
             fontSize: 'clamp(14px, 2.8vw, 18px)',
-            color: 'rgba(255,255,255,0.52)', marginBottom: 34, lineHeight: 1.65, maxWidth: 520, margin: '0 auto 34px',
+            color: '#5B6B83', marginBottom: 34, lineHeight: 1.65, maxWidth: 520, margin: '0 auto 34px',
           }}>
             Discover early-stage startups, join as a collaborator, and build the next generation of products.
           </p>
@@ -377,7 +378,7 @@ export default function StartupsPage() {
             )}
             <a href="#explore" className="btn-glass btn-ripple" style={{
               padding: '13px 26px', borderRadius: 12, fontSize: 14, textDecoration: 'none',
-              color: 'rgba(255,255,255,0.75)', borderColor: 'rgba(255,255,255,0.14)',
+              color: '#51477F', borderColor: 'rgba(255,255,255,0.14)',
             }}>
               <span className="material-symbols-outlined" style={{ fontSize: 19 }}>explore</span>
               Explore All
@@ -389,8 +390,8 @@ export default function StartupsPage() {
       {/* â”€â”€ Stats Banner â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€ */}
       <div style={{
         background: 'var(--glass-bg-3)',
-        backdropFilter: '(24px) saturate(1.8)',
-        WebkitBackdropFilter: '(24px) saturate(1.8)',
+        backdropFilter: 'blur(24px) saturate(1.8)',
+        WebkitBackdropFilter: 'blur(24px) saturate(1.8)',
         borderBottom: '1px solid var(--glass-border)',
         boxShadow: 'inset 0 1px 0 rgba(255,255,255,0.18)',
         overflowX: 'auto',
@@ -464,9 +465,9 @@ export default function StartupsPage() {
                   padding: '7px 15px', borderRadius: 99, fontSize: 12, fontWeight: 650, cursor: 'pointer',
                   border: active ? `2px solid ${s.color}` : '1.5px solid var(--glass-border)',
                   background: active ? `${s.color}20` : 'var(--glass-bg-2)',
-                  color: active ? s.color : 'var(--text-secondary)',
+                  color: active ? s.color: 'var(--text-secondary)',
                   boxShadow: active ? `0 0 10px ${s.glow}, inset 0 1px 0 rgba(255,255,255,0.1)` : 'none',
-                  backdropFilter: '(10px)',
+                  backdropFilter: 'blur(10px)',
                   transition: 'all 0.18s cubic-bezier(0.22,1,0.36,1)',
                   whiteSpace: 'nowrap', outline: 'none',
                   fontFamily: 'Space Grotesk, Inter, sans-serif',
@@ -489,14 +490,14 @@ export default function StartupsPage() {
             textAlign: 'center', padding: '72px 24px',
             background: 'rgba(239,68,68,0.07)',
             borderRadius: 24, border: '1px solid rgba(239,68,68,0.22)',
-            backdropFilter: '(12px)',
+            backdropFilter: 'blur(12px)',
           }}>
             <span className="material-symbols-outlined" style={{
               fontSize: 52, display: 'block', marginBottom: 14, color: '#A6A6A6',
               fontVariationSettings: "'FILL' 1",
             }}>error</span>
             <p style={{ color: '#A6A6A6', fontWeight: 700, marginBottom: 16, fontSize: 16 }}>{error}</p>
-            <button onClick={() => loadStartups()} className="btn-danger btn-ripple" style={{ padding: '10px 24px', borderRadius: 10, fontSize: 13 }}>
+            <button onClick={() => setRetryKey((value) => value + 1)} className="btn-danger btn-ripple" style={{ padding: '10px 24px', borderRadius: 10, fontSize: 13 }}>
               Try Again
             </button>
           </div>
@@ -510,13 +511,13 @@ export default function StartupsPage() {
               display: 'flex', alignItems: 'center', justifyContent: 'center',
               boxShadow: '0 0 32px rgba(99,102,241,0.2)',
             }}>
-              <span className="material-symbols-outlined" style={{ fontSize: 36, color: '#818cf8', fontVariationSettings: "'FILL' 1" }}>rocket_launch</span>
+              <span className="material-symbols-outlined" style={{ fontSize: 36, color: '#7669B5', fontVariationSettings: "'FILL' 1" }}>rocket_launch</span>
             </div>
             <h2 style={{ fontSize: 20, fontWeight: 750, marginBottom: 8, color: 'var(--text-primary)', letterSpacing: '-0.02em' }}>
               No startups found
             </h2>
             <p style={{ color: 'var(--text-muted)', marginBottom: 24, lineHeight: 1.6 }}>
-              {search || stageFilter !== 'all'
+              {submittedSearch || stageFilter !== 'all'
                 ? 'Try adjusting your search or stage filter.'
                 : 'Be the first to list your startup here.'}
             </p>

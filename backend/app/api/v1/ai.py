@@ -9,7 +9,7 @@ system contributions:
   5. Asynchronous Continuous Indexing Loop
   6. Semi-Supervised Self-Training Classifier (tau = 0.7)
   7. Anti-Leakage Dataset Pipeline (crc-py-dataset, temporal cutoff June 1, 2024)
-  8. Semantic Judge Evaluation (LLM-as-a-Judge, Llama-3-70B, kappa = 0.78)
+  8. Semantic Judge Evaluation (LLM-as-a-Judge, requires human validation)
 """
 from __future__ import annotations
 
@@ -68,10 +68,6 @@ async def get_ai_overview(
                     "discussion": {"model": "Mistral-Instruct-7B", "k": 3, "focus": "Configuration & Prose"},
                     "false_positive": {"model": "early_exit", "k": 0, "focus": "Zero API Cost Filter"},
                 },
-                "performance_gain": {
-                    "hybrid_vs_zero_shot": "+13.2% net gain",
-                    "hybrid_vs_single_best": "+7.7% net gain",
-                },
                 "total_cached_reviews": total_reviews,
                 "category_distribution": category_counts,
             },
@@ -94,7 +90,7 @@ async def get_ai_overview(
             },
             "3_context_collapse_guard": {
                 "title": "Context Collapse Mitigation in Small Models (SLMs)",
-                "discovery": "While larger models benefit from retrieved examples (k=3), smaller models (Phi-3-Mini 3.8B) suffer Context Collapse at k=5 where attention saturation surges hallucinations from 10.66% to 20.97%.",
+                "policy_note": "Small-model context limits are a heuristic setting, not a measured improvement for this deployment.",
                 "guard_policy": {
                     "slm_parameter_ceiling": "3.8B parameters",
                     "max_k_for_slm": K_MAX_SMALL_MODEL,
@@ -138,7 +134,7 @@ async def get_ai_overview(
                 "finding": "Traditional lexical metrics (BLEU-4, ROUGE-L) fail to assess code review quality because valid technical feedback has varied syntactic forms.",
                 "judge_model": JUDGE_MODEL,
                 "evaluation_axes": SCORE_AXES,
-                "human_calibration": "Validated against senior software engineers with kappa = 0.78 inter-annotator agreement across >39,000 evaluations",
+                "human_calibration": "Not measured for this deployment; requires independent human evaluation.",
             },
         },
     }

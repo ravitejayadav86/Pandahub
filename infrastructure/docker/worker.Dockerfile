@@ -15,12 +15,14 @@ RUN apt-get update && apt-get install -y --no-install-recommends \
 
 WORKDIR /app
 
-COPY requirements.txt .
+COPY backend/requirements.txt ./requirements.txt
 RUN pip install --no-cache-dir --upgrade pip && \
     pip install --no-cache-dir -r requirements.txt && \
-    pip install --no-cache-dir semgrep
+    python -m venv /opt/semgrep-venv && \
+    /opt/semgrep-venv/bin/pip install --no-cache-dir semgrep && \
+    ln -sf /opt/semgrep-venv/bin/semgrep /usr/local/bin/semgrep
 
-COPY . .
+COPY backend/ .
 
 RUN useradd --create-home pandahub && chown -R pandahub:pandahub /app
 USER pandahub

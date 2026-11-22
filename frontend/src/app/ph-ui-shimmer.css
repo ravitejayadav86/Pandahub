@@ -1,0 +1,73 @@
+/* PANDAHUB_SHIMMER_UI_V2 — light, accessible, transform-only shimmer.
+   Imported AFTER globals.css so it can override historical loader policies. */
+:root { --ph-sk-bg: #E8F9FF; --ph-sk-fill: #C4D9FF; --ph-sk-hi: #C5BAFF; --ph-sk-ink: #1F2937; }
+.ph-sk-page { width: min(100%, 1180px); padding: clamp(18px, 3vw, 36px); margin: 0 auto; min-height: 55vh; display: flex; flex-direction: column; gap: 24px; color: var(--ph-sk-ink); box-sizing: border-box; }
+.ph-sk-heading, .ph-sk-lines, .ph-sk-grow, .ph-sk-field { display: flex; flex-direction: column; gap: 12px; min-width: 0; }
+.ph-sk-heading { gap: 12px; padding: 10px 0 2px; }
+.ph-sk-row { display:flex; align-items:center; gap:14px; min-width:0; }
+.ph-sk-grow { flex:1; gap:10px; }
+.ph-sk-block { display:block; max-width:100%; flex-shrink:0; background: var(--ph-sk-fill); opacity:.68; }
+.ph-sk-panel { position: relative; overflow:hidden; isolation:isolate; min-width:0; border:1px solid rgba(115,130,178,.22); border-radius:20px; padding:22px; background: var(--ph-sk-bg); display:flex; flex-direction:column; gap:15px; box-shadow:0 6px 26px rgba(92,110,155,.055); }
+.ph-sk-grid { display:grid; grid-template-columns:repeat(auto-fit,minmax(min(100%,260px),1fr)); gap:16px; }
+.ph-sk-stats { grid-template-columns:repeat(3,minmax(0,1fr)); }
+.ph-sk-two { display:grid; grid-template-columns:minmax(0,1.5fr) minmax(280px,1fr); align-items:start; gap:16px; }
+.ph-sk-mb { margin-bottom:8px; }
+.ph-sk-footer { margin-top:10px; justify-content:space-between; }
+.ph-sk-list { padding:0; }
+.ph-sk-list-row, .ph-sk-table-row { display:flex; align-items:center; gap:16px; padding:18px 22px; min-width:0; border-bottom:1px solid rgba(111,131,170,.15); }
+.ph-sk-list-row:last-child, .ph-sk-table-row:last-child { border-bottom:0; }
+.ph-sk-table-row { justify-content:space-between; }
+.ph-sk-toolbar { display:flex; gap:12px; }
+.ph-sk-form { max-width:620px; margin:0 auto; width:100%; padding:30px; gap:18px; }
+.ph-sk-field { margin:6px 0; gap:7px; }
+.ph-sk-editor { display:grid; grid-template-columns:minmax(0,1.5fr) minmax(260px,1fr); gap:16px; }
+.ph-sk-editor-area { min-height:260px; margin-top:16px; background:rgba(255,255,255,.44); border:1px solid rgba(116,130,177,.15); border-radius:14px; padding:22px; }
+.ph-sk-inline { position:relative; overflow:hidden; isolation:isolate; width:min(100%,300px); min-height:82px; background:var(--ph-sk-bg); border:1px solid rgba(113,129,178,.15); border-radius:14px; display:flex; flex-direction:column; justify-content:center; align-items:flex-start; gap:9px; padding:15px 18px; }
+.ph-sk-status { display:inline-flex; width:100%; max-width:330px; }
+.ph-sk-status-compact { width:auto; flex-shrink:0; }
+.ph-sk-inline-sm { padding:0; min-height:10px; width:32px; border:0; background:transparent; }
+.ph-sk-inline-sm .ph-sk-block { opacity:.9; background:#C5BAFF; }
+@keyframes ph-sk-pass { to { transform:translate3d(180%,0,0); } }
+html body [data-ph-shimmer="true"]::after {
+  content:""; position:absolute; inset:0; display:block; pointer-events:none; z-index:2;
+  background:linear-gradient(105deg, transparent 26%, rgba(255,255,255,.14) 39%, rgba(255,255,255,.64) 50%, rgba(197,186,255,.23) 62%, transparent 75%);
+  transform:translate3d(-180%,0,0);
+  animation: ph-sk-pass 1.9s ease-in-out infinite !important;
+}
+/* Existing startup placeholder cards also get a proper shimmer despite the
+   legacy `animation:none!important` rule targeting the word "skeleton". */
+html body .skeleton, html body .skeleton-load, html body .skeleton-loader { position:relative; overflow:hidden; background-color:#C4D9FF !important; }
+html body .skeleton::after, html body .skeleton-load::after, html body .skeleton-loader::after {
+  content:""; position:absolute; inset:0; display:block; pointer-events:none;
+  background:linear-gradient(105deg,transparent 22%,rgba(255,255,255,.68) 50%,transparent 78%) !important;
+  transform:translate3d(-180%,0,0);
+  animation: ph-sk-pass 2.2s ease-in-out infinite !important;
+}
+/* Accessible premium micro-feedback: light, transient, no scroll listeners. */
+.ph-app-shell :is(button, a, [role="button"]):focus-visible { outline:2px solid #8E7BDF !important; outline-offset:3px; }
+.ph-app-shell :is(button, [role="button"], a) { -webkit-tap-highlight-color:transparent; touch-action:manipulation; }
+.ph-app-shell :is(.btn-primary, .btn-ghost, .btn-glass, .gh-btn, .ph-create-link, .ph-nav-link) { transition:background-color .18s ease, color .18s ease, border-color .18s ease, transform .18s ease, box-shadow .18s ease; }
+.ph-app-shell :is(button, [role="button"]):disabled { cursor:not-allowed; opacity:.56; }
+@media (hover:hover) and (pointer:fine) {
+  .ph-app-shell :is(.btn-primary, .btn-ghost, .btn-glass, .gh-btn):not(:disabled):hover { transform:translateY(-1px); box-shadow:0 8px 20px rgba(102,102,161,.12); }
+  .ph-app-shell :is(.btn-primary, .btn-ghost, .btn-glass, .gh-btn):not(:disabled):active { transform:translateY(0) scale(.985); }
+  .ph-app-shell :is(.glass-card, .ph-startup-card):hover { border-color:#B6A8F0; }
+}
+@media (max-width:680px) { .ph-sk-page { padding:18px 14px 96px; gap:15px; } .ph-sk-stats { grid-template-columns:1fr; } .ph-sk-two,.ph-sk-editor { grid-template-columns:1fr; } .ph-sk-panel { padding:17px; } .ph-sk-list-row { padding:14px 16px; } }
+@media (prefers-reduced-motion:reduce) {
+  html body [data-ph-shimmer="true"]::after, html body .skeleton::after, html body .skeleton-load::after, html body .skeleton-loader::after { animation:none !important; transform:none; opacity:0; }
+  .ph-app-shell :is(.btn-primary, .btn-ghost, .btn-glass, .gh-btn, .ph-create-link, .ph-nav-link) { transition:none !important; }
+}
+
+/* Active, accessible hover polish without React state or permanent paint loops. */
+.ph-explore-hover { transition:transform .18s ease, box-shadow .18s ease, border-color .18s ease; }
+@keyframes ph-sk-brief-scan { from { background-position:200% 0; } to { background-position:-100% 0; } }
+@media (hover:hover) and (pointer:fine) {
+  .ph-explore-hover:hover { transform:translateY(-3px); box-shadow:0 12px 28px rgba(95,111,161,.12); border-color:#BAADF1; }
+  html body .ph-startup-card:hover .ph-startup-scanline { animation:ph-sk-brief-scan 1.05s ease-out 1 !important; }
+}
+@media (prefers-reduced-motion:reduce) {
+  .ph-explore-hover { transition:none !important; }
+  .ph-explore-hover:hover { transform:none !important; }
+  html body .ph-startup-card:hover .ph-startup-scanline { animation:none !important; }
+}

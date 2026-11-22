@@ -227,7 +227,7 @@ export default function GeneratedPage() {
 
 <div className="glass-row flex items-center justify-between px-4 py-2.5 group cursor-pointer">
 <div className="flex items-center gap-3 min-w-0">
-<span className="material-symbols-outlined text-[#38bdf8] text-xl opacity-80 group-hover:opacity-100 transition-opacity">palette</span>
+<span className="material-symbols-outlined text-[#66599F] text-xl opacity-80 group-hover:opacity-100 transition-opacity">palette</span>
 <span className="text-sm font-medium text-on-surface truncate">tailwind.config.js</span>
 </div>
 <div className="hidden sm:block text-sm text-on-surface-variant truncate w-1/3 text-left pl-4">

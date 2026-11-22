@@ -1,4 +1,4 @@
-﻿import * as React from "react"
+import * as React from "react"
 import { cn } from "@/lib/utils"
 
 export interface CardProps extends React.HTMLAttributes<HTMLDivElement> {
@@ -10,13 +10,13 @@ const variantClasses: Record<NonNullable<CardProps["variant"]>, string> = {
   "glass-panel": "glass-panel rounded-2xl",
   "glass-card": "glass-card rounded-2xl",
   default:
-    "bg-[#0d0d0f] border border-[#27272a] shadow-sm rounded-xl text-white transition-colors duration-200 hover:border-[#3f3f46]",
+    "bg-[#E8F9FF] border border-[#C4D9FF] shadow-sm rounded-xl text-slate-800 transition-colors duration-200 hover:border-[#B8ADEC]",
 }
 
 const interactiveClasses: Record<NonNullable<CardProps["interactive"]>, string> = {
   // Keep interactions CSS-based so cards do not mount Framer Motion components.
   lift: "cursor-pointer transition-transform duration-150 hover:-translate-y-0.5 active:translate-y-0",
-  glow: "cursor-pointer transition-colors duration-150 hover:border-white/20",
+  glow: "cursor-pointer transition-colors duration-150 hover:border-[#B8ADEC]",
   none: "",
 }
 

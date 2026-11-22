@@ -54,8 +54,8 @@ export default function RepoTreeRedirectPage() {
 
   if (loading) {
     return (
-      <main className="min-h-screen bg-[#f8f9fb] dark:bg-[#0f172a] flex items-center justify-center px-6">
-        <div className="motion- rounded-3xl border border-slate-200/60 dark:border-slate-800/60 bg-white/70 dark:bg-slate-900/70 px-10 py-8 shadow-sm text-center">
+      <main className="min-h-screen bg-[#FBFBFB] dark:bg-[#E8F9FF] flex items-center justify-center px-6">
+        <div className="motion- rounded-3xl border border-slate-200/60 border-[#C4D9FF] bg-white/70 bg-[#E8F9FF] px-10 py-8 shadow-sm text-center">
           <PandaLoader size="lg" glow={true} label="Loading repository…" />
         </div>
       </main>
@@ -64,7 +64,7 @@ export default function RepoTreeRedirectPage() {
 
   if (repoError) {
     return (
-      <main className="min-h-screen bg-[#f8f9fb] flex items-center justify-center px-6">
+      <main className="min-h-screen bg-[#FBFBFB] flex items-center justify-center px-6">
         <div className="max-w-md rounded-2xl border border-red-200 bg-white px-8 py-7 shadow-sm text-center">
           <div className="mx-auto mb-4 flex h-12 w-12 items-center justify-center rounded-full bg-red-50">
             <span className="material-symbols-outlined text-red-500">
@@ -83,7 +83,7 @@ export default function RepoTreeRedirectPage() {
           <button
             type="button"
             onClick={() => router.push(`/${owner}/${repoName}`)}
-            className="mt-5 rounded-xl bg-slate-900 px-5 py-2.5 text-sm font-semibold text-white hover:bg-slate-800"
+            className="mt-5 rounded-xl bg-[#C5BAFF] px-5 py-2.5 text-sm font-semibold text-[#26213F] hover:bg-[#B9ACF5]"
           >
             Back to repository
           </button>
@@ -94,7 +94,7 @@ export default function RepoTreeRedirectPage() {
 
   if (!branches.length) {
     return (
-      <main className="min-h-screen bg-[#f8f9fb] flex items-center justify-center px-6">
+      <main className="min-h-screen bg-[#FBFBFB] flex items-center justify-center px-6">
         <div className="max-w-lg rounded-3xl border border-slate-200 bg-white px-8 py-9 shadow-sm text-center">
           <div className="mx-auto mb-5 flex h-16 w-16 items-center justify-center rounded-2xl bg-slate-100">
             <span className="material-symbols-outlined text-3xl text-slate-500">
@@ -116,7 +116,7 @@ export default function RepoTreeRedirectPage() {
             <button
               type="button"
               onClick={() => router.push(`/${owner}/${repoName}`)}
-              className="rounded-xl bg-slate-900 px-5 py-2.5 text-sm font-semibold text-white hover:bg-slate-800"
+              className="rounded-xl bg-[#C5BAFF] px-5 py-2.5 text-sm font-semibold text-[#26213F] hover:bg-[#B9ACF5]"
             >
               Back to repository
             </button>

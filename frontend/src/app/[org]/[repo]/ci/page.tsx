@@ -204,7 +204,7 @@ export default function NativeCIDashboard() {
     }
   };
 
-  const terminalCommand = `python scripts/panda_ci_runner.py --repo ${owner}/${repo}`;
+  const terminalCommand = `python scripts/panda_ci_runner.py --repo ${owner}/${repo} --token-file ~/.pandahub/ci-runners/${owner}-${repo}.token`;
   const selectedState = selected ? ciVisualState(selected) : null;
 
   const selectFilter = (value: Filter) => {
@@ -574,8 +574,8 @@ export default function NativeCIDashboard() {
                 <span className="rounded-full border border-white/10 px-2.5 py-1 font-mono text-[10px] text-zinc-400">MVP</span>
               </div>
               <p className="mt-3 text-xs leading-6 text-zinc-500">
-                PandaHub queues new commits when CI is enabled. Start the separate Docker runner
-                on your own trusted development machine; the dashboard cannot execute jobs remotely.
+                After a repository admin registers a runner credential, start the separate Docker
+                runner on your trusted development machine. This dashboard cannot execute jobs remotely.
               </p>
               <div className="mt-4 flex items-center gap-2 rounded-xl border border-white/10 bg-black p-3">
                 <code className="min-w-0 flex-1 break-all font-mono text-[11px] text-zinc-300">{terminalCommand}</code>

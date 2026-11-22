@@ -38,6 +38,14 @@ class CIRun(Base, UUIDPKMixin):
     log_excerpt: Mapped[str | None] = mapped_column(String(10000))
     started_at: Mapped[datetime | None] = mapped_column(DateTime(timezone=True))
     completed_at: Mapped[datetime | None] = mapped_column(DateTime(timezone=True))
+    runner_credential_id: Mapped[uuid.UUID | None] = mapped_column(
+        UUID(as_uuid=True),
+        ForeignKey("ci_runner_credentials.id", ondelete="SET NULL"),
+        nullable=True, index=True,
+    )
+    lease_id: Mapped[uuid.UUID | None] = mapped_column(UUID(as_uuid=True))
+    lease_expires_at: Mapped[datetime | None] = mapped_column(DateTime(timezone=True))
+    last_heartbeat_at: Mapped[datetime | None] = mapped_column(DateTime(timezone=True))
     created_at: Mapped[datetime] = mapped_column(
         DateTime(timezone=True), nullable=False, server_default=func.now(),
     )

@@ -28,12 +28,20 @@ router = APIRouter(tags=["native-ci"])
 STALE_CI_AFTER = timedelta(minutes=10)
 
 
-def ci_run_is_stale(status: str, started_at: datetime | None, now: datetime) -> bool:
-    """A missing timestamp is NOT evidence that a runner is stale."""
+def ci_run_is_stale(
+    status: str,
+    started_at: datetime | None,
+    now: datetime,
+    lease_expires_at: datetime | None = None,
+) -> bool:
+    """Never time out a job with a currently valid runner heartbeat lease."""
     if status != "running" or started_at is None:
         return False
     if started_at.tzinfo is None or now.tzinfo is None:
         return False
+    if lease_expires_at is not None:
+        if lease_expires_at.tzinfo is None or now < lease_expires_at:
+            return False
     return now >= started_at + STALE_CI_AFTER
 
 
@@ -57,7 +65,12 @@ def _view(run: CIRun) -> dict:
         "created_at": run.created_at.isoformat() if run.created_at else None,
         "started_at": run.started_at.isoformat() if run.started_at else None,
         "completed_at": run.completed_at.isoformat() if run.completed_at else None,
-        "attestation": "repository_admin_reported",
+        "lease_expires_at": run.lease_expires_at.isoformat() if getattr(run, "lease_expires_at", None) else None,
+        "attestation": (
+            "repository_scoped_runner_reported"
+            if getattr(run, "runner_credential_id", None)
+            else "repository_admin_reported"
+        ),
         "trusted_for_deployment": False,
     }
 
@@ -116,32 +129,20 @@ async def get_ci_run(
     return _view(run)
 
 
+# Legacy admin-controlled claims/reports are disabled once runner identities
+# exist. Keeping these explicit 410 responses prevents old CLI clients from
+# silently forging results after migration 0008.
 @router.post("/{owner}/{repo}/ci/runs/{run_id}/claim")
 async def claim_ci_run(
     run_id: uuid.UUID,
     repository: Repository = Depends(get_repository),
-    db: AsyncSession = Depends(get_db),
     _perm: PermissionLevel = Depends(
         require_repo_permission(PermissionLevel.ADMIN, allow_anonymous=False)
     ),
 ) -> dict:
-    """Atomic manual claim by a repository administrator; no execution here."""
-    run = await db.scalar(
-        select(CIRun).where(
-            CIRun.id == run_id, CIRun.repository_id == repository.id,
-        ).with_for_update()
-    )
-    if run is None:
-        raise HTTPException(status_code=404, detail="CI run not found")
-    if not repository.auto_ci_enabled:
-        raise HTTPException(status_code=409, detail="CI disabled for this repository")
-    if run.status != "queued":
-        raise HTTPException(status_code=409, detail="CI run already claimed or completed")
-    run.status = "running"
-    run.started_at = datetime.now(timezone.utc)
-    await db.commit()
-    await db.refresh(run)
-    return _view(run)
+    raise HTTPException(status_code=410, detail=(
+        "Legacy admin CI claim disabled. Use the repository-scoped runner API."
+    ))
 
 
 @router.post("/{owner}/{repo}/ci/runs/{run_id}/complete")
@@ -154,23 +155,9 @@ async def complete_ci_run(
         require_repo_permission(PermissionLevel.ADMIN, allow_anonymous=False)
     ),
 ) -> dict:
-    """Record a bounded runner report; NEVER mark a deployment verified."""
-    run = await db.scalar(
-        select(CIRun).where(
-            CIRun.id == run_id, CIRun.repository_id == repository.id,
-        ).with_for_update()
-    )
-    if run is None:
-        raise HTTPException(status_code=404, detail="CI run not found")
-    if run.status != "running":
-        raise HTTPException(status_code=409, detail="CI run is not running")
-    run.status = "completed"
-    run.conclusion = payload.conclusion
-    run.log_excerpt = payload.log_excerpt
-    run.completed_at = datetime.now(timezone.utc)
-    await db.commit()
-    await db.refresh(run)
-    return _view(run)
+    raise HTTPException(status_code=410, detail=(
+        "Legacy admin CI completion disabled. Use the leased runner API."
+    ))
 
 
 @router.post("/{owner}/{repo}/ci/runs/{run_id}/timeout")
@@ -198,7 +185,7 @@ async def mark_stale_ci_run_timed_out(
         raise HTTPException(status_code=404, detail="CI run not found")
 
     now = datetime.now(timezone.utc)
-    if not ci_run_is_stale(run.status, run.started_at, now):
+    if not ci_run_is_stale(run.status, run.started_at, now, getattr(run, "lease_expires_at", None)):
         raise HTTPException(
             status_code=409,
             detail="Only a running CI job older than 10 minutes may be marked timed out",

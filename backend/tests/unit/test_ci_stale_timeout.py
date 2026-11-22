@@ -50,6 +50,14 @@ def test_stale_run_requires_real_aware_start_time():
     assert not ci_run_is_stale("completed", now - timedelta(minutes=30), now)
     assert not ci_run_is_stale("running", None, now)
     assert not ci_run_is_stale("running", now.replace(tzinfo=None), now)
+    assert not ci_run_is_stale(
+        "running", now - timedelta(minutes=20), now,
+        now + timedelta(minutes=1),
+    )
+    assert ci_run_is_stale(
+        "running", now - timedelta(minutes=20), now,
+        now - timedelta(seconds=1),
+    )
 
 
 @pytest.mark.asyncio
@@ -110,6 +118,6 @@ async def test_completed_timeout_cannot_be_overwritten_with_success():
             repository=SimpleNamespace(id=run.repository_id),
             db=db, _perm=PermissionLevel.ADMIN,
         )
-    assert exc.value.status_code == 409
+    assert exc.value.status_code == 410
     assert run.conclusion == "timed_out"
     db.commit.assert_not_awaited()

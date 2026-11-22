@@ -69,6 +69,8 @@ jobs:
         working-directory: backend
         run: ruff check app
 
-      - name: Run tests with coverage
+      - name: Run unit and real PostgreSQL integration tests with coverage
         working-directory: backend
-        run: pytest -v --cov=app --cov-report=term-missing || [ "$?" = "5" ]
+        env:
+          PANDAHUB_RUN_DB_INTEGRATION_TESTS: "1"
+        run: pytest -v --cov=app --cov-report=term-missing

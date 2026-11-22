@@ -12,13 +12,20 @@ import {
 import api from "@/lib/api";
 import {
   ciApiError, ciCanResolveStaleRun, ciDuration, ciStateLabel, ciSummary, ciTime,
-  ciVisualState, filterCiRuns, type CIRun, type CIVisualState,
+  ciVisualState, ciAttemptVisualState, ciAttemptCountLabel, filterCiRuns,
+  type CIAttempt, type CIRun, type CIVisualState,
 } from "@/lib/native-ci";
 
 const MAX_RUNS = 100;
 const PAGE_SIZE = 10;
 type Filter = "all" | "active" | "success" | "failed";
 type Clip = "sha" | "logs" | "command" | null;
+type AttemptLoad = {
+  runId: string;
+  state: "loading" | "ready" | "error";
+  records: CIAttempt[];
+  error?: string;
+};
 
 function StatusIcon({ state, className = "h-4 w-4" }: {
   state: CIVisualState; className?: string;
@@ -88,6 +95,8 @@ export default function NativeCIDashboard() {
   const [query, setQuery] = useState("");
   const [page, setPage] = useState(1);
   const [copied, setCopied] = useState<Clip>(null);
+  const [attemptLoad, setAttemptLoad] = useState<AttemptLoad | null>(null);
+  const [attemptRefresh, setAttemptRefresh] = useState(0);
   const requestRef = useRef<AbortController | null>(null);
 
   const load = useCallback(async (first = false) => {
@@ -110,6 +119,9 @@ export default function NativeCIDashboard() {
       const recorded = Array.isArray(history.data) ? history.data : [];
       setEnabled(settings.data.enabled === true);
       setRuns(recorded);
+      // Refresh the selected run's audit when the main list refreshes,
+      // including when a runner completes without changing selection.
+      setAttemptRefresh((version) => version + 1);
       setSelectedId((previous) =>
         previous && recorded.some((run) => run.id === previous)
           ? previous : (recorded[0]?.id ?? null)
@@ -151,6 +163,42 @@ export default function NativeCIDashboard() {
     () => filteredRuns.find((run) => run.id === selectedId) ?? filteredRuns[0] ?? null,
     [filteredRuns, selectedId],
   );
+  const selectedRunId = selected?.id ?? null;
+  const visibleAttemptLoad =
+    attemptLoad?.runId === selectedRunId ? attemptLoad : null;
+
+  useEffect(() => {
+    if (!selectedRunId) {
+      setAttemptLoad(null);
+      return;
+    }
+    const controller = new AbortController();
+    setAttemptLoad({
+      runId: selectedRunId, state: "loading", records: [],
+    });
+    // Read-only, scoped to ONE selected CI run. Never fetch every run's logs
+    // or mutate the queue just by opening the dashboard.
+    void api.get<CIAttempt[]>(
+      `${apiBase}/runs/${encodeURIComponent(selectedRunId)}/attempts`,
+      { signal: controller.signal },
+    ).then(({ data }) => {
+      if (controller.signal.aborted) return;
+      setAttemptLoad({
+        runId: selectedRunId,
+        state: "ready",
+        records: Array.isArray(data) ? data : [],
+      });
+    }).catch((exc: unknown) => {
+      if (controller.signal.aborted) return;
+      setAttemptLoad({
+        runId: selectedRunId,
+        state: "error",
+        records: [],
+        error: ciApiError(exc),
+      });
+    });
+    return () => controller.abort();
+  }, [apiBase, selectedRunId, attemptRefresh]);
 
   // Only poll while a job is actually pending. No perpetual animation or polling.
   useEffect(() => {
@@ -456,6 +504,9 @@ export default function NativeCIDashboard() {
                             <span className="truncate">{run.branch}</span>
                           </span>
                           <span>{ciTime(run.created_at)}</span>
+                          {run.attempt_count !== undefined && (
+                            <span>{ciAttemptCountLabel(run.attempt_count)} attempt{run.attempt_count === 1 ? "" : "s"}</span>
+                          )}
                         </div>
                       </div>
                       <ChevronRight className={`h-4 w-4 shrink-0 ${active ? "text-white" : "text-zinc-600"}`} aria-hidden="true" />
@@ -517,6 +568,10 @@ export default function NativeCIDashboard() {
                     )}
                     <div className="space-y-3">
                       <div className="flex items-start justify-between gap-3">
+                        <span className="text-xs text-zinc-500">Attempts</span>
+                        <span className="font-mono text-xs text-zinc-300">{ciAttemptCountLabel(selected.attempt_count)}</span>
+                      </div>
+                      <div className="flex items-start justify-between gap-3">
                         <span className="text-xs text-zinc-500">Commit</span>
                         <button type="button" onClick={() => void copy(selected.sha, "sha")}
                           className="flex min-w-0 items-center gap-1.5 font-mono text-xs text-zinc-200 hover:text-white">
@@ -559,7 +614,7 @@ export default function NativeCIDashboard() {
                   </div>
                   <div className="flex items-start gap-2 px-5 py-4 text-[11px] leading-5 text-zinc-500">
                     <LockKeyhole className="mt-0.5 h-4 w-4 shrink-0" aria-hidden="true" />
-                    Administrator-reported result. Not independently attested and not valid as deployment approval.
+                    Runner- or administrator-reported advisory result. Not independently attested and not valid as deployment approval.
                   </div>
                 </>
               )}

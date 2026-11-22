@@ -110,10 +110,13 @@ def runner_register(repository: str, name: str, out_path: str | None) -> None:
         )
     if not dest.parent.is_dir():
         dest.parent.mkdir(parents=True, exist_ok=True)
-    if dest.parent.resolve().is_relative_to(Path.cwd().resolve()):
-        raise click.ClickException(
-            "Runner credentials must not be saved inside your current source tree."
-        )
+    # Refuse secrets inside any surrounding Git worktree, not merely under
+    # the process cwd (which might itself be the user's home directory).
+    for ancestor in (Path.cwd(), *Path.cwd().parents):
+        if (ancestor / ".git").exists() and dest.is_relative_to(ancestor.resolve()):
+            raise click.ClickException(
+                "Runner credentials must not be saved inside a Git repository."
+            )
 
     data = _call(
         "POST", f"/{target}/ci/runner/credentials",

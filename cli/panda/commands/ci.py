@@ -173,3 +173,66 @@ def runner_revoke(repository: str, credential_id: str) -> None:
     _call("DELETE", f"/{target}/ci/runner/credentials/{parsed_id}")
     click.echo(f"Runner {parsed_id} revoked for {target}.")
     click.echo("Inspect any in-progress Docker jobs before recovery.")
+
+
+@ci.command("attempts")
+@click.argument("repository")
+@click.argument("run_id")
+def show_attempts(repository: str, run_id: str) -> None:
+    """Show persisted attempt history, not just the latest CI summary."""
+    import uuid
+    target = _repo(repository)
+    try:
+        canonical_run_id = str(uuid.UUID(run_id))
+    except ValueError:
+        raise click.BadParameter("Expected run UUID") from None
+    rows = _call("GET", f"/{target}/ci/runs/{canonical_run_id}/attempts")
+    if not rows:
+        click.echo("No attempts recorded for this run.")
+    for row in rows:
+        summary = row["conclusion"] or "running"
+        click.echo(
+            f'Attempt #{row["attempt_number"]} [{summary}] '
+            f'{row["started_at"]} -> {row["completed_at"] or "active"}'
+        )
+        if row.get("retry_reason"):
+            click.echo(f'Retry authorization: {row["retry_reason"]}')
+        if row.get("log_excerpt"):
+            click.echo(row["log_excerpt"])
+    click.echo("CI attempts are advisory, not trusted deployment attestations.")
+
+
+@ci.command("retry")
+@click.argument("repository")
+@click.argument("run_id")
+@click.option(
+    "--reason", required=True, type=str,
+    help="10-300 characters explaining why a new attempt is justified",
+)
+@click.confirmation_option(
+    prompt=(
+        "I have inspected the runner host and confirmed the previous "
+        "Docker job is stopped. Queue a new attempt?"
+    ),
+)
+def retry(repository: str, run_id: str, reason: str) -> None:
+    """Queue an unsuccessful run again only after manual container inspection."""
+    import uuid
+    target = _repo(repository)
+    try:
+        canonical_run_id = str(uuid.UUID(run_id))
+    except ValueError:
+        raise click.BadParameter("Expected run UUID") from None
+    if not 10 <= len(reason) <= 300:
+        raise click.BadParameter("Reason must be 10-300 characters") from None
+    row = _call(
+        "POST", f"/{target}/ci/runs/{canonical_run_id}/retry",
+        json_body={
+            "operator_confirmed_runner_stopped": True,
+            "reason": reason,
+        },
+    )
+    click.echo(
+        f'CI {row["id"]} requeued. Prior attempt results retained. '
+        "Start the separate runner deliberately; no job was executed."
+    )

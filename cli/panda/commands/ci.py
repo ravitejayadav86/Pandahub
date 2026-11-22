@@ -63,3 +63,25 @@ def show(repository: str, run_id: str):
     click.echo(f'CI {row["id"]}  {row["sha"]}  [{row["conclusion"] or row["status"]}]')
     click.echo(row.get("log_excerpt") or "No test output recorded.")
     click.echo("This is an admin-reported advisory result, NOT a trusted deployment check.")
+
+
+@ci.command("timeout")
+@click.argument("repository")
+@click.argument("run_id")
+@click.confirmation_option(
+    prompt="Mark this stranded CI run timed out? This does not stop Docker on the runner host",
+)
+def mark_timeout(repository: str, run_id: str):
+    """Admin-only: resolve a running CI job that has been stuck for 10+ min."""
+    import uuid
+    target = _repo(repository)
+    try:
+        canonical_run_id = str(uuid.UUID(run_id))
+    except ValueError:
+        raise click.BadParameter("Expected a UUID run ID", param_hint="RUN_ID") from None
+
+    row = _call("POST", f"/{target}/ci/runs/{canonical_run_id}/timeout")
+    click.echo(
+        f'CI {row["id"]} resolved as [{row["conclusion"]}]. '
+        "Inspect Docker on the runner host before starting another job."
+    )

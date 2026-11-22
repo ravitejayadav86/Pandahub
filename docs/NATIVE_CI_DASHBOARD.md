@@ -54,6 +54,39 @@ after the frontend feature has been deployed locally. A previously completed
 run must show PASS and its saved two test cases; the repository's CI setting
 should remain disabled unless the administrator explicitly enables it.
 
+## Safe integration into the existing Windows project
+
+The main PandaHub working directory may contain local frontend and CLI
+changes. Do not switch branches in that directory and do not overwrite
+entire repository pages with copies from another branch.
+
+```powershell
+Set-Location "$env:USERPROFILE\Downloads\Pandahub"
+git fetch github feature/native-ci-dashboard-20261122
+$dashboardWorktree = "$env:USERPROFILE\Downloads\PandaHub-CI-Dashboard"
+git worktree add --detach $dashboardWorktree github/feature/native-ci-dashboard-20261122
+
+$python = (Resolve-Path ".\backend\.venv\Scripts\python.exe").Path
+& $python "$dashboardWorktree\scripts\install_ci_dashboard.py" --project (Get-Location).Path --source $dashboardWorktree
+
+# Only after reviewing the dry-run:
+& $python "$dashboardWorktree\scripts\install_ci_dashboard.py" --project (Get-Location).Path --source $dashboardWorktree --apply
+
+Set-Location .\frontend
+npm run type-check
+npm run test
+npm run lint
+npm run build
+```
+
+The guarded installer only copies **three new frontend files** and adds
+small navigation anchors to three existing files. It refuses to overwrite
+changed navigation files, takes a timestamped backup in Downloads,
+and does not touch the database, worker, secrets, or deployed frontend.
+Its default invocation is read-only and the `--apply` action changes
+local frontend source only. A production build or Docker frontend update
+remains a separate explicit action.
+
 ## Out of scope
 
 This PR does not modify the native CI backend, start a runner, enable CI

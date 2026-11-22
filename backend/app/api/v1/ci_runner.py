@@ -195,7 +195,9 @@ async def runner_heartbeat(
     if not _lease_valid(run, credential.id, payload.lease_id, now):
         raise HTTPException(status_code=409, detail="CI runner lease is not active")
     run.last_heartbeat_at = now
-    run.lease_expires_at = now + LEASE_DURATION
+    run.lease_expires_at = min(
+        now + LEASE_DURATION, run.started_at + MAX_RUN_DURATION
+    )
     await db.commit()
     return {"lease_expires_at": run.lease_expires_at.isoformat(), "status": "running"}
 

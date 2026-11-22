@@ -8,6 +8,7 @@ from __future__ import annotations
 import uuid
 
 from sqlalchemy import select
+from sqlalchemy.dialects.postgresql import insert as pg_insert
 
 from app.models.ci_run import CIRun
 from app.models.repo import Repository
@@ -31,21 +32,16 @@ def queue_ci_runs(repo_uuid: uuid.UUID, updates: list, session_factory) -> int:
         if repo is None or not repo.auto_ci_enabled:
             return 0
         for branch_name, sha in tips.items():
-            exists = db.scalar(
-                select(CIRun.id).where(
-                    CIRun.repository_id == repo_uuid,
-                    CIRun.branch_name == branch_name,
-                    CIRun.commit_sha == sha,
-                )
-            )
-            if exists:
-                continue
-            db.add(CIRun(
+            # ON CONFLICT is atomic even if two post-receive workers race.
+            statement = pg_insert(CIRun).values(
                 repository_id=repo_uuid,
                 branch_name=branch_name,
                 commit_sha=sha,
                 status="queued",
-            ))
-            new_count += 1
+            ).on_conflict_do_nothing(
+                constraint="uq_ci_run_repo_branch_sha",
+            ).returning(CIRun.id)
+            if db.scalar(statement) is not None:
+                new_count += 1
         db.commit()
     return new_count

@@ -3,7 +3,7 @@
 import { useCallback, useEffect, useState } from "react";
 import Link from "next/link";
 import { useParams } from "next/navigation";
-import { BrainCircuit, ArrowLeft, RefreshCw, ShieldAlert } from "lucide-react";
+import { BrainCircuit, ArrowLeft, RefreshCw, ShieldAlert, Workflow } from "lucide-react";
 import api from "@/lib/api";
 
 type NextStep = {
@@ -89,10 +89,15 @@ export default function CommitInsightsPage() {
             <div className="flex items-center gap-3"><BrainCircuit size={25} /><h1 className="text-3xl font-semibold tracking-tight">Commit insights</h1></div>
             <p className="max-w-2xl text-sm text-zinc-500">Evidence-based AI feedback about code pushed to {owner}/{repo}. Reviews are advisory; tests and deployment are separate.</p>
           </div>
+          <div className="flex flex-wrap items-center gap-2">
+          <Link href={`${repoUrl}/ci`} className="inline-flex items-center gap-2 rounded-xl border border-zinc-300 px-3 py-2 text-sm font-medium hover:bg-zinc-100 dark:border-zinc-700 dark:hover:bg-zinc-900">
+            <Workflow size={15} /> CI Runs
+          </Link>
           <button type="button" onClick={() => void load()} disabled={loading}
             className="inline-flex items-center gap-2 rounded-xl border border-zinc-300 px-3 py-2 text-sm hover:bg-zinc-100 disabled:opacity-50 dark:border-zinc-700 dark:hover:bg-zinc-900">
             <RefreshCw size={15} /> Refresh
           </button>
+          </div>
         </header>
         <section className="flex flex-wrap items-center justify-between gap-4 rounded-2xl border border-zinc-200 p-5 dark:border-zinc-800">
           <div className="space-y-1"><h2 className="font-semibold">Automatic AI review on push</h2>

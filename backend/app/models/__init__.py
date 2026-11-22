@@ -57,6 +57,7 @@ from app.models.code_analysis import CodeAnalysisReport  # noqa: F401
 from app.models.code_analysis_feedback import CodeAnalysisFeedback  # noqa: F401
 from app.models.commit_ai_analysis import CommitAIAnalysis  # noqa: F401
 from app.models.ci_run import CIRun  # noqa: F401
+from app.models.ci_run_attempt import CIRunAttempt  # noqa: F401
 from app.models.ci_runner_credential import CIRunnerCredential  # noqa: F401
 from app.models.startup import (  # noqa: F401
     Startup,
@@ -81,7 +82,7 @@ __all__ = [
     "Message",
     "SecurityAlert",
     "RepositoryPages",
-    "CodeAnalysisReport", "CodeAnalysisFeedback", "CommitAIAnalysis", "CIRun", "CIRunnerCredential",
+    "CodeAnalysisReport", "CodeAnalysisFeedback", "CommitAIAnalysis", "CIRun", "CIRunAttempt", "CIRunnerCredential",
     "Startup", "StartupMember", "StartupOpenRole", "StartupCollaborationRequest",
     "StartupProject", "StartupInvestor",
 ]

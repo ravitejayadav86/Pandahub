@@ -18,6 +18,7 @@ from sqlalchemy.ext.asyncio import AsyncSession
 from app.api.dependencies import get_repository, require_repo_permission
 from app.db.session import get_db
 from app.models.ci_run import CIRun
+from app.models.ci_run_attempt import CIRunAttempt
 from app.models.enums import PermissionLevel
 from app.models.repo import Repository
 
@@ -26,6 +27,7 @@ router = APIRouter(tags=["native-ci"])
 # A local runner has a 120-second execution limit; allow ample time for
 # startup/export/cleanup before an administrator can resolve a stranded job.
 STALE_CI_AFTER = timedelta(minutes=10)
+MAX_CI_ATTEMPTS = 3
 
 
 def ci_run_is_stale(
@@ -54,12 +56,19 @@ class CIResult(BaseModel):
     log_excerpt: str = Field(default="", max_length=10000)
 
 
+class CIRetryRequest(BaseModel):
+    # The backend cannot attest Docker cleanup; require an explicit operator.
+    operator_confirmed_runner_stopped: Literal[True]
+    reason: str = Field(min_length=10, max_length=300)
+
+
 def _view(run: CIRun) -> dict:
     return {
         "id": str(run.id),
         "branch": run.branch_name,
         "sha": run.commit_sha,
         "status": run.status,
+        "attempt_count": run.attempt_count,
         "conclusion": run.conclusion,
         "log_excerpt": run.log_excerpt,
         "created_at": run.created_at.isoformat() if run.created_at else None,
@@ -191,15 +200,125 @@ async def mark_stale_ci_run_timed_out(
             detail="Only a running CI job older than 10 minutes may be marked timed out",
         )
 
+    # This does not prove the original Docker container has stopped.
+    attempt = await db.scalar(select(CIRunAttempt).where(
+        CIRunAttempt.run_id == run.id,
+        CIRunAttempt.attempt_number == run.attempt_count,
+    ).with_for_update())
+    if attempt is None or attempt.completed_at is not None:
+        raise HTTPException(status_code=409, detail="Active CI attempt audit missing")
+    attempt.completed_at = now
+    attempt.conclusion = "timed_out"
+    attempt.end_reason = "admin_unverified_timeout"
     run.status = "completed"
     run.conclusion = "timed_out"
     run.completed_at = now
+    run.lease_expires_at = None
     run.log_excerpt = (
         "Administrative timeout: runner completion was not received within "
         "10 minutes of starting. This is not a verified Docker timeout and "
         "does not attest that the container has stopped. Inspect the runner "
         "host and its containers before starting another job."
     )
+    attempt.log_excerpt = run.log_excerpt
+    await db.commit()
+    await db.refresh(run)
+    return _view(run)
+
+
+@router.get("/{owner}/{repo}/ci/runs/{run_id}/attempts")
+async def list_ci_attempts(
+    run_id: uuid.UUID,
+    repository: Repository = Depends(get_repository),
+    db: AsyncSession = Depends(get_db),
+    _perm: PermissionLevel = Depends(require_repo_permission(PermissionLevel.READ)),
+) -> list[dict]:
+    """Bounded history; never return runner tokens or lease secrets."""
+    run = await db.scalar(select(CIRun).where(
+        CIRun.id == run_id, CIRun.repository_id == repository.id,
+    ))
+    if run is None:
+        raise HTTPException(status_code=404, detail="CI run not found")
+    records = await db.execute(select(CIRunAttempt).where(
+        CIRunAttempt.run_id == run.id,
+    ).order_by(CIRunAttempt.attempt_number))
+    return [{
+        "attempt_number": item.attempt_number,
+        "started_at": item.started_at.isoformat(),
+        "completed_at": item.completed_at.isoformat() if item.completed_at else None,
+        "conclusion": item.conclusion,
+        "end_reason": item.end_reason,
+        "log_excerpt": item.log_excerpt,
+        "retry_requested_at": (
+            item.retry_requested_at.isoformat() if item.retry_requested_at else None
+        ),
+        "retry_reason": item.retry_reason,
+        "trusted_for_deployment": False,
+    } for item in records.scalars().all()]
+
+
+@router.post("/{owner}/{repo}/ci/runs/{run_id}/retry")
+async def request_ci_retry(
+    run_id: uuid.UUID,
+    payload: CIRetryRequest,
+    repository: Repository = Depends(get_repository),
+    db: AsyncSession = Depends(get_db),
+    _perm: PermissionLevel = Depends(
+        require_repo_permission(PermissionLevel.ADMIN, allow_anonymous=False)
+    ),
+) -> dict:
+    """Manually requeue the *same* commit after confirming runner shutdown.
+
+    Never automatically restart an expired/uncertain Docker container.
+    No same-SHA Git push is needed; queue uniqueness is preserved.
+    All prior results remain in ci_run_attempts, with retry authorizations.
+    """
+    run = await db.scalar(select(CIRun).where(
+        CIRun.id == run_id, CIRun.repository_id == repository.id,
+    ).with_for_update())
+    if run is None:
+        raise HTTPException(status_code=404, detail="CI run not found")
+    if not repository.auto_ci_enabled:
+        raise HTTPException(
+            status_code=409, detail="Enable CI job creation explicitly before retrying"
+        )
+    if run.status != "completed" or run.conclusion not in (
+        "failure", "error", "timed_out",
+    ):
+        raise HTTPException(
+            status_code=409, detail="Only completed, unsuccessful CI runs can be retried"
+        )
+    if not 1 <= run.attempt_count < MAX_CI_ATTEMPTS:
+        raise HTTPException(
+            status_code=409, detail="Maximum three runner attempts reached"
+        )
+
+    last_attempt = await db.scalar(select(CIRunAttempt).where(
+        CIRunAttempt.run_id == run.id,
+        CIRunAttempt.attempt_number == run.attempt_count,
+    ).with_for_update())
+    if (
+        last_attempt is None or last_attempt.completed_at is None or
+        last_attempt.conclusion != run.conclusion or
+        last_attempt.retry_requested_at is not None
+    ):
+        raise HTTPException(
+            status_code=409, detail="Previous CI attempt audit is not finalized"
+        )
+
+    # The operator's assertion is retained for audit but is NOT technical
+    # proof of actual container cleanup. Never mark the result trusted.
+    last_attempt.retry_requested_at = datetime.now(timezone.utc)
+    last_attempt.retry_reason = payload.reason
+    run.status = "queued"
+    run.conclusion = None
+    run.log_excerpt = None
+    run.started_at = None
+    run.completed_at = None
+    run.runner_credential_id = None
+    run.lease_id = None
+    run.lease_expires_at = None
+    run.last_heartbeat_at = None
     await db.commit()
     await db.refresh(run)
     return _view(run)

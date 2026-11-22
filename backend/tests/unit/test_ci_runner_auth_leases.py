@@ -52,7 +52,7 @@ def queued_job(repo_id: uuid.UUID):
     return SimpleNamespace(
         id=uuid.uuid4(), repository_id=repo_id,
         branch_name="qa", commit_sha="a" * 40,
-        status="queued", started_at=None,
+        status="queued", attempt_count=0, started_at=None,
         runner_credential_id=None, lease_id=None,
         lease_expires_at=None, last_heartbeat_at=None,
     )
@@ -229,7 +229,12 @@ async def test_valid_completion_preserves_advisory_status_and_burns_lease():
     job.runner_credential_id = ident
     job.lease_id = uuid.uuid4()
     job.lease_expires_at = datetime.now(timezone.utc) + timedelta(minutes=2)
-    db = database(credential(token, ident, repo_id), job)
+    audited = SimpleNamespace(
+        run_id=job.id, attempt_number=1, lease_id=job.lease_id,
+        completed_at=None, conclusion=None, log_excerpt=None, end_reason=None,
+    )
+    job.attempt_count = 1
+    db = database(credential(token, ident, repo_id), job, audited)
     response = await runner_complete(
         job.id, RunnerConclusion(
             lease_id=job.lease_id, conclusion="failure", log_excerpt="1 failed"
@@ -239,4 +244,6 @@ async def test_valid_completion_preserves_advisory_status_and_burns_lease():
     assert response["trusted_for_deployment"] is False
     assert job.lease_expires_at is None
     assert job.status == "completed"
+    assert audited.conclusion == "failure"
+    assert audited.end_reason == "runner_reported"
     db.commit.assert_awaited_once()

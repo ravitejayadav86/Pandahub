@@ -25,6 +25,8 @@ def make_run(age_minutes: float, status="running"):
         branch_name="qa",
         commit_sha="a" * 40,
         status=status,
+        attempt_count=1,
+        lease_expires_at=None,
         conclusion=None,
         log_excerpt=None,
         started_at=now - timedelta(minutes=age_minutes),
@@ -34,11 +36,16 @@ def make_run(age_minutes: float, status="running"):
 
 
 def make_db(run):
+    audit = SimpleNamespace(
+        completed_at=None, conclusion=None,
+        log_excerpt=None, end_reason=None, retry_requested_at=None,
+    )
     db = SimpleNamespace(
-        scalar=AsyncMock(return_value=run),
+        scalar=AsyncMock(side_effect=[run, audit]),
         commit=AsyncMock(),
         refresh=AsyncMock(),
     )
+    db.audit = audit
     return db
 
 
@@ -75,6 +82,8 @@ async def test_admin_can_mark_only_stale_running_job_as_unverified_timeout():
     assert "not" in response["log_excerpt"].lower()
     assert "Docker" in response["log_excerpt"]
     assert run.completed_at is not None
+    assert db.audit.end_reason == "admin_unverified_timeout"
+    assert db.audit.conclusion == "timed_out"
     db.commit.assert_awaited_once()
 
 

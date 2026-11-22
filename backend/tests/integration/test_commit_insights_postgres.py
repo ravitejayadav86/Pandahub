@@ -54,12 +54,12 @@ def _git(*args: str, cwd: Path) -> str:
 def test_alembic_migrated_postgres_schema(test_engine):
     tables = set(inspect(test_engine).get_table_names())
     assert {"users", "repositories", "branches", "commit_ai_analyses",
-            "ci_runs", "ci_runner_credentials", "code_analysis_reports", "code_analysis_feedback"} <= tables
+            "ci_runs", "ci_run_attempts", "ci_runner_credentials", "code_analysis_reports", "code_analysis_feedback"} <= tables
     columns = {col["name"] for col in inspect(test_engine).get_columns("repositories")}
     assert "auto_ai_analysis_enabled" in columns
     assert "auto_ci_enabled" in columns
     with test_engine.connect() as db:
-        assert db.scalar(text("SELECT version_num FROM alembic_version")) == "0008_ci_runner_leases"
+        assert db.scalar(text("SELECT version_num FROM alembic_version")) == "0009_ci_attempt_audit"
         assert db.scalar(text(
             "SELECT data_type FROM information_schema.columns "
             "WHERE table_name = 'commit_ai_analyses' AND column_name = 'suggestions'"

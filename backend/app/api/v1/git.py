@@ -192,15 +192,6 @@ async def _stream_git_backend(
     # Feed the request body to git http-backend stdin in a background task
     # so we can simultaneously start reading stdout (avoids a deadlock on
     # large pushes where both stdin and stdout buffers fill simultaneously).
-    # Smart-HTTP stderr contains diagnostics, not guaranteed ref-update lines.
-    # Capture the actual refs before and after the accepted push instead.
-    from app.git_engine.push_events import snapshot_refs, changed_ref_lines
-    try:
-        refs_before = await asyncio.to_thread(snapshot_refs, repo.disk_path)
-    except (OSError, subprocess.SubprocessError) as exc:
-        logger.error("Cannot inspect Git refs before push: %s", exc)
-        return Response(status_code=503, content="Repository refs unavailable")
-
     request_body = await request.body()
     stdin_task = asyncio.create_task(_write_stdin(proc, request_body))
 
@@ -472,6 +463,16 @@ async def receive_pack(
     # so stderr from the process itself is mostly git internal diagnostics.
     # The post-receive hook parses the refs from stdout sideband data.
     env = _build_env(request, repo, "/git-receive-pack", user)
+
+    # Smart-HTTP stderr contains diagnostics, not guaranteed ref-update lines.
+    # Capture the actual refs before and after the accepted push instead.
+    from app.git_engine.push_events import snapshot_refs, changed_ref_lines
+    try:
+        refs_before = await asyncio.to_thread(snapshot_refs, repo.disk_path)
+    except (OSError, subprocess.SubprocessError) as exc:
+        logger.error("Cannot inspect Git refs before push: %s", exc)
+        return Response(status_code=503, content="Repository refs unavailable")
+
 
     # Guard: disk_path must exist before spawning subprocess
     if not os.path.exists(repo.disk_path):

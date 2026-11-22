@@ -7,7 +7,7 @@ import click
 
 from panda.core import config
 from panda.core.api_client import ApiError, request
-from panda.core.gitutil import GIT_HOST, ensure_credential_helper
+from panda.core.gitutil import GIT_HOST, GIT_SCHEME, ensure_credential_helper
 
 
 @click.command()
@@ -53,11 +53,22 @@ def login(username: str | None):
             )
             raise SystemExit(1)
 
+    # Save JWTs first so /auth/me can resolve the canonical username.
+    # Logging in with an email must not produce invalid repository Git URLs.
     config.save_tokens(
         data["access_token"],
         data["refresh_token"],
         username,
     )
+    try:
+        me = request("GET", "/auth/me")
+        username = me.get("username") or username
+        config.save_tokens(
+            data["access_token"], data["refresh_token"], username,
+        )
+    except ApiError:
+        # Session is still valid; canonical name can be recovered at next login.
+        pass
 
     ensure_credential_helper()
 
@@ -180,7 +191,7 @@ def token_create(
     click.echo()
     click.echo("Git URL format:")
     click.echo(
-        f"  https://{username}:<TOKEN>@"
+        f"  {GIT_SCHEME}://{username}:<TOKEN>@"
         f"{GIT_HOST}/git/{username}/<repo-name>.git"
     )
 

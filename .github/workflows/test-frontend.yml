@@ -4,10 +4,14 @@ on:
   pull_request:
     paths:
       - "frontend/**"
+      - ".github/workflows/test-frontend.yml"
   push:
     branches: [main]
     paths:
       - "frontend/**"
+      - ".github/workflows/test-frontend.yml"
+
+  workflow_dispatch: {}
 
 jobs:
   test:

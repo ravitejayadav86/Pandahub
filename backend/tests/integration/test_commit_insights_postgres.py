@@ -54,11 +54,12 @@ def _git(*args: str, cwd: Path) -> str:
 def test_alembic_migrated_postgres_schema(test_engine):
     tables = set(inspect(test_engine).get_table_names())
     assert {"users", "repositories", "branches", "commit_ai_analyses",
-            "code_analysis_reports", "code_analysis_feedback"} <= tables
+            "ci_runs", "code_analysis_reports", "code_analysis_feedback"} <= tables
     columns = {col["name"] for col in inspect(test_engine).get_columns("repositories")}
     assert "auto_ai_analysis_enabled" in columns
+    assert "auto_ci_enabled" in columns
     with test_engine.connect() as db:
-        assert db.scalar(text("SELECT version_num FROM alembic_version")) == "0006_commit_ai_analysis"
+        assert db.scalar(text("SELECT version_num FROM alembic_version")) == "0007_native_ci_queue"
         assert db.scalar(text(
             "SELECT data_type FROM information_schema.columns "
             "WHERE table_name = 'commit_ai_analyses' AND column_name = 'suggestions'"
@@ -76,7 +77,9 @@ def test_real_git_push_event_to_persisted_ai_next_steps(test_engine, tmp_path):
     from app.models.user import User
     from app.models.repo import Repository
     from app.models.commit_ai_analysis import CommitAIAnalysis
-    from app.worker.tasks.git_tasks import _queue_opted_in_commit_analyses
+    from app.models.ci_run import CIRun
+    from app.services.ci_queue import queue_ci_runs
+    from app.worker.tasks.git_tasks import _queue_opted_in_commit_analyses, _get_sync_session
     from app.worker.tasks.commit_ai_tasks import analyze_commit_task
 
     work, bare = tmp_path / "work", tmp_path / "hosted.git"
@@ -118,6 +121,21 @@ def test_real_git_push_event_to_persisted_ai_next_steps(test_engine, tmp_path):
         repo_id = repo.id
 
     try:
+        # Native CI creates only a durable queue record; never runs repo code.
+        assert queue_ci_runs(repo_id, updates, _get_sync_session) == 0
+        with Session(test_engine) as db:
+            repository = db.get(Repository, repo_id)
+            repository.auto_ci_enabled = True
+            db.commit()
+        assert queue_ci_runs(repo_id, updates, _get_sync_session) == 1
+        assert queue_ci_runs(repo_id, updates, _get_sync_session) == 0
+        with Session(test_engine) as db:
+            ci_record = db.scalar(select(CIRun).where(CIRun.repository_id == repo_id))
+            assert ci_record is not None
+            assert ci_record.status == "queued"
+            assert ci_record.conclusion is None
+            assert ci_record.commit_sha == updates[0].new_sha
+
         with patch(
             "app.worker.tasks.commit_ai_tasks.analyze_commit_task.apply_async"
         ) as submit:

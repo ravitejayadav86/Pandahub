@@ -59,6 +59,8 @@ class Repository(Base, UUIDPKMixin, TimestampMixin):
 
     # Only enable after repository admins consent to external AI code analysis.
     auto_ai_analysis_enabled: Mapped[bool] = mapped_column(Boolean, default=False, nullable=False)
+    # Off by default. Pushes queue CI records; code runs only in the external runner.
+    auto_ci_enabled: Mapped[bool] = mapped_column(Boolean, default=False, nullable=False)
 
     # Absolute path to the bare repo on the shared git_storage volume, e.g.
     # /data/repositories/<uuid>.git — NOT derived from name, so renaming a

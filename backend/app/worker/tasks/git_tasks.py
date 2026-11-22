@@ -355,6 +355,16 @@ def post_receive_hook(
         logger.exception("Commit AI dispatch failed: %s", type(exc).__name__)
         summary["errors"].append("Commit AI dispatch failed")
     
+    # Record CI requests; do not run any untrusted repository code in Celery.
+    try:
+        from app.services.ci_queue import queue_ci_runs
+        summary["ci_runs_queued"] = queue_ci_runs(
+            repo_uuid, updates, _get_sync_session,
+        )
+    except Exception as exc:
+        logger.exception("Native CI record creation failed: %s", type(exc).__name__)
+        summary["errors"].append("Native CI queue failed")
+
     # Trigger Security Scanning
     try:
         from app.worker.tasks.security_tasks import scan_repository_security

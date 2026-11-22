@@ -13,7 +13,7 @@ from pathlib import Path
 from fastapi import FastAPI
 from fastapi.middleware.cors import CORSMiddleware
 
-from app.api.v1 import auth, repos, git, issues, pulls, orgs, startups, messages, pages, error_logs, ai
+from app.api.v1 import auth, repos, git, issues, pulls, orgs, startups, messages, pages, error_logs, ai, code_analysis, commit_insights
 from app.api import ws
 from app.core.config import get_settings
 from app.core.exceptions import register_exception_handlers
@@ -173,6 +173,8 @@ register_exception_handlers(app)
 
 app.include_router(auth.router, prefix=settings.API_V1_PREFIX)
 app.include_router(auth.users_router, prefix=settings.API_V1_PREFIX)
+app.include_router(code_analysis.router, prefix=settings.API_V1_PREFIX)
+app.include_router(commit_insights.router, prefix=settings.API_V1_PREFIX)
 app.include_router(repos.router, prefix=settings.API_V1_PREFIX)
 app.include_router(issues.router, prefix=settings.API_V1_PREFIX)
 app.include_router(pulls.router, prefix=settings.API_V1_PREFIX)

@@ -6,7 +6,7 @@ import Link from 'next/link'
 import api from '@/lib/api'
 import { 
   MapPin, Link as LinkIcon, Calendar, BookMarked, GitMerge, Star, Users, 
-  Smile, Search, ChevronDown, Activity, Package, Layout, Book, Trophy, Hexagon
+  Search, ChevronDown, Activity, Package, Layout, Book, Trophy, Hexagon
 } from 'lucide-react'
 import { useAuthStore } from '@/store/authStore'
 import Navbar from '@/components/shared/Navbar'
@@ -62,7 +62,7 @@ export default function FollowingPage() {
             avatar_url: orgData.avatar_url || null,
             location: null,
             website_url: orgData.website_url || null,
-            is_verified: true,
+            is_verified: orgData.is_verified === true,
             created_at: orgData.created_at || null,
             repo_count: 0,
             follower_count: 0,
@@ -170,12 +170,6 @@ export default function FollowingPage() {
               <div className="w-full h-full bg-gradient-to-br from-blue-600 to-purple-600 flex items-center justify-center text-white text-7xl font-bold">
                 {profile.username.charAt(0).toUpperCase()}
               </div>
-            )}
-            
-            {isOwner && (
-              <button className="absolute bottom-6 right-6 w-10 h-10 glass-panel rounded-full flex items-center justify-center shadow-lg hover:text-blue-500 transition-colors z-20 border border-[var(--glass-border)]" aria-label="Set status">
-                <Smile className="w-5 h-5 text-slate-400" />
-              </button>
             )}
           </div>
 

@@ -262,7 +262,7 @@ function ToastItem({
         ${visible ? 'opacity-100 translate-y-0 scale-100' : 'opacity-0 translate-y-4 scale-95'}
         shadow-xl shadow-black/30
       `}
-      style={{ background: 'rgba(13, 17, 23, 0.92)' }}
+      style={{ background: 'rgba(232, 249, 255, 0.96)' }}
     >
       {/* Top accent stripe */}
       <div className={`absolute top-0 left-0 right-0 h-[2px] ${cfg.iconBg} opacity-60`} />

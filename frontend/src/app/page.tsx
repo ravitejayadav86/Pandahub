@@ -2,7 +2,6 @@
 
 import Link from "next/link";
 import { useEffect } from "react";
-import MotionDetectiveBackground from "@/components/MotionDetectiveBackground";
 import {
   ArrowDownRight,
   ArrowRight,
@@ -19,50 +18,6 @@ import {
 
 export default function HomePage() {
   useEffect(() => {
-    const progressBar = document.querySelector<HTMLElement>(".phx-progress");
-    if (!progressBar) return;
-
-    let frame: number | null = null;
-    let maxScroll = Math.max(
-      1,
-      document.documentElement.scrollHeight - window.innerHeight,
-    );
-
-    const paintProgress = () => {
-      frame = null;
-      const progress = Math.max(0, Math.min(1, window.scrollY / maxScroll));
-      progressBar.style.transform = `scaleX(${progress})`;
-    };
-
-    const schedulePaint = () => {
-      if (frame === null) frame = window.requestAnimationFrame(paintProgress);
-    };
-
-    const measureScrollRange = () => {
-      maxScroll = Math.max(
-        1,
-        document.documentElement.scrollHeight - window.innerHeight,
-      );
-      schedulePaint();
-    };
-
-    const resizeObserver = new ResizeObserver(measureScrollRange);
-    resizeObserver.observe(document.documentElement);
-    resizeObserver.observe(document.body);
-
-    schedulePaint();
-    window.addEventListener("scroll", schedulePaint, { passive: true });
-    window.addEventListener("resize", measureScrollRange, { passive: true });
-
-    return () => {
-      window.removeEventListener("scroll", schedulePaint);
-      window.removeEventListener("resize", measureScrollRange);
-      resizeObserver.disconnect();
-      if (frame !== null) window.cancelAnimationFrame(frame);
-    };
-  }, []);
-
-  useEffect(() => {
     const nodes = document.querySelectorAll<HTMLElement>(".phx-content-reveal");
     if (!("IntersectionObserver" in window)) {
       nodes.forEach((n) => n.classList.add("is-visible"));
@@ -78,7 +33,6 @@ export default function HomePage() {
 
   return (
     <main className="phx-page">
-      <MotionDetectiveBackground />
       <div className="phx-cinema" aria-hidden="true">
         <div className="phx-camera">
           <div className="phx-ambient" />
@@ -116,7 +70,6 @@ export default function HomePage() {
         <div className="phx-letterbox bottom" />
       </div>
 
-      <div className="phx-progress" aria-hidden="true" />
 
       <nav className="phx-nav">
         <Link href="/" className="phx-brand">
@@ -167,27 +120,22 @@ export default function HomePage() {
                 <small className="consolelabel">OPERATING SYSTEM FOR BUILDERS</small>
                 <h2>Build / review / ship</h2>
                 <div className="stats">
-                  <div><small>REPOSITORIES</small><b>24</b></div>
-                  <div><small>ISSUES</small><b>08</b></div>
-                  <div><small>DEPLOYS</small><b>46</b></div>
-                </div>
-                <div className="codebox">
-                  <div><Terminal size={13}/> production.log</div>
-                  <code>
-                    <span>$</span> panda inspect workspace<br/>
-                    <span>+</span> checks passed<br/>
-                    <span>+</span> branch synchronized<br/>
-                    <span>+</span> deployment ready
-                  </code>
+                  <div><small>REPOSITORIES</small><b>Manage</b></div>
+                  <div><small>ISSUES</small><b>Track</b></div>
+                  <div><small>DELIVERY</small><b>Ship</b></div>
                 </div>
               </div>
             </div>
           </div>
           <div className="phx-chip chip-a"><Search size={14}/><div><small>DISCOVERY</small><b>Find what matters</b></div></div>
-          <div className="phx-chip chip-b"><Boxes size={14}/><div><small>DELIVERY</small><b>46 releases tracked</b></div></div>
+          <div className="phx-chip chip-b"><Boxes size={14}/><div><small>DELIVERY</small><b>Release workflows</b></div></div>
         </div>
 
-        <div className="phx-scroll">SCROLL TO MOVE THE CAMERA <ArrowDownRight size={15}/></div>
+        <div className="phx-scroll">SCROLL TO EXPLORE PANDAHUB <ArrowDownRight size={15}/></div>
+        {/* Scroll‑triggered demo */}
+        <section className="phx-demo-section phx-content-reveal">
+          <div className="demo-box" />
+        </section>
       </section>
 
       <section className="phx-panel-section">
@@ -214,7 +162,7 @@ export default function HomePage() {
           <div className="phx-number">02</div>
           <div className="phx-kicker">MOTION ENGINE</div>
           <h2>Movement with <i>intent.</i></h2>
-          <p>The camera, rings, light field and depth planes react to scroll progress, creating the feeling of travelling through a living product environment.</p>
+          <p>Thoughtful transitions, clear focus states and subtle depth guide attention without slowing down your workspace.</p>
         </div>
       </section>
 
@@ -223,12 +171,15 @@ export default function HomePage() {
           <div className="phx-number">03</div>
           <div className="phx-kicker">SIGNAL OVER NOISE</div>
           <h2>Premium feels <i>quiet.</i></h2>
-          <p>Pure monochrome, crisp borders, measured typography and restrained motion. No neon required.</p>
+          <p>Soft sky and lavender, crisp borders, measured typography and restrained motion. No visual noise required.</p>
           <Link href="/dashboard" className="phx-inline">Open workspace <ArrowRight size={16}/></Link>
         </div>
         <div className="phx-terminal">
-          <div className="terminal-head"><span><Terminal size={14}/> terminal</span><em>LIVE</em></div>
-          <pre>{`$ panda connect\n> repository linked\n> review queue synchronized\n> deployment pipeline ready\n\n$ panda ship --prod\n> checks passed\n> production updated`}</pre>
+          <div className="terminal-head"><span><Terminal size={14}/> workflow</span><em>OVERVIEW</em></div>
+          <pre>{`1. Create or connect a repository
+2. Collaborate on issues and pull requests
+3. Review code changes
+4. Manage your delivery workflow`}</pre>
         </div>
       </section>
 

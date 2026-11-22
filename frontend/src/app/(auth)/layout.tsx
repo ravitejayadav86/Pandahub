@@ -1,72 +1,25 @@
 import type { Metadata } from 'next';
+import type { ReactNode } from 'react';
 import Link from 'next/link';
 
 export const metadata: Metadata = {
   title: 'Sign in to PandaHub',
-  description: 'Sign in to your PandaHub account',
+  description: 'Sign in to your PandaHub workspace',
 };
 
-export default function AuthLayout({ children }: { children: React.ReactNode }) {
+export default function AuthLayout({ children }: { children: ReactNode }) {
   return (
-    <div style={{
-      minHeight: '100vh',
-      display: 'flex',
-      flexDirection: 'column',
-      background: 'var(--bg-primary)',
-    }}>
-      {/* Top bar */}
-      <header style={{
-        padding: '14px 16px',
-        borderBottom: '1px solid var(--border-color)',
-        display: 'flex', alignItems: 'center',
-        background: 'rgba(13, 17, 23, 0.8)',
-        backdropFilter: '(20px)',
-      }}>
-        <Link href="/" style={{
-          display: 'flex', alignItems: 'center', gap: 10, textDecoration: 'none',
-        }}>
-          <div style={{
-            width: 32, height: 32, borderRadius: 8,
-            background: 'var(--gradient-brand)',
-            display: 'flex', alignItems: 'center', justifyContent: 'center',
-            fontSize: 18,
-          }}>🐼</div>
-          <span style={{ fontWeight: 700, fontSize: 18, color: 'var(--text-primary)' }}>
-            Panda<span style={{
-              background: 'var(--gradient-brand)',
-              WebkitBackgroundClip: 'text',
-              WebkitTextFillColor: 'transparent',
-            }}>Hub</span>
-          </span>
-        </Link>
+    <div className="ph-auth-layout">
+      <header className="ph-auth-topbar">
+        <div className="ph-auth-topbar-inner">
+          <Link href="/" className="ph-auth-brand" aria-label="PandaHub home">
+            <span className="ph-auth-brand-mark" aria-hidden="true">🐼</span>
+            <span>Panda<span>Hub</span></span>
+          </Link>
+          <Link href="/" className="ph-auth-home-link">Back to home <span aria-hidden="true">↗</span></Link>
+        </div>
       </header>
-
-      {/* Content */}
-      <div style={{
-        flex: 1, display: 'flex',
-        alignItems: 'center', justifyContent: 'center',
-        padding: '40px 24px',
-        position: 'relative',
-      }}>
-        {/* Background blobs — percentage-based so they don't overflow on mobile */}
-        <div style={{
-          position: 'fixed', top: '20%', left: '10%',
-          width: 'clamp(180px, 30vw, 400px)',
-          height: 'clamp(180px, 30vw, 400px)',
-          borderRadius: '50%',
-          background: 'radial-gradient(circle, rgba(124,58,237,0.08) 0%, transparent 70%)',
-          pointerEvents: 'none',
-        }} />
-        <div style={{
-          position: 'fixed', bottom: '20%', right: '10%',
-          width: 'clamp(140px, 22vw, 300px)',
-          height: 'clamp(140px, 22vw, 300px)',
-          borderRadius: '50%',
-          background: 'radial-gradient(circle, rgba(37,99,235,0.08) 0%, transparent 70%)',
-          pointerEvents: 'none',
-        }} />
-        {children}
-      </div>
+      <div className="ph-auth-layout-content">{children}</div>
     </div>
   );
 }

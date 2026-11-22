@@ -134,13 +134,13 @@ export default function ChatBox({ recipientUsername, onClose }: ChatBoxProps) {
   return (
     <div className="fixed bottom-4 right-4 w-80 h-[430px] glass-panel rounded-2xl shadow-2xl flex flex-col z-50 overflow-hidden font-sans border border-[var(--glass-border)] animate-fade-in-up">
       {/* Header */}
-      <div className="px-4 py-3 bg-[#18181b] border-b border-[#333333] text-white flex justify-between items-center shrink-0">
+      <div className="px-4 py-3 bg-[#E8F9FF] border-b border-[#C4D9FF] text-[#1F2937] flex justify-between items-center shrink-0">
         <div className="flex items-center gap-2">
-          <Lock className="w-3.5 h-3.5 opacity-90 text-white" />
+          <Lock className="w-3.5 h-3.5 opacity-90 text-[#66599F]" />
           <h3 className="font-semibold text-sm">Chat with {recipientUsername}</h3>
         </div>
-        <button onClick={onClose} className="hover:bg-white/10 p-1 rounded-md transition-colors" aria-label="Close chat">
-          <X className="w-4 h-4 text-white" />
+        <button onClick={onClose} className="hover:bg-[#C4D9FF] p-1 rounded-md transition-colors" aria-label="Close chat">
+          <X className="w-4 h-4 text-[#475569]" />
         </button>
       </div>
 
@@ -158,10 +158,10 @@ export default function ChatBox({ recipientUsername, onClose }: ChatBoxProps) {
             <div className="w-12 h-12 rounded-full bg-amber-500/10 border border-amber-500/20 flex items-center justify-center">
               <Lock className="w-6 h-6 text-amber-500" />
             </div>
-            <p className="text-sm font-semibold text-slate-800 dark:text-slate-200">
+            <p className="text-sm font-semibold text-slate-800 text-[#475569]">
               E2EE Not Set Up
             </p>
-            <p className="text-xs text-slate-500 dark:text-slate-400">
+            <p className="text-xs text-slate-500 text-[#64748B]">
               <strong>{recipientUsername}</strong> hasn&apos;t set up end-to-end encryption keys yet. Ask them to open a chat first to auto-initialize their keys.
             </p>
           </div>
@@ -198,7 +198,7 @@ export default function ChatBox({ recipientUsername, onClose }: ChatBoxProps) {
             <div className={`max-w-[80%] rounded-2xl px-3.5 py-2 text-sm shadow-sm ${
               msg.isMine 
                 ? 'bg-white text-black font-semibold rounded-br-none shadow-md' 
-                : 'bg-[#18181b] border border-[#333333] text-zinc-100 rounded-bl-none'
+                : 'bg-[#E8F9FF] border border-[#C4D9FF] text-zinc-100 rounded-bl-none'
             }`}>
               {msg.text}
             </div>
@@ -208,7 +208,7 @@ export default function ChatBox({ recipientUsername, onClose }: ChatBoxProps) {
       </div>
 
       {/* Input */}
-      <form onSubmit={handleSend} className="p-3 border-t border-[#333333] flex gap-2 shrink-0 bg-[#0e0e10]">
+      <form onSubmit={handleSend} className="p-3 border-t border-[#C4D9FF] flex gap-2 shrink-0 bg-[#E8F9FF]">
         <input 
           type="text" 
           value={input}

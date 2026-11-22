@@ -254,10 +254,10 @@ export default function PullDetailPage() {
                 disabled={merging}
                 style={{
                   padding: '10px 22px', borderRadius: 12,
-                  background: '#ffffff',
-                  color: '#000000', fontWeight: 700, fontSize: 14, border: '1px solid #ffffff', cursor: 'pointer',
+                  background: '#C5BAFF',
+                  color: '#26213F', fontWeight: 700, fontSize: 14, border: '1px solid #B8ADEC', cursor: 'pointer',
                   display: 'flex', alignItems: 'center', gap: 8,
-                  boxShadow: '0 4px 14px rgba(255,255,255,0.18)',
+                  boxShadow: '0 4px 14px rgba(128,111,194,0.16)',
                   opacity: merging ? 0.7 : 1,
                 }}
               >
@@ -270,10 +270,10 @@ export default function PullDetailPage() {
               disabled={triggering}
               style={{
                 padding: '10px 20px', borderRadius: 12,
-                background: '#18181b',
-                color: '#ffffff', fontWeight: 600, fontSize: 13, border: '1px solid #333333', cursor: 'pointer',
+                background: '#E8F9FF',
+                color: '#1F2937', fontWeight: 600, fontSize: 13, border: '1px solid #C4D9FF', cursor: 'pointer',
                 display: 'flex', alignItems: 'center', gap: 8,
-                boxShadow: '0 2px 8px rgba(0,0,0,0.5)',
+                boxShadow: '0 4px 12px rgba(91,109,160,0.10)',
                 opacity: triggering ? 0.7 : 1,
               }}
             >
@@ -316,44 +316,34 @@ export default function PullDetailPage() {
         {/* ========================================================================= */}
         <div className="glass-card" style={{
           borderRadius: 20, border: '1px solid rgba(99, 102, 241, 0.3)',
-          background: 'linear-gradient(180deg, rgba(30, 27, 75, 0.4) 0%, rgba(15, 23, 42, 0.6) 100%)',
-          padding: 28, marginBottom: 32, boxShadow: '0 10px 30px rgba(0,0,0,0.3)'
+          background: 'linear-gradient(145deg, #C4D9FF 0%, #E8F9FF 100%)',
+          padding: 28, marginBottom: 32, boxShadow: '0 10px 30px rgba(91,109,160,0.10)'
         }}>
           {/* Header */}
-          <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', flexWrap: 'wrap', gap: 12, marginBottom: 20, borderBottom: '1px solid rgba(255,255,255,0.08)', paddingBottom: 16 }}>
+          <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', flexWrap: 'wrap', gap: 12, marginBottom: 20, borderBottom: '1px solid rgba(107,126,174,0.20)', paddingBottom: 16 }}>
             <div style={{ display: 'flex', alignItems: 'center', gap: 12 }}>
               <div style={{
                 width: 40, height: 40, borderRadius: 12,
-                background: '#18181b', border: '1px solid #333333',
-                display: 'flex', alignItems: 'center', justifyContent: 'center', color: '#fff'
+                background: '#E8F9FF', border: '1px solid #C4D9FF',
+                display: 'flex', alignItems: 'center', justifyContent: 'center', color: '#1F2937'
               }}>
                 <span className="material-symbols-outlined" style={{ fontSize: 24 }}>hub</span>
               </div>
               <div>
-                <h3 style={{ margin: 0, fontSize: 18, fontWeight: 700, color: '#fff' }}>
+                <h3 style={{ margin: 0, fontSize: 18, fontWeight: 700, color: '#1F2937' }}>
                   Dynamic Hybrid Expert Routing
                 </h3>
-                <span style={{ fontSize: 12, color: '#a1a1aa' }}>
+                <span style={{ fontSize: 12, color: '#64748B' }}>
                   Semantic Category Dispatch • Specialized Model Allocation • Two-Layer RAG
                 </span>
               </div>
-            </div>
-
-            {/* Performance Gain Pill (Contribution 1) */}
-            <div style={{
-              background: '#18181b', border: '1px solid #333333',
-              padding: '6px 14px', borderRadius: 999, fontSize: 12, fontWeight: 600, color: '#f4f4f5',
-              display: 'flex', alignItems: 'center', gap: 8
-            }}>
-              <span className="material-symbols-outlined" style={{ fontSize: 16, color: '#ffffff' }}>trending_up</span>
-              <strong>+13.2%</strong> vs zero-shot • <strong>+7.7%</strong> vs single best model
             </div>
           </div>
 
           {!aiReview ? (
             <div style={{ textAlign: 'center', padding: '36px 20px', color: 'var(--text-secondary)' }}>
               <span className="material-symbols-outlined" style={{ fontSize: 48, color: '#6366f1', marginBottom: 12 }}>bolt</span>
-              <h4 style={{ margin: '0 0 8px 0', fontSize: 16, fontWeight: 600, color: '#fff' }}>No AI Review Generated Yet</h4>
+              <h4 style={{ margin: '0 0 8px 0', fontSize: 16, fontWeight: 600, color: '#1F2937' }}>No AI Review Generated Yet</h4>
               <p style={{ margin: '0 0 18px 0', fontSize: 13, maxWidth: 500, marginInline: 'auto' }}>
                 Dispatch this PR's diff to our specialist models: Qwen2.5-Coder-32B for code logic or Mistral-Instruct-7B for documentation, augmented by Qdrant vector retrieval.
               </p>
@@ -362,9 +352,9 @@ export default function PullDetailPage() {
                 disabled={triggering}
                 style={{
                   padding: '10px 24px', borderRadius: 12,
-                  background: '#ffffff',
-                  color: '#000000', fontWeight: 700, fontSize: 14, border: '1px solid #ffffff', cursor: 'pointer',
-                  boxShadow: '0 4px 14px rgba(255,255,255,0.18)',
+                  background: '#C5BAFF',
+                  color: '#26213F', fontWeight: 700, fontSize: 14, border: '1px solid #B8ADEC', cursor: 'pointer',
+                  boxShadow: '0 4px 14px rgba(128,111,194,0.16)',
                 }}
               >
                 {triggering ? 'Analyzing PR Diffs...' : 'Run Dynamic Hybrid Expert Review'}
@@ -379,8 +369,8 @@ export default function PullDetailPage() {
               }}>
                 {/* 1. Category */}
                 <div style={{
-                  padding: '14px 16px', borderRadius: 14, background: 'rgba(255,255,255,0.03)',
-                  border: '1px solid rgba(255,255,255,0.06)'
+                  padding: '14px 16px', borderRadius: 14, background: '#E8F9FF',
+                  border: '1px solid rgba(107,126,174,0.18)'
                 }}>
                   <div style={{ fontSize: 11, color: 'var(--text-muted)', fontWeight: 600, textTransform: 'uppercase', marginBottom: 4 }}>
                     1. Semantic Category
@@ -393,7 +383,7 @@ export default function PullDetailPage() {
                       border: `1px solid ${categoryColor(aiReview.diff_category)}44`,
                       textTransform: 'capitalize'
                     }}>
-                      {aiReview.diff_category || 'Functional'}
+                      {aiReview.diff_category || 'Not classified'}
                     </span>
                     {severityBadge(aiReview.severity)}
                   </div>
@@ -401,17 +391,17 @@ export default function PullDetailPage() {
 
                 {/* 2. Specialized Model Allocation */}
                 <div style={{
-                  padding: '14px 16px', borderRadius: 14, background: 'rgba(255,255,255,0.03)',
-                  border: '1px solid rgba(255,255,255,0.06)'
+                  padding: '14px 16px', borderRadius: 14, background: '#E8F9FF',
+                  border: '1px solid rgba(107,126,174,0.18)'
                 }}>
                   <div style={{ fontSize: 11, color: 'var(--text-muted)', fontWeight: 600, textTransform: 'uppercase', marginBottom: 4 }}>
                     2. Model Allocation
                   </div>
-                  <div style={{ fontSize: 13, fontWeight: 700, color: '#fff', display: 'flex', alignItems: 'center', gap: 6 }}>
+                  <div style={{ fontSize: 13, fontWeight: 700, color: '#1F2937', display: 'flex', alignItems: 'center', gap: 6 }}>
                     <span className="material-symbols-outlined" style={{ fontSize: 16, color: '#38bdf8' }}>smart_toy</span>
                     {aiReview.model_used.includes('qwen') ? 'Qwen2.5-Coder-32B' : aiReview.model_used.includes('mistral') ? 'Mistral-Instruct-7B' : aiReview.model_used}
                     <span style={{ fontSize: 11, padding: '2px 6px', borderRadius: 4, background: 'rgba(56, 189, 248, 0.2)', color: '#38bdf8' }}>
-                      k={aiReview.k_samples || 3}
+                      k={aiReview.k_samples ?? 0}
                     </span>
                   </div>
                   <div style={{ fontSize: 11, color: 'var(--text-muted)', marginTop: 2 }}>
@@ -421,15 +411,17 @@ export default function PullDetailPage() {
 
                 {/* 3. Two-Layer RAG & Neighbor Voting */}
                 <div style={{
-                  padding: '14px 16px', borderRadius: 14, background: 'rgba(255,255,255,0.03)',
-                  border: '1px solid rgba(255,255,255,0.06)'
+                  padding: '14px 16px', borderRadius: 14, background: '#E8F9FF',
+                  border: '1px solid rgba(107,126,174,0.18)'
                 }}>
                   <div style={{ fontSize: 11, color: 'var(--text-muted)', fontWeight: 600, textTransform: 'uppercase', marginBottom: 4 }}>
                     3. Qdrant RAG (384-d)
                   </div>
                   <div style={{ fontSize: 13, fontWeight: 600, color: '#34d399', display: 'flex', alignItems: 'center', gap: 6 }}>
                     <span className="material-symbols-outlined" style={{ fontSize: 16 }}>database</span>
-                    {aiReview.routing_metadata?.rag_neighbours ? `${aiReview.routing_metadata.rag_neighbours} neighbours matched` : 'Vector Indexed'}
+                    {typeof aiReview.routing_metadata?.rag_neighbours === 'number'
+                      ? `${aiReview.routing_metadata.rag_neighbours} neighbours matched`
+                      : aiReview.routing_metadata?.rag_available === false ? 'RAG unavailable' : 'Retrieval not reported'}
                   </div>
                   <div style={{ fontSize: 11, color: 'var(--text-muted)', marginTop: 2 }}>
                     Primary (Repo) + Secondary (crc-py)
@@ -438,20 +430,20 @@ export default function PullDetailPage() {
 
                 {/* 4. Guards Active */}
                 <div style={{
-                  padding: '14px 16px', borderRadius: 14, background: 'rgba(255,255,255,0.03)',
-                  border: '1px solid rgba(255,255,255,0.06)'
+                  padding: '14px 16px', borderRadius: 14, background: '#E8F9FF',
+                  border: '1px solid rgba(107,126,174,0.18)'
                 }}>
                   <div style={{ fontSize: 11, color: 'var(--text-muted)', fontWeight: 600, textTransform: 'uppercase', marginBottom: 4 }}>
                     4. Active Guards
                   </div>
-                  <div style={{ fontSize: 12, color: '#fcd34d', display: 'flex', flexDirection: 'column', gap: 2 }}>
+                  <div style={{ fontSize: 12, color: '#946B22', display: 'flex', flexDirection: 'column', gap: 2 }}>
                     <span style={{ display: 'inline-flex', alignItems: 'center', gap: 4 }}>
                       <span className="material-symbols-outlined" style={{ fontSize: 14, color: '#22c55e' }}>verified</span>
-                      Context Collapse: Cap k≤3
+                      Context sampling: k={aiReview.routing_metadata?.context_collapse_guard?.k_effective ?? aiReview.k_samples ?? 'not reported'}
                     </span>
                     <span style={{ display: 'inline-flex', alignItems: 'center', gap: 4 }}>
                       <span className="material-symbols-outlined" style={{ fontSize: 14, color: '#22c55e' }}>verified</span>
-                      Severity Bias Mitigation: ON
+                      Severity cap: {aiReview.routing_metadata?.severity_overestimation_mitigation?.applied === true ? 'Applied' : aiReview.routing_metadata?.severity_overestimation_mitigation?.applied === false ? 'Not required' : 'Not reported'}
                     </span>
                   </div>
                 </div>
@@ -459,8 +451,8 @@ export default function PullDetailPage() {
 
               {/* Review Summary */}
               <div style={{
-                background: 'rgba(0,0,0,0.25)', borderRadius: 14, padding: '18px 20px',
-                border: '1px solid rgba(255,255,255,0.06)', marginBottom: 20
+                background: '#E8F9FF', borderRadius: 14, padding: '18px 20px',
+                border: '1px solid rgba(107,126,174,0.18)', marginBottom: 20
               }}>
                 <div style={{ fontSize: 12, fontWeight: 700, color: 'var(--text-secondary)', textTransform: 'uppercase', marginBottom: 6 }}>
                   Expert Review Summary
@@ -473,18 +465,18 @@ export default function PullDetailPage() {
               {/* Actionable Suggestions */}
               {Array.isArray(aiReview.suggestions) && aiReview.suggestions.length > 0 && (
                 <div style={{ marginBottom: 24 }}>
-                  <div style={{ fontSize: 13, fontWeight: 700, color: '#fff', marginBottom: 12, display: 'flex', alignItems: 'center', gap: 8 }}>
+                  <div style={{ fontSize: 13, fontWeight: 700, color: '#1F2937', marginBottom: 12, display: 'flex', alignItems: 'center', gap: 8 }}>
                     <span className="material-symbols-outlined" style={{ fontSize: 18, color: '#818cf8' }}>rate_review</span>
                     Actionable Code Suggestions ({aiReview.suggestions.length})
                   </div>
                   <div style={{ display: 'flex', flexDirection: 'column', gap: 10 }}>
                     {aiReview.suggestions.map((s: any, idx: number) => (
                       <div key={idx} style={{
-                        padding: '14px 18px', borderRadius: 12, background: 'rgba(255,255,255,0.02)',
-                        border: '1px solid rgba(255,255,255,0.07)'
+                        padding: '14px 18px', borderRadius: 12, background: '#E8F9FF',
+                        border: '1px solid rgba(107,126,174,0.18)'
                       }}>
                         <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: 6 }}>
-                          <span style={{ fontSize: 13, fontWeight: 700, color: '#e2e8f0', fontFamily: 'monospace' }}>
+                          <span style={{ fontSize: 13, fontWeight: 700, color: '#475569', fontFamily: 'monospace' }}>
                             {s.file || 'File'} {s.line ? `(L${s.line})` : ''}
                           </span>
                           {severityBadge(s.severity)}
@@ -502,16 +494,16 @@ export default function PullDetailPage() {
               {/* Contribution 8 — Semantic Judge Evaluation (LLM-as-a-Judge)           */}
               {/* ===================================================================== */}
               <div style={{
-                marginTop: 24, paddingTop: 20, borderTop: '1px solid rgba(255,255,255,0.08)'
+                marginTop: 24, paddingTop: 20, borderTop: '1px solid rgba(107,126,174,0.20)'
               }}>
                 <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', flexWrap: 'wrap', gap: 12, marginBottom: 16 }}>
                   <div>
-                    <h4 style={{ margin: '0 0 4px 0', fontSize: 15, fontWeight: 700, color: '#fff', display: 'flex', alignItems: 'center', gap: 8 }}>
+                    <h4 style={{ margin: '0 0 4px 0', fontSize: 15, fontWeight: 700, color: '#1F2937', display: 'flex', alignItems: 'center', gap: 8 }}>
                       <span className="material-symbols-outlined" style={{ fontSize: 20, color: '#c084fc' }}>gavel</span>
                       Semantic Judge Evaluation (Llama-3-70B-Instruct)
                     </h4>
                     <span style={{ fontSize: 12, color: 'var(--text-muted)' }}>
-                      Calibrated evaluator (κ = 0.78 inter-annotator agreement vs senior engineers across &gt;39,000 runs)
+                      Rubric-based model evaluation; agreement with human reviewers has not been measured here
                     </span>
                   </div>
                   <button
@@ -519,10 +511,10 @@ export default function PullDetailPage() {
                     disabled={judging}
                     style={{
                       padding: '8px 18px', borderRadius: 10,
-                      background: '#18181b',
-                      color: '#ffffff', fontWeight: 600, fontSize: 13, border: '1px solid #333333', cursor: 'pointer',
+                      background: '#E8F9FF',
+                      color: '#1F2937', fontWeight: 600, fontSize: 13, border: '1px solid #C4D9FF', cursor: 'pointer',
                       display: 'flex', alignItems: 'center', gap: 6,
-                      boxShadow: '0 2px 8px rgba(0,0,0,0.5)',
+                      boxShadow: '0 4px 12px rgba(91,109,160,0.10)',
                       opacity: judging ? 0.7 : 1,
                     }}
                   >
@@ -533,16 +525,16 @@ export default function PullDetailPage() {
 
                 {judgeData && judgeData.scores ? (
                   <div style={{
-                    padding: '18px 20px', borderRadius: 14, background: '#121214',
-                    border: '1px solid #27272a'
+                    padding: '18px 20px', borderRadius: 14, background: '#C4D9FF',
+                    border: '1px solid #C4D9FF'
                   }}>
                     <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: 16, flexWrap: 'wrap', gap: 8 }}>
-                      <span style={{ fontSize: 13, fontWeight: 700, color: '#ffffff' }}>
+                      <span style={{ fontSize: 13, fontWeight: 700, color: '#1F2937' }}>
                         Evaluator: {judgeData.judge_model || 'meta-llama/llama-3-70b-instruct'}
                       </span>
                       <span style={{
-                        padding: '4px 12px', borderRadius: 999, background: '#18181b', border: '1px solid #333333',
-                        color: '#ffffff', fontWeight: 800, fontSize: 13
+                        padding: '4px 12px', borderRadius: 999, background: '#E8F9FF', border: '1px solid #C4D9FF',
+                        color: '#1F2937', fontWeight: 800, fontSize: 13
                       }}>
                         Score: {judgeData.mean_score?.toFixed(2) || '4.60'} / 5.0
                       </span>
@@ -552,7 +544,7 @@ export default function PullDetailPage() {
                     <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(180px, 1fr))', gap: 12, marginBottom: 14 }}>
                       {Object.entries(judgeData.scores).map(([axis, val]: any) => (
                         <div key={axis}>
-                          <div style={{ display: 'flex', justifyContent: 'space-between', fontSize: 12, color: '#d4d4d8', textTransform: 'capitalize', marginBottom: 4 }}>
+                          <div style={{ display: 'flex', justifyContent: 'space-between', fontSize: 12, color: '#475569', textTransform: 'capitalize', marginBottom: 4 }}>
                             <span>{axis}</span>
                             <strong>{val.toFixed ? val.toFixed(1) : val}/5</strong>
                           </div>
@@ -567,7 +559,7 @@ export default function PullDetailPage() {
                     </div>
 
                     {judgeData.rationale && (
-                      <p style={{ margin: 0, fontSize: 12, color: '#a1a1aa', lineHeight: 1.5, fontStyle: 'italic' }}>
+                      <p style={{ margin: 0, fontSize: 12, color: '#64748B', lineHeight: 1.5, fontStyle: 'italic' }}>
                         "{judgeData.rationale}"
                       </p>
                     )}

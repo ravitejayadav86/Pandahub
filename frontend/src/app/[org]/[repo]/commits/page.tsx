@@ -50,8 +50,8 @@ export default function CommitsPage() {
                 <div key={commit.sha} style={{ display: 'flex', alignItems: 'flex-start', gap: 16, padding: '18px 24px', borderBottom: i < commits.length - 1 ? '1px solid var(--glass-border)' : 'none', transition: 'background 0.15s' }}
                   onMouseEnter={e => (e.currentTarget as HTMLElement).style.background = 'var(--glass-bg-2)'}
                   onMouseLeave={e => (e.currentTarget as HTMLElement).style.background = 'transparent'}>
-                  <div style={{ width: 36, height: 36, borderRadius: '50%', background: 'linear-gradient(135deg, #AFAFAF, #A8A8A8)', display: 'flex', alignItems: 'center', justifyContent: 'center', flexShrink: 0, boxShadow: '0 2px 8px rgba(99,102,241,0.3)' }}>
-                    <span style={{ fontSize: 14, fontWeight: 700, color: '#fff' }}>{commit.author_name.charAt(0).toUpperCase()}</span>
+                  <div style={{ width: 36, height: 36, borderRadius: '50%', background: 'linear-gradient(135deg, #C5BAFF, #C4D9FF)', display: 'flex', alignItems: 'center', justifyContent: 'center', flexShrink: 0, boxShadow: '0 2px 8px rgba(99,102,241,0.3)' }}>
+                    <span style={{ fontSize: 14, fontWeight: 700, color: '#1F2937' }}>{commit.author_name.charAt(0).toUpperCase()}</span>
                   </div>
                   <div style={{ flex: 1, minWidth: 0 }}>
                     <p style={{ fontSize: 14, fontWeight: 600, marginBottom: 4, overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap', color: 'var(--text-primary)' }}>{commit.message.split('\n')[0]}</p>
@@ -69,8 +69,8 @@ export default function CommitsPage() {
           )}
         {!loading && commits.length > 0 && (
           <div style={{ display: 'flex', justifyContent: 'center', gap: 12, marginTop: 24 }}>
-            {page > 1 && <button onClick={() => setPage(p => p - 1)} style={{ padding: '8px 20px', borderRadius: 12, background: '#18181b', border: '1px solid #333333', fontSize: 13, fontWeight: 600, cursor: 'pointer', color: '#f4f4f5' }}>Previous</button>}
-            {hasMore && <button onClick={() => setPage(p => p + 1)} style={{ padding: '8px 20px', borderRadius: 12, background: '#ffffff', color: '#000000', fontSize: 13, fontWeight: 700, border: '1px solid #ffffff', cursor: 'pointer', boxShadow: '0 4px 14px rgba(255,255,255,0.18)' }}>Next</button>}
+            {page > 1 && <button onClick={() => setPage(p => p - 1)} style={{ padding: '8px 20px', borderRadius: 12, background: '#E8F9FF', border: '1px solid #C4D9FF', fontSize: 13, fontWeight: 600, cursor: 'pointer', color: '#f4f4f5' }}>Previous</button>}
+            {hasMore && <button onClick={() => setPage(p => p + 1)} style={{ padding: '8px 20px', borderRadius: 12, background: '#C5BAFF', color: '#26213F', fontSize: 13, fontWeight: 700, border: '1px solid #B8ADEC', cursor: 'pointer', boxShadow: '0 4px 14px rgba(128,111,194,0.16)' }}>Next</button>}
           </div>
         )}
       </div>

@@ -72,7 +72,7 @@ function ErrorFallback({ error, onReset }: { error: Error | null; onReset: () =>
   };
 
   return (
-    <div className="min-h-screen bg-[#0d1117] flex items-center justify-center p-6 font-sans">
+    <div className="min-h-screen bg-[#E8F9FF] flex items-center justify-center p-6 font-sans">
       {/* Background glow */}
       <div className="fixed inset-0 pointer-events-none">
         <div className="absolute top-1/4 left-1/2 -translate-x-1/2 w-[600px] h-[400px] bg-red-600/8 rounded-full" />
@@ -86,7 +86,7 @@ function ErrorFallback({ error, onReset }: { error: Error | null; onReset: () =>
               <span className="text-5xl select-none">🐼</span>
             </div>
             <div className="absolute -bottom-2 -right-2 w-8 h-8 rounded-xl bg-red-500 flex items-center justify-center shadow-lg shadow-red-500/40">
-              <span className="text-white text-sm font-bold">!</span>
+              <span className="text-[#1F2937] text-sm font-bold">!</span>
             </div>
           </div>
         </div>
@@ -94,8 +94,8 @@ function ErrorFallback({ error, onReset }: { error: Error | null; onReset: () =>
         {/* Main card */}
         <div className="rounded-2xl border border-red-500/15 bg-red-500/5 overflow-hidden">
           <div className="px-8 py-7">
-            <h1 className="text-2xl font-bold text-white mb-2">Something went wrong</h1>
-            <p className="text-slate-400 text-sm leading-relaxed mb-5">
+            <h1 className="text-2xl font-bold text-[#1F2937] mb-2">Something went wrong</h1>
+            <p className="text-[#64748B] text-sm leading-relaxed mb-5">
               PandaHub ran into an unexpected error while rendering this page.
               This is a bug on our side — you haven't done anything wrong.
             </p>
@@ -109,21 +109,21 @@ function ErrorFallback({ error, onReset }: { error: Error | null; onReset: () =>
             </div>
 
             {/* Error message */}
-            <div className="px-4 py-3 rounded-xl bg-black/30 border border-white/6 mb-6">
-              <p className="text-slate-300 text-sm font-mono break-all leading-relaxed">{errorText}</p>
+            <div className="px-4 py-3 rounded-xl bg-[#E8F9FF] border border-white/6 mb-6">
+              <p className="text-[#475569] text-sm font-mono break-all leading-relaxed">{errorText}</p>
             </div>
 
             {/* Actions */}
             <div className="flex flex-col sm:flex-row gap-3">
               <button
                 onClick={onReset}
-                className="flex-1 py-2.5 px-4 rounded-xl bg-white text-black text-sm font-bold hover:bg-zinc-200 transition-all shadow-md active:scale-95"
+                className="flex-1 py-2.5 px-4 rounded-xl bg-[#C5BAFF] text-[#26213F] text-sm font-bold hover:bg-[#B9ACF5] transition-all shadow-md active:scale-95"
               >
                 ↺ Try again
               </button>
               <button
                 onClick={() => { window.location.href = '/dashboard'; }}
-                className="flex-1 py-2.5 px-4 rounded-xl border border-zinc-700 bg-zinc-900 text-zinc-100 text-sm font-semibold hover:bg-zinc-800 transition-all"
+                className="flex-1 py-2.5 px-4 rounded-xl border border-[#C4D9FF] bg-[#C4D9FF] text-[#1F2937] text-sm font-semibold hover:bg-[#B8D0FB] transition-all"
               >
                 🏠 Go to Dashboard
               </button>
@@ -131,13 +131,13 @@ function ErrorFallback({ error, onReset }: { error: Error | null; onReset: () =>
           </div>
 
           {/* Footer */}
-          <div className="px-8 py-4 border-t border-white/6 bg-black/20 flex items-center justify-between gap-4">
+          <div className="px-8 py-4 border-t border-white/6 bg-[#E8F9FF] flex items-center justify-between gap-4">
             <p className="text-xs text-slate-500">
               If this keeps happening, copy the error details and file a report.
             </p>
             <button
               onClick={copyDetails}
-              className="flex-shrink-0 text-xs px-3 py-1.5 rounded-lg bg-white/6 text-slate-400 hover:bg-white/10 hover:text-slate-200 transition-all border border-white/8"
+              className="flex-shrink-0 text-xs px-3 py-1.5 rounded-lg bg-white/6 text-[#64748B] hover:bg-white/10 hover:text-slate-200 transition-all border border-white/8"
             >
               {copied ? '✓ Copied' : '⎘ Copy details'}
             </button>
@@ -150,7 +150,7 @@ function ErrorFallback({ error, onReset }: { error: Error | null; onReset: () =>
             href="https://github.com/mrteji/pandahub/issues/new"
             target="_blank"
             rel="noopener noreferrer"
-            className="text-slate-500 hover:text-slate-300 transition-colors"
+            className="text-slate-500 hover:text-[#475569] transition-colors"
           >
             Report this issue ↗
           </a>

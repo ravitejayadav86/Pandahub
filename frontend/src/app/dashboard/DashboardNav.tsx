@@ -1,77 +1,24 @@
-"use client"
+"use client";
 
-import React from 'react'
-import Link from 'next/link'
-import { useRouter } from 'next/navigation'
-import { Input } from '@/components/ui/Input'
-import { Button } from '@/components/ui/Button'
-import { Avatar } from '@/components/ui/Avatar'
-import { useAuthStore } from '@/store/authStore'
-import { Search, Plus, Bell, Settings, Menu } from 'lucide-react'
+import Link from 'next/link';
+import { useRouter } from 'next/navigation';
+import { Plus, Settings } from 'lucide-react';
+import SearchBox from '@/components/shared/SearchBox';
+import { useAuthStore } from '@/store/authStore';
+import { Avatar } from '@/components/ui/Avatar';
 
-interface DashboardNavProps {
-  onMenuClick: () => void;
-}
-
-export function DashboardNav({ onMenuClick }: DashboardNavProps) {
-  const { user } = useAuthStore()
-  const router = useRouter()
-
-  return (
-    <header className="sticky top-0 z-50 h-[64px] bg-white/90 dark:bg-slate-900/90 border-b border-slate-200 dark:border-slate-800 flex items-center justify-between px-4 md:px-6" style={{ transform: 'translateZ(0)', willChange: 'transform' }}>
-      
-      {/* Left section: Logo & Context */}
-      <div className="flex items-center gap-4 md:gap-6">
-        <button 
-          onClick={onMenuClick}
-          className="p-1 hover:bg-slate-100 dark:hover:bg-slate-800 rounded-md transition-colors text-slate-500"
-        >
-          <Menu className="w-5 h-5" />
-        </button>
-        <Link href="/dashboard" className="flex items-center gap-2">
-          <span className="text-2xl inline-block hover:animate-wiggle cursor-default">🐼</span>
-          <span className="font-bold text-xl tracking-tight hidden md:block text-slate-900 dark:text-white">
-            PandaHub
-          </span>
-        </Link>
-        <div className="hidden md:flex items-center gap-2">
-          <span className="text-slate-300 dark:text-slate-700">/</span>
-          <span className="text-sm font-medium text-slate-600 dark:text-slate-300">Dashboard</span>
-        </div>
-      </div>
-
-      {/* Center/Right section: Search & Actions */}
-      <div className="flex items-center gap-4 flex-1 justify-end">
-        <div className="hidden md:block w-72">
-          <Input 
-            placeholder="Type / to search..." 
-            icon={<Search className="w-4 h-4" />}
-            className="h-9"
-          />
-        </div>
-        
-        <div className="flex items-center gap-2 border-l border-slate-200 dark:border-slate-800 pl-4 ml-2">
-          <Button variant="ghost" className="w-9 h-9 p-0 rounded-full" onClick={() => router.push('/new')}>
-            <Plus className="w-5 h-5 text-slate-500" />
-          </Button>
-          <Button variant="ghost" className="w-9 h-9 p-0 rounded-full relative" onClick={() => alert('Notifications coming soon!')}>
-            <Bell className="w-5 h-5 text-slate-500" />
-            <span className="absolute top-1.5 right-1.5 w-2 h-2 bg-blue-500 rounded-full border-2 border-white dark:border-slate-900" />
-          </Button>
-          <Button variant="ghost" className="w-9 h-9 p-0 rounded-full" onClick={() => router.push('/settings')}>
-            <Settings className="w-5 h-5 text-slate-500" />
-          </Button>
-          
-          <div className="ml-2 cursor-pointer card-lift" onClick={() => router.push(`/${user?.username}`)}>
-            <Avatar 
-              size="md" 
-              src={user?.avatar_url} 
-              alt={user?.username || 'User'} 
-              fallback={user?.username?.charAt(0).toUpperCase() || 'U'}
-            />
-          </div>
-        </div>
-      </div>
-    </header>
-  )
+/** Dashboard-specific toolbar. Primary navigation lives in PandaHubSidebar. */
+export function DashboardNav() {
+  const user = useAuthStore((state) => state.user);
+  const router = useRouter();
+  return <header className="ph-dashboard-toolbar">
+    <div className="ph-dashboard-toolbar-title"><span aria-hidden="true">✦</span><strong>Workspace</strong><span className="ph-dashboard-toolbar-divider">/</span><span>Overview</span></div>
+    <div className="ph-dashboard-toolbar-search"><SearchBox placeholder="Search PandaHub…" maxWidth={360} expandedMaxWidth={440} triggerSlash={true} /></div>
+    <div className="ph-dashboard-toolbar-actions">
+      <Link className="ph-dashboard-toolbar-create" href="/new" aria-label="Create repository" title="Create repository"><Plus size={18}/><span>New</span></Link>
+      <Link className="ph-dashboard-toolbar-icon" href="/settings" aria-label="Settings" title="Settings"><Settings size={19}/></Link>
+      {user?.username ? <button className="ph-dashboard-toolbar-avatar" type="button" onClick={() => router.push(`/${encodeURIComponent(user.username)}`)} aria-label="Your profile" title="Your profile"><Avatar size="sm" src={user.avatar_url} fallback={user.username.slice(0, 1).toUpperCase()} /></button>
+        : <Link className="ph-dashboard-toolbar-create" href="/login">Sign in</Link>}
+    </div>
+  </header>;
 }

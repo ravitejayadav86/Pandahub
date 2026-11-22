@@ -9,13 +9,13 @@ Tests:
   5. Asynchronous Continuous Indexing Loop on PR merge
   6. Semi-Supervised Self-Training Classifier (Dual-branch TF-IDF + tau=0.7)
   7. Anti-Leakage Dataset Pipeline (Temporal cutoff June 1, 2024 + sanitization)
-  8. Semantic Judge Evaluation (LLM-as-a-Judge 5 axes & kappa=0.78 calibration)
+  8. Semantic Judge Evaluation (provider-dependent rubric on five axes)
 """
 from __future__ import annotations
 
 import pytest
 from datetime import datetime, timezone
-from unittest.mock import patch, MagicMock
+from unittest.mock import AsyncMock, patch, MagicMock
 
 from app.services.ai_router import (
     classify_diff,
@@ -37,7 +37,6 @@ from app.worker.tasks.crc_tasks import (
 )
 from app.services.judge import (
     judge_review,
-    _calibrated_local_judge,
     SCORE_AXES,
     JUDGE_MODEL,
 )
@@ -249,17 +248,88 @@ def test_contribution_7_anti_leakage_temporal_cutoff():
 # ─────────────────────────────────────────────────────────────────────────────
 
 @pytest.mark.asyncio
-async def test_contribution_8_semantic_judge_axes():
-    candidate = "Ensure password comparison uses constant-time bcrypt verification to prevent timing attacks."
-    reference = "Vulnerability: plain string comparison leaks password timing information. Use constant time check."
-    diff = "+++ b/auth.py\n-if user.pw == pw:\n+if bcrypt.checkpw(pw, user.pw):"
+async def test_contribution_8_judge_without_provider_fails_explicitly():
+    """No provider means no fabricated semantic scores."""
+    with patch("app.services.judge.get_settings") as mock_settings:
+        mock_settings.return_value.OPENROUTER_API_KEY = None
+        result = await judge_review(
+            "Fix password comparison.",
+            "Use constant-time password verification.",
+            "+++ b/auth.py\n-if pw == stored:\n+if bcrypt.checkpw(pw, stored):",
+        )
 
-    # Evaluates across the 5 calibrated semantic dimensions
-    result = await judge_review(candidate, reference, diff)
+    assert not result.success
+    assert result.scores == {}
+    assert result.mean_score == 0.0
+    assert "not configured" in (result.error or "").lower()
 
-    assert result.success is True
-    assert set(result.scores.keys()) == set(SCORE_AXES)
-    for axis in SCORE_AXES:
-        assert 1.0 <= result.scores[axis] <= 5.0
-    assert result.mean_score >= 3.5
-    assert len(result.rationale) > 20
+
+@pytest.mark.asyncio
+async def test_contribution_8_judge_accepts_real_provider_schema():
+    """Mock the HTTP transport, not semantic agreement or score quality."""
+    provider_reply = {
+        "accuracy": 5,
+        "completeness": 4,
+        "actionability": 4,
+        "severity": 3,
+        "style": 5,
+        "rationale": "The review identifies the issue and gives a specific fix.",
+    }
+    response = MagicMock()
+    response.json.return_value = {
+        "choices": [{"message": {"content": __import__("json").dumps(provider_reply)}}]
+    }
+    response.raise_for_status.return_value = None
+
+    client = MagicMock()
+    client.post = AsyncMock(return_value=response)
+    client.__aenter__ = AsyncMock(return_value=client)
+    client.__aexit__ = AsyncMock(return_value=None)
+
+    with (
+        patch("app.services.judge.get_settings") as mock_settings,
+        patch("app.services.judge.httpx.AsyncClient", return_value=client),
+    ):
+        mock_settings.return_value.OPENROUTER_API_KEY = "unit-test-provider-key"
+        mock_settings.return_value.BACKEND_URL = "http://localhost:8000"
+        result = await judge_review(
+            "Use bcrypt.checkpw for password verification.",
+            "Use constant-time comparison.",
+            "+++ b/auth.py\n-if pw == stored:\n+if bcrypt.checkpw(pw, stored):",
+        )
+
+    assert result.success
+    assert set(result.scores) == set(SCORE_AXES)
+    assert result.scores == {axis: float(provider_reply[axis]) for axis in SCORE_AXES}
+    assert result.mean_score == 4.2
+    assert result.judge_model == JUDGE_MODEL
+    assert result.rationale == provider_reply["rationale"]
+    client.post.assert_awaited_once()
+    assert client.post.call_args.kwargs["json"]["model"] == JUDGE_MODEL
+
+
+@pytest.mark.asyncio
+async def test_contribution_8_rejects_invalid_provider_scores():
+    """Invalid provider responses must not be passed off as success."""
+    response = MagicMock()
+    response.json.return_value = {
+        "choices": [{"message": {"content": '{"accuracy": 99, "completeness": 5, "actionability": 5, "severity": 5, "style": 5}'}}]
+    }
+    response.raise_for_status.return_value = None
+
+    client = MagicMock()
+    client.post = AsyncMock(return_value=response)
+    client.__aenter__ = AsyncMock(return_value=client)
+    client.__aexit__ = AsyncMock(return_value=None)
+
+    with (
+        patch("app.services.judge.get_settings") as mock_settings,
+        patch("app.services.judge.httpx.AsyncClient", return_value=client),
+    ):
+        mock_settings.return_value.OPENROUTER_API_KEY = "unit-test-provider-key"
+        mock_settings.return_value.BACKEND_URL = "http://localhost:8000"
+        result = await judge_review("candidate", "reference", "diff")
+
+    assert not result.success
+    assert result.scores == {}
+    assert "invalid score" in (result.error or "").lower()

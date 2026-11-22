@@ -38,6 +38,7 @@ from __future__ import annotations
 
 import asyncio
 import os
+import subprocess
 from typing import AsyncGenerator, Optional
 from pathlib import Path
 
@@ -457,11 +458,20 @@ async def receive_pack(
 
     # Use _stream_git_backend (streaming I/O) instead of proc.communicate()
     # to avoid buffering the entire push pack file in memory (OOM risk).
-    # We capture stderr separately via a side-channel temp approach:
-    # git http-backend writes its progress/ref output to stdout (sideband-2),
-    # so stderr from the process itself is mostly git internal diagnostics.
-    # The post-receive hook parses the refs from stdout sideband data.
+    # git http-backend emits diagnostic stderr and sideband output; neither
+    # is a reliable complete list of accepted ref changes. We compare actual
+    # repository ref snapshots before and after receive-pack instead.
     env = _build_env(request, repo, "/git-receive-pack", user)
+
+    # Git progress/stderr is not a reliable source of updated ref names.
+    # Compare real refs before/after receive-pack; only accepted updates count.
+    from app.git_engine.push_events import snapshot_refs, changed_ref_lines
+    try:
+        refs_before = await asyncio.to_thread(snapshot_refs, repo.disk_path)
+    except (OSError, subprocess.SubprocessError) as exc:
+        logger.error("Could not inspect Git refs before push: %s", exc)
+        return Response(status_code=503, content="Repository refs unavailable")
+
 
     # Guard: disk_path must exist before spawning subprocess
     if not os.path.exists(repo.disk_path):
@@ -522,15 +532,19 @@ async def receive_pack(
     # Fire the post-receive hook in a thread pool executor so Celery broker
     # I/O (synchronous) doesn't block the async uvicorn event loop.
     if return_code == 0:
-        import asyncio as _asyncio
-        _asyncio.get_running_loop().run_in_executor(
-            None,
-            _fire_post_receive_hook,
-            str(repo.id),
-            repo.disk_path,
-            user.username,
-            stderr_data.decode("utf-8", errors="replace"),
-        )
+        try:
+            refs_after = await asyncio.to_thread(snapshot_refs, repo.disk_path)
+            updated_refs = changed_ref_lines(refs_before, refs_after)
+        except (OSError, subprocess.SubprocessError) as exc:
+            logger.exception("Git push succeeded but ref event capture failed: %s", exc)
+            updated_refs = ""
+        if updated_refs:
+            # Once the push has been accepted, enqueue post-processing without
+            # blocking the Git client's response.
+            asyncio.get_running_loop().run_in_executor(
+                None, _fire_post_receive_hook, str(repo.id), repo.disk_path,
+                user.username, updated_refs,
+            )
 
     logger.info(
         "git push completed",
@@ -566,11 +580,14 @@ def _fire_post_receive_hook(
     """
     try:
         from app.worker.tasks.git_tasks import post_receive_hook
-        post_receive_hook(
-            repo_id=repo_id,
-            disk_path=disk_path,
-            pusher_username=pusher_username,
-            receive_pack_output=stderr_output,
+        post_receive_hook.apply_async(
+            kwargs={
+                "repo_id": repo_id,
+                "disk_path": disk_path,
+                "pusher_username": pusher_username,
+                "receive_pack_output": stderr_output,
+            },
+            queue="git_ops",
         )
     except Exception as exc:
         # Non-fatal: the push already succeeded; the hook failing means

@@ -1,21 +1,43 @@
 "use client";
 
-import { useState, useEffect, Suspense } from 'react';
+import { Suspense, useEffect, useState } from 'react';
+import type { FormEvent } from 'react';
+import Link from 'next/link';
 import { useRouter, useSearchParams } from 'next/navigation';
+import {
+  ArrowRight,
+  CheckCircle2,
+  Code2,
+  GitBranch,
+  Github,
+  KeyRound,
+  LoaderCircle,
+  LockKeyhole,
+  Mail,
+  ShieldCheck,
+  Sparkles,
+  UserRound,
+  UsersRound,
+} from 'lucide-react';
 import { useAuthStore } from '@/store/authStore';
-import api, { BASE_URL } from '@/lib/api';
+import api from '@/lib/api';
 
-// OAuth redirects must go directly to the backend server (not through the
-// Next.js proxy) because Google/GitHub's callback URL is registered against
-// the real backend origin, not the frontend.
+// OAuth redirects go directly to the backend because the callback URLs are
+// registered against the backend origin, not the Next.js frontend proxy.
 const BACKEND_OAUTH_BASE = process.env.NEXT_PUBLIC_API_URL
   ? `${process.env.NEXT_PUBLIC_API_URL}/api/v1`
   : 'http://localhost:8000/api/v1';
 
-import dynamic from 'next/dynamic';
-import Settings from '../../Settings';
-
-const SpaceBackground = dynamic(() => import('../../SpaceBackground'), { ssr: false });
+function GoogleMark() {
+  return (
+    <svg aria-hidden="true" viewBox="0 0 24 24" className="h-5 w-5">
+      <path fill="#4285F4" d="M23.49 12.275c0-.79-.07-1.55-.2-2.275H12v4.51h6.47a5.53 5.53 0 0 1-2.39 3.63v3h3.87c2.26-2.09 3.54-5.17 3.54-8.865Z" />
+      <path fill="#34A853" d="M12 24c3.24 0 5.96-1.07 7.95-2.9l-3.87-3c-1.07.72-2.46 1.15-4.08 1.15-3.13 0-5.79-2.11-6.74-4.95H1.28v3.08A12 12 0 0 0 12 24Z" />
+      <path fill="#FBBC05" d="M5.26 14.3a7.2 7.2 0 0 1 0-4.6V6.61H1.28a12 12 0 0 0 0 10.78l3.98-3.09Z" />
+      <path fill="#EA4335" d="M12 4.75c1.77 0 3.36.61 4.61 1.8l3.43-3.43A11.48 11.48 0 0 0 12 0 12 12 0 0 0 1.28 6.61l3.98 3.09C6.21 6.86 8.87 4.75 12 4.75Z" />
+    </svg>
+  );
+}
 
 function LoginPageContent() {
   const [isLogin, setIsLogin] = useState(true);
@@ -27,37 +49,35 @@ function LoginPageContent() {
   const [isSuccess, setIsSuccess] = useState(false);
   const [challengeToken, setChallengeToken] = useState<string | null>(null);
   const [totpCode, setTotpCode] = useState('');
-  
+
   const router = useRouter();
   const searchParams = useSearchParams();
   const fetchMe = useAuthStore(state => state.fetchMe);
 
-  // Show OAuth errors passed back from the backend callback redirect
-  // e.g. /login?error=Google+login+cancelled
   useEffect(() => {
     const oauthError = searchParams.get('error');
     if (oauthError) {
-      setError(decodeURIComponent(oauthError.replace(/\+/g, ' ')));
+      setError(oauthError.replace(/\+/g, ' '));
     }
   }, [searchParams]);
 
-  const handleSubmit = async (e: React.FormEvent) => {
-    e.preventDefault();
+  const handleSubmit = async (event: FormEvent<HTMLFormElement>) => {
+    event.preventDefault();
     setError('');
     setLoading(true);
-    
+
     try {
       if (challengeToken) {
         const { data } = await api.post('/auth/login/2fa', {
           challenge_token: challengeToken,
-          totp_code: totpCode
+          totp_code: totpCode,
         });
         localStorage.setItem('access_token', data.access_token);
         localStorage.setItem('refresh_token', data.refresh_token);
       } else if (isLogin) {
         const { data } = await api.post('/auth/login', {
           username_or_email: email,
-          password
+          password,
         });
         if (data.challenge_token) {
           setChallengeToken(data.challenge_token);
@@ -67,14 +87,10 @@ function LoginPageContent() {
         localStorage.setItem('access_token', data.access_token);
         localStorage.setItem('refresh_token', data.refresh_token);
       } else {
-        await api.post('/auth/register', {
-          username,
-          email,
-          password
-        });
+        await api.post('/auth/register', { username, email, password });
         const { data } = await api.post('/auth/login', {
           username_or_email: email,
-          password
+          password,
         });
         if (data.challenge_token) {
           setChallengeToken(data.challenge_token);
@@ -84,21 +100,16 @@ function LoginPageContent() {
         localStorage.setItem('access_token', data.access_token);
         localStorage.setItem('refresh_token', data.refresh_token);
       }
-      
+
       await fetchMe();
-      
-      // Trigger success animation
       setIsSuccess(true);
-      setTimeout(() => {
-        router.push('/dashboard');
-      }, 2000);
-      
+      window.setTimeout(() => router.push('/dashboard'), 1600);
     } catch (err: any) {
       const errorMsg =
         err.response?.data?.error?.message ||
         err.response?.data?.detail ||
         err.response?.data?.message ||
-        (typeof err.response?.data === 'string' ? err.response?.data : null) ||
+        (typeof err.response?.data === 'string' ? err.response.data : null) ||
         err.message ||
         'An error occurred. Please try again.';
       setError(errorMsg);
@@ -107,204 +118,198 @@ function LoginPageContent() {
     }
   };
 
+  const startOAuth = (provider: 'github' | 'google') => {
+    window.location.href = `${BACKEND_OAUTH_BASE}/auth/${provider}/login`;
+  };
+
   return (
-    <main className="min-h-screen text-on-surface font-body relative overflow-hidden bg-background transition-colors duration-300">
+    <main className="ph-auth-page">
+      <section className="ph-auth-card" aria-label="PandaHub account access">
+        <aside className="ph-auth-aside">
+          <div className="ph-auth-aside-content">
+            <div className="ph-auth-eyebrow"><Sparkles size={15} /> YOUR DEVELOPMENT WORKSPACE</div>
+            <h1>Make great work, <span>together.</span></h1>
+            <p className="ph-auth-aside-copy">
+              Keep your repositories, collaboration, and code reviews in one calm, organised workspace.
+            </p>
 
+            <div className="ph-auth-feature-list">
+              <div className="ph-auth-feature">
+                <span className="ph-auth-feature-icon"><GitBranch size={19} /></span>
+                <span><strong>Code in one place</strong><small>Repositories, branches and pull requests</small></span>
+              </div>
+              <div className="ph-auth-feature">
+                <span className="ph-auth-feature-icon"><UsersRound size={19} /></span>
+                <span><strong>Work better together</strong><small>Issues, reviews and team collaboration</small></span>
+              </div>
+              <div className="ph-auth-feature">
+                <span className="ph-auth-feature-icon"><Code2 size={19} /></span>
+                <span><strong>Build with confidence</strong><small>Helpful AI-assisted code insights</small></span>
+              </div>
+            </div>
+          </div>
+          <div className="ph-auth-aside-footer">
+            <ShieldCheck size={16} /> A clear space for your next great idea.
+          </div>
+          <div className="ph-auth-orbit ph-auth-orbit-one" aria-hidden="true" />
+          <div className="ph-auth-orbit ph-auth-orbit-two" aria-hidden="true" />
+        </aside>
 
-<header className="fixed top-0 w-full z-50 flex justify-between items-center px-6 py-6 max-w-7xl mx-auto left-0 right-0">
-<a className="flex items-center gap-2 group" href="/">
-<div className="w-8 h-8 rounded-lg bg-gradient-to-br from-primary-container to-inverse-primary flex items-center justify-center text-on-primary-container shadow-[0_0_15px_rgba(10,132,255,0.3)]">
-<span className="material-symbols-outlined text-lg" style={{fontVariationSettings: '"FILL" 1'}}>widgets</span>
-</div>
-<span className="text-xl font-bold tracking-tighter text-on-surface">PandaHub</span>
-</a>
-</header>
+        <div className="ph-auth-form-panel">
+          <div className="ph-auth-form-inner">
+            <div className="ph-auth-tabs" role="tablist" aria-label="Choose account action">
+              <button
+                type="button"
+                role="tab"
+                aria-selected={isLogin}
+                className={isLogin ? 'active' : ''}
+                onClick={() => { setIsLogin(true); setError(''); }}
+                disabled={isSuccess || Boolean(challengeToken)}
+              >Sign in</button>
+              <button
+                type="button"
+                role="tab"
+                aria-selected={!isLogin}
+                className={!isLogin ? 'active' : ''}
+                onClick={() => { setIsLogin(false); setError(''); }}
+                disabled={isSuccess || Boolean(challengeToken)}
+              >Create account</button>
+            </div>
 
-<div className="fixed inset-0 z-0 pointer-events-none">
-  <SpaceBackground />
-</div>
+            {isSuccess ? (
+              <div className="ph-auth-success" role="status">
+                <div className="ph-auth-success-icon"><CheckCircle2 size={38} /></div>
+                <h2>You’re all set.</h2>
+                <p>Welcome to PandaHub. Taking you to your workspace…</p>
+              </div>
+            ) : challengeToken ? (
+              <>
+                <div className="ph-auth-heading">
+                  <span className="ph-auth-kicker">ACCOUNT SECURITY</span>
+                  <h2>Verify it’s you</h2>
+                  <p>Enter the 6-digit code from your authenticator app.</p>
+                </div>
 
-<div className="relative z-10 flex items-center justify-center min-h-screen px-4 py-24">
+                {error && <div className="ph-auth-error" role="alert">{error}</div>}
 
-<div className="w-full max-w-md glass-panel card-glow rounded-3xl overflow-hidden shadow-2xl animate-fade-in-up border border-white/20">
+                <form className="ph-auth-form" onSubmit={handleSubmit}>
+                  <label className="ph-auth-label" htmlFor="totpCode">Authentication code</label>
+                  <div className="ph-auth-input-wrap">
+                    <KeyRound size={18} aria-hidden="true" />
+                    <input
+                      id="totpCode"
+                      type="text"
+                      inputMode="numeric"
+                      autoComplete="one-time-code"
+                      placeholder="Enter 6-digit code"
+                      value={totpCode}
+                      onChange={(event) => setTotpCode(event.target.value.replace(/\D/g, '').slice(0, 6))}
+                      required
+                    />
+                  </div>
+                  <button className="ph-auth-submit" type="submit" disabled={loading || totpCode.length !== 6}>
+                    {loading ? <><LoaderCircle className="ph-auth-spinner" size={18} /> Verifying…</> : <>Verify code <ArrowRight size={17} /></>}
+                  </button>
+                  <button
+                    type="button"
+                    className="ph-auth-cancel"
+                    onClick={() => { setChallengeToken(null); setTotpCode(''); setError(''); }}
+                  >Back to sign in</button>
+                </form>
+              </>
+            ) : (
+              <>
+                <div className="ph-auth-heading">
+                  <span className="ph-auth-kicker">{isLogin ? 'WELCOME BACK' : 'GET STARTED'}</span>
+                  <h2>{isLogin ? 'Sign in to PandaHub' : 'Create your account'}</h2>
+                  <p>{isLogin ? 'Pick up where you left off.' : 'Your workspace is just a few details away.'}</p>
+                </div>
 
-<div className="flex border-b border-border-color w-full relative">
+                {error && <div className="ph-auth-error" role="alert">{error}</div>}
 
-<div className="absolute bottom-0 left-0 w-1/2 h-[2px] bg-primary shadow-[0_-2px_10px_rgba(10,132,255,0.5)] transition-transform duration-300 ease-out" style={{ transform: isLogin ? 'translateX(0%)' : 'translateX(100%)' }}></div>
-<button type="button" className={`flex-1 py-5 text-sm tracking-wide transition-all duration-300 ${isLogin ? 'font-semibold text-on-surface scale-105' : 'font-medium text-on-surface-variant hover:text-on-surface'}`} onClick={() => { setIsLogin(true); setError(''); }} disabled={isSuccess}>
-                    Sign In
-                </button>
-<button type="button" className={`flex-1 py-5 text-sm tracking-wide transition-all duration-300 ${!isLogin ? 'font-semibold text-on-surface scale-105' : 'font-medium text-on-surface-variant hover:text-on-surface'}`} onClick={() => { setIsLogin(false); setError(''); }} disabled={isSuccess}>
-                    Create Account
-                </button>
-</div>
-<div className="p-8 sm:p-10 relative">
+                <form className="ph-auth-form" onSubmit={handleSubmit}>
+                  {!isLogin && (
+                    <div className="ph-auth-field">
+                      <label className="ph-auth-label" htmlFor="username">Username</label>
+                      <div className="ph-auth-input-wrap">
+                        <UserRound size={18} aria-hidden="true" />
+                        <input
+                          id="username"
+                          type="text"
+                          autoComplete="username"
+                          placeholder="Choose a username"
+                          value={username}
+                          onChange={(event) => setUsername(event.target.value)}
+                          required
+                        />
+                      </div>
+                    </div>
+                  )}
 
-{isSuccess ? (
-  <div className="flex flex-col items-center justify-center py-10 animate-fade-in-scale">
-    <div className="w-20 h-20 bg-green-100 rounded-full flex items-center justify-center mb-6 shadow-[0_0_30px_rgba(34,197,94,0.3)] relative">
-      <div className="absolute inset-0 rounded-full border-4 border-green-500 border-t-transparent animate-spin-slow"></div>
-      <span className="material-symbols-outlined text-green-600 text-4xl animate-bounce-in" style={{ animationDelay: '0.2s' }}>check_circle</span>
-    </div>
-    <h2 className="text-2xl font-bold text-on-surface mb-2 animate-fade-in-up">Success!</h2>
-    <p className="text-on-surface-variant text-center animate-fade-in-up" style={{ animationDelay: '0.1s' }}>
-      Welcome to PandaHub.<br/>Redirecting to your dashboard...
-    </p>
-  </div>
-) : challengeToken ? (
-  <>
-<div className="mb-8 text-center">
-<h1 className="text-3xl font-display font-bold tracking-tight text-on-surface mb-2">Two-Factor Auth</h1>
-<p className="text-on-surface-variant text-sm font-label">Enter the 6-digit code from your authenticator app.</p>
-</div>
+                  <div className="ph-auth-field">
+                    <label className="ph-auth-label" htmlFor="email">{isLogin ? 'Username or email' : 'Email address'}</label>
+                    <div className="ph-auth-input-wrap">
+                      <Mail size={18} aria-hidden="true" />
+                      <input
+                        id="email"
+                        type={isLogin ? 'text' : 'email'}
+                        autoComplete={isLogin ? 'username' : 'email'}
+                        placeholder={isLogin ? 'Enter your username or email' : 'you@example.com'}
+                        value={email}
+                        onChange={(event) => setEmail(event.target.value)}
+                        required
+                      />
+                    </div>
+                  </div>
 
-{error && (
-  <div className="mb-4 p-3 bg-error/20 border border-error/50 rounded-xl text-error text-sm text-center animate-bounce-in flex items-center gap-2 justify-center">
-    <span className="material-symbols-outlined text-[16px]">error</span>
-    {error}
-  </div>
-)}
+                  <div className="ph-auth-field">
+                    <div className="ph-auth-label-row">
+                      <label className="ph-auth-label" htmlFor="password">Password</label>
+                      {isLogin && <Link className="ph-auth-forgot" href="/reset-password">Forgot password?</Link>}
+                    </div>
+                    <div className="ph-auth-input-wrap">
+                      <LockKeyhole size={18} aria-hidden="true" />
+                      <input
+                        id="password"
+                        type="password"
+                        autoComplete={isLogin ? 'current-password' : 'new-password'}
+                        placeholder={isLogin ? 'Enter your password' : 'Create a password'}
+                        value={password}
+                        onChange={(event) => setPassword(event.target.value)}
+                        required
+                      />
+                    </div>
+                  </div>
 
-<form className="space-y-5 stagger-children" onSubmit={handleSubmit}>
-<div className="space-y-1">
-<label className="block text-xs font-medium text-on-surface-variant font-label tracking-wide ml-1" htmlFor="totpCode">Authentication Code</label>
-<div className="relative">
-<div className="absolute inset-y-0 left-0 pl-4 flex items-center pointer-events-none text-outline">
-<span className="material-symbols-outlined text-[20px]">password</span>
-</div>
-<input className="block w-full pl-11 pr-4 py-3.5 bg-surface-container-low/50 input-glass border-outline-variant/30 rounded-xl text-on-surface placeholder:text-outline focus:ring-0 sm:text-sm glow-accent-focus tracking-widest text-lg" id="totpCode" placeholder="123456" type="text" required value={totpCode} onChange={(e) => setTotpCode(e.target.value.replace(/\D/g, '').slice(0, 6))} />
-</div>
-</div>
-<button className="btn-primary btn-ripple w-full flex justify-center items-center gap-2 py-4 px-4 text-sm mt-8 disabled:opacity-50 disabled:cursor-not-allowed" type="submit" disabled={loading || totpCode.length !== 6}>
-  {loading ? (
-    <>
-      <svg className="animate-spin h-4 w-4 text-white" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24">
-        <circle className="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" strokeWidth="4"/>
-        <path className="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4z"/>
-      </svg>
-      Verifying…
-    </>
-  ) : 'Verify Code'}
-</button>
-<button type="button" onClick={() => {setChallengeToken(null); setTotpCode(''); setError('');}} className="w-full text-center text-sm text-on-surface-variant hover:text-on-surface transition-colors mt-4 block">Cancel</button>
-</form>
-  </>
-) : (
-  <>
-<div className="mb-8 text-center">
-<h1 className="text-3xl font-display font-bold tracking-tight text-on-surface mb-2">{isLogin ? 'Welcome back' : 'Create an account'}</h1>
-<p className="text-on-surface-variant text-sm font-label">{isLogin ? 'Enter your details to access your workspace.' : 'Get started with PandaHub today.'}</p>
-</div>
+                  <button className="ph-auth-submit" type="submit" disabled={loading}>
+                    {loading
+                      ? <><LoaderCircle className="ph-auth-spinner" size={18} /> Please wait…</>
+                      : <>{isLogin ? 'Sign in to workspace' : 'Create account'} <ArrowRight size={17} /></>}
+                  </button>
+                </form>
 
-{error && (
-  <div className="mb-4 p-3 bg-error/20 border border-error/50 rounded-xl text-error text-sm text-center animate-bounce-in flex items-center gap-2 justify-center">
-    <span className="material-symbols-outlined text-[16px]">error</span>
-    {error}
-  </div>
-)}
-
-<form className="space-y-5 stagger-children" onSubmit={handleSubmit}>
-
-{!isLogin && (
-  <div className="space-y-1">
-  <label className="block text-xs font-medium text-on-surface-variant font-label tracking-wide ml-1" htmlFor="username">Username</label>
-  <div className="relative">
-  <div className="absolute inset-y-0 left-0 pl-4 flex items-center pointer-events-none text-outline">
-  <span className="material-symbols-outlined text-[20px]">person</span>
-  </div>
-  <input className="block w-full pl-11 pr-4 py-3.5 bg-surface-container-low/50 input-glass border-outline-variant/30 rounded-xl text-on-surface placeholder:text-outline focus:ring-0 sm:text-sm glow-accent-focus" id="username" placeholder="johndoe" type="text" required value={username} onChange={(e) => setUsername(e.target.value)} />
-  </div>
-  </div>
-)}
-
-<div className="space-y-1">
-<label className="block text-xs font-medium text-on-surface-variant font-label tracking-wide ml-1" htmlFor="email">
-  {isLogin ? 'Username or Email' : 'Email'}
-</label>
-<div className="relative">
-<div className="absolute inset-y-0 left-0 pl-4 flex items-center pointer-events-none text-outline">
-<span className="material-symbols-outlined text-[20px]">{isLogin ? 'person' : 'mail'}</span>
-</div>
-<input 
-  className="block w-full pl-11 pr-4 py-3.5 bg-surface-container-low/50 input-glass border-outline-variant/30 rounded-xl text-on-surface placeholder:text-outline focus:ring-0 sm:text-sm glow-accent-focus" 
-  id="email" 
-  placeholder={isLogin ? "username or email" : "name@company.com"} 
-  type={isLogin ? "text" : "email"} 
-  required 
-  value={email} 
-  onChange={(e) => setEmail(e.target.value)} 
-/>
-</div>
-</div>
-<div className="space-y-1">
-<div className="flex items-center justify-between ml-1">
-<label className="block text-xs font-medium text-on-surface-variant font-label tracking-wide" htmlFor="password">Password</label>
-{isLogin && <a className="text-xs font-medium text-primary hover:text-primary-fixed transition-colors" href="/reset-password">Forgot password?</a>}
-</div>
-<div className="relative">
-<div className="absolute inset-y-0 left-0 pl-4 flex items-center pointer-events-none text-outline">
-<span className="material-symbols-outlined text-[20px]">lock</span>
-</div>
-<input className="block w-full pl-11 pr-10 py-3.5 bg-surface-container-low/50 input-glass border-outline-variant/30 rounded-xl text-on-surface placeholder:text-outline focus:ring-0 sm:text-sm glow-accent-focus" id="password" placeholder="••••••••" type="password" required value={password} onChange={(e) => setPassword(e.target.value)} />
-</div>
-</div>
-<button className="btn-primary btn-ripple w-full flex justify-center items-center gap-2 py-4 px-4 text-sm mt-8 disabled:opacity-50 disabled:cursor-not-allowed" type="submit" disabled={loading}>
-  {loading ? (
-    <>
-      <svg className="animate-spin h-4 w-4 text-white" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24">
-        <circle className="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" strokeWidth="4"/>
-        <path className="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4z"/>
-      </svg>
-      Processing…
-    </>
-  ) : (isLogin ? 'Sign In' : 'Create Account')}
-</button>
-</form>
-<div className="mt-8">
-<div className="relative">
-<div className="absolute inset-0 flex items-center">
-<div className="w-full border-t border-white/10"></div>
-</div>
-<div className="relative flex justify-center text-xs">
-<span className="px-3 bg-transparent text-outline font-label">Or continue with</span>
-</div>
-</div>
-<div className="mt-6 grid grid-cols-2 gap-4">
-<button onClick={(e) => { e.preventDefault(); window.location.href = `${BACKEND_OAUTH_BASE}/auth/github/login`; }} className="flex justify-center items-center py-3 px-4 input-glass rounded-xl hover:bg-white/5 transition-all active:scale-95 group">
-<svg aria-hidden="true" className="h-5 w-5 text-on-surface group-hover:text-white transition-colors" fill="currentColor" viewBox="0 0 24 24">
-<path clipRule="evenodd" d="M12 2C6.477 2 2 6.484 2 12.017c0 4.425 2.865 8.18 6.839 9.504.5.092.682-.217.682-.483 0-.237-.008-.868-.013-1.703-2.782.605-3.369-1.343-3.369-1.343-.454-1.158-1.11-1.466-1.11-1.466-.908-.62.069-.608.069-.608 1.003.07 1.531 1.032 1.531 1.032.892 1.53 2.341 1.088 2.91.832.092-.647.35-1.088.636-1.338-2.22-.253-4.555-1.113-4.555-4.951 0-1.093.39-1.988 1.029-2.688-.103-.253-.446-1.272.098-2.65 0 0 .84-.27 2.75 1.026A9.564 9.564 0 0112 6.844c.85.004 1.705.115 2.504.337 1.909-1.296 2.747-1.027 2.747-1.027.546 1.379.202 2.398.1 2.651.64.7 1.028 1.595 1.028 2.688 0 3.848-2.339 4.695-4.566 4.943.359.309.678.92.678 1.855 0 1.338-.012 2.419-.012 2.747 0 .268.18.58.688.482A10.019 10.019 0 0022 12.017C22 6.484 17.522 2 12 2z" fillRule="evenodd"></path>
-</svg>
-</button>
-<button onClick={(e) => { e.preventDefault(); window.location.href = `${BACKEND_OAUTH_BASE}/auth/google/login`; }} className="flex justify-center items-center py-3 px-4 input-glass rounded-xl hover:bg-white/5 transition-all active:scale-95 group">
-<svg aria-hidden="true" className="h-5 w-5" viewBox="0 0 24 24">
-<path d="M12.0003 4.75C13.7703 4.75 15.3553 5.36002 16.6053 6.54998L20.0303 3.125C17.9502 1.19 15.2353 0 12.0003 0C7.31028 0 3.25527 2.69 1.28027 6.60998L5.27028 9.70498C6.21525 6.86002 8.87028 4.75 12.0003 4.75Z" fill="#EA4335"></path>
-<path d="M23.49 12.275C23.49 11.49 23.415 10.73 23.3 10H12V14.51H18.47C18.18 15.99 17.34 17.25 16.08 18.1L19.945 21.1C22.2 19.01 23.49 15.92 23.49 12.275Z" fill="#4285F4"></path>
-<path d="M5.26498 14.2949C5.02498 13.5699 4.88501 12.7999 4.88501 11.9999C4.88501 11.1999 5.01998 10.4299 5.26498 9.7049L1.275 6.60986C0.46 8.22986 0 10.0599 0 11.9999C0 13.9399 0.46 15.7699 1.28 17.3899L5.26498 14.2949Z" fill="#FBBC05"></path>
-<path d="M12.0004 24.0001C15.2404 24.0001 17.9654 22.935 19.9454 21.095L16.0804 18.095C15.0054 18.82 13.6204 19.245 12.0004 19.245C8.8704 19.245 6.21537 17.135 5.26538 14.29L1.27539 17.385C3.25539 21.31 7.3104 24.0001 12.0004 24.0001Z" fill="#34A853"></path>
-</svg>
-</button>
-</div>
-</div>
-  </>
-)}
-</div>
-</div>
-</div>
-
-
-          {/* Settings toggle */}
-      <Settings />
+                <div className="ph-auth-divider"><span>or continue with</span></div>
+                <div className="ph-auth-socials">
+                  <button type="button" onClick={() => startOAuth('github')} className="ph-auth-social">
+                    <Github size={19} /> <span>GitHub</span>
+                  </button>
+                  <button type="button" onClick={() => startOAuth('google')} className="ph-auth-social">
+                    <GoogleMark /> <span>Google</span>
+                  </button>
+                </div>
+                <p className="ph-auth-secure-note"><ShieldCheck size={14} /> Secure sign-in to your PandaHub workspace</p>
+              </>
+            )}
+          </div>
+        </div>
+      </section>
     </main>
   );
 }
 
-export default function GeneratedPage() {
+export default function LoginPage() {
   return (
-    <Suspense fallback={
-      <div className="min-h-screen flex items-center justify-center bg-background">
-        <div className="w-12 h-12 border-4 border-primary border-t-transparent rounded-full animate-spin" />
-      </div>
-    }>
+    <Suspense fallback={<div className="ph-auth-loading"><LoaderCircle className="ph-auth-spinner" size={26} /></div>}>
       <LoginPageContent />
     </Suspense>
   );

@@ -1,5 +1,7 @@
 "use client";
 
+
+import PageSkeleton from '@/components/ui/PageSkeleton';
 import { useEffect, Suspense } from "react";
 import { useRouter, useSearchParams } from "next/navigation";
 import { useAuthStore } from "@/store/authStore";
@@ -35,23 +37,14 @@ function OAuthCallbackContent() {
     }
   }, [searchParams, router, fetchMe]);
 
-  return (
-    <div className="flex h-screen w-screen items-center justify-center bg-background">
-      <div className="flex flex-col items-center justify-center gap-4 animate-fade-in-up">
-        <div className="w-12 h-12 border-4 border-primary border-t-transparent rounded-full animate-spin"></div>
-        <p className="text-on-surface font-medium tracking-wide">Completing login...</p>
-      </div>
-    </div>
-  );
+  /* PANDAHUB_OAUTH_SHIMMER */
+  return <PageSkeleton variant="form" label="Completing sign-in" />;
+
 }
 
 export default function OAuthCallbackPage() {
   return (
-    <Suspense fallback={
-      <div className="flex h-screen w-screen items-center justify-center bg-background">
-        <div className="w-12 h-12 border-4 border-primary border-t-transparent rounded-full animate-spin"></div>
-      </div>
-    }>
+    <Suspense fallback={<PageSkeleton variant="form" label="Loading authentication" />}>
       <OAuthCallbackContent />
     </Suspense>
   );

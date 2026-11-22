@@ -66,6 +66,11 @@ _SLUG_RE = re.compile(r"[^a-z0-9._-]+")
 
 def _b2_client():
     """Return a fresh boto3 S3 client pointed at Backblaze B2."""
+    if not settings.B2_KEY_ID or not settings.B2_APPLICATION_KEY:
+        raise RuntimeError(
+            "Backblaze B2 is not configured. Set B2_KEY_ID and "
+            "B2_APPLICATION_KEY as environment variables after rotating the key."
+        )
     endpoint = settings.B2_ENDPOINT_URL
     # Ensure the endpoint has a scheme so boto3 can parse it correctly.
     if not endpoint.startswith(("http://", "https://")):

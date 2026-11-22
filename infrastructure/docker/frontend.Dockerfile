@@ -4,10 +4,10 @@ FROM node:20-alpine AS base
 WORKDIR /app
 
 # Install deps first for layer caching
-COPY package.json package-lock.json* ./
+COPY frontend/package.json frontend/package-lock.json* ./
 RUN npm ci
 
-COPY . .
+COPY frontend/ .
 
 EXPOSE 3000
 

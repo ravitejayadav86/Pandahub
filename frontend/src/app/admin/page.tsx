@@ -1,4 +1,5 @@
-﻿'use client';
+'use client';
+import PageSkeleton from '@/components/ui/PageSkeleton';
 import { useState, useEffect } from 'react';
 import api from '@/lib/api';
 import { User } from '@/types';
@@ -70,7 +71,7 @@ export default function AdminPage() {
     <div style={{ minHeight: '100vh', background: 'var(--bg-primary)', fontFamily: 'Inter, sans-serif', color: 'var(--text-primary)' }}>
       {/* Top Bar */}
       <header style={{
-        height: 64, background: 'var(--glass-bg-4)', backdropFilter: '(20px) saturate(1.8)',
+        height: 64, background: 'var(--glass-bg-4)', backdropFilter: 'blur(20px) saturate(1.8)',
         borderBottom: '1px solid var(--glass-border)', boxShadow: 'var(--glass-shadow)',
         display: 'flex', alignItems: 'center', justifyContent: 'space-between',
         padding: '0 32px', position: 'sticky', top: 0, zIndex: 40,
@@ -80,8 +81,8 @@ export default function AdminPage() {
             <span className="material-symbols-outlined" style={{ fontSize: 20 }}>arrow_back</span>
           </button>
           <div style={{ display: 'flex', alignItems: 'center', gap: 10 }}>
-            <div style={{ width: 34, height: 34, borderRadius: 10, background: 'linear-gradient(135deg, #AFAFAF, #A8A8A8)', display: 'flex', alignItems: 'center', justifyContent: 'center', boxShadow: '0 4px 12px rgba(99,102,241,0.3)' }}>
-              <span className="material-symbols-outlined" style={{ fontSize: 18, color: '#fff' }}>admin_panel_settings</span>
+            <div style={{ width: 34, height: 34, borderRadius: 10, background: 'linear-gradient(135deg, #C5BAFF, #C4D9FF)', display: 'flex', alignItems: 'center', justifyContent: 'center', boxShadow: '0 4px 12px rgba(99,102,241,0.3)' }}>
+              <span className="material-symbols-outlined" style={{ fontSize: 18, color: '#1F2937' }}>admin_panel_settings</span>
             </div>
             <div>
               <h1 style={{ fontSize: 16, fontWeight: 700, margin: 0, color: 'var(--text-primary)' }}>Admin Panel</h1>
@@ -106,7 +107,7 @@ export default function AdminPage() {
 
       <div style={{ maxWidth: 1200, margin: '0 auto', padding: '32px 24px', opacity: mounted ? 1 : 0, transition: 'opacity 0.4s' }}>
         {/* Tabs */}
-        <div style={{ display: 'flex', gap: 4, marginBottom: 32, background: 'var(--glass-bg-2)', borderRadius: 14, padding: 4, width: 'fit-content', border: '1px solid var(--glass-border)', backdropFilter: '(12px)' }}>
+        <div style={{ display: 'flex', gap: 4, marginBottom: 32, background: 'var(--glass-bg-2)', borderRadius: 14, padding: 4, width: 'fit-content', border: '1px solid var(--glass-border)', backdropFilter: 'blur(12px)' }}>
           {(['overview', 'users'] as const).map(tab => (
             <button key={tab} onClick={() => setActiveTab(tab)} style={{
               padding: '8px 22px', borderRadius: 10, border: 'none', cursor: 'pointer', fontSize: 13, fontWeight: 600,
@@ -171,7 +172,7 @@ export default function AdminPage() {
               ))}
             </div>
             {loading ? (
-              <div style={{ padding: '60px', textAlign: 'center', color: 'var(--text-muted)' }}>Loading usersâ€¦</div>
+              <PageSkeleton variant="table" label="Loading users" />
             ) : filtered.length === 0 ? (
               <div style={{ padding: '60px', textAlign: 'center', color: 'var(--text-muted)' }}>
                 <span className="material-symbols-outlined" style={{ fontSize: 48, display: 'block', marginBottom: 12 }}>group_off</span>
@@ -180,10 +181,10 @@ export default function AdminPage() {
             ) : filtered.map((u, i) => (
               <div key={u.id} style={{ display: 'grid', gridTemplateColumns: '1fr 1fr 100px 100px 80px', padding: '14px 24px', borderBottom: i < filtered.length - 1 ? '1px solid var(--glass-border)' : 'none', alignItems: 'center' }}>
                 <div style={{ display: 'flex', alignItems: 'center', gap: 10 }}>
-                  <div style={{ width: 34, height: 34, borderRadius: '50%', background: 'linear-gradient(135deg, #AFAFAF, #A8A8A8)', display: 'flex', alignItems: 'center', justifyContent: 'center', flexShrink: 0 }}>
+                  <div style={{ width: 34, height: 34, borderRadius: '50%', background: 'linear-gradient(135deg, #C5BAFF, #C4D9FF)', display: 'flex', alignItems: 'center', justifyContent: 'center', flexShrink: 0 }}>
                     {u.avatar_url
                       ? <img src={u.avatar_url} alt="" style={{ width: '100%', height: '100%', borderRadius: '50%', objectFit: 'cover' }} />
-                      : <span style={{ fontSize: 14, fontWeight: 700, color: '#fff' }}>{u.username.charAt(0).toUpperCase()}</span>
+                      : <span style={{ fontSize: 14, fontWeight: 700, color: '#1F2937' }}>{u.username.charAt(0).toUpperCase()}</span>
                     }
                   </div>
                   <span style={{ fontSize: 14, fontWeight: 600, color: 'var(--text-primary)' }}>{u.username}</span>

@@ -5,6 +5,7 @@ FROM python:3.12-slim AS base
 RUN apt-get update && apt-get install -y --no-install-recommends \
     build-essential \
     git \
+    default-jdk-headless \
     libgit2-dev \
     libpq-dev \
     curl \
@@ -13,11 +14,11 @@ RUN apt-get update && apt-get install -y --no-install-recommends \
 WORKDIR /app
 
 # Install python deps first (layer caching: only reinstall when requirements change)
-COPY requirements.txt .
+COPY backend/requirements.txt ./requirements.txt
 RUN pip install --no-cache-dir --upgrade pip && \
     pip install --no-cache-dir -r requirements.txt
 
-COPY . .
+COPY backend/ .
 
 # Non-root user for security (defense in depth — container escape doesn't grant root on host)
 RUN useradd --create-home pandahub && chown -R pandahub:pandahub /app

@@ -1,4 +1,4 @@
-﻿"use client";
+'use client';
 import { useEffect, useRef } from 'react';
 
 interface Particle {
@@ -38,11 +38,11 @@ interface DepthOrb {
 }
 
 const THEMES: Record<string, string[]> = {
-  multicolor: ['#E6E6E6', '#5E5CE6', '#30D158', '#64D2FF', '#BF5AF2'],
-  emerald:    ['#30D158', '#34C759', '#00C7BE', '#32D74B'],
-  ocean:      ['#E6E6E6', '#64D2FF', '#0040DD', '#007AFF'],
-  cyberpunk:  ['#BF5AF2', '#FF2D55', '#FF375F', '#D30DF2'],
-  mono:       ['#64748B', '#475569', '#334155', '#94A3B8'],
+  multicolor: ['#C5BAFF', '#C4D9FF', '#E8F9FF', '#9B8DE0'],
+  emerald:    ['#C5BAFF', '#C4D9FF', '#E8F9FF', '#9B8DE0'],
+  ocean:      ['#C5BAFF', '#C4D9FF', '#E8F9FF', '#9B8DE0'],
+  cyberpunk:  ['#C5BAFF', '#C4D9FF', '#E8F9FF', '#9B8DE0'],
+  mono:       ['#C5BAFF', '#C4D9FF', '#E8F9FF', '#9B8DE0'],
 };
 
 export default function SpaceBackground() {
@@ -77,8 +77,7 @@ export default function SpaceBackground() {
 
     const isDark = () => {
       if (typeof window === 'undefined') return false;
-      return document.documentElement.classList.contains('dark') ||
-             document.body.classList.contains('dark');
+      return false;
     };
 
     const hexToRgb = (hex: string) => {
@@ -363,7 +362,7 @@ export default function SpaceBackground() {
 
     // Kick off
     resize();
-    ctx.fillStyle = isDark() ? '#060810' : '#eef2f7';
+    ctx.fillStyle = '#FBFBFB';
     ctx.fillRect(0, 0, canvas.width, canvas.height);
     window.addEventListener('resize',     resize);
     window.addEventListener('mousemove',  onMouseMove);

@@ -8,7 +8,7 @@ import Link from 'next/link';
 
 export default function NotFound() {
   return (
-    <div className="min-h-screen bg-[#0d1117] flex items-center justify-center p-6 font-sans">
+    <div className="min-h-screen bg-[#E8F9FF] flex items-center justify-center p-6 font-sans">
       {/* Background */}
       <div className="fixed inset-0 pointer-events-none overflow-hidden">
         <div className="absolute top-0 right-0 w-[600px] h-[600px] bg-violet-600/6 rounded-full" />
@@ -30,7 +30,7 @@ export default function NotFound() {
           <div
             className="text-[180px] font-black leading-none text-transparent"
             style={{
-              WebkitTextStroke: '2px rgba(255,255,255,0.05)',
+              WebkitTextStroke: '2px rgba(102,89,159,0.14)',
               letterSpacing: '-8px',
             }}
           >
@@ -48,10 +48,10 @@ export default function NotFound() {
         </div>
 
         {/* Content */}
-        <h1 className="text-3xl font-bold text-white mb-3 tracking-tight">
+        <h1 className="text-3xl font-bold text-[#1F2937] mb-3 tracking-tight">
           Lost in the bamboo forest
         </h1>
-        <p className="text-slate-400 text-base leading-relaxed mb-8">
+        <p className="text-[#64748B] text-base leading-relaxed mb-8">
           This page doesn&apos;t exist — the URL might be wrong, or the resource
           may have been moved or deleted.
         </p>
@@ -60,25 +60,25 @@ export default function NotFound() {
         <div className="flex flex-col sm:flex-row gap-3 justify-center">
           <Link
             href="/dashboard"
-            className="inline-flex items-center justify-center gap-2 px-6 py-3 rounded-xl bg-gradient-to-r from-violet-600 to-blue-600 text-white font-semibold text-sm hover:from-violet-500 hover:to-blue-500 transition-all shadow-lg shadow-violet-500/25 hover:shadow-violet-500/40 active:scale-95"
+            className="inline-flex items-center justify-center gap-2 px-6 py-3 rounded-xl bg-[#C5BAFF] text-[#26213F] font-semibold text-sm hover:bg-[#B9ACF5] transition-all shadow-lg shadow-violet-500/25 hover:shadow-violet-500/40 active:scale-95"
           >
             🏠 Go to Dashboard
           </Link>
           <button
             onClick={() => window.history.back()}
-            className="inline-flex items-center justify-center gap-2 px-6 py-3 rounded-xl border border-white/10 bg-white/4 text-slate-300 font-medium text-sm hover:bg-white/8 transition-all"
+            className="inline-flex items-center justify-center gap-2 px-6 py-3 rounded-xl border border-[#C4D9FF] bg-[#E8F9FF] text-[#475569] font-medium text-sm hover:bg-[#C4D9FF] transition-all"
           >
             ← Go back
           </button>
         </div>
 
         {/* Helpful links */}
-        <div className="mt-10 pt-6 border-t border-white/6">
-          <p className="text-xs text-slate-600 mb-3">Or try one of these:</p>
+        <div className="mt-10 pt-6 border-t border-[#C4D9FF]">
+          <p className="text-xs text-[#64748B] mb-3">Or try one of these:</p>
           <div className="flex items-center justify-center gap-6 text-xs">
-            <Link href="/"         className="text-slate-500 hover:text-slate-300 transition-colors">Home</Link>
-            <Link href="/explore"  className="text-slate-500 hover:text-slate-300 transition-colors">Explore</Link>
-            <Link href="/settings" className="text-slate-500 hover:text-slate-300 transition-colors">Settings</Link>
+            <Link href="/"         className="text-[#64748B] hover:text-[#51477F] transition-colors">Home</Link>
+            <Link href="/explore"  className="text-[#64748B] hover:text-[#51477F] transition-colors">Explore</Link>
+            <Link href="/settings" className="text-[#64748B] hover:text-[#51477F] transition-colors">Settings</Link>
           </div>
         </div>
       </div>

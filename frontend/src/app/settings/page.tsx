@@ -324,9 +324,9 @@ export default function SettingsPage() {
         @media(max-width:768px){ .gh-layout{grid-template-columns:1fr;} .gh-sidebar{flex-direction:row;} }
 
         /* sidebar */
-        .gh-sidebar { position:sticky; top:100px; display:flex; flex-direction:column; align-items:center; gap:16px; padding:24px 0; background:#0a0a0c; border:1px solid #27272a; border-radius:2rem; box-shadow:0 10px 30px rgba(0,0,0,0.5); z-index:50; }
+        .gh-sidebar { position:sticky; top:100px; display:flex; flex-direction:column; align-items:center; gap:16px; padding:24px 0; background:#E8F9FF; border:1px solid #C4D9FF; border-radius:2rem; box-shadow:0 10px 30px rgba(91,109,160,0.12); z-index:50; }
         .gh-sidebar-heading { display:none; }
-        .gh-nav-divider { width: 40px; height: 1px; background: #27272a; margin: 4px 0; }
+        .gh-nav-divider { width: 40px; height: 1px; background: #C4D9FF; margin: 4px 0; }
 
         /* panel */
         .gh-panel { background:var(--glass-bg-3); backdrop-filter:(24px); -webkit-backdrop-filter:(24px);
@@ -347,19 +347,19 @@ export default function SettingsPage() {
         .gh-inp { background:var(--glass-bg-2); border:1px solid var(--glass-border); border-radius:12px;
           color:var(--text-primary); font-size:14px; padding:6px 14px; height:38px; width:100%;
           outline:none; transition:border-color .15s,box-shadow .15s; font-family:inherit; }
-        .gh-inp:focus { border-color:#C8C8C8; box-shadow:0 0 0 3px rgba(59,130,246,.25); }
+        .gh-inp:focus { border-color:#66599F; box-shadow:0 0 0 3px rgba(59,130,246,.25); }
         .gh-inp::placeholder { color:var(--text-muted); }
         .gh-textarea { background:var(--glass-bg-2); border:1px solid var(--glass-border); border-radius:12px;
           color:var(--text-primary); font-size:14px; padding:10px 14px; width:100%; outline:none;
           resize:vertical; font-family:inherit; transition:border-color .15s,box-shadow .15s; }
-        .gh-textarea:focus { border-color:#C8C8C8; box-shadow:0 0 0 3px rgba(59,130,246,.25); }
+        .gh-textarea:focus { border-color:#66599F; box-shadow:0 0 0 3px rgba(59,130,246,.25); }
         .gh-textarea::placeholder { color:var(--text-muted); }
         .gh-select { background:var(--glass-bg-2); border:1px solid var(--glass-border); border-radius:12px;
           color:var(--text-primary); font-size:14px; padding:6px 32px 6px 14px; height:38px; width:100%;
           outline:none; cursor:pointer; font-family:inherit; appearance:none;
           background-image:url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='10' height='6'%3E%3Cpath fill='%237d8590' d='M0 0l5 6 5-6'/%3E%3C/svg%3E");
           background-repeat:no-repeat; background-position:right 12px center; }
-        .gh-select:focus { border-color:#C8C8C8; box-shadow:0 0 0 3px rgba(59,130,246,.25); }
+        .gh-select:focus { border-color:#66599F; box-shadow:0 0 0 3px rgba(59,130,246,.25); }
 
         /* prefix input */
         .gh-prefix-wrap { position:relative; }
@@ -372,12 +372,12 @@ export default function SettingsPage() {
           cursor:pointer; transition:all .15s ease; border:1px solid transparent;
           font-family:inherit; white-space:nowrap; outline:none; }
         .gh-btn:disabled { opacity:.5; cursor:not-allowed; }
-        .gh-btn-primary { background:#ffffff !important; color:#000000 !important; border:1px solid #ffffff !important; font-weight:700 !important; box-shadow:0 2px 10px rgba(255,255,255,.18) !important; }
-        .gh-btn-primary:hover:not(:disabled) { background:#e4e4e7 !important; color:#000000 !important; transform:translateY(-1px); }
-        .gh-btn-default { background:#18181b !important; border:1px solid #333333 !important; color:#f4f4f5 !important; }
-        .gh-btn-default:hover:not(:disabled) { background:#27272a !important; border-color:#52525b !important; color:#ffffff !important; }
-        .gh-btn-danger { background:#18181b !important; border:1px solid rgba(239,68,68,0.4) !important; color:#f87171 !important; box-shadow:0 2px 6px rgba(0,0,0,.4); }
-        .gh-btn-danger:hover:not(:disabled) { background:rgba(239,68,68,0.15) !important; color:#ffffff !important; }
+        .gh-btn-primary { background:#C5BAFF !important; color:#26213F !important; border:1px solid #B8ADEC !important; font-weight:700 !important; box-shadow:0 4px 14px rgba(128,111,194,.16) !important; }
+        .gh-btn-primary:hover:not(:disabled) { background:#B9ACF5 !important; color:#26213F !important; transform:translateY(-1px); }
+        .gh-btn-default { background:#C4D9FF !important; border:1px solid #B7C9EA !important; color:#1F2937 !important; }
+        .gh-btn-default:hover:not(:disabled) { background:#B8D0FB !important; border-color:#AFC2E8 !important; color:#1F2937 !important; }
+        .gh-btn-danger { background:#E8F9FF !important; border:1px solid rgba(185,78,97,0.32) !important; color:#B94E61 !important; box-shadow:0 2px 8px rgba(91,109,160,.08); }
+        .gh-btn-danger:hover:not(:disabled) { background:rgba(185,78,97,0.10) !important; color:#9F4053 !important; }
         .gh-btn-outline-danger { background:transparent; border-color:rgba(239,68,68,.4); color:#f87171; }
         .gh-btn-outline-danger:hover:not(:disabled) { background:rgba(239,68,68,.1); }
 
@@ -400,10 +400,10 @@ export default function SettingsPage() {
           display:flex; align-items:center; justify-content:center;
           font-size:30px; font-weight:700; color:var(--text-primary); transition:all .15s;
           box-shadow:var(--glass-shadow); }
-        .gh-avatar:hover { border-color:#C8C8C8; transform:scale(1.03); }
+        .gh-avatar:hover { border-color:#66599F; transform:scale(1.03); }
         .gh-avatar img { width:100%; height:100%; object-fit:cover; }
         .gh-avatar-name { font-weight:700; font-size:16px; margin-bottom:4px; color:var(--text-primary); }
-        .gh-avatar-link { color:#C8C8C8; font-size:13px; cursor:pointer; font-weight:600; }
+        .gh-avatar-link { color:#66599F; font-size:13px; cursor:pointer; font-weight:600; }
         .gh-avatar-link:hover { text-decoration:underline; }
         .gh-avatar-sub { color:var(--text-muted); font-size:12px; margin-top:4px; }
 
@@ -435,7 +435,7 @@ export default function SettingsPage() {
         .gh-pill { display:inline-flex; align-items:center; gap:5px; padding:4px 12px;
           border-radius:999px; border:1px solid; font-size:12px; font-weight:600;
           cursor:pointer; transition:all .15s; user-select:none; }
-        .gh-pill.on { background:rgba(59,130,246,.15); border-color:#C8C8C8; color:#C8C8C8; }
+        .gh-pill.on { background:rgba(59,130,246,.15); border-color:#66599F; color:#66599F; }
         .gh-pill.off { background:var(--glass-bg-1); border-color:var(--glass-border); color:var(--text-secondary); }
         .gh-pill.off:hover { border-color:var(--text-muted); color:var(--text-primary); }
 
@@ -468,10 +468,10 @@ export default function SettingsPage() {
         .gh-toggle-desc { font-size:12px; color:var(--text-muted); margin-top:2px; }
         .gh-toggle { width:44px; height:24px; border-radius:999px; border:none;
           cursor:pointer; flex-shrink:0; position:relative; transition:background .2s; outline:none; }
-        .gh-toggle.on { background:#C8C8C8; }
+        .gh-toggle.on { background:#C5BAFF; }
         .gh-toggle.off { background:var(--glass-border); }
         .gh-toggle-thumb { position:absolute; top:3px; width:18px; height:18px;
-          border-radius:50%; background:#fff; transition:left .2s; box-shadow:0 1px 3px rgba(0,0,0,.3); }
+          border-radius:50%; background:#fff; transition:left .2s; box-shadow:0 1px 3px rgba(91,109,160,.14); }
         .on .gh-toggle-thumb { left:23px; }
         .off .gh-toggle-thumb { left:3px; }
 
@@ -490,7 +490,7 @@ export default function SettingsPage() {
           font-size:13px; font-weight:600; padding:6px 0; margin-bottom:12px; }
 
         /* modal */
-        .gh-overlay { position:fixed; inset:0; background:rgba(0,0,0,.6); backdrop-filter:(8px);
+        .gh-overlay { position:fixed; inset:0; background:rgba(111,101,158,.24); backdrop-filter:(8px);
           display:flex; align-items:center; justify-content:center; z-index:999; padding:16px; }
         .gh-modal { background:var(--glass-bg-4); border:1px solid var(--glass-border); border-radius:20px;
           backdrop-filter:(24px); padding:24px; max-width:440px; width:100%; box-shadow:var(--glass-shadow); }
@@ -511,9 +511,9 @@ export default function SettingsPage() {
           <nav className="gh-sidebar">
             {SECTIONS.filter((s) => !s.danger).map((s) => (
               <div key={s.id} className="relative group flex items-center justify-center w-full">
-                <div className="absolute left-20 px-3 py-1.5 rounded-lg bg-[#1a1a1a] border border-white/10 text-white text-xs font-medium opacity-0 group-hover:opacity-100 transition-opacity whitespace-nowrap pointer-events-none z-50">
+                <div className="absolute left-20 px-3 py-1.5 rounded-lg bg-[#E8F9FF] border border-white/10 text-white text-xs font-medium opacity-0 group-hover:opacity-100 transition-opacity whitespace-nowrap pointer-events-none z-50">
                   {s.label}
-                  <div className="absolute top-1/2 -left-1 -translate-y-1/2 w-2 h-2 bg-[#1a1a1a] border-b border-l border-white/10 rotate-45" />
+                  <div className="absolute top-1/2 -left-1 -translate-y-1/2 w-2 h-2 bg-[#E8F9FF] border-b border-l border-white/10 rotate-45" />
                 </div>
                 <motion.button
                   onClick={() => { setActiveSection(s.id); setError(''); }}
@@ -523,7 +523,7 @@ export default function SettingsPage() {
                   className={`w-12 h-12 flex items-center justify-center rounded-2xl transition-colors duration-200 ${
                     activeSection === s.id 
                       ? 'bg-white/10 text-white border border-white/20' 
-                      : 'bg-[#18181b] text-zinc-400 border border-[#333333] hover:text-white hover:bg-[#27272a]'
+                      : 'bg-[#E8F9FF] text-zinc-400 border border-[#C4D9FF] hover:text-white hover:bg-[#C4D9FF]'
                   }`}
                 >
                   <span className="material-symbols-outlined" style={{ fontSize: 20, fontVariationSettings: activeSection === s.id ? '"FILL" 1' : '"FILL" 0' }}>{s.icon}</span>
@@ -535,9 +535,9 @@ export default function SettingsPage() {
 
             {SECTIONS.filter((s) => s.danger).map((s) => (
               <div key={s.id} className="relative group flex items-center justify-center w-full">
-                <div className="absolute left-20 px-3 py-1.5 rounded-lg bg-[#1a1a1a] border border-white/10 text-white text-xs font-medium opacity-0 group-hover:opacity-100 transition-opacity whitespace-nowrap pointer-events-none z-50">
+                <div className="absolute left-20 px-3 py-1.5 rounded-lg bg-[#E8F9FF] border border-white/10 text-white text-xs font-medium opacity-0 group-hover:opacity-100 transition-opacity whitespace-nowrap pointer-events-none z-50">
                   {s.label}
-                  <div className="absolute top-1/2 -left-1 -translate-y-1/2 w-2 h-2 bg-[#1a1a1a] border-b border-l border-white/10 rotate-45" />
+                  <div className="absolute top-1/2 -left-1 -translate-y-1/2 w-2 h-2 bg-[#E8F9FF] border-b border-l border-white/10 rotate-45" />
                 </div>
                 <motion.button
                   onClick={() => { setActiveSection(s.id); setError(''); }}
@@ -547,7 +547,7 @@ export default function SettingsPage() {
                   className={`w-12 h-12 flex items-center justify-center rounded-2xl transition-colors duration-200 ${
                     activeSection === s.id 
                       ? 'bg-red-500/20 text-red-400 border border-red-500/30' 
-                      : 'bg-[#18181b] text-red-500/70 border border-[#333333] hover:text-red-400 hover:bg-[#27272a]'
+                      : 'bg-[#E8F9FF] text-red-500/70 border border-[#C4D9FF] hover:text-red-400 hover:bg-[#C4D9FF]'
                   }`}
                 >
                   <span className="material-symbols-outlined" style={{ fontSize: 20 }}>{s.icon}</span>
@@ -810,7 +810,7 @@ export default function SettingsPage() {
                         <p className="gh-hint">
                           Scan this QR code with your authenticator app (e.g. Google Authenticator, Authy), then enter the 6-digit code below to verify.
                         </p>
-                        <div style={{ padding: 16, background: '#fff', borderRadius: 8, display: 'inline-block', border: '1px solid #30363d' }}>
+                        <div style={{ padding: 16, background: '#fff', borderRadius: 8, display: 'inline-block', border: '1px solid #C4D9FF' }}>
                           <QRCodeSVG value={twoFaSetup.provisioning_uri} size={148} />
                         </div>
                         {twoFaError && <ErrorBanner msg={twoFaError} />}
@@ -1041,10 +1041,10 @@ export default function SettingsPage() {
             <div className="gh-modal">
               <h3 className="gh-modal-title">Are you absolutely sure?</h3>
               <p className="gh-modal-body">
-                This action <strong style={{ color: '#e6edf3' }}>cannot be undone</strong>. This will permanently delete your account,
+                This action <strong style={{ color: '#334155' }}>cannot be undone</strong>. This will permanently delete your account,
                 all your repositories, issues, pull requests, and all associated data.
                 <br /><br />
-                Please type <strong style={{ color: '#e6edf3' }}>{user?.username}</strong> to confirm.
+                Please type <strong style={{ color: '#334155' }}>{user?.username}</strong> to confirm.
               </p>
               <input
                 type="text"

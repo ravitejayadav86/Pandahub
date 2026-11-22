@@ -4,6 +4,21 @@
 @tailwind components;
 @tailwind utilities;
 
+.material-symbols-outlined {
+  font-family: 'Material Symbols Outlined', sans-serif !important;
+  font-weight: normal;
+  font-style: normal;
+  font-size: 20px;
+  line-height: 1;
+  display: inline-block;
+  white-space: nowrap;
+  word-wrap: normal;
+  direction: ltr;
+  -webkit-font-smoothing: antialiased;
+  text-rendering: optimizeLegibility;
+  font-feature-settings: 'liga';
+}
+
 /* â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•
    DESIGN TOKENS â€” 4 Design Language System
 â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â• */
@@ -4279,13 +4294,21 @@ a:active,
 
 /* Monochromatic input surfaces */
 .glass-input, .input-glass, .premium-input {
-  background: #121214 !important;
-  border: 1px solid #27272a !important;
+  background: #141418 !important;
+  border: 1px solid rgba(255, 255, 255, 0.18) !important;
   color: #ffffff !important;
+  transition: all 0.2s cubic-bezier(0.22, 1, 0.36, 1) !important;
 }
 .glass-input:focus, .input-glass:focus, .premium-input:focus {
-  border-color: #52525b !important;
+  background: #191920 !important;
+  border-color: rgba(255, 255, 255, 0.45) !important;
+  box-shadow: 0 0 0 3px rgba(255, 255, 255, 0.08) !important;
   outline: none !important;
+}
+.glass-card {
+  background: rgba(18, 18, 22, 0.95);
+  border: 1px solid rgba(255, 255, 255, 0.12);
+  color: var(--text-primary);
 }
 
 /* ═══════════════════════════════════════════════════════════
@@ -4360,4 +4383,1289 @@ html.is-scrolling [class*="motion-blur"] {
 
 @media (prefers-reduced-motion: reduce) {
   html { scroll-behavior: auto; }
+}
+
+
+/* ======================================================================
+   PANDAHUB SOFT SKY + LAVENDER PALETTE
+   Global final layer: keeps every route on the same four-colour system.
+   Background #FBFBFB | Surface #E8F9FF | Cards #C4D9FF | Accent #C5BAFF
+   ====================================================================== */
+:root,
+html.dark,
+.dark,
+[data-theme="dark"] {
+  color-scheme: light !important;
+  --color-primary: #C5BAFF !important;
+  --color-secondary: #C4D9FF !important;
+  --color-accent: #C5BAFF !important;
+  --color-success: #39866A !important;
+  --color-warning: #A86E24 !important;
+  --color-error: #B94E61 !important;
+  --color-rose: #B94E61 !important;
+  --color-amber: #A86E24 !important;
+
+  --bg-primary: #FBFBFB !important;
+  --bg-secondary: #E8F9FF !important;
+  --bg-tertiary: #C4D9FF !important;
+  --text-primary: #1F2937 !important;
+  --text-secondary: #475569 !important;
+  --text-muted: #64748B !important;
+  --border-color: rgba(107, 126, 174, 0.22) !important;
+
+  --glass-bg-1: rgba(232, 249, 255, 0.78) !important;
+  --glass-bg-2: rgba(232, 249, 255, 0.92) !important;
+  --glass-bg-3: rgba(196, 217, 255, 0.48) !important;
+  --glass-bg-4: rgba(251, 251, 251, 0.98) !important;
+  --glass-bg: rgba(232, 249, 255, 0.94) !important;
+  --glass-border: rgba(119, 137, 188, 0.28) !important;
+  --glass-border-subtle: rgba(119, 137, 188, 0.16) !important;
+  --glass-shadow: 0 10px 30px rgba(91, 109, 160, 0.10) !important;
+
+  --color-on-surface: #1F2937 !important;
+  --color-on-surface-variant: #475569 !important;
+  --color-surface-container: #E8F9FF !important;
+  --color-outline-variant: rgba(107, 126, 174, 0.22) !important;
+  --color-border: rgba(107, 126, 174, 0.22) !important;
+  --gradient-brand: linear-gradient(135deg, #C5BAFF 0%, #C4D9FF 100%) !important;
+  --brand-accent: #C5BAFF !important;
+  --accent-red: #B94E61 !important;
+}
+
+html, body {
+  color-scheme: light !important;
+  background: #FBFBFB !important;
+  color: #1F2937 !important;
+}
+body {
+  background-color: #FBFBFB !important;
+  background-image: none !important;
+}
+
+::selection { background: rgba(197, 186, 255, 0.45) !important; color: #1F2937 !important; }
+::-webkit-scrollbar-thumb { background: rgba(151, 137, 211, 0.58) !important; }
+::-webkit-scrollbar-thumb:hover { background: #9B8DE0 !important; }
+:focus-visible { outline-color: #9B8DE0 !important; }
+
+/* Main app shells and shared glass surfaces */
+#__next, #root, main, .app-shell, .page-shell { background-color: transparent; }
+.glass-panel, .glass-card, .glass-navbar, .gh-panel, .gh-sidebar,
+.card, .repo-card, .activity-card, .dashboard-card {
+  background-color: #C4D9FF !important;
+  border-color: rgba(107, 126, 174, 0.24) !important;
+  color: #1F2937 !important;
+  box-shadow: 0 8px 24px rgba(91, 109, 160, 0.08) !important;
+}
+.glass-input, .input-glass, .premium-input, .gh-inp, .gh-textarea,
+input, textarea, select {
+  background-color: #E8F9FF !important;
+  color: #1F2937 !important;
+  border-color: rgba(107, 126, 174, 0.28) !important;
+}
+input::placeholder, textarea::placeholder { color: #64748B !important; }
+.glass-input:focus, .input-glass:focus, .premium-input:focus,
+.gh-inp:focus, .gh-textarea:focus,
+input:focus, textarea:focus, select:focus {
+  border-color: #9B8DE0 !important;
+  box-shadow: 0 0 0 3px rgba(197, 186, 255, 0.32) !important;
+}
+
+/* Dark Tailwind surface utilities become the soft secondary surface. */
+[class~="bg-black"], [class~="bg-slate-950"], [class~="bg-slate-900"],
+[class~="bg-zinc-950"], [class~="bg-zinc-900"], [class~="bg-neutral-900"],
+[class~="bg-gray-900"], [class~="bg-[#050505]"], [class~="bg-[#030303]"],
+[class~="bg-[#010409]"], [class~="bg-[#0d1117]"], [class~="bg-[#18181b]"],
+[class~="bg-[#0e0e10]"], [class~="bg-[#0d0d12]"], [class~="bg-[#17171d]"],
+[class~="bg-[#111116]"] {
+  background-color: #E8F9FF !important;
+  color: #1F2937 !important;
+}
+[class~="bg-slate-800"], [class~="bg-zinc-800"], [class~="bg-gray-800"],
+[class~="bg-neutral-800"], [class~="bg-[#161b22]"], [class~="bg-[#21262d]"],
+[class~="bg-[#1f1f23]"] {
+  background-color: #C4D9FF !important;
+  color: #1F2937 !important;
+}
+[class~="bg-white"], [class~="bg-slate-50"], [class~="bg-gray-50"], [class~="bg-zinc-50"] {
+  background-color: #FBFBFB !important;
+  color: #1F2937 !important;
+}
+[class~="bg-slate-100"], [class~="bg-slate-200"], [class~="bg-gray-100"],
+[class~="bg-zinc-100"], [class~="bg-zinc-200"] {
+  background-color: #E8F9FF !important;
+  color: #1F2937 !important;
+}
+
+/* Blue / violet / cyan brand utilities now use the lavender accent. */
+[class*="bg-blue-"], [class*="bg-sky-"], [class*="bg-cyan-"],
+[class*="bg-indigo-"], [class*="bg-violet-"], [class*="bg-purple-"] {
+  background-color: #C5BAFF !important;
+  color: #26213F !important;
+}
+[class*="text-blue-"], [class*="text-sky-"], [class*="text-cyan-"],
+[class*="text-indigo-"], [class*="text-violet-"], [class*="text-purple-"] {
+  color: #66599F !important;
+}
+[class*="border-blue-"], [class*="border-sky-"], [class*="border-cyan-"],
+[class*="border-indigo-"], [class*="border-violet-"], [class*="border-purple-"] {
+  border-color: rgba(128, 111, 194, 0.34) !important;
+}
+[class*="from-blue-"], [class*="from-sky-"], [class*="from-cyan-"],
+[class*="from-indigo-"], [class*="from-violet-"], [class*="from-purple-"],
+[class*="to-blue-"], [class*="to-sky-"], [class*="to-cyan-"],
+[class*="to-indigo-"], [class*="to-violet-"], [class*="to-purple-"] {
+  --tw-gradient-from: #C5BAFF !important;
+  --tw-gradient-to: #C4D9FF !important;
+  --tw-gradient-stops: var(--tw-gradient-from), var(--tw-gradient-to) !important;
+}
+
+/* Remove old white-on-black typography where it would disappear on light surfaces. */
+[class*="text-white"], [class~="text-black"], [class*="text-slate-950"],
+[class*="text-slate-900"], [class*="text-slate-800"], [class*="text-zinc-100"],
+[class*="text-zinc-200"], [class*="text-gray-900"], [class*="text-neutral-900"] {
+  color: #1F2937 !important;
+}
+[class*="text-slate-"], [class*="text-zinc-"], [class*="text-gray-"] {
+  color: #475569;
+}
+[class*="border-white"], [class*="border-slate-800"], [class*="border-slate-700"],
+[class*="border-zinc-700"], [class*="border-gray-800"] {
+  border-color: rgba(107, 126, 174, 0.22) !important;
+}
+
+/* Consistent button hierarchy across all routes. */
+.gh-btn-primary, .btn-white, .phx-primary, .phx-nav-cta,
+button.primary, a.primary, [data-variant="primary"] {
+  background: #C5BAFF !important;
+  background-color: #C5BAFF !important;
+  color: #26213F !important;
+  border: 1px solid #B4A8F0 !important;
+  box-shadow: 0 4px 14px rgba(128, 111, 194, 0.16) !important;
+}
+.gh-btn-primary:hover:not(:disabled), .btn-white:hover, .phx-primary:hover,
+.phx-nav-cta:hover, button.primary:hover, a.primary:hover {
+  background: #B9ACF5 !important;
+  color: #26213F !important;
+}
+.gh-btn-default, .gh-btn, .btn-grey, .phx-secondary,
+button.secondary, a.secondary, [data-variant="secondary"] {
+  background: #C4D9FF !important;
+  background-color: #C4D9FF !important;
+  color: #1F2937 !important;
+  border: 1px solid rgba(107, 126, 174, 0.28) !important;
+  box-shadow: 0 3px 10px rgba(91, 109, 160, 0.08) !important;
+}
+.gh-btn-default:hover:not(:disabled), .gh-btn:hover:not(:disabled),
+.btn-grey:hover, .phx-secondary:hover, button.secondary:hover, a.secondary:hover {
+  background: #B8D0FB !important;
+  color: #1F2937 !important;
+}
+
+/* Landing page cinematic scene: retain layout/depth, recolour its surfaces. */
+.phx-page { background: #FBFBFB !important; color: #1F2937 !important; }
+.phx-cinema { background: #FBFBFB !important; opacity: 0.52; }
+.phx-vignette { background: none !important; opacity: 0 !important; }
+.phx-grain { opacity: 0.012 !important; }
+.phx-letterbox { background: #E8F9FF !important; opacity: 0.55 !important; }
+.phx-progress { background: #C5BAFF !important; }
+.phx-nav {
+  background: rgba(232, 249, 255, 0.94) !important;
+  color: #1F2937 !important;
+  border-color: rgba(107, 126, 174, 0.28) !important;
+  box-shadow: 0 12px 34px rgba(91, 109, 160, 0.12) !important;
+}
+.phx-brand-icon { background: #C5BAFF !important; color: #26213F !important; }
+.phx-nav-links a, .phx-login, .phx-kicker, .phx-proof, .phx-scroll,
+.phx-number, .phx-console-back small, .consolelabel, .phx-layer-card small,
+.terminal-head, .phx-footer { color: #64748B !important; }
+.phx-hero h1, .phx-panel-section h2, .phx-end h2,
+.phx-console-main, .phx-console-back, .phx-chip, .phx-layer-card,
+.phx-terminal, .core, .phx-page strong, .phx-page b { color: #1F2937 !important; }
+.phx-hero h1 i, .phx-panel-section h2 i, .phx-end h2 i,
+.phx-inline { color: #7668B4 !important; }
+.phx-hero-copy > p, .phx-panel-copy > p, .phx-terminal pre,
+.phx-console-back .tree, .windowbody aside, .codebox code { color: #475569 !important; }
+.phx-console-back, .phx-console-main, .phx-chip, .phx-layer-card,
+.phx-terminal, .core {
+  background: linear-gradient(145deg, rgba(196,217,255,.72), rgba(232,249,255,.94)) !important;
+  border-color: rgba(107,126,174,.30) !important;
+  box-shadow: 0 16px 42px rgba(91,109,160,.12) !important;
+}
+.windowbody aside .active, .stats > div, .codebox {
+  background: rgba(251,251,251,.82) !important;
+  border-color: rgba(107,126,174,.22) !important;
+  color: #1F2937 !important;
+}
+.codebox > div, .windowbar { color: #64748B !important; border-color: rgba(107,126,174,.20) !important; }
+.phx-frame3d, .phx-ring, .orb-ring { border-color: rgba(128,111,194,.25) !important; }
+.phx-slab { background: linear-gradient(145deg, rgba(197,186,255,.32), rgba(196,217,255,.45)) !important; border-color: rgba(128,111,194,.24) !important; }
+.phx-beam-a, .phx-beam-b, .phx-beam-c { background: linear-gradient(105deg, transparent 35%, rgba(197,186,255,.32) 50%, transparent 65%) !important; }
+.phx-gridfloor { opacity: .16 !important; }
+.phx-streak, .phx-scan { background: linear-gradient(90deg, transparent, rgba(155,141,224,.38), transparent) !important; }
+.phx-particles i { background: rgba(128,111,194,.48) !important; box-shadow: 0 0 12px rgba(128,111,194,.20) !important; }
+.phx-panel-section, .phx-end, .phx-footer { color: #1F2937 !important; }
+
+/* Settings, repository setup, chat, and search panels with inline legacy styles. */
+.gh-root { background: #FBFBFB !important; color: #1F2937 !important; }
+.gh-sidebar { background: #E8F9FF !important; border-color: rgba(107,126,174,.24) !important; }
+.gh-panel { background: #C4D9FF !important; border-color: rgba(107,126,174,.24) !important; }
+.gh-nav-divider { background: rgba(107,126,174,.24) !important; }
+.gh-inp, .gh-textarea { background: #E8F9FF !important; color: #1F2937 !important; }
+
+/* Remaining arbitrary legacy surfaces and hover states. */
+[class~="bg-[#1a1a1a]"], [class~="bg-[#0a0a0c]"], [class~="bg-[#0f172a]"],
+[class~="bg-[#121214]"], [class~="bg-[#0c0c10]"], [class~="bg-[#09090c]"],
+[class~="bg-[#0d0d0f]"] { background-color: #E8F9FF !important; color: #1F2937 !important; }
+[class~="hover:bg-[#27272a]"]:hover, [class~="hover:bg-[#1a1a1a]"]:hover {
+  background-color: #C4D9FF !important;
+  color: #1F2937 !important;
+}
+
+/* Translucent dark utility surfaces used by dropdowns and modal layers. */
+[class~="bg-slate-950/70"], [class~="bg-slate-900/70"],
+[class~="bg-slate-900/60"], [class~="bg-zinc-950/80"],
+[class~="bg-slate-900"], [class~="bg-zinc-900"] {
+  background-color: rgba(232, 249, 255, 0.96) !important;
+  color: #1F2937 !important;
+}
+[class~="bg-slate-800/80"], [class~="bg-slate-700"], [class~="bg-zinc-800"] {
+  background-color: #C4D9FF !important;
+  color: #1F2937 !important;
+}
+[class~="bg-black/20"], [class~="bg-black/30"], [class~="bg-black/40"],
+[class~="bg-black/60"], [class~="bg-black/80"], [class~="bg-black/90"] {
+  background-color: rgba(197, 186, 255, 0.20) !important;
+}
+
+
+/* Preserve subtle tints for utility classes that intentionally carry alpha. */
+[class*="bg-blue-"][class*="/"], [class*="bg-sky-"][class*="/"],
+[class*="bg-cyan-"][class*="/"], [class*="bg-indigo-"][class*="/"],
+[class*="bg-violet-"][class*="/"], [class*="bg-purple-"][class*="/"] {
+  background-color: rgba(197, 186, 255, 0.24) !important;
+  color: #66599F !important;
+}
+
+/* PANDAHUB_UNIFIED_SIDE_NAV_V1 */
+.ph-app-shell { min-height: 100vh; min-width: 0; }
+.ph-app-content { min-height: 100vh; min-width: 0; margin-left: 218px; }
+.ph-app-content-public { margin-left: 0; }
+
+.ph-left-rail {
+  position: fixed;
+  z-index: 80;
+  left: 16px;
+  top: 50%;
+  transform: translateY(-50%);
+  display: flex;
+  flex-direction: column;
+  width: 188px;
+  max-height: min(88vh, 820px);
+  padding: 12px;
+  border: 1px solid rgba(196, 217, 255, .94);
+  border-radius: 28px;
+  background: linear-gradient(165deg, rgba(232, 249, 255, .97), rgba(251, 251, 255, .96) 55%, rgba(232, 249, 255, .94));
+  box-shadow: 0 18px 48px rgba(91, 109, 160, .14), 0 3px 10px rgba(91, 109, 160, .06), inset 0 1px 0 rgba(255,255,255,.92);
+  -webkit-backdrop-filter: blur(18px) saturate(1.18);
+  backdrop-filter: blur(18px) saturate(1.18);
+  color: #334155;
+}
+.ph-rail-brand { display: flex; align-items: center; gap: 9px; padding: 4px 5px 12px; border-bottom: 1px solid rgba(196,217,255,.76); flex: 0 0 auto; }
+.ph-brand-mark { display: grid; place-items: center; width: 36px; height: 36px; flex: 0 0 36px; border: 1px solid #C4D9FF; border-radius: 13px; background: #FBFBFB; box-shadow: 0 3px 10px rgba(91,109,160,.08); font-size: 19px; }
+.ph-brand-copy { display: flex; flex-direction: column; min-width: 0; }
+.ph-brand-name { color: #25324A; font-size: 14px; font-weight: 750; letter-spacing: -.025em; line-height: 1.15; }
+.ph-brand-caption { margin-top: 3px; color: #8190A8; font-size: 9px; font-weight: 600; letter-spacing: .045em; white-space: nowrap; }
+.ph-rail-scroll { min-height: 0; overflow-y: auto; overscroll-behavior: contain; padding: 10px 0 7px; scrollbar-width: none; }
+.ph-rail-scroll::-webkit-scrollbar { display: none; }
+.ph-nav-section { display: flex; flex-direction: column; gap: 3px; }
+.ph-nav-section-title { margin: 0 0 4px; padding: 0 8px; color: #91A0B6; font-size: 9px; font-weight: 800; letter-spacing: .14em; text-transform: uppercase; }
+.ph-nav-item-wrap { width: 100%; }
+.ph-nav-link { position: relative; isolation: isolate; display: flex; min-height: 37px; align-items: center; gap: 10px; width: 100%; padding: 8px 10px; overflow: hidden; border: 1px solid transparent; border-radius: 13px; color: #65748B; font-size: 11.5px; font-weight: 650; line-height: 1.2; text-decoration: none; transition: color .18s ease, background-color .18s ease, border-color .18s ease; }
+.ph-nav-link:hover { color: #51477F; background: rgba(197,186,255,.22); border-color: rgba(197,186,255,.28); }
+.ph-nav-link-active { color: #51477F; border-color: rgba(181,171,235,.58); background: linear-gradient(105deg, rgba(197,186,255,.68), rgba(232,249,255,.92)); box-shadow: 0 4px 12px rgba(120,108,186,.11), inset 0 1px 0 rgba(255,255,255,.65); }
+.ph-nav-active-bg { position: absolute; z-index: -1; inset: 0; border-radius: inherit; background: linear-gradient(105deg, rgba(197,186,255,.50), rgba(232,249,255,.74)); }
+.ph-nav-icon { flex: 0 0 auto; color: #8592AA; transition: transform .2s cubic-bezier(.2,.8,.2,1), color .2s ease; }
+.ph-nav-link:hover .ph-nav-icon, .ph-nav-link-active .ph-nav-icon { color: #7669B5; }
+.ph-nav-link:hover .ph-nav-icon { transform: translateY(-1px) rotate(-4deg); }
+.ph-nav-label { position: relative; z-index: 1; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+.ph-create-link { position: relative; display: flex; align-items: center; gap: 9px; min-height: 43px; margin: 11px 0 12px; padding: 7px 10px; overflow: hidden; border: 1px solid rgba(176,164,239,.78); border-radius: 15px; color: #51477F; background: linear-gradient(105deg, #C5BAFF, #DAD4FF 64%, #E8F9FF); box-shadow: 0 7px 17px rgba(137,119,210,.22), inset 0 1px 0 rgba(255,255,255,.7); font-size: 11.5px; font-weight: 800; text-decoration: none; transition: box-shadow .2s ease, filter .2s ease; }
+.ph-create-link:hover { box-shadow: 0 10px 22px rgba(137,119,210,.28), inset 0 1px 0 rgba(255,255,255,.8); filter: saturate(1.06); }
+.ph-create-icon { display: grid; place-items: center; width: 26px; height: 26px; border: 1px solid rgba(255,255,255,.7); border-radius: 10px; background: rgba(251,251,251,.52); box-shadow: 0 2px 7px rgba(105,89,181,.12); }
+.ph-create-spark { margin-left: auto; color: rgba(81,71,127,.66); font-size: 13px; }
+.ph-repo-section { padding-top: 2px; }
+.ph-repo-caption { display: flex; align-items: center; gap: 6px; min-width: 0; margin: 0 7px 5px; padding: 5px 7px; border-radius: 9px; color: #8B98AD; background: rgba(196,217,255,.26); font-size: 9px; font-weight: 700; }
+.ph-repo-caption span { overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+.ph-rail-footer { flex: 0 0 auto; padding-top: 5px; }
+.ph-rail-divider { height: 1px; margin: 0 4px 8px; background: rgba(196,217,255,.82); }
+.ph-rail-footnote { display: flex; align-items: center; gap: 6px; padding: 7px 8px 1px; color: #A2AEC0; font-size: 9px; font-weight: 600; }
+.ph-mobile-dock { display: none; }
+
+@media (max-width: 1100px) and (min-width: 901px) {
+  .ph-left-rail { left: 10px; width: 166px; padding: 10px; }
+  .ph-app-content { margin-left: 190px; }
+}
+
+@media (max-width: 900px) {
+  .ph-app-content { margin-left: 0; padding-bottom: 98px; }
+  .ph-left-rail { display: none; }
+  .ph-mobile-dock {
+    position: fixed;
+    z-index: 100;
+    left: 10px;
+    right: 10px;
+    bottom: max(10px, env(safe-area-inset-bottom));
+    display: flex;
+    align-items: center;
+    gap: 5px;
+    max-width: 760px;
+    height: 70px;
+    margin: 0 auto;
+    padding: 7px 9px;
+    overflow-x: auto;
+    overscroll-behavior-x: contain;
+    scrollbar-width: none;
+    border: 1px solid rgba(196,217,255,.96);
+    border-radius: 23px;
+    background: rgba(232,249,255,.94);
+    box-shadow: 0 12px 34px rgba(91,109,160,.17), inset 0 1px 0 rgba(255,255,255,.95);
+    -webkit-backdrop-filter: blur(18px) saturate(1.15);
+    backdrop-filter: blur(18px) saturate(1.15);
+  }
+  .ph-mobile-dock::-webkit-scrollbar { display: none; }
+  .ph-mobile-item-wrap { flex: 0 0 auto; }
+  .ph-mobile-nav-link { position: relative; isolation: isolate; display: flex; flex-direction: column; align-items: center; justify-content: center; gap: 4px; min-width: 54px; height: 54px; padding: 4px 6px; border: 1px solid transparent; border-radius: 15px; color: #73819A; font-size: 9px; font-weight: 750; text-decoration: none; }
+  .ph-mobile-nav-link .ph-nav-label { max-width: 66px; font-size: 8.5px; }
+  .ph-mobile-nav-link .ph-nav-icon { width: 18px; height: 18px; }
+  .ph-mobile-nav-link.ph-nav-link-active { background: linear-gradient(145deg, rgba(197,186,255,.76), rgba(232,249,255,.94)); border-color: rgba(181,171,235,.6); box-shadow: 0 3px 10px rgba(120,108,186,.12); }
+  .ph-mobile-nav-link.ph-mobile-create { min-width: 60px; color: #51477F; background: linear-gradient(145deg, #C5BAFF, #E0DBFF); border-color: rgba(176,164,239,.78); box-shadow: 0 4px 13px rgba(137,119,210,.2); }
+}
+
+@media (max-width: 390px) {
+  .ph-mobile-dock { left: 6px; right: 6px; gap: 2px; padding: 6px; }
+  .ph-mobile-nav-link { min-width: 49px; }
+  .ph-mobile-nav-link .ph-nav-label { font-size: 8px; }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .ph-nav-link, .ph-nav-icon, .ph-create-link { transition: none !important; }
+}
+
+
+
+
+
+/* PANDAHUB_PREMIUM_LIGHT_AUTH_DASHBOARD_V1 */
+/* ======================================================================
+   PANDAHUB AUTH — PREMIUM SOFT SKY / LAVENDER
+   Quiet, light surfaces; no dark glass or animated space background.
+   ====================================================================== */
+.ph-auth-layout {
+  min-height: 100vh;
+  display: flex;
+  flex-direction: column;
+  background: #FBFBFB;
+  color: #263449;
+}
+.ph-auth-topbar {
+  position: relative;
+  z-index: 5;
+  min-height: 68px;
+  background: rgba(232, 249, 255, .94);
+  border-bottom: 1px solid #C4D9FF;
+}
+.ph-auth-topbar-inner {
+  width: min(100% - 48px, 1240px);
+  min-height: 68px;
+  margin: 0 auto;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 16px;
+}
+.ph-auth-brand {
+  display: inline-flex;
+  align-items: center;
+  gap: 11px;
+  color: #263449 !important;
+  text-decoration: none !important;
+  font-size: 19px;
+  font-weight: 750;
+  letter-spacing: -.04em;
+}
+.ph-auth-brand > span:last-child > span {
+  color: #7668B4;
+}
+.ph-auth-brand-mark {
+  width: 36px;
+  height: 36px;
+  display: grid;
+  place-items: center;
+  border-radius: 12px;
+  background: linear-gradient(145deg, #C5BAFF, #C4D9FF);
+  border: 1px solid rgba(128, 111, 194, .2);
+  font-size: 20px;
+  box-shadow: 0 4px 12px rgba(128, 111, 194, .12);
+}
+.ph-auth-home-link {
+  display: inline-flex;
+  align-items: center;
+  gap: 7px;
+  color: #64748B !important;
+  font-size: 13px;
+  font-weight: 600;
+  text-decoration: none !important;
+  transition: color .18s ease;
+}
+.ph-auth-home-link:hover { color: #66599F !important; }
+.ph-auth-layout-content {
+  position: relative;
+  z-index: 1;
+  flex: 1;
+  display: flex;
+  flex-direction: column;
+  background: #FBFBFB;
+}
+.ph-auth-page {
+  position: relative;
+  isolation: isolate;
+  min-height: calc(100vh - 68px);
+  flex: 1;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  overflow: hidden;
+  padding: clamp(24px, 4vw, 54px);
+  color: #263449;
+  background: linear-gradient(145deg, #FBFBFB 0%, #F7FAFF 52%, #F8F6FF 100%);
+}
+.ph-auth-page::before,
+.ph-auth-page::after {
+  content: "";
+  position: absolute;
+  z-index: -1;
+  pointer-events: none;
+  border-radius: 999px;
+}
+.ph-auth-page::before {
+  width: min(44vw, 520px);
+  height: min(44vw, 520px);
+  top: -24%;
+  right: -9%;
+  background: radial-gradient(circle, rgba(197, 186, 255, .24) 0%, rgba(197, 186, 255, 0) 70%);
+}
+.ph-auth-page::after {
+  width: min(42vw, 480px);
+  height: min(42vw, 480px);
+  bottom: -30%;
+  left: -10%;
+  background: radial-gradient(circle, rgba(196, 217, 255, .38) 0%, rgba(196, 217, 255, 0) 70%);
+}
+.ph-auth-card {
+  width: min(100%, 1040px);
+  min-height: 610px;
+  display: grid;
+  grid-template-columns: minmax(0, .92fr) minmax(0, 1.08fr);
+  overflow: hidden;
+  border: 1px solid rgba(162, 177, 218, .36);
+  border-radius: 30px;
+  background: #FBFBFB;
+  box-shadow: 0 26px 80px rgba(91, 109, 160, .14), 0 4px 14px rgba(91, 109, 160, .05);
+}
+.ph-auth-aside {
+  position: relative;
+  isolation: isolate;
+  overflow: hidden;
+  display: flex;
+  flex-direction: column;
+  justify-content: space-between;
+  padding: clamp(32px, 4vw, 54px);
+  background: linear-gradient(145deg, #E8F9FF 0%, #D7E7FF 48%, #D3CBFF 100%);
+}
+.ph-auth-aside::before {
+  content: "";
+  position: absolute;
+  z-index: -1;
+  width: 390px;
+  height: 390px;
+  right: -190px;
+  top: 110px;
+  border: 1px solid rgba(118, 104, 180, .19);
+  border-radius: 50%;
+  box-shadow: 0 0 0 34px rgba(251, 251, 251, .10), 0 0 0 68px rgba(251, 251, 251, .08);
+}
+.ph-auth-aside::after {
+  content: "";
+  position: absolute;
+  z-index: -1;
+  right: 8%;
+  bottom: 13%;
+  width: 170px;
+  height: 170px;
+  border-radius: 42px;
+  transform: rotate(28deg);
+  background: linear-gradient(145deg, rgba(251,251,251,.34), rgba(197,186,255,.12));
+  border: 1px solid rgba(251,251,251,.40);
+}
+.ph-auth-aside-content { position: relative; z-index: 1; max-width: 390px; }
+.ph-auth-eyebrow {
+  width: fit-content;
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
+  padding: 9px 12px;
+  border: 1px solid rgba(255,255,255,.62);
+  border-radius: 999px;
+  background: rgba(251,251,251,.48);
+  color: #62568F;
+  font-size: 10px;
+  font-weight: 800;
+  letter-spacing: .13em;
+}
+.ph-auth-aside h1 {
+  margin: 42px 0 16px;
+  max-width: 390px;
+  color: #263449;
+  font-size: clamp(36px, 4vw, 52px);
+  font-weight: 780;
+  line-height: 1.04;
+  letter-spacing: -.055em;
+}
+.ph-auth-aside h1 span { color: #7465B4; }
+.ph-auth-aside-copy {
+  max-width: 350px;
+  margin: 0;
+  color: #52627D;
+  font-size: 15px;
+  line-height: 1.75;
+}
+.ph-auth-feature-list {
+  display: grid;
+  gap: 19px;
+  margin-top: 42px;
+}
+.ph-auth-feature {
+  display: flex;
+  align-items: center;
+  gap: 13px;
+}
+.ph-auth-feature-icon {
+  width: 42px;
+  height: 42px;
+  flex: 0 0 42px;
+  display: grid;
+  place-items: center;
+  border: 1px solid rgba(255,255,255,.76);
+  border-radius: 14px;
+  background: rgba(251,251,251,.62);
+  color: #65599B;
+  box-shadow: 0 5px 14px rgba(91,109,160,.06);
+}
+.ph-auth-feature strong,
+.ph-auth-feature small { display: block; }
+.ph-auth-feature strong { color: #34435C; font-size: 13px; font-weight: 750; }
+.ph-auth-feature small { margin-top: 3px; color: #63728A; font-size: 11px; line-height: 1.45; }
+.ph-auth-aside-footer {
+  position: relative;
+  z-index: 1;
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  margin-top: 38px;
+  color: #5B6681;
+  font-size: 11px;
+  font-weight: 600;
+}
+.ph-auth-orbit { position: absolute; pointer-events: none; border-radius: 50%; }
+.ph-auth-orbit-one { width: 11px; height: 11px; top: 19%; right: 18%; background: #FBFBFB; box-shadow: 0 0 0 8px rgba(251,251,251,.20); }
+.ph-auth-orbit-two { width: 7px; height: 7px; bottom: 25%; right: 28%; background: #A99CE8; box-shadow: 0 0 0 7px rgba(169,156,232,.13); }
+.ph-auth-form-panel {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding: clamp(30px, 4vw, 58px);
+  background: #FBFBFB;
+}
+.ph-auth-form-inner { width: 100%; max-width: 390px; }
+.ph-auth-tabs {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 5px;
+  padding: 5px;
+  margin-bottom: 38px;
+  border: 1px solid #DCE7FA;
+  border-radius: 14px;
+  background: #E8F9FF;
+}
+.ph-auth-tabs button {
+  min-height: 40px;
+  border: 0;
+  border-radius: 10px;
+  background: transparent;
+  color: #64748B;
+  cursor: pointer;
+  font-size: 13px;
+  font-weight: 650;
+  transition: background .18s ease, color .18s ease, box-shadow .18s ease;
+}
+.ph-auth-tabs button.active {
+  background: #C5BAFF;
+  color: #40366C;
+  box-shadow: 0 3px 10px rgba(128,111,194,.16);
+}
+.ph-auth-tabs button:disabled { cursor: default; opacity: .75; }
+.ph-auth-heading { margin-bottom: 26px; }
+.ph-auth-kicker {
+  display: inline-block;
+  margin-bottom: 10px;
+  color: #8173BE;
+  font-size: 10px;
+  font-weight: 800;
+  letter-spacing: .15em;
+}
+.ph-auth-heading h2,
+.ph-auth-success h2 {
+  margin: 0;
+  color: #263449;
+  font-size: clamp(25px, 2.4vw, 31px);
+  font-weight: 780;
+  line-height: 1.2;
+  letter-spacing: -.045em;
+}
+.ph-auth-heading p,
+.ph-auth-success p {
+  margin: 9px 0 0;
+  color: #64748B;
+  font-size: 13px;
+  line-height: 1.6;
+}
+.ph-auth-error {
+  margin: -8px 0 18px;
+  padding: 11px 13px;
+  border: 1px solid #F1C4CC;
+  border-radius: 12px;
+  background: #FFF2F4;
+  color: #A53D52;
+  font-size: 12px;
+  line-height: 1.5;
+}
+.ph-auth-form { display: grid; gap: 17px; }
+.ph-auth-field { display: grid; gap: 8px; }
+.ph-auth-label-row { display: flex; align-items: center; justify-content: space-between; gap: 12px; }
+.ph-auth-label { color: #475569; font-size: 12px; font-weight: 700; }
+.ph-auth-forgot { color: #7668B4 !important; font-size: 11px; font-weight: 700; text-decoration: none !important; }
+.ph-auth-forgot:hover { color: #5D4D9D !important; text-decoration: underline !important; }
+.ph-auth-input-wrap {
+  min-height: 49px;
+  display: flex;
+  align-items: center;
+  gap: 11px;
+  padding: 0 14px;
+  border: 1px solid #C9DDF4;
+  border-radius: 13px;
+  background: #E8F9FF;
+  color: #8292AD;
+  transition: border-color .18s ease, box-shadow .18s ease, background .18s ease;
+}
+.ph-auth-input-wrap:focus-within {
+  border-color: #A99BEA;
+  background: #F4F6FF;
+  box-shadow: 0 0 0 4px rgba(197,186,255,.24);
+}
+.ph-auth-input-wrap input,
+.ph-auth-input-wrap input:focus {
+  width: 100%;
+  min-width: 0;
+  height: 47px;
+  padding: 0;
+  border: 0 !important;
+  outline: 0;
+  background: transparent !important;
+  color: #263449 !important;
+  box-shadow: none !important;
+  font-size: 13px;
+}
+.ph-auth-input-wrap input::placeholder { color: #91A0B7 !important; opacity: 1; }
+.ph-auth-submit {
+  min-height: 50px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 10px;
+  margin-top: 5px;
+  padding: 0 18px;
+  border: 1px solid #B7A9F0;
+  border-radius: 13px;
+  background: linear-gradient(105deg, #C5BAFF 0%, #C4D9FF 100%);
+  color: #38315F;
+  box-shadow: 0 7px 16px rgba(128,111,194,.17);
+  cursor: pointer;
+  font-size: 13px;
+  font-weight: 800;
+  transition: transform .18s ease, box-shadow .18s ease, filter .18s ease;
+}
+.ph-auth-submit:hover:not(:disabled) { transform: translateY(-1px); box-shadow: 0 10px 20px rgba(128,111,194,.22); filter: saturate(1.04); }
+.ph-auth-submit:active:not(:disabled) { transform: translateY(0); }
+.ph-auth-submit:disabled { cursor: not-allowed; opacity: .62; box-shadow: none; }
+.ph-auth-spinner { animation: ph-auth-spin .9s linear infinite; }
+@keyframes ph-auth-spin { to { transform: rotate(360deg); } }
+.ph-auth-divider { display: flex; align-items: center; gap: 13px; margin: 27px 0 17px; color: #94A3B8; font-size: 10px; font-weight: 650; }
+.ph-auth-divider::before,
+.ph-auth-divider::after { content: ""; height: 1px; flex: 1; background: #E2EAF6; }
+.ph-auth-socials { display: grid; grid-template-columns: 1fr 1fr; gap: 12px; }
+.ph-auth-social {
+  min-height: 47px;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: 9px;
+  border: 1px solid #D7E3F4;
+  border-radius: 12px;
+  background: #FBFBFB;
+  color: #475569;
+  cursor: pointer;
+  font-size: 12px;
+  font-weight: 700;
+  transition: border-color .18s ease, background .18s ease, transform .18s ease;
+}
+.ph-auth-social:hover { border-color: #B8ADEC; background: #F6F5FF; transform: translateY(-1px); }
+.ph-auth-secure-note { display: flex; align-items: center; justify-content: center; gap: 7px; margin: 24px 0 0; color: #94A3B8; font-size: 10px; }
+.ph-auth-cancel { display: block; margin: 15px auto 0; border: 0; background: transparent; color: #7668B4; cursor: pointer; font-size: 12px; font-weight: 700; }
+.ph-auth-success { display: flex; min-height: 390px; flex-direction: column; align-items: center; justify-content: center; text-align: center; }
+.ph-auth-success-icon { width: 76px; height: 76px; display: grid; place-items: center; margin-bottom: 21px; border: 1px solid #C5BAFF; border-radius: 24px; background: #F0EDFF; color: #7668B4; }
+.ph-auth-loading { min-height: 100vh; display: grid; place-items: center; background: #FBFBFB; color: #7668B4; }
+
+@media (max-width: 860px) {
+  .ph-auth-card { max-width: 560px; min-height: 0; grid-template-columns: 1fr; }
+  .ph-auth-aside { padding: 28px 32px; }
+  .ph-auth-aside h1 { margin-top: 22px; font-size: 35px; }
+  .ph-auth-aside-copy { max-width: 460px; font-size: 13px; }
+  .ph-auth-feature-list { grid-template-columns: 1fr; gap: 12px; margin-top: 22px; }
+  .ph-auth-feature-icon { width: 36px; height: 36px; flex-basis: 36px; border-radius: 12px; }
+  .ph-auth-feature small { font-size: 10px; }
+  .ph-auth-aside-footer { margin-top: 22px; }
+  .ph-auth-form-panel { padding: 32px; }
+  .ph-auth-tabs { margin-bottom: 29px; }
+}
+@media (max-width: 520px) {
+  .ph-auth-topbar-inner { width: calc(100% - 32px); min-height: 60px; }
+  .ph-auth-topbar { min-height: 60px; }
+  .ph-auth-home-link { font-size: 11px; }
+  .ph-auth-page { min-height: calc(100vh - 60px); padding: 14px; }
+  .ph-auth-card { border-radius: 22px; }
+  .ph-auth-aside { padding: 23px 22px; }
+  .ph-auth-aside h1 { font-size: 30px; margin-bottom: 10px; }
+  .ph-auth-aside-copy { font-size: 12px; }
+  .ph-auth-feature-list { display: none; }
+  .ph-auth-aside-footer { margin-top: 20px; font-size: 10px; }
+  .ph-auth-form-panel { padding: 24px 21px 26px; }
+  .ph-auth-tabs { margin-bottom: 25px; }
+  .ph-auth-heading h2 { font-size: 25px; }
+  .ph-auth-socials { gap: 9px; }
+}
+
+/* PANDAHUB LIGHT BUTTON OVERRIDES — replace inherited charcoal controls. */
+.btn-primary, .btn-white {
+  background: linear-gradient(105deg, #C5BAFF 0%, #C4D9FF 100%) !important;
+  background-color: #C5BAFF !important;
+  color: #38315F !important;
+  border: 1px solid #B7A9F0 !important;
+  box-shadow: 0 5px 15px rgba(128,111,194,.16) !important;
+}
+.btn-primary:hover:not(:disabled), .btn-white:hover:not(:disabled) {
+  background: linear-gradient(105deg, #BFB2FA 0%, #B8D0FB 100%) !important;
+  color: #38315F !important;
+  box-shadow: 0 8px 19px rgba(128,111,194,.21) !important;
+}
+.btn-primary:active, .btn-white:active {
+  background: #B6A9F0 !important;
+  color: #38315F !important;
+  box-shadow: inset 0 1px 3px rgba(80,68,135,.16) !important;
+}
+.btn-glass, .btn-secondary, .btn-grey, .btn-icon {
+  background: #E8F9FF !important;
+  color: #52627D !important;
+  border: 1px solid #C4D9FF !important;
+  box-shadow: 0 3px 10px rgba(91,109,160,.07) !important;
+}
+.btn-glass:hover, .btn-secondary:hover, .btn-grey:hover, .btn-icon:hover {
+  background: #C4D9FF !important;
+  color: #3D4B66 !important;
+  border-color: #B8ADEC !important;
+  box-shadow: 0 5px 13px rgba(91,109,160,.10) !important;
+}
+.btn-danger {
+  background: #FFF1F3 !important;
+  color: #A53D52 !important;
+  border: 1px solid #F1C4CC !important;
+  box-shadow: 0 2px 7px rgba(165,61,82,.07) !important;
+}
+.btn-danger:hover {
+  background: #FFE7EB !important;
+  color: #91384C !important;
+  border-color: #E9AAB6 !important;
+}
+.btn-ghost {
+  background: transparent !important;
+  color: #52627D !important;
+  border: 1px solid transparent !important;
+}
+.btn-ghost:hover {
+  background: #C4D9FF !important;
+  color: #34435C !important;
+  border-color: #C4D9FF !important;
+}
+
+/* Keep the cinematic home-page vignette from darkening any shared route. */
+.p3c-vignette, .phx-vignette { display: none !important; background: none !important; opacity: 0 !important; }
+
+
+/* ======================================================================
+   PANDAHUB_LIGHT_THEME_AUDIT_V2
+   Final override layer. Older mad-black/monochrome rules above this point
+   were still winning for rounded panels, buttons, code surfaces and inline
+   dark variants. These selectors deliberately win over the legacy rules.
+   ====================================================================== */
+:root,
+html,
+html.dark,
+body,
+body.dark,
+[data-theme="dark"] {
+  color-scheme: light !important;
+  --bg-primary: #FBFBFB !important;
+  --bg-secondary: #E8F9FF !important;
+  --bg-tertiary: #C4D9FF !important;
+  --text-primary: #1F2937 !important;
+  --text-secondary: #475569 !important;
+  --text-muted: #64748B !important;
+  --color-primary: #C5BAFF !important;
+  --color-secondary: #C4D9FF !important;
+  --color-accent: #C5BAFF !important;
+  --color-surface-container: #E8F9FF !important;
+  --glass-bg: rgba(232,249,255,.94) !important;
+  --glass-bg-1: rgba(232,249,255,.78) !important;
+  --glass-bg-2: rgba(232,249,255,.90) !important;
+  --glass-bg-3: rgba(196,217,255,.78) !important;
+  --glass-bg-4: rgba(251,251,251,.98) !important;
+  --glass-border: rgba(107,126,174,.24) !important;
+  --glass-border-subtle: rgba(107,126,174,.16) !important;
+  --glass-shadow: 0 10px 30px rgba(91,109,160,.10) !important;
+  --border-color: rgba(107,126,174,.24) !important;
+}
+html, body { background: #FBFBFB !important; color: #1F2937 !important; }
+body { background-image: none !important; }
+
+/* Legacy global glass rules had a higher-specificity selector that painted
+   rounded bordered panels black. Reassert light surfaces with equal/higher
+   specificity for all common card variants. */
+html body .glass-card,
+html body .glass-panel,
+html body .glass-navbar,
+html body .gh-panel,
+html body .gh-sidebar,
+html body .card,
+html body .repo-card,
+html body .activity-card,
+html body .dashboard-card,
+html body [class*="rounded-xl"][class*="border"],
+html body [class*="rounded-2xl"][class*="border"],
+html body [class*="rounded-3xl"][class*="border"] {
+  background-color: #C4D9FF !important;
+  background-image: none !important;
+  color: #1F2937 !important;
+  border-color: rgba(107,126,174,.24) !important;
+  box-shadow: 0 8px 24px rgba(91,109,160,.09) !important;
+}
+html body .ph-auth-card,
+html body .ph-auth-form-panel,
+html body .ph-auth-tabs,
+html body .ph-auth-feature-icon {
+  background-color: #FBFBFB !important;
+  color: #1F2937 !important;
+}
+html body .ph-auth-aside { background: linear-gradient(145deg,#E8F9FF 0%,#D7E7FF 48%,#D3CBFF 100%) !important; }
+html body .ph-auth-tabs { background: #E8F9FF !important; }
+
+/* Every old Button component variant is soft, including hover/pressed states. */
+html body .btn-primary,
+html body .btn-white,
+html body .btn-primary:hover,
+html body .btn-white:hover,
+html body .btn-primary:active,
+html body .btn-white:active {
+  background: #C5BAFF !important;
+  background-color: #C5BAFF !important;
+  color: #26213F !important;
+  border-color: #B8ADEC !important;
+  box-shadow: 0 4px 14px rgba(128,111,194,.16) !important;
+}
+html body .btn-glass,
+html body .btn-secondary,
+html body .btn-grey,
+html body .btn-icon,
+html body .btn-danger,
+html body .btn-glass:hover,
+html body .btn-secondary:hover,
+html body .btn-grey:hover,
+html body .btn-icon:hover,
+html body .btn-danger:hover,
+html body .btn-glass:active,
+html body .btn-secondary:active,
+html body .btn-grey:active,
+html body .btn-icon:active {
+  background: #E8F9FF !important;
+  background-color: #E8F9FF !important;
+  color: #1F2937 !important;
+  border-color: #C4D9FF !important;
+  box-shadow: 0 3px 10px rgba(91,109,160,.09) !important;
+}
+html body .btn-danger,
+html body .btn-danger:hover { color: #B94E61 !important; border-color: rgba(185,78,97,.32) !important; }
+html body .btn-ghost { background: transparent !important; color: #475569 !important; border-color: transparent !important; box-shadow: none !important; }
+html body .btn-ghost:hover,
+html body .btn-ghost:focus-visible { background: #E8F9FF !important; color: #51477F !important; border-color: #C4D9FF !important; }
+
+/* Replace old global black code/pre/table surfaces with readable soft panels. */
+html body pre,
+html body code,
+html body table,
+html body thead {
+  background-color: #E8F9FF !important;
+  color: #1F2937 !important;
+  border-color: rgba(107,126,174,.22) !important;
+}
+html body pre,
+html body code { box-shadow: none !important; }
+
+/* Tailwind and arbitrary legacy dark surface tokens, including opacity and
+   dark: variants that escaped the earlier class-by-class conversion. */
+[class*="dark:bg-"] {
+  background-color: #E8F9FF !important;
+  background-image: none !important;
+  color: #1F2937 !important;
+}
+[class*="dark:border-"] { border-color: rgba(107,126,174,.24) !important; }
+[class*="dark:text-"] { color: #475569 !important; }
+[class~="bg-black"], [class*="bg-black/"],
+[class*="bg-slate-950"], [class*="bg-slate-900"], [class*="bg-slate-800"],
+[class*="bg-zinc-950"], [class*="bg-zinc-900"], [class*="bg-zinc-800"],
+[class*="bg-gray-900"], [class*="bg-neutral-900"],
+[class~="bg-[#09090b]"], [class~="bg-[#111113]"], [class~="bg-[#080809]"],
+[class~="bg-[#17171d]"], [class~="bg-[#111116]"], [class~="bg-[#18181b]"],
+[class~="bg-[#0a0a0c]"], [class~="bg-[#0d1117]"], [class~="bg-[#161b22]"],
+[class~="bg-[#21262d]"], [class~="bg-[#1a1a1a]"], [class~="bg-[#0f172a]"],
+[class~="bg-[#121214]"], [class~="bg-[#0c0c10]"], [class~="bg-[#09090c]"],
+[class~="bg-[#0d0d0f]"] {
+  background-color: #E8F9FF !important;
+  background-image: none !important;
+  color: #1F2937 !important;
+  border-color: rgba(107,126,174,.24) !important;
+}
+[class*="bg-black/"] { background-color: rgba(197,186,255,.24) !important; }
+[class*="hover:bg-black"]:hover,
+[class*="hover:bg-slate-9"]:hover,
+[class*="hover:bg-zinc-9"]:hover,
+[class*="hover:bg-zinc-8"]:hover { background-color: #C4D9FF !important; color: #1F2937 !important; }
+
+/* Landing hero and preview consoles: preserve their geometry, remove the
+   inherited charcoal scene and low-contrast white-on-black text. */
+html body .phx-page { background: #FBFBFB !important; color: #1F2937 !important; }
+html body .phx-cinema { background: #FBFBFB !important; opacity: .32 !important; }
+html body .phx-vignette { display: none !important; background: none !important; opacity: 0 !important; }
+html body .phx-letterbox { background: #E8F9FF !important; opacity: .55 !important; }
+html body .phx-console-back,
+html body .phx-console-main,
+html body .phx-terminal,
+html body .phx-layer-card,
+html body .phx-chip,
+html body .windowbody,
+html body .windowbar,
+html body .stats > div,
+html body .codebox {
+  background: linear-gradient(145deg,rgba(196,217,255,.76),rgba(232,249,255,.96)) !important;
+  background-color: #C4D9FF !important;
+  color: #1F2937 !important;
+  border-color: rgba(107,126,174,.24) !important;
+  box-shadow: 0 14px 36px rgba(91,109,160,.12) !important;
+}
+html body .phx-page h1,
+html body .phx-page h2,
+html body .phx-page h3,
+html body .phx-page p,
+html body .phx-page small,
+html body .phx-page b,
+html body .phx-page strong,
+html body .phx-page span,
+html body .phx-page .terminal-head,
+html body .phx-page .phx-console-back .tree,
+html body .phx-page .phx-terminal pre { color: #1F2937 !important; }
+html body .phx-page .phx-kicker,
+html body .phx-page .phx-inline,
+html body .phx-page .phx-hero h1 i,
+html body .phx-page .phx-panel-section h2 i,
+html body .phx-page .phx-end h2 i { color: #66599F !important; }
+html body .phx-secondary { background: #E8F9FF !important; color: #1F2937 !important; border-color: #C4D9FF !important; }
+html body .phx-nav { background: rgba(232,249,255,.96) !important; color: #1F2937 !important; border-color: #C4D9FF !important; box-shadow: 0 12px 34px rgba(91,109,160,.12) !important; }
+
+/* Inline-style form controls, dialogs and profile controls are also light. */
+html body input,
+html body textarea,
+html body select { background-color: #E8F9FF !important; color: #1F2937 !important; border-color: #C4D9FF !important; }
+html body input::placeholder,
+html body textarea::placeholder { color: #64748B !important; }
+html body .gh-sidebar { background: #E8F9FF !important; color: #1F2937 !important; }
+html body .gh-btn-primary { background: #C5BAFF !important; color: #26213F !important; border-color: #B8ADEC !important; }
+html body .gh-btn-default { background: #C4D9FF !important; color: #1F2937 !important; border-color: #B7C9EA !important; }
+html body .gh-btn-danger { background: #E8F9FF !important; color: #B94E61 !important; border-color: rgba(185,78,97,.32) !important; }
+html body .gh-overlay { background: rgba(111,101,158,.24) !important; }
+
+/* Keep ordinary text dark enough on all light surfaces. */
+[class*="text-white"], [class~="text-black"],
+[class*="text-zinc-100"], [class*="text-zinc-200"], [class*="text-zinc-300"],
+[class*="text-slate-900"], [class*="text-slate-800"] { color: #1F2937 !important; }
+[class*="border-white"], [class*="border-zinc-7"], [class*="border-slate-8"] { border-color: rgba(107,126,174,.24) !important; }
+
+
+/* ======================================================================
+   PANDAHUB_LIGHT_THEME_AUDIT_V3
+   Inline and legacy utility safety net for pages that still contain
+   hand-authored dark backgrounds. Keep this final in the stylesheet.
+   ====================================================================== */
+html body [style*="background: #0"],
+html body [style*="background:#0"],
+html body [style*="background: #1"],
+html body [style*="background:#1"],
+html body [style*="background-color: #0"],
+html body [style*="background-color:#0"],
+html body [style*="background-color: #1"],
+html body [style*="background-color:#1"],
+html body [style*="background: rgba(0, 0, 0"],
+html body [style*="background:rgba(0,0,0"],
+html body [style*="background-color: rgba(0, 0, 0"] {
+  background: #E8F9FF !important;
+  background-color: #E8F9FF !important;
+  background-image: none !important;
+  color: #1F2937 !important;
+}
+[class*="bg-neutral-8"], [class*="bg-neutral-9"],
+[class*="bg-stone-8"], [class*="bg-stone-9"],
+[class*="bg-gray-8"], [class*="bg-gray-9"],
+[class*="bg-slate-8"], [class*="bg-slate-9"],
+[class*="bg-zinc-8"], [class*="bg-zinc-9"] {
+  background: #E8F9FF !important;
+  background-color: #E8F9FF !important;
+  background-image: none !important;
+  color: #1F2937 !important;
+}
+/* Don't leave any auth, docs, chat or settings surface with legacy dark ink. */
+html body .codebox,
+html body .terminal-window,
+html body .terminal-panel,
+html body .editor-panel,
+html body .code-editor,
+html body .markdown-body pre,
+html body .markdown-body code,
+html body .chat-header,
+html body .chat-window,
+html body .settings-panel,
+html body .settings-sidebar {
+  background-color: #E8F9FF !important;
+  background-image: none !important;
+  color: #1F2937 !important;
+  border-color: rgba(107,126,174,.24) !important;
+  box-shadow: 0 8px 24px rgba(91,109,160,.08) !important;
+}
+
+
+/* PANDAHUB_LIGHT_THEME_AUDIT_V4: normalized inline dark RGB surfaces */
+html body [style*="background: rgb(0, 0, 0)"],
+html body [style*="background-color: rgb(0, 0, 0)"],
+html body [style*="background: rgb(8, 8, 8)"],
+html body [style*="background-color: rgb(8, 8, 8)"],
+html body [style*="background: rgb(18, 18, 20)"],
+html body [style*="background-color: rgb(18, 18, 20)"],
+html body [style*="background: rgb(24, 24, 27)"],
+html body [style*="background-color: rgb(24, 24, 27)"],
+html body [style*="background: rgb(13, 17, 23)"],
+html body [style*="background-color: rgb(13, 17, 23)"] {
+  background: #E8F9FF !important;
+  background-color: #E8F9FF !important;
+  color: #1F2937 !important;
+}
+
+
+/* ======================================================================
+   PANDAHUB_LIGHT_THEME_AUDIT_V5
+   Final whole-app cleanup for legacy white-opacity utilities and remaining
+   black input/skeleton rules that were declared with !important earlier.
+   ====================================================================== */
+:root,
+html,
+html.dark,
+body,
+body.dark,
+[data-theme="dark"] {
+  color-scheme: light !important;
+  --bg-primary: #FBFBFB !important;
+  --bg-secondary: #E8F9FF !important;
+  --bg-tertiary: #C4D9FF !important;
+  --color-primary: #C5BAFF !important;
+  --color-accent: #C5BAFF !important;
+  --glass-bg: #E8F9FF !important;
+  --glass-bg-1: #E8F9FF !important;
+  --glass-bg-2: #E8F9FF !important;
+  --glass-bg-3: #C4D9FF !important;
+  --glass-bg-4: #FBFBFB !important;
+}
+
+/* The legacy global rule mapped every semi-transparent white utility to
+   near-black. Restore those utilities to the secondary light surface. */
+html body .bg-white,
+html body [class*="bg-white/"],
+html body [class*="bg-white["],
+html body [class*="bg-slate-50"],
+html body [class*="bg-slate-100"],
+html body [class*="bg-gray-50"],
+html body [class*="bg-gray-100"],
+html body [class*="bg-zinc-50"],
+html body [class*="bg-zinc-100"] {
+  background: #E8F9FF !important;
+  background-color: #E8F9FF !important;
+  background-image: none !important;
+  color: #1F2937 !important;
+  border-color: rgba(107,126,174,.24) !important;
+}
+
+/* Secondary/tertiary dark Tailwind utilities that may still exist in page
+   components are mapped consistently, including opacity suffixes. */
+html body [class*="bg-black"],
+html body [class*="bg-slate-800"],
+html body [class*="bg-slate-900"],
+html body [class*="bg-slate-950"],
+html body [class*="bg-zinc-800"],
+html body [class*="bg-zinc-900"],
+html body [class*="bg-zinc-950"],
+html body [class*="bg-gray-800"],
+html body [class*="bg-gray-900"],
+html body [class*="bg-neutral-800"],
+html body [class*="bg-neutral-900"] {
+  background: #E8F9FF !important;
+  background-color: #E8F9FF !important;
+  background-image: none !important;
+  color: #1F2937 !important;
+  border-color: rgba(107,126,174,.24) !important;
+}
+
+/* Repository and legacy CTA gradient utilities now use the lavender accent. */
+html body [class*="from-zinc-800"],
+html body [class*="from-zinc-900"],
+html body [class*="from-zinc-950"],
+html body [class*="to-zinc-800"],
+html body [class*="to-zinc-900"],
+html body [class*="to-zinc-950"],
+html body [class*="from-violet-600"],
+html body [class*="from-blue-600"],
+html body [class*="to-violet-600"],
+html body [class*="to-blue-600"] {
+  background: #C5BAFF !important;
+  background-color: #C5BAFF !important;
+  background-image: none !important;
+  color: #26213F !important;
+  border-color: #B8ADEC !important;
+}
+
+/* These selectors were intentionally dark and used !important, so the
+   light form treatment must also be explicit and equally strong. */
+html body .glass-input,
+html body .input-glass,
+html body .premium-input,
+html body .gh-inp,
+html body .gh-textarea {
+  background: #E8F9FF !important;
+  background-color: #E8F9FF !important;
+  background-image: none !important;
+  color: #1F2937 !important;
+  border: 1px solid rgba(107,126,174,.28) !important;
+  box-shadow: inset 0 1px 1px rgba(91,109,160,.04) !important;
+}
+html body .glass-input:hover,
+html body .input-glass:hover,
+html body .premium-input:hover,
+html body .glass-input:focus,
+html body .input-glass:focus,
+html body .premium-input:focus,
+html body .gh-inp:focus,
+html body .gh-textarea:focus {
+  background: #FBFBFB !important;
+  background-color: #FBFBFB !important;
+  border-color: #A99AE8 !important;
+  box-shadow: 0 0 0 3px rgba(197,186,255,.28) !important;
+  color: #1F2937 !important;
+  outline: none !important;
+}
+html body .glass-input::placeholder,
+html body .input-glass::placeholder,
+html body .premium-input::placeholder,
+html body .gh-inp::placeholder,
+html body .gh-textarea::placeholder {
+  color: #64748B !important;
+}
+
+/* Startup loading cards previously used a hard-coded #111 background. */
+html body .skeleton,
+html body .skeleton-load,
+html body .skeleton-loader {
+  background: linear-gradient(100deg, #E8F9FF 20%, #C4D9FF 45%, #E8F9FF 70%) !important;
+  background-color: #E8F9FF !important;
+  border-color: rgba(107,126,174,.16) !important;
+}
+html body .skeleton::after,
+html body .skeleton-load::after,
+html body .skeleton-loader::after {
+  background: linear-gradient(90deg, transparent, rgba(197,186,255,.25), transparent) !important;
+}
+
+/* Opacity-based white borders should look like soft blue-grey dividers. */
+html body [class*="border-white/"],
+html body [class*="border-white["],
+html body [class*="border-slate-800"],
+html body [class*="border-zinc-800"] {
+  border-color: rgba(107,126,174,.24) !important;
+}
+
+/* Restore dark readable text where legacy screens expected white text. */
+html body [class*="text-white"],
+html body [class*="text-slate-100"],
+html body [class*="text-slate-200"],
+html body [class*="text-slate-300"],
+html body [class*="text-zinc-100"],
+html body [class*="text-zinc-200"],
+html body [class*="text-zinc-300"] {
+  color: #1F2937 !important;
+}
+
+/* Keep status feedback semantic rather than forcing it into the brand tint. */
+html body .text-red-400, html body .text-red-500,
+html body .text-rose-400, html body .text-rose-500 { color: #B94E61 !important; }
+html body .text-emerald-400, html body .text-green-400 { color: #287A56 !important; }
+html body .text-amber-400, html body .text-yellow-400 { color: #946A20 !important; }
+html body .text-sky-400, html body .text-blue-400 { color: #4B65A8 !important; }
+
+/* PANDAHUB_UI_HEALTH_POLISH_V1: additive, light-theme-safe usability rules */
+:where(a, button, input, textarea, select, [role="button"]):focus-visible {
+  outline: 3px solid #8D7CDF !important;
+  outline-offset: 2px;
+}
+:where(button, [role="button"], a) { touch-action: manipulation; }
+:where(input, textarea, select, img, video) { max-width: 100%; }
+.ph-startup-card:hover { transform: translateY(-3px); box-shadow: 0 10px 26px rgba(77,97,140,.12); }
+@media (hover: none) { .ph-startup-card:hover { transform: none; box-shadow: none; } }
+@media (prefers-reduced-motion: reduce) {
+  html:focus-within { scroll-behavior: auto !important; }
+  *, *::before, *::after {
+    animation-duration: 0.01ms !important;
+    animation-iteration-count: 1 !important;
+    transition-duration: 0.01ms !important;
+    scroll-behavior: auto !important;
+  }
 }

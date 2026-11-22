@@ -51,7 +51,7 @@ export default function PullsPage() {
 
         {/* Controls */}
         <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', marginBottom: 24, flexWrap: 'wrap', gap: 12 }}>
-          <div style={{ display: 'flex', gap: 4, background: 'var(--glass-bg-2)', borderRadius: 12, padding: 4, border: '1px solid var(--glass-border)', backdropFilter: '(12px)' }}>
+          <div style={{ display: 'flex', gap: 4, background: 'var(--glass-bg-2)', borderRadius: 12, padding: 4, border: '1px solid var(--glass-border)', backdropFilter: 'blur(12px)' }}>
             {(['open', 'closed', 'merged'] as const).map(s => (
               <button key={s} onClick={() => setFilter(s)} style={{
                 padding: '7px 18px', borderRadius: 9, border: 'none', cursor: 'pointer', fontSize: 13, fontWeight: 600,
@@ -63,7 +63,7 @@ export default function PullsPage() {
             ))}
           </div>
           {user && (
-            <button onClick={() => setShowNew(!showNew)} style={{ padding: '10px 22px', borderRadius: 12, background: '#ffffff', color: '#000000', fontWeight: 700, fontSize: 14, border: '1px solid #ffffff', cursor: 'pointer', display: 'flex', alignItems: 'center', gap: 8, boxShadow: '0 4px 14px rgba(255,255,255,0.18)' }}>
+            <button onClick={() => setShowNew(!showNew)} style={{ padding: '10px 22px', borderRadius: 12, background: '#C5BAFF', color: '#26213F', fontWeight: 700, fontSize: 14, border: '1px solid #B8ADEC', cursor: 'pointer', display: 'flex', alignItems: 'center', gap: 8, boxShadow: '0 4px 14px rgba(128,111,194,0.16)' }}>
               <span className="material-symbols-outlined" style={{ fontSize: 18 }}>add</span>
               New pull request
             </button>
@@ -107,10 +107,10 @@ export default function PullsPage() {
                   style={{ width: '100%', padding: '10px 14px', borderRadius: 12, fontSize: 14, outline: 'none', fontFamily: 'Inter, sans-serif', resize: 'vertical', boxSizing: 'border-box' }} />
               </div>
               <div style={{ display: 'flex', gap: 10 }}>
-                <button type="submit" disabled={submitting} style={{ padding: '10px 24px', borderRadius: 12, background: '#ffffff', color: '#000000', fontWeight: 700, fontSize: 14, border: '1px solid #ffffff', cursor: 'pointer', boxShadow: '0 4px 14px rgba(255,255,255,0.18)' }}>
+                <button type="submit" disabled={submitting} style={{ padding: '10px 24px', borderRadius: 12, background: '#C5BAFF', color: '#26213F', fontWeight: 700, fontSize: 14, border: '1px solid #B8ADEC', cursor: 'pointer', boxShadow: '0 4px 14px rgba(128,111,194,0.16)' }}>
                   {submitting ? 'Creating...' : 'Create pull request'}
                 </button>
-                <button type="button" onClick={() => setShowNew(false)} style={{ padding: '10px 20px', borderRadius: 12, background: '#18181b', border: '1px solid #333333', fontWeight: 600, fontSize: 14, cursor: 'pointer', color: '#f4f4f5' }}>Cancel</button>
+                <button type="button" onClick={() => setShowNew(false)} style={{ padding: '10px 20px', borderRadius: 12, background: '#E8F9FF', border: '1px solid #C4D9FF', fontWeight: 600, fontSize: 14, cursor: 'pointer', color: '#f4f4f5' }}>Cancel</button>
               </div>
             </form>
           </div>

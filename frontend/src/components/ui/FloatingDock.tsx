@@ -40,7 +40,7 @@ export function FloatingDock({ items, onItemClick }: { items?: DockItem[], onIte
     <div
       onMouseMove={(e) => mouseX.set(e.clientX)}
       onMouseLeave={() => mouseX.set(Infinity)}
-      className="fixed bottom-6 left-1/2 -translate-x-1/2 flex items-end gap-2 px-3 py-3 rounded-3xl bg-black/80 backdrop-blur-xl border border-white/10 shadow-[0_0_40px_rgba(0,0,0,0.5)] z-50 h-20"
+      className="fixed bottom-6 left-1/2 -translate-x-1/2 flex items-end gap-2 px-3 py-3 rounded-3xl bg-[#E8F9FF]/95 backdrop-blur-xl border border-[#C4D9FF] shadow-[0_12px_34px_rgba(91,109,160,0.16)] z-50 h-20"
     >
       {dockItems.map((item, index) => (
         <DockIcon key={index} name={item.name} mouseX={mouseX} onClick={() => onItemClick?.(item.name)}>
@@ -97,11 +97,11 @@ function DockIcon({
             animate={{ opacity: 1, y: 0, x: "-50%" }}
             exit={{ opacity: 0, y: 5, x: "-50%" }}
             transition={{ duration: 0.15 }}
-            className="absolute -top-14 left-1/2 whitespace-nowrap px-3 py-1.5 rounded-md bg-[#1a1a1a] border border-white/10 text-gray-200 text-xs font-medium shadow-xl pointer-events-none z-50"
+            className="absolute -top-14 left-1/2 whitespace-nowrap px-3 py-1.5 rounded-md bg-[#E8F9FF] border border-[#C4D9FF] text-gray-200 text-xs font-medium shadow-xl pointer-events-none z-50"
           >
             {name}
             {/* Tooltip triangle */}
-            <div className="absolute -bottom-1 left-1/2 -translate-x-1/2 w-2 h-2 bg-[#1a1a1a] border-b border-r border-white/10 rotate-45" />
+            <div className="absolute -bottom-1 left-1/2 -translate-x-1/2 w-2 h-2 bg-[#E8F9FF] border-b border-r border-[#C4D9FF] rotate-45" />
           </motion.div>
         )}
       </AnimatePresence>
@@ -112,7 +112,7 @@ function DockIcon({
         onMouseEnter={() => setHovered(true)}
         onMouseLeave={() => setHovered(false)}
         onClick={onClick}
-        className="flex items-center justify-center rounded-2xl bg-white/5 hover:bg-white/10 transition-colors border border-white/10 cursor-pointer relative shadow-inner overflow-hidden transform-gpu"
+        className="flex items-center justify-center rounded-2xl bg-white/5 hover:bg-white/10 transition-colors border border-[#C4D9FF] cursor-pointer relative shadow-inner overflow-hidden transform-gpu"
       >
         <div className="w-1/2 h-1/2 flex items-center justify-center">
           {children}

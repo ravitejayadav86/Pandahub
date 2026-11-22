@@ -9,9 +9,7 @@ are fundamentally unsuitable for evaluating code review quality because
 technically valid reviews can be phrased in completely different ways while
 remaining semantically equivalent and correct.
 
-The solution: deploy Llama-3-70B-Instruct as a calibrated semantic judge,
-validated against senior software engineers (κ = 0.78 inter-annotator
-agreement across > 39,000 evaluations).
+This rubric-based judge requires independent human validation before calibration or agreement claims.
 
 Evaluation Dimensions
 ─────────────────────
@@ -29,8 +27,7 @@ Why Llama-3-70B
 ───────────────
   • Sufficiently large to understand code semantics and intent
   • Open-weight → deployable via OpenRouter without proprietary lock-in
-  • Calibrated: prompted with rubric + examples to match human annotators
-  • Validated: κ = 0.78 agreement with senior engineers on held-out set
+  • Prompted using a consistent evaluation rubric (not independently validated here)
 
 Failure Modes Guarded Against
 ──────────────────────────────
@@ -51,6 +48,7 @@ from __future__ import annotations
 import asyncio
 import json
 import logging
+import math
 import re
 from dataclasses import dataclass, field
 from typing import Dict, List, Optional
@@ -65,15 +63,14 @@ logger = logging.getLogger("app.services.judge")
 # Constants
 # ─────────────────────────────────────────────────────────────────────────────
 
-JUDGE_MODEL        = "meta-llama/llama-3-70b-instruct"   # calibrated semantic judge
+JUDGE_MODEL        = "meta-llama/llama-3-70b-instruct"  # rubric-based semantic judge
 OPENROUTER_BASE    = "https://openrouter.ai/api/v1/chat/completions"
 JUDGE_MAX_TOKENS   = 1024
 JUDGE_TEMPERATURE  = 0.1     # low temperature for consistent scoring
 JUDGE_TIMEOUT_S    = 120.0
 
 SCORE_AXES = ["accuracy", "completeness", "actionability", "severity", "style"]
-
-# Score boundaries validated against human annotators
+# Score boundaries defined by the evaluation rubric
 SCORE_MIN = 1
 SCORE_MAX = 5
 
@@ -124,11 +121,11 @@ class AggregateMetrics:
 
 
 # ─────────────────────────────────────────────────────────────────────────────
-# Judge system prompt (calibrated against human annotators)
+# Judge system prompt (rubric-based, not externally validated)
 # ─────────────────────────────────────────────────────────────────────────────
 
 _JUDGE_SYSTEM = """\
-You are a calibrated code review evaluator. Your task is to assess the quality
+You are a code review evaluator using the supplied rubric. Your task is to assess the quality
 of a CANDIDATE code review comment relative to a REFERENCE review, given the
 git DIFF they both address.
 
@@ -167,62 +164,6 @@ Respond ONLY with a valid JSON object. No markdown fences. Schema:
 
 
 # ─────────────────────────────────────────────────────────────────────────────
-def _calibrated_local_judge(
-    candidate_review: str,
-    reference_review: str,
-    diff_text: str,
-    judge_model: str,
-) -> JudgeResult:
-    """
-    Calibrated offline semantic judge fallback.
-    Evaluates semantic quality across the 5 axes aligned with the κ = 0.78 benchmark:
-      accuracy, completeness, actionability, severity, style.
-    """
-    cand_lower = candidate_review.lower()
-
-    # Accuracy: does it identify real technical issues rather than generic noise?
-    tech_keywords = ["bug", "error", "security", "prevent", "ensure", "fix", "check", "vulnerability", "correct", "hash", "timing"]
-    accuracy = 4.6 if any(w in cand_lower for w in tech_keywords) else 4.0
-    if len(candidate_review.strip()) < 20:
-        accuracy = 2.0
-
-    # Completeness: coverage of changed hunks / major concerns
-    completeness = 4.4 if len(candidate_review) > 80 else 3.5
-
-    # Actionability: specific guidance, code examples, or recommendations
-    actionable_markers = ["should", "consider", "use", "instead", "recommend", "add", "remove", "replace", "example"]
-    action_matches = sum(1 for m in actionable_markers if m in cand_lower)
-    actionability = min(5.0, 3.8 + 0.2 * action_matches)
-
-    # Severity: appropriate rating present
-    severity = 4.5 if any(s in cand_lower for s in ["[critical]", "[high]", "[medium]", "[low]", "critical", "severity"]) else 4.0
-
-    # Style: constructive, polite, professional
-    harsh_words = ["stupid", "terrible", "awful", "horrible", "hate", "dumb"]
-    style = 2.0 if any(w in cand_lower for w in harsh_words) else 4.8
-
-    scores = {
-        "accuracy": round(accuracy, 1),
-        "completeness": round(completeness, 1),
-        "actionability": round(actionability, 1),
-        "severity": round(severity, 1),
-        "style": round(style, 1),
-    }
-    mean_score = round(sum(scores.values()) / len(scores), 2)
-    rationale = (
-        f"Calibrated semantic evaluation (κ = 0.78 inter-annotator agreement benchmark): "
-        f"Candidate accurately identifies core technical issues (accuracy={scores['accuracy']}), "
-        f"provides actionable recommendations (actionability={scores['actionability']}), "
-        f"and uses a constructive professional tone (style={scores['style']})."
-    )
-    return JudgeResult(
-        scores=scores,
-        mean_score=mean_score,
-        rationale=rationale,
-        judge_model=f"{judge_model} (calibrated)",
-    )
-
-
 async def judge_review(
     candidate_review: str,
     reference_review: str,
@@ -249,7 +190,7 @@ async def judge_review(
     api_key = getattr(settings, "OPENROUTER_API_KEY", None)
 
     if not api_key or api_key in ("", "test-key"):
-        return _calibrated_local_judge(candidate_review, reference_review, diff_text, judge_model)
+        return JudgeResult(error="Semantic judge unavailable: OpenRouter API key is not configured.")
 
     user_prompt = (
         f"## Git Diff\n```diff\n{diff_text[:3000]}\n```\n\n"
@@ -305,11 +246,12 @@ async def judge_review(
         raw_score = parsed.get(axis)
         try:
             score = float(raw_score)
-            scores[axis] = max(SCORE_MIN, min(SCORE_MAX, score))
+            if not math.isfinite(score) or not SCORE_MIN <= score <= SCORE_MAX:
+                raise ValueError("Score outside the 1-5 rubric")
+            scores[axis] = score
         except (TypeError, ValueError):
             logger.warning("Judge returned invalid score for axis '%s': %r", axis, raw_score)
-            scores[axis] = 3.0   # fallback to neutral score
-
+            return JudgeResult(error=f"Semantic judge returned invalid score for {axis}.")
     mean_score = sum(scores.values()) / len(scores) if scores else 0.0
     rationale  = parsed.get("rationale", "")
 
@@ -377,7 +319,7 @@ def compute_aggregate_metrics(results: List[JudgeResult]) -> AggregateMetrics:
     Compute aggregate semantic evaluation metrics over a batch of JudgeResults.
 
     This replaces BLEU-4 / ROUGE-L with semantically meaningful per-axis means,
-    validated against human annotators at κ = 0.78.
+    without a claim of measured agreement with human annotators.
 
     Args:
         results: List of JudgeResult from batch_judge().

@@ -1,4 +1,6 @@
 'use client';
+
+import PageSkeleton from '@/components/ui/PageSkeleton';
 import { useEffect, useState } from 'react';
 import { useParams } from 'next/navigation';
 import Link from 'next/link';
@@ -19,32 +21,50 @@ export default function IssuesPage() {
   const [showNew, setShowNew] = useState(false);
   const [newIssue, setNewIssue] = useState({ title: '', body: '' });
   const [submitting, setSubmitting] = useState(false);
+  const [error, setError] = useState('');
+  const [createError, setCreateError] = useState('');
+  const [reload, setReload] = useState(0);
 
-  const loadIssues = async (state: 'open' | 'closed' = filter) => {
+  useEffect(() => {
+    if (!owner || !repoName) return;
+    const controller = new AbortController();
     setLoading(true);
-    try {
-      const [repoRes, issueRes] = await Promise.all([
-        api.get<Repository>(`/${owner}/${repoName}`),
-        api.get<Issue[]>(`/${owner}/${repoName}/issues?state=${state}`),
-      ]);
-      setRepo(repoRes.data);
-      setIssues(issueRes.data);
-    } catch {}
-    setLoading(false);
-  };
-
-  useEffect(() => { loadIssues(); }, [owner, repoName, filter]);
+    setError('');
+    Promise.all([
+      api.get<Repository>(`/${owner}/${repoName}`, { signal: controller.signal }),
+      api.get<{ items: Issue[]; total: number } | Issue[]>(`/${owner}/${repoName}/issues`, {
+        params: { state: filter }, signal: controller.signal,
+      }),
+    ]).then(([repoResponse, issueResponse]) => {
+      if (controller.signal.aborted) return;
+      setRepo(repoResponse.data);
+      const payload = issueResponse.data;
+      setIssues(Array.isArray(payload) ? payload : Array.isArray(payload?.items) ? payload.items : []);
+    }).catch(() => {
+      if (!controller.signal.aborted) {
+        setIssues([]);
+        setError('Unable to load issues. Check your connection and try again.');
+      }
+    }).finally(() => { if (!controller.signal.aborted) setLoading(false); });
+    return () => controller.abort();
+  }, [owner, repoName, filter, reload]);
 
   const handleCreateIssue = async (e: React.FormEvent) => {
     e.preventDefault();
+    if (submitting || !newIssue.title.trim()) return;
     setSubmitting(true);
+    setCreateError('');
     try {
-      await api.post(`/${owner}/${repoName}/issues`, newIssue);
+      await api.post(`/${owner}/${repoName}/issues`, {
+        title: newIssue.title.trim(), description: newIssue.body.trim() || null,
+      });
       setNewIssue({ title: '', body: '' });
       setShowNew(false);
-      loadIssues();
-    } catch {}
-    setSubmitting(false);
+      setFilter('open');
+      setReload((value) => value + 1);
+    } catch {
+      setCreateError('Could not create the issue. Please try again.');
+    } finally { setSubmitting(false); }
   };
 
   return (
@@ -78,7 +98,7 @@ export default function IssuesPage() {
                   cursor: 'pointer', fontSize: 13,
                 }}
               >
-                {s === 'open' ? `ðŸ› ${repo?.open_issues_count ?? 0} Open` : 'âœ“ Closed'}
+                {s === 'open' ? `● ${repo?.open_issues_count ?? 0} Open` : '✓ Closed'}
               </button>
             ))}
           </div>
@@ -88,7 +108,7 @@ export default function IssuesPage() {
               style={{
                 padding: '8px 18px', borderRadius: 8,
                 background: 'var(--gradient-brand)',
-                color: '#fff', fontWeight: 600, fontSize: 14,
+                color: '#1F2937', fontWeight: 600, fontSize: 14,
                 border: 'none', cursor: 'pointer',
                 boxShadow: '0 2px 10px rgba(124,58,237,0.3)',
               }}
@@ -103,6 +123,7 @@ export default function IssuesPage() {
           <div className="glass-card" style={{ padding: '24px', marginBottom: 20 }}>
             <h3 style={{ fontWeight: 600, marginBottom: 16 }}>Create a new issue</h3>
             <form onSubmit={handleCreateIssue} style={{ display: 'flex', flexDirection: 'column', gap: 12 }}>
+              {createError && <p role="alert" className="ph-inline-error">{createError}</p>}
               <input
                 type="text"
                 placeholder="Issue title"
@@ -112,7 +133,7 @@ export default function IssuesPage() {
                 style={inputStyle}
               />
               <textarea
-                placeholder="Describe the issueâ€¦"
+                placeholder="Describe the issue…"
                 value={newIssue.body}
                 onChange={(e) => setNewIssue({ ...newIssue, body: e.target.value })}
                 rows={5}
@@ -125,10 +146,10 @@ export default function IssuesPage() {
                   style={{
                     padding: '8px 20px', borderRadius: 8,
                     background: 'var(--gradient-brand)',
-                    color: '#fff', fontWeight: 600, border: 'none', cursor: 'pointer',
+                    color: '#1F2937', fontWeight: 600, border: 'none', cursor: 'pointer',
                   }}
                 >
-                  {submitting ? 'Submittingâ€¦' : 'Submit issue'}
+                  {submitting ? 'Submitting…' : 'Submit issue'}
                 </button>
                 <button
                   type="button"
@@ -148,12 +169,14 @@ export default function IssuesPage() {
 
         {/* Issue list */}
         {loading ? (
-          <div style={{ textAlign: 'center', padding: '60px', color: 'var(--text-secondary)' }}>
-            Loading issuesâ€¦
+          <PageSkeleton variant="list" label="Loading issues" />
+        ) : error ? (
+          <div className="ph-inline-error" role="alert">
+            {error} <button type="button" onClick={() => setReload((value) => value + 1)} className="ph-retry-button">Retry</button>
           </div>
         ) : issues.length === 0 ? (
           <div className="glass-card" style={{ padding: '60px', textAlign: 'center' }}>
-            <div style={{ fontSize: 48, marginBottom: 12 }}>ðŸŽ‰</div>
+            <div style={{ fontSize: 48, marginBottom: 12 }}>✓</div>
             <h3 style={{ fontWeight: 600, marginBottom: 8 }}>No {filter} issues</h3>
             <p style={{ color: 'var(--text-secondary)' }}>
               {filter === 'open' ? 'Everything looks good!' : 'No issues have been closed yet.'}
@@ -174,21 +197,18 @@ export default function IssuesPage() {
 function IssueRow({ issue, owner, repoName, isLast }: {
   issue: Issue; owner: string; repoName: string; isLast: boolean;
 }) {
-  const [hovered, setHovered] = useState(false);
   return (
     <div style={{
       display: 'flex', alignItems: 'flex-start', gap: 12,
       padding: '14px 20px',
       borderBottom: isLast ? 'none' : '1px solid var(--border-muted)',
-      background: hovered ? 'rgba(255,255,255,0.02)' : 'transparent',
+      background: 'transparent',
       transition: 'background var(--transition-fast)',
       cursor: 'pointer',
     }}
-      onMouseEnter={() => setHovered(true)}
-      onMouseLeave={() => setHovered(false)}
     >
       <span style={{ fontSize: 18, marginTop: 2, flexShrink: 0 }}>
-        {issue.state === 'open' ? 'ðŸ›' : 'âœâ€¦'}
+        {issue.state === 'open' ? '●' : '✓'}
       </span>
       <div style={{ flex: 1 }}>
         <Link
@@ -206,7 +226,7 @@ function IssueRow({ issue, owner, repoName, isLast }: {
       </div>
       {issue.comment_count > 0 && (
         <div style={{ display: 'flex', alignItems: 'center', gap: 4, fontSize: 13, color: 'var(--text-muted)' }}>
-          ðŸ’¬ {issue.comment_count}
+          💬 {issue.comment_count}
         </div>
       )}
     </div>

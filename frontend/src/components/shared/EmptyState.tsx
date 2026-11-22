@@ -14,7 +14,7 @@ export default function EmptyState({ icon = 'inbox', title, description, action 
       <h3 style={{ fontSize: 18, fontWeight: 700, marginBottom: 8, color: 'var(--text-primary)' }}>{title}</h3>
       {description && <p style={{ fontSize: 14, color: 'var(--text-secondary)', maxWidth: 400, lineHeight: 1.6 }}>{description}</p>}
       {action && (
-        <button onClick={action.onClick} style={{ marginTop: 20, padding: '10px 24px', borderRadius: 10, background: 'var(--text-primary)', color: '#fff', fontWeight: 600, fontSize: 14, border: 'none', cursor: 'pointer' }}>
+        <button onClick={action.onClick} style={{ marginTop: 20, padding: '10px 24px', borderRadius: 10, background: '#C5BAFF', color: '#26213F', fontWeight: 600, fontSize: 14, border: '1px solid #B8ADEC', cursor: 'pointer', boxShadow: '0 4px 14px rgba(128,111,194,0.16)' }}>
           {action.label}
         </button>
       )}

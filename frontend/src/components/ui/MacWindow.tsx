@@ -55,7 +55,7 @@ export function MacWindow({
           transition={{ type: "spring", stiffness: 300, damping: 25 }}
           onPointerDown={handlePointerDown}
           style={{ zIndex }}
-          className={`absolute flex flex-col overflow-hidden bg-black/60 backdrop-blur-2xl border border-white/10 shadow-[0_20px_60px_-15px_rgba(0,0,0,0.8)] ${
+          className={`absolute flex flex-col overflow-hidden bg-[#C4D9FF] backdrop-blur-2xl border border-[#C4D9FF] shadow-[0_18px_48px_-15px_rgba(91,109,160,0.14)] ${
             isMaximized ? "rounded-none" : "rounded-xl"
           }`}
         >

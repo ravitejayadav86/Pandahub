@@ -1,5 +1,5 @@
-
 "use client";
+
 
 import { useEffect, useMemo, useRef, useState } from "react";
 import Link from "next/link";
@@ -7,6 +7,22 @@ import { useParams, usePathname, useRouter } from "next/navigation";
 import { useAuthStore } from "@/store/authStore";
 import { logout } from "@/lib/auth";
 import api from "@/lib/api";
+import {
+  LayoutDashboard,
+  Code2,
+  GitCommit,
+  CircleDot,
+  GitPullRequest,
+  ShieldCheck,
+  BrainCircuit,
+  Globe,
+  Settings as SettingsIcon,
+  FolderTree,
+  UploadCloud,
+  Compass,
+  Plus,
+  Sliders,
+} from "lucide-react";
 
 interface UserProfile {
   username: string;
@@ -472,43 +488,74 @@ export default function RepoDashboardPage() {
   const sidebarItems = [
     {
       label: "Overview",
-      icon: "grid_view",
+      icon: LayoutDashboard,
       href: repoBase,
     },
     {
       label: "Code",
-      icon: "code",
+      icon: Code2,
       href: repoBase,
     },
     {
       label: "Commits",
-      icon: "commit",
+      icon: GitCommit,
       href: `${repoBase}/commits`,
     },
     {
       label: "Issues",
-      icon: "adjust",
+      icon: CircleDot,
       href: `${repoBase}/issues`,
     },
     {
       label: "Pull Requests",
-      icon: "alt_route",
+      icon: GitPullRequest,
       href: `${repoBase}/pulls`,
     },
     {
       label: "Security",
-      icon: "security",
+      icon: ShieldCheck,
       href: `${repoBase}/security`,
     },
     {
+      label: "AI Insights",
+      icon: BrainCircuit,
+      href: `${repoBase}/insights`,
+    },
+    {
       label: "Pages",
-      icon: "public",
+      icon: Globe,
       href: `${repoBase}/pages`,
     },
     {
       label: "Settings",
-      icon: "settings",
+      icon: SettingsIcon,
       href: `${repoBase}#settings`,
+    },
+  ];
+
+  const toolItems = [
+    {
+      label: "File Tree",
+      icon: FolderTree,
+      href: `${repoBase}/tree`,
+    },
+    {
+      label: "Upload Files",
+      icon: UploadCloud,
+      href: `${repoBase}/upload`,
+    },
+  ];
+
+  const systemItems = [
+    {
+      label: "Settings",
+      icon: Sliders,
+      href: "/settings",
+    },
+    {
+      label: "Explore",
+      icon: Compass,
+      href: "/explore",
     },
   ];
 
@@ -527,147 +574,182 @@ export default function RepoDashboardPage() {
   return (
     <div className="min-h-screen bg-[var(--bg-primary)] text-[var(--text-primary)] font-sans">
       <div className="flex min-h-screen">
-        {/* Sidebar */}
-        <aside className="hidden md:flex w-[260px] shrink-0 flex-col border-r border-[var(--glass-border)] bg-[var(--glass-bg-3)] sticky top-0 h-screen">
-          <div className="h-[72px] border-b border-[var(--glass-border)] px-6 flex items-center">
+        {/* macOS Style Sidebar */}
+        <aside className="hidden md:flex w-[265px] shrink-0 flex-col border-r border-white/[0.08] bg-[#E8F9FF]/95 backdrop-blur-2xl sticky top-0 h-screen select-none z-30 transition-all duration-300">
+          
+          {/* macOS Traffic Lights Header */}
+          <div className="pt-4 px-5 pb-3 flex items-center justify-between border-b border-white/[0.06]">
+            <div className="flex items-center gap-2">
+              <span 
+                className="w-3.5 h-3.5 rounded-full bg-[#ff5f56] border border-[#e0443e] shadow-[inset_0_1px_1px_rgba(255,255,255,0.4),0_0_8px_rgba(255,95,86,0.35)] cursor-pointer hover:brightness-110 active:scale-95 transition-all"
+                title="Close"
+              />
+              <span 
+                className="w-3.5 h-3.5 rounded-full bg-[#ffbd2e] border border-[#dea123] shadow-[inset_0_1px_1px_rgba(255,255,255,0.4),0_0_8px_rgba(255,189,46,0.35)] cursor-pointer hover:brightness-110 active:scale-95 transition-all"
+                title="Minimize"
+              />
+              <span 
+                className="w-3.5 h-3.5 rounded-full bg-[#27c93f] border border-[#1aab29] shadow-[inset_0_1px_1px_rgba(255,255,255,0.4),0_0_8px_rgba(39,201,63,0.35)] cursor-pointer hover:brightness-110 active:scale-95 transition-all"
+                title="Zoom"
+              />
+            </div>
+            <span className="text-[10px] font-mono tracking-widest text-zinc-400 font-semibold uppercase">
+              PANDAHUB
+            </span>
+          </div>
+
+          {/* App / Workspace Branding */}
+          <div className="px-5 py-3 border-b border-white/[0.06]">
             <Link
               href="/dashboard"
-              className="flex items-center gap-3 no-underline"
+              className="flex items-center gap-3 no-underline group"
             >
-              <div className="w-10 h-10 rounded-xl bg-[#18181b] border border-[#333333] flex items-center justify-center shadow-md">
-                <span className="material-symbols-outlined text-white">
-                  public
-                </span>
+              <div className="w-9 h-9 rounded-xl bg-gradient-to-br from-zinc-800 to-zinc-950 border border-white/10 flex items-center justify-center shadow-md group-hover:scale-105 group-hover:border-white/20 transition-all duration-200">
+                <span className="text-base select-none">🐼</span>
               </div>
 
-              <div>
-                <div className="text-base font-extrabold tracking-tight text-[var(--text-primary)]">
+              <div className="min-w-0 flex-1">
+                <div className="text-[14px] font-bold tracking-tight text-[#1F2937] group-hover:text-blue-400 transition-colors">
                   PandaHub
                 </div>
-                <div className="text-[11px] text-[var(--text-secondary)] font-medium">
+                <div className="text-[11px] text-zinc-400 font-medium truncate">
                   Repository platform
                 </div>
               </div>
             </Link>
           </div>
 
-          <div className="p-5">
+          {/* New Repository Button */}
+          <div className="p-3.5">
             <Link
               href="/new"
-              className="w-full h-10 rounded-xl bg-white hover:bg-zinc-200 text-black flex items-center justify-center gap-2 text-sm font-bold no-underline transition-all shadow-md"
+              className="w-full h-9 rounded-xl bg-white/[0.08] hover:bg-white/[0.14] active:bg-white/[0.18] text-[#1F2937] border border-white/15 hover:border-white/30 flex items-center justify-center gap-2 text-xs font-semibold no-underline transition-all duration-200 shadow-sm"
             >
-              <span className="material-symbols-outlined text-[18px]">
-                add
-              </span>
-              New Repository
+              <Plus className="w-3.5 h-3.5 text-zinc-200" />
+              <span>New Repository</span>
             </Link>
           </div>
 
-          <nav className="px-3 flex-1">
-            <div className="px-3 pb-2 text-[10px] font-bold uppercase tracking-[0.18em] text-[var(--text-muted)]">
-              Repository
-            </div>
+          {/* Scrollable Navigation List */}
+          <nav className="px-3 flex-1 overflow-y-auto space-y-4 [scrollbar-width:thin] scrollbar-thumb-zinc-800">
+            {/* Repository Section */}
+            <div>
+              <div className="px-3 pb-1.5 text-[11px] font-semibold uppercase tracking-[0.08em] text-zinc-400 select-none">
+                Repository
+              </div>
 
-            <div className="space-y-1">
-              {sidebarItems.map((item) => {
-                const isSettings = item.label === "Settings";
-                const active = isSettings
-                  ? activeTab === "Settings"
-                  : item.label === "Code"
-                    ? pathname === repoBase && activeTab !== "Settings"
-                    : isActive(item.href) && activeTab !== "Settings";
+              <div className="space-y-0.5">
+                {sidebarItems.map((item) => {
+                  const ItemIcon = item.icon;
+                  const isSettings = item.label === "Settings";
+                  const isOverview = item.label === "Overview";
+                  const isCode = item.label === "Code";
 
-                if (isSettings) {
+                  let active = false;
+                  if (isSettings) {
+                    active = activeTab === "Settings";
+                  } else if (isOverview) {
+                    active = activeTab === "Overview" && pathname === repoBase;
+                  } else if (isCode) {
+                    active = activeTab === "Code";
+                  } else {
+                    active = isActive(item.href) && activeTab !== "Settings";
+                  }
+
+                  if (isSettings) {
+                    return (
+                      <button
+                        key={item.label}
+                        type="button"
+                        onClick={() => setActiveTab("Settings")}
+                        className={`w-full flex items-center gap-2.5 px-3 py-2 rounded-xl text-[13px] font-medium transition-all duration-200 group text-left ${
+                          active
+                            ? "bg-red-500/15 text-red-400 font-semibold border border-red-500/30 shadow-[0_2px_10px_rgba(239,68,68,0.15)]"
+                            : "text-[#475569] hover:bg-white/[0.07] hover:text-[#1F2937] hover:translate-x-1 border border-transparent"
+                        }`}
+                      >
+                        <ItemIcon className="w-4 h-4 shrink-0 transition-transform duration-200 group-hover:scale-110" />
+                        <span className="whitespace-nowrap flex-1">Repo Settings</span>
+                        {active && (
+                          <span className="w-1.5 h-1.5 rounded-full bg-red-400 shadow-[0_0_6px_rgba(248,113,113,0.8)] shrink-0" />
+                        )}
+                      </button>
+                    );
+                  }
+
                   return (
-                    <button
-                      key={item.label}
-                      type="button"
-                      onClick={() => setActiveTab("Settings")}
-                      className={`w-full flex items-center gap-3 px-3 py-2.5 rounded-xl text-sm font-medium transition-colors ${
+                    <Link
+                      key={`${item.label}-${item.href}`}
+                      href={item.href}
+                      onClick={() => {
+                        if (isOverview) setActiveTab("Overview");
+                        else if (isCode) setActiveTab("Code");
+                        else setActiveTab("Overview");
+                      }}
+                      className={`flex items-center gap-2.5 px-3 py-2 rounded-xl text-[13px] font-medium no-underline transition-all duration-200 group ${
                         active
-                          ? "bg-red-500/10 text-red-500 font-semibold border border-red-500/20"
-                          : "text-[var(--text-secondary)] hover:bg-[var(--glass-bg-2)] hover:text-[var(--text-primary)]"
+                          ? "bg-[#C5BAFF] text-[#1F2937] font-semibold border border-[#B8ADEC] shadow-[0_4px_14px_rgba(91,109,160,0.12)]"
+                          : "text-[#475569] hover:bg-white/[0.07] hover:text-[#1F2937] hover:translate-x-1 border border-transparent"
                       }`}
                     >
-                      <span className="material-symbols-outlined text-[19px]">
-                        {item.icon}
-                      </span>
-                      <span>Repo Settings</span>
-                    </button>
+                      <ItemIcon className={`w-4 h-4 shrink-0 transition-transform duration-200 group-hover:scale-110 ${active ? "text-blue-400" : "text-zinc-300"}`} />
+                      <span className="whitespace-nowrap flex-1">{item.label}</span>
+                      {active && (
+                        <span className="w-1.5 h-1.5 rounded-full bg-blue-400 shadow-[0_0_6px_rgba(96,165,250,0.8)] shrink-0" />
+                      )}
+                    </Link>
                   );
-                }
-
-                return (
-                  <Link
-                    key={`${item.label}-${item.href}`}
-                    href={item.href}
-                    onClick={() => setActiveTab("Overview")}
-                    className={`flex items-center gap-3 px-3 py-2.5 rounded-xl text-sm font-medium no-underline transition-all ${
-                      active
-                        ? "bg-[var(--glass-bg-2)] text-blue-500 font-semibold border border-[var(--glass-border)] shadow-sm"
-                        : "text-[var(--text-secondary)] hover:bg-[var(--glass-bg-1)] hover:text-[var(--text-primary)]"
-                    }`}
-                  >
-                    <span className="material-symbols-outlined text-[19px]">
-                      {item.icon}
-                    </span>
-                    <span>{item.label}</span>
-                  </Link>
-                );
-              })}
+                })}
+              </div>
             </div>
 
-            <div className="mt-7 px-3 pb-2 text-[10px] font-bold uppercase tracking-[0.18em] text-[var(--text-muted)]">
-              Repository tools
-            </div>
+            {/* Repository Tools Section */}
+            <div>
+              <div className="px-3 pb-1.5 text-[11px] font-semibold uppercase tracking-[0.08em] text-zinc-400 select-none">
+                Repository Tools
+              </div>
 
-            <div className="space-y-1">
-              {[
-                {
-                  label: "File Tree",
-                  icon: "folder_open",
-                  href: `${repoBase}/tree`,
-                },
-                {
-                  label: "Upload Files",
-                  icon: "upload_file",
-                  href: `${repoBase}/upload`,
-                },
-              ].map((item) => (
-                <Link
-                  key={item.label}
-                  href={item.href}
-                  className="flex items-center gap-3 px-3 py-2.5 rounded-xl text-sm font-medium text-[var(--text-secondary)] hover:bg-[var(--glass-bg-1)] hover:text-[var(--text-primary)] no-underline transition-colors"
-                >
-                  <span className="material-symbols-outlined text-[19px]">
-                    {item.icon}
-                  </span>
-                  {item.label}
-                </Link>
-              ))}
+              <div className="space-y-0.5">
+                {toolItems.map((item) => {
+                  const ToolIcon = item.icon;
+                  const active = isActive(item.href);
+                  return (
+                    <Link
+                      key={item.label}
+                      href={item.href}
+                      className={`flex items-center gap-2.5 px-3 py-2 rounded-xl text-[13px] font-medium no-underline transition-all duration-200 group ${
+                        active
+                          ? "bg-[#C5BAFF] text-[#1F2937] font-semibold border border-[#B8ADEC] shadow-[0_4px_14px_rgba(91,109,160,0.12)]"
+                          : "text-[#475569] hover:bg-white/[0.07] hover:text-[#1F2937] hover:translate-x-1 border border-transparent"
+                      }`}
+                    >
+                      <ToolIcon className="w-4 h-4 shrink-0 text-zinc-300 transition-transform duration-200 group-hover:scale-110" />
+                      <span className="whitespace-nowrap flex-1">{item.label}</span>
+                      {active && (
+                        <span className="w-1.5 h-1.5 rounded-full bg-blue-400 shadow-[0_0_6px_rgba(96,165,250,0.8)] shrink-0" />
+                      )}
+                    </Link>
+                  );
+                })}
+              </div>
             </div>
           </nav>
 
-          <div className="border-t border-[var(--glass-border)] p-3 space-y-1">
-            <Link
-              href="/settings"
-              className="flex items-center gap-3 px-3 py-2.5 rounded-xl text-sm font-medium text-[var(--text-secondary)] hover:bg-[var(--glass-bg-1)] hover:text-[var(--text-primary)] no-underline transition-colors"
-            >
-              <span className="material-symbols-outlined text-[19px]">
-                settings
-              </span>
-              Settings
-            </Link>
-
-            <Link
-              href="/explore"
-              className="flex items-center gap-3 px-3 py-2.5 rounded-xl text-sm font-medium text-[var(--text-secondary)] hover:bg-[var(--glass-bg-1)] hover:text-[var(--text-primary)] no-underline transition-colors"
-            >
-              <span className="material-symbols-outlined text-[19px]">
-                explore
-              </span>
-              Explore
-            </Link>
+          {/* Bottom System Navigation */}
+          <div className="border-t border-white/[0.08] p-3 space-y-0.5 bg-[#E8F9FF]/50">
+            {systemItems.map((item) => {
+              const SystemIcon = item.icon;
+              return (
+                <Link
+                  key={item.label}
+                  href={item.href}
+                  className="flex items-center gap-2.5 px-3 py-2 rounded-xl text-[13px] font-medium text-[#475569] hover:bg-white/[0.07] hover:text-[#1F2937] hover:translate-x-1 no-underline transition-all duration-200 group"
+                >
+                  <SystemIcon className="w-4 h-4 shrink-0 text-zinc-300 transition-transform duration-200 group-hover:scale-110" />
+                  <span className="whitespace-nowrap flex-1">{item.label}</span>
+                </Link>
+              );
+            })}
           </div>
         </aside>
 
@@ -958,6 +1040,7 @@ export default function RepoDashboardPage() {
                   { label: "Issues", href: `${repoBase}/issues` },
                   { label: "Pull Requests", href: `${repoBase}/pulls` },
                   { label: "Security", href: `${repoBase}/security` },
+                  { label: "AI Insights", href: `${repoBase}/insights` },
                   { label: "Settings", href: `${repoBase}#settings` },
                 ].map((item) => {
                   const isSettings = item.label === 'Settings';
@@ -1003,10 +1086,10 @@ export default function RepoDashboardPage() {
             {isEmptyRepository && activeTab !== 'Settings' && (
               <section className="mt-6 space-y-6 animate-fade-in">
                 {/* Get started options banner */}
-                <div className="rounded-3xl border border-white/10 bg-zinc-950/80 p-6 sm:p-7 shadow-sm">
+                <div className="rounded-3xl border border-white/10 bg-[#C4D9FF] p-6 sm:p-7 shadow-sm">
                   <div className="flex flex-col md:flex-row md:items-center justify-between gap-5">
                     <div className="flex items-start sm:items-center gap-4">
-                      <div className="w-12 h-12 rounded-2xl bg-zinc-900 text-white border border-zinc-700 flex items-center justify-center shrink-0 shadow-inner">
+                      <div className="w-12 h-12 rounded-2xl bg-[#C4D9FF] text-[#1F2937] border border-[#B7C9EA] flex items-center justify-center shrink-0 shadow-inner">
                         <span className="material-symbols-outlined text-[26px]">rocket_launch</span>
                       </div>
                       <div>
@@ -1018,7 +1101,7 @@ export default function RepoDashboardPage() {
                           <button
                             type="button"
                             onClick={() => handleOpenCreateFile('README.md', `# ${repoName}\n\nWelcome to ${repoName}!`)}
-                            className="font-bold text-white hover:underline cursor-pointer bg-transparent border-none p-0 inline"
+                            className="font-bold text-[#1F2937] hover:underline cursor-pointer bg-transparent border-none p-0 inline"
                           >
                             creating a new file
                           </button>{' '}
@@ -1026,7 +1109,7 @@ export default function RepoDashboardPage() {
                           <button
                             type="button"
                             onClick={() => quickFileInputRef.current?.click()}
-                            className="font-bold text-white hover:underline cursor-pointer bg-transparent border-none p-0 inline"
+                            className="font-bold text-[#1F2937] hover:underline cursor-pointer bg-transparent border-none p-0 inline"
                           >
                             upload file from file manager
                           </button>
@@ -1061,7 +1144,7 @@ export default function RepoDashboardPage() {
                 <div className="rounded-3xl border border-slate-200 bg-white p-6 sm:p-8 shadow-sm">
                   <div className="flex flex-col md:flex-row md:items-center justify-between gap-4">
                     <div className="flex items-center gap-4">
-                      <div className="w-14 h-14 rounded-2xl bg-gradient-to-br from-slate-900 to-slate-800 flex items-center justify-center text-white shadow-md">
+                      <div className="w-14 h-14 rounded-2xl bg-gradient-to-br from-slate-900 to-slate-800 flex items-center justify-center text-[#1F2937] shadow-md">
                         <span className="material-symbols-outlined text-[28px]">terminal</span>
                       </div>
                       <div>
@@ -1078,7 +1161,7 @@ export default function RepoDashboardPage() {
                       <button
                         type="button"
                         onClick={handleCopyCloneUrl}
-                        className="h-10 px-4 rounded-xl bg-slate-950 hover:bg-slate-800 text-white text-xs sm:text-sm font-semibold flex items-center gap-2 shadow-sm transition-colors"
+                        className="h-10 px-4 rounded-xl bg-[#E8F9FF] hover:bg-[#B8D0FB] text-[#1F2937] text-xs sm:text-sm font-semibold flex items-center gap-2 shadow-sm transition-colors"
                       >
                         <span className="material-symbols-outlined text-[17px]">content_copy</span>
                         {copied ? "Clone URL copied!" : "Copy Clone URL"}
@@ -1125,7 +1208,7 @@ export default function RepoDashboardPage() {
                         …or create a new repository on the command line
                       </div>
 
-                      <div className="relative rounded-2xl bg-slate-950 border border-slate-800 p-5 overflow-x-auto shadow-inner group">
+                      <div className="relative rounded-2xl bg-[#E8F9FF] border border-[#B7C9EA] p-5 overflow-x-auto shadow-inner group">
                         <button
                           type="button"
                           onClick={() => copyCode(
@@ -1147,7 +1230,7 @@ panda remote-add ${owner}/${repoName}
 panda push -u pandahub main`,
                             'new-repo'
                           )}
-                          className="absolute right-4 top-4 h-8 px-3 rounded-lg bg-slate-800/80 hover:bg-slate-700 text-slate-200 text-xs font-semibold flex items-center gap-1.5 transition-colors border border-slate-700"
+                          className="absolute right-4 top-4 h-8 px-3 rounded-lg bg-[#C4D9FF] hover:bg-[#B8D0FB] text-[#475569] text-xs font-semibold flex items-center gap-1.5 transition-colors border border-slate-700"
                         >
                           <span className="material-symbols-outlined text-[15px]">
                             {copiedSnippet === 'new-repo' ? 'check' : 'content_copy'}
@@ -1155,7 +1238,7 @@ panda push -u pandahub main`,
                           {copiedSnippet === 'new-repo' ? 'Copied' : 'Copy'}
                         </button>
 
-                        <pre className="text-xs sm:text-sm font-mono text-slate-200 leading-7">
+                        <pre className="text-xs sm:text-sm font-mono text-[#475569] leading-7">
 <span className="text-slate-500"># 1. Log in to PandaHub (auto-configures Git credentials)</span>
 <span className="text-emerald-400 font-semibold">panda</span> login
 
@@ -1184,7 +1267,7 @@ panda push -u pandahub main`,
                         …or push an existing repository from the command line
                       </div>
 
-                      <div className="relative rounded-2xl bg-slate-950 border border-slate-800 p-5 overflow-x-auto shadow-inner group">
+                      <div className="relative rounded-2xl bg-[#E8F9FF] border border-[#B7C9EA] p-5 overflow-x-auto shadow-inner group">
                         <button
                           type="button"
                           onClick={() => copyCode(
@@ -1200,7 +1283,7 @@ panda branch -M main
 panda push -u pandahub main`,
                             'existing-repo'
                           )}
-                          className="absolute right-4 top-4 h-8 px-3 rounded-lg bg-slate-800/80 hover:bg-slate-700 text-slate-200 text-xs font-semibold flex items-center gap-1.5 transition-colors border border-slate-700"
+                          className="absolute right-4 top-4 h-8 px-3 rounded-lg bg-[#C4D9FF] hover:bg-[#B8D0FB] text-[#475569] text-xs font-semibold flex items-center gap-1.5 transition-colors border border-slate-700"
                         >
                           <span className="material-symbols-outlined text-[15px]">
                             {copiedSnippet === 'existing-repo' ? 'check' : 'content_copy'}
@@ -1208,7 +1291,7 @@ panda push -u pandahub main`,
                           {copiedSnippet === 'existing-repo' ? 'Copied' : 'Copy'}
                         </button>
 
-                        <pre className="text-xs sm:text-sm font-mono text-slate-200 leading-7">
+                        <pre className="text-xs sm:text-sm font-mono text-[#475569] leading-7">
 <span className="text-slate-500"># 1. Log in to PandaHub</span>
 <span className="text-emerald-400 font-semibold">panda</span> login
 
@@ -1231,7 +1314,7 @@ panda push -u pandahub main`,
                         …or push using standard Git HTTPS
                       </div>
 
-                      <div className="relative rounded-2xl bg-slate-950 border border-slate-800 p-5 overflow-x-auto shadow-inner group">
+                      <div className="relative rounded-2xl bg-[#E8F9FF] border border-[#B7C9EA] p-5 overflow-x-auto shadow-inner group">
                         <button
                           type="button"
                           onClick={() => copyCode(
@@ -1240,7 +1323,7 @@ git branch -M main
 git push -u origin main`,
                             'git-https'
                           )}
-                          className="absolute right-4 top-4 h-8 px-3 rounded-lg bg-slate-800/80 hover:bg-slate-700 text-slate-200 text-xs font-semibold flex items-center gap-1.5 transition-colors border border-slate-700"
+                          className="absolute right-4 top-4 h-8 px-3 rounded-lg bg-[#C4D9FF] hover:bg-[#B8D0FB] text-[#475569] text-xs font-semibold flex items-center gap-1.5 transition-colors border border-slate-700"
                         >
                           <span className="material-symbols-outlined text-[15px]">
                             {copiedSnippet === 'git-https' ? 'check' : 'content_copy'}
@@ -1248,7 +1331,7 @@ git push -u origin main`,
                           {copiedSnippet === 'git-https' ? 'Copied' : 'Copy'}
                         </button>
 
-                        <pre className="text-xs sm:text-sm font-mono text-slate-200 leading-7">
+                        <pre className="text-xs sm:text-sm font-mono text-[#475569] leading-7">
 <span className="text-slate-500"># Link remote & push via standard Git</span>
 <span className="text-emerald-400 font-semibold">git</span> remote add origin <span className="text-sky-300">{cloneUrl}</span>
 <span className="text-emerald-400 font-semibold">git</span> branch -M main
@@ -1397,7 +1480,7 @@ git push -u origin main`,
                     {!user && " Please sign in with the owner account to manage this repository."}
                   </p>
                   {!user && (
-                    <Link href="/login" className="mt-5 inline-flex items-center gap-2 px-5 py-2.5 rounded-xl bg-slate-950 text-white text-sm font-semibold hover:bg-slate-800 no-underline shadow-sm">
+                    <Link href="/login" className="mt-5 inline-flex items-center gap-2 px-5 py-2.5 rounded-xl bg-[#E8F9FF] text-[#1F2937] text-sm font-semibold hover:bg-[#B8D0FB] no-underline shadow-sm">
                       Sign in
                     </Link>
                   )}
@@ -1417,7 +1500,8 @@ git push -u origin main`,
                           id="repo-description"
                           rows={3}
                           defaultValue={repoMeta?.description ?? ''}
-                          placeholder="A short description of your repository…"
+                          disabled
+                          placeholder="Repository description (read-only)"
                           className="w-full rounded-xl border border-slate-200 bg-slate-50 px-3.5 py-2.5 text-sm text-slate-900 placeholder:text-slate-400 focus:outline-none focus:border-blue-400 focus:ring-2 focus:ring-blue-100 resize-none"
                         />
                       </div>
@@ -1426,19 +1510,15 @@ git push -u origin main`,
                         <div className="flex gap-3">
                           {(['public', 'private', 'internal'] as const).map(v => (
                             <label key={v} className="flex items-center gap-2 cursor-pointer">
-                              <input type="radio" name="visibility" value={v} defaultChecked={repoMeta?.visibility === v} className="accent-blue-600" />
+                              <input type="radio" name="visibility" value={v} defaultChecked={repoMeta?.visibility === v} disabled className="accent-blue-600" />
                               <span className="text-sm text-slate-700 capitalize">{v}</span>
                             </label>
                           ))}
                         </div>
                       </div>
-                      <button
-                        type="button"
-                        className="h-9 px-4 rounded-xl bg-slate-950 hover:bg-slate-800 text-white text-sm font-semibold"
-                        onClick={() => setNotice('Settings saved (demo — API update coming soon).')}
-                      >
-                        Save changes
-                      </button>
+                      <p className="text-xs text-slate-500">
+                        Repository description and visibility are read-only here until a supported update action is available.
+                      </p>
                     </div>
                   </section>
 
@@ -1843,7 +1923,7 @@ git push -u origin main`,
                     </div>
                   </section>
 
-                  <section className="rounded-3xl border border-slate-200 bg-slate-950 p-5 text-white">
+                  <section className="rounded-3xl border border-slate-200 bg-[#E8F9FF] p-5 text-[#1F2937]">
                     <div className="flex items-center gap-2">
                       <div className="w-8 h-8 rounded-lg bg-white/10 flex items-center justify-center">
                         <span className="text-sm">🐼</span>
@@ -1856,8 +1936,8 @@ git push -u origin main`,
                       </div>
                     </div>
 
-                    <div className="mt-4 rounded-xl border border-white/10 bg-black/20 p-4 overflow-x-auto">
-                      <code className="text-[11px] leading-6 text-slate-200 whitespace-pre">
+                    <div className="mt-4 rounded-xl border border-white/10 bg-[#E8F9FF] p-4 overflow-x-auto">
+                      <code className="text-[11px] leading-6 text-[#475569] whitespace-pre">
 {`panda clone ${owner}/${repoName}
 cd ${repoName}
 panda status
@@ -1876,7 +1956,7 @@ panda push`}
 
       {/* Toast */}
       {notice && (
-        <div className="fixed bottom-5 right-5 z-[100] rounded-xl bg-slate-950 text-white px-4 py-3 shadow-2xl text-sm font-medium">
+        <div className="fixed bottom-5 right-5 z-[100] rounded-xl bg-[#E8F9FF] text-[#1F2937] px-4 py-3 shadow-2xl text-sm font-medium">
           {notice}
         </div>
       )}
@@ -1884,7 +1964,7 @@ panda push`}
            {/* Deploy modal */}
       {showDeployModal && (
         <div
-          className="fixed inset-0 z-[120] bg-slate-950/70 flex items-center justify-center p-4"
+          className="fixed inset-0 z-[120] bg-[#E8F9FF]/70 flex items-center justify-center p-4"
           onClick={(event) => {
             if (event.target === event.currentTarget) {
               setShowDeployModal(false);
@@ -1962,7 +2042,7 @@ panda push`}
 
       {/* ── Delete Repository Confirmation Modal ────────────────────────── */}
       {showDeleteModal && (
-        <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/60 px-4">
+        <div className="fixed inset-0 z-50 flex items-center justify-center bg-[#9B94C0]/25 px-4">
           <div className="w-full max-w-md rounded-3xl bg-white border border-red-200 shadow-2xl overflow-hidden">
             {/* Header */}
             <div className="px-6 py-5 border-b border-red-100 bg-red-50 flex items-center gap-3">
@@ -2024,7 +2104,7 @@ panda push`}
                   type="button"
                   onClick={handleDeleteRepo}
                   disabled={deleteConfirmText !== repoName || isDeleting}
-                  className="flex-1 h-10 rounded-xl bg-red-600 hover:bg-red-700 text-white text-sm font-semibold flex items-center justify-center gap-2 disabled:opacity-40 disabled:cursor-not-allowed transition-colors"
+                  className="flex-1 h-10 rounded-xl bg-red-600 hover:bg-red-700 text-[#1F2937] text-sm font-semibold flex items-center justify-center gap-2 disabled:opacity-40 disabled:cursor-not-allowed transition-colors"
                 >
                   {isDeleting ? (
                     <>
@@ -2049,7 +2129,7 @@ panda push`}
 
       {/* Create New File Modal */}
       {showCreateFileModal && (
-        <div className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-black/60 animate-fade-in">
+        <div className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-[#9B94C0]/25 animate-fade-in">
           <div className="w-full max-w-2xl rounded-3xl bg-[var(--glass-bg-4)] border border-[var(--glass-border)] shadow-2xl overflow-hidden text-[var(--text-primary)]">
             {/* Header */}
             <div className="px-6 py-5 border-b border-[var(--glass-border)] bg-[var(--glass-bg-2)] flex items-center justify-between">

@@ -1,8 +1,13 @@
 import type { Metadata, Viewport } from 'next';
 import './globals.css';
+import './ph-ui-shimmer.css';
+import './ph-ui-polish-v3.css';
+import './ph-ui-refinement-v4.css';
+import './ph-premium-v22.css';
+import './ph-compact-dock-v221.css';
+import GlobalNavigationShell from '@/components/navigation/GlobalNavigationShell';
 import { ErrorBoundary }  from '@/components/shared/ErrorBoundary';
 import { ToastProvider } from '@/components/shared/ToastProvider';
-import GlobalLoading from '@/components/GlobalLoading';
 import ScrollPerformanceManager from '@/components/ScrollPerformanceManager';
 
 export const metadata: Metadata = {
@@ -16,15 +21,15 @@ export const viewport: Viewport = {
   initialScale: 1,
   maximumScale: 5,
   themeColor: [
-    { media: '(prefers-color-scheme: light)', color: '#000000' },
-    { media: '(prefers-color-scheme: dark)',  color: '#000000' },
+    { media: '(prefers-color-scheme: light)', color: '#FBFBFB' },
+    { media: '(prefers-color-scheme: dark)',  color: '#FBFBFB' },
   ],
   viewportFit: 'cover', // enables safe-area-inset-* on iOS notch devices
 };
 
 export default function RootLayout({ children }: { children: React.ReactNode }) {
   return (
-    <html lang="en" className="dark" suppressHydrationWarning>
+    <html lang="en" suppressHydrationWarning>
       <body>
         {/*
           ErrorBoundary: catches any render-phase crash in the entire client
@@ -35,9 +40,8 @@ export default function RootLayout({ children }: { children: React.ReactNode }) 
         */}
         <ErrorBoundary>
           <ToastProvider>
-            <GlobalLoading />
             <ScrollPerformanceManager />
-            {children}
+            <GlobalNavigationShell>{children}</GlobalNavigationShell>
           </ToastProvider>
         </ErrorBoundary>
       </body>

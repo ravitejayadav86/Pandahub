@@ -28,8 +28,7 @@ Context-Collapse Guard (Contribution 3)
 ───────────────────────────────────────
 When routing to a small model (≤ 3.8B parameters), the retrieval k
 is capped at K_MAX_SMALL = 3 to prevent attention saturation.
-Exceeding this threshold on Phi-3-Mini was shown to increase
-hallucination rate from 10.66% → 20.97% (context collapse).
+This is a heuristic limit; its impact has not been measured for this deployment.
 
 Error Severity Overestimation Mitigation (Contribution 4)
 ──────────────────────────────────────────────────────────
@@ -99,8 +98,7 @@ def get_k_for_model(base_k: int, model_id: str, model_params_millions: int = 999
 
     Larger models (Qwen2.5-Coder-32B, Mistral-7B) are unaffected.
 
-    Research finding: Phi-3-Mini at k=5 raises hallucination rate from
-    10.66% → 20.97% due to context overflow in attention mechanisms.
+    The context limit is a precautionary heuristic, not an empirically validated reduction.
 
     Args:
         base_k              : The k value from the routing table.
@@ -119,7 +117,7 @@ def get_k_for_model(base_k: int, model_id: str, model_params_millions: int = 999
         effective_k = min(base_k, K_MAX_SMALL_MODEL)
         if effective_k < base_k:
             logger.info(
-                "Context-collapse guard: capping k %d → %d for small model %s (prevents attention saturation and hallucination surge from 10.66%% to 20.97%%)",
+                "Context guard: capping k %d → %d for small model %s (heuristic cap; performance not benchmarked)",
                 base_k, effective_k, model_id,
             )
         return effective_k

@@ -1,12 +1,8 @@
-﻿"use client";
+'use client';
 import { useState, useEffect } from 'react';
 
 const ACCENTS = [
-  { id: 'multicolor', label: 'Multicolor', colors: ['#E6E6E6', '#5E5CE6', '#30D158', '#64D2FF', '#BF5AF2'] },
-  { id: 'emerald', label: 'Emerald', colors: ['#30D158', '#34C759', '#00C7BE', '#32D74B'] },
-  { id: 'ocean', label: 'Ocean', colors: ['#E6E6E6', '#64D2FF', '#0040DD', '#007AFF'] },
-  { id: 'cyberpunk', label: 'Cyberpunk', colors: ['#BF5AF2', '#FF2D55', '#FF375F', '#D30DF2'] },
-  { id: 'mono', label: 'Slate', colors: ['#64748B', '#475569', '#334155', '#94A3B8'] }
+  { id: 'soft-sky-lavender', label: 'Soft Sky + Lavender', colors: ['#FBFBFB', '#E8F9FF', '#C4D9FF', '#C5BAFF'] },
 ];
 
 export default function Settings() {

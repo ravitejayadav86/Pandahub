@@ -235,7 +235,7 @@ export default function NewRepoPage() {
                 id="create-repo-submit"
                 type="submit"
                 disabled={loading || !form.name}
-                className="btn-primary btn-ripple w-full flex justify-center items-center gap-2 py-4 px-4 text-sm disabled:opacity-50 disabled:cursor-not-allowed shadow-[0_8px_20px_rgba(10,132,255,0.3)] hover:shadow-[0_12px_25px_rgba(10,132,255,0.4)] transition-all"
+                className="btn-primary btn-ripple w-full flex justify-center items-center gap-2 py-4 px-4 text-sm disabled:opacity-50 disabled:cursor-not-allowed shadow-[0_4px_14px_rgba(59,130,246,0.25)] hover:shadow-[0_6px_18px_rgba(59,130,246,0.35)] transition-all"
               >
                 {loading ? (
                   <>

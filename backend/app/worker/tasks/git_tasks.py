@@ -326,10 +326,34 @@ def post_receive_hook(
     # ------------------------------------------------------------------
     # 5. [Module 11 hook point] AI review dispatch & Security Scanning
     # ------------------------------------------------------------------
-    # Trigger AI Review
-    # When Module 11 (AI) is built, add:
-    #   from app.worker.tasks.ai_tasks import trigger_ai_review_for_push
-    #   trigger_ai_review_for_push.delay(repo_id=repo_id, pushed_refs=[...])
+    # PR reviews: only when deployment explicitly opts in. This may send
+    # diffs to an external AI provider.
+    if getattr(settings, "AUTO_AI_REVIEW_PR_ON_PUSH", False):
+        active_branches = {u.branch_name for u in updates if u.is_branch and not u.is_delete}
+        if active_branches:
+            try:
+                from app.models.pull_request import PullRequest
+                from app.models.enums import PullRequestState
+                from app.worker.tasks.ai_tasks import generate_pr_review_task
+                with _get_sync_session() as ai_session:
+                    prs = ai_session.execute(select(PullRequest).where(
+                        PullRequest.source_repository_id == repo_uuid,
+                        PullRequest.state == PullRequestState.OPEN,
+                        PullRequest.source_branch.in_(active_branches),
+                    )).scalars().all()
+                for pr in prs:
+                    generate_pr_review_task.apply_async(args=[str(pr.id)], queue="ai_ops")
+                summary["ai_pr_reviews_queued"] = len(prs)
+            except Exception as exc:
+                logger.exception("AI PR dispatch failed: %s", type(exc).__name__)
+                summary["errors"].append("AI PR dispatch failed")
+
+    # Normal commits do not need a PR: enqueue repository-scoped insights.
+    try:
+        summary["commit_analyses_queued"] = _queue_opted_in_commit_analyses(repo_uuid, updates)
+    except Exception as exc:
+        logger.exception("Commit AI dispatch failed: %s", type(exc).__name__)
+        summary["errors"].append("Commit AI dispatch failed")
     
     # Trigger Security Scanning
     try:
@@ -491,3 +515,70 @@ def _deliver_webhook(webhook, payload: dict) -> bool:
             extra={"url": webhook.url, "error": str(exc)},
         )
         return False
+
+
+def _queue_opted_in_commit_analyses(repo_uuid: uuid.UUID, updates: list) -> int:
+    """Create durable queued records for pushed branch tips before publishing jobs.
+
+    A repository administrator must enable this feature; disabled repositories
+    never send source code to an external LLM.
+    """
+    from sqlalchemy import select
+    from app.models.repo import Repository
+    from app.models.commit_ai_analysis import CommitAIAnalysis
+
+    # Only branch tip commits are analyzed; tags and deletions are excluded.
+    tips = {
+        update.branch_name: (update.old_sha, update.new_sha)
+        for update in updates if update.is_branch and not update.is_delete
+    }
+    if not tips:
+        return 0
+
+    queued_ids: list[str] = []
+    with _get_sync_session() as session:
+        repository = session.scalar(select(Repository).where(Repository.id == repo_uuid))
+        if not repository or not repository.auto_ai_analysis_enabled:
+            return 0
+        for branch_name, (base_sha, sha) in tips.items():
+            existing = session.scalar(
+                select(CommitAIAnalysis.id).where(
+                    CommitAIAnalysis.repository_id == repo_uuid,
+                    CommitAIAnalysis.branch_name == branch_name,
+                    CommitAIAnalysis.commit_sha == sha,
+                )
+            )
+            if existing:
+                continue  # Idempotent on worker retry / repeated push.
+            analysis = CommitAIAnalysis(
+                repository_id=repo_uuid,
+                branch_name=branch_name,
+                commit_sha=sha,
+                base_sha=base_sha,
+                status="queued",
+                suggestions=[],
+                next_steps=[],
+            )
+            session.add(analysis)
+            session.flush()
+            queued_ids.append(str(analysis.id))
+        session.commit()
+
+    if not queued_ids:
+        return 0
+
+    from app.worker.tasks.commit_ai_tasks import analyze_commit_task
+    queued = 0
+    for item_id in queued_ids:
+        try:
+            analyze_commit_task.apply_async(args=[item_id], queue="ai_ops")
+            queued += 1
+        except Exception as exc:
+            logger.error("Failed to dispatch commit analysis %s: %s", item_id, type(exc).__name__)
+            with _get_sync_session() as session:
+                record = session.get(CommitAIAnalysis, uuid.UUID(item_id))
+                if record is not None:
+                    record.status = "failed"
+                    record.error_message = "Worker queue unavailable"
+                    session.commit()
+    return queued

@@ -1,0 +1,65 @@
+/* PandaHub UI Repair v3 | additive, accessible, pastel, GPU-light micro-interactions.
+ * Imported after globals.css and ph-ui-shimmer.css. No animation on page scroll.
+ */
+:root {
+  --ph-polish-bg: #FBFBFB;
+  --ph-polish-surface: #E8F9FF;
+  --ph-polish-card: #C4D9FF;
+  --ph-polish-accent: #C5BAFF;
+  --ph-polish-ink: #1F2937;
+  --ph-polish-ring: #9585DD;
+}
+/* Stable keyboard focus on form controls, nav, buttons and dialogs. */
+.ph-app-shell :is(a, button, input, select, textarea, [role="button"], [role="link"], [tabindex="0"]):focus-visible {
+  outline: 2px solid var(--ph-polish-ring) !important;
+  outline-offset: 3px;
+}
+.ph-app-shell :is(input, textarea, select):not(:disabled) {
+  transition: border-color 160ms ease, box-shadow 160ms ease, background-color 160ms ease;
+}
+.ph-app-shell :is(input, textarea, select):not(:disabled):focus-visible {
+  border-color: var(--ph-polish-ring) !important;
+  box-shadow: 0 0 0 3px rgba(197, 186, 255, .27) !important;
+}
+/* Small intentional interactions, never on continuous pointer-move / scroll. */
+.ph-app-shell :is(.glass-card, .gh-card, .ph-startup-card, .ph-explore-hover) {
+  transition: border-color 170ms ease, box-shadow 170ms ease, background-color 170ms ease;
+}
+.ph-app-shell :is(.btn-primary, .btn-glass, .btn-ghost, .gh-btn, .ph-nav-link, .ph-create-link) {
+  transition: transform 160ms ease, box-shadow 160ms ease, background-color 160ms ease, border-color 160ms ease, color 160ms ease;
+}
+.ph-app-shell :is(button, [role="button"]):disabled { opacity: .58; cursor: not-allowed; }
+.ph-app-shell :is(a, button, [role="button"]) { -webkit-tap-highlight-color: transparent; touch-action: manipulation; }
+@media (hover: hover) and (pointer: fine) {
+  .ph-app-shell :is(.glass-card, .gh-card, .ph-startup-card, .ph-explore-hover):hover {
+    border-color: #BAADEE;
+    box-shadow: 0 9px 26px rgba(92, 106, 153, .12);
+  }
+  .ph-app-shell :is(.btn-primary, .btn-glass, .btn-ghost, .gh-btn, .ph-nav-link, .ph-create-link):not(:disabled):hover {
+    transform: translateY(-1px);
+    box-shadow: 0 6px 16px rgba(93, 109, 161, .12);
+  }
+  .ph-app-shell :is(.btn-primary, .btn-glass, .btn-ghost, .gh-btn, .ph-nav-link, .ph-create-link):not(:disabled):active {
+    transform: translateY(0) scale(.985);
+  }
+}
+/* Active navigation is evident without depending on colour alone. */
+.ph-app-shell :is(.ph-nav-link, .ph-create-link)[aria-current="page"] {
+  box-shadow: inset 3px 0 0 #8875D5, 0 2px 9px rgba(116, 100, 174, .10);
+}
+/* Keep shimmer within its own area; disable when motion reduction is requested. */
+.ph-sk-page { overflow-x: clip; }
+.ph-sk-panel { contain: paint; }
+@media (max-width: 680px) {
+  .ph-sk-page { max-width: 100%; }
+  .ph-app-shell :is(.glass-card, .gh-card, .ph-startup-card) { border-radius: 16px; }
+}
+@media (prefers-reduced-motion: reduce) {
+  .ph-app-shell :is(.glass-card, .gh-card, .ph-startup-card, .ph-explore-hover, .btn-primary, .btn-glass, .btn-ghost, .gh-btn, .ph-nav-link, .ph-create-link, input, textarea, select) {
+    transition: none !important;
+  }
+  .ph-app-shell :is(.btn-primary, .btn-glass, .btn-ghost, .gh-btn, .ph-nav-link, .ph-create-link):hover,
+  .ph-app-shell :is(.glass-card, .gh-card, .ph-startup-card, .ph-explore-hover):hover {
+    transform: none !important;
+  }
+}

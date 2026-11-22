@@ -7,7 +7,7 @@ export interface BadgeProps extends React.HTMLAttributes<HTMLSpanElement> {
 
 function Badge({ className, variant = "default", ...props }: BadgeProps) {
   const variantClasses = {
-    default: "bg-[#18181b] text-zinc-100 border border-[#333333]",
+    default: "bg-[#E8F9FF] text-zinc-100 border border-[#C4D9FF]",
     blue: "chip-blue",
     green: "chip-green",
     purple: "chip-purple",

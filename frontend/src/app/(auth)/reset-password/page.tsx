@@ -1,11 +1,11 @@
-﻿"use client";
+'use client';
+import PageSkeleton from '@/components/ui/PageSkeleton';
 
 import { useState, Suspense } from 'react';
 import { useRouter, useSearchParams } from 'next/navigation';
-import dynamic from 'next/dynamic';
 import api from '@/lib/api';
 
-const SpaceBackground = dynamic(() => import('../../SpaceBackground'), { ssr: false });
+
 
 /* â”€â”€â”€ Step 1: Request reset email â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€ */
 function RequestResetStep({
@@ -37,11 +37,11 @@ function RequestResetStep({
       <div className="flex flex-col items-center mb-8">
         <div
           className="rounded-xl glass-layer-2 border border-[var(--glass-border)] w-14 h-14 flex items-center justify-center mb-5"
-          style={{ background: 'linear-gradient(145deg, #1a9aff 0%, #0055cc 100%)' }}
+          style={{ background: 'linear-gradient(145deg, #C5BAFF 0%, #C4D9FF 100%)' }}
         >
           <span
             className="material-symbols-outlined"
-            style={{ fontSize: 28, color: 'white', fontVariationSettings: '"FILL" 1' }}
+            style={{ fontSize: 28, color: '#66599F', fontVariationSettings: '"FILL" 1' }}
           >
             lock_reset
           </span>
@@ -127,7 +127,7 @@ function EmailSentStep({ email }: { email: string }) {
         className="w-20 h-20 rounded-full flex items-center justify-center mb-6"
         style={{
           background: 'rgba(34,197,94,0.12)',
-          boxShadow: '0 0 32px rgba(34,197,94,0.25), 8px 8px 18px rgba(0,0,0,0.1), -8px -8px 18px rgba(255,255,255,0.05)',
+          boxShadow: '0 0 32px rgba(34,197,94,0.25), 8px 8px 18px rgba(91,109,160,0.08), -8px -8px 18px rgba(255,255,255,0.05)',
         }}
       >
         <span
@@ -249,7 +249,7 @@ function SetNewPasswordStep({ token }: { token: string }) {
         >
           <span
             className="material-symbols-outlined"
-            style={{ fontSize: 28, color: 'white', fontVariationSettings: '"FILL" 1' }}
+            style={{ fontSize: 28, color: '#66599F', fontVariationSettings: '"FILL" 1' }}
           >
             key
           </span>
@@ -312,7 +312,7 @@ function SetNewPasswordStep({ token }: { token: string }) {
                   <div
                     key={i}
                     className="h-1 flex-1 rounded-full transition-all duration-400"
-                    style={{ background: i <= strength ? strengthColor : 'rgba(0,0,0,0.1)' }}
+                    style={{ background: i <= strength ? strengthColor : 'rgba(107,126,174,0.16)' }}
                   />
                 ))}
               </div>
@@ -413,7 +413,7 @@ function ResetPasswordContent() {
 
   return (
     <main className="min-h-screen relative overflow-hidden" style={{ background: 'var(--bg-primary)' }}>
-      <SpaceBackground />
+      {/* Deliberately static: premium pastel surface without a continuous canvas loop. */}
 
       {/* Morphing blobs */}
       <div className="fixed inset-0 z-[1] pointer-events-none overflow-hidden">
@@ -442,11 +442,11 @@ function ResetPasswordContent() {
         <a href="/" className="flex items-center gap-2.5 group">
           <div
             className="rounded-xl glass-layer-2 border border-[var(--glass-border)] w-9 h-9 flex items-center justify-center transition-transform duration-300 group-hover:rotate-12"
-            style={{ background: 'linear-gradient(145deg, #1a9aff 0%, #0055cc 100%)' }}
+            style={{ background: 'linear-gradient(145deg, #C5BAFF 0%, #C4D9FF 100%)' }}
           >
             <span
               className="material-symbols-outlined"
-              style={{ fontSize: 18, color: 'white', fontVariationSettings: '"FILL" 1' }}
+              style={{ fontSize: 18, color: '#66599F', fontVariationSettings: '"FILL" 1' }}
             >
               cloud_sync
             </span>
@@ -461,10 +461,10 @@ function ResetPasswordContent() {
           className="w-full max-w-md rounded-3xl overflow-hidden shadow-2xl animate-fade-in-up"
           style={{
             background: 'var(--glass-bg-3)',
-            backdropFilter: '(28px) saturate(1.9)',
-            WebkitBackdropFilter: '(28px) saturate(1.9)',
+            backdropFilter: 'blur(28px) saturate(1.9)',
+            WebkitBackdropFilter: 'blur(28px) saturate(1.9)',
             border: '1px solid var(--glass-border)',
-            boxShadow: '0 24px 64px rgba(0,0,0,0.15), inset 0 1px 0 rgba(255,255,255,0.35)',
+            boxShadow: '0 24px 64px rgba(91,109,160,0.12), inset 0 1px 0 rgba(255,255,255,0.35)',
           }}
         >
           {step === 'request' && <RequestResetStep onSent={setSentEmail} />}
@@ -478,11 +478,7 @@ function ResetPasswordContent() {
 
 export default function ResetPasswordPage() {
   return (
-    <Suspense fallback={
-      <div className="min-h-screen flex items-center justify-center" style={{ background: 'var(--bg-primary)' }}>
-        <div className="w-12 h-12 border-4 border-t-transparent rounded-full animate-spin" style={{ borderColor: 'var(--color-primary)', borderTopColor: 'transparent' }} />
-      </div>
-    }>
+    <Suspense fallback={<PageSkeleton variant="form" label="Loading password reset" />}>
       <ResetPasswordContent />
     </Suspense>
   );

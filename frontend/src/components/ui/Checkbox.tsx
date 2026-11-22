@@ -29,13 +29,13 @@ const Checkbox = React.forwardRef<HTMLInputElement, CheckboxProps>(
             {label && (
               <label 
                 htmlFor={checkboxId} 
-                className="text-sm font-medium text-slate-800 dark:text-slate-200 cursor-pointer select-none"
+                className="text-sm font-medium text-slate-800 text-[#475569] cursor-pointer select-none"
               >
                 {label}
               </label>
             )}
             {description && (
-              <p className="text-xs text-slate-500 dark:text-slate-400">
+              <p className="text-xs text-slate-500 text-[#64748B]">
                 {description}
               </p>
             )}

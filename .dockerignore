@@ -1,0 +1,27 @@
+# Git metadata and local dependency/build folders
+.git
+**/.git
+**/node_modules
+**/.next
+**/.turbo
+**/venv
+**/.venv
+**/__pycache__
+**/*.py[cod]
+**/.pytest_cache
+**/.mypy_cache
+**/.ruff_cache
+**/dist
+**/build
+**/coverage
+**/.coverage
+**/test-results
+**/playwright-report
+
+# Local logs, archives, backups, and secrets (Compose still reads env_file locally)
+**/*.log
+**/*.zip
+**/*-backup-*
+**/*_backup_*
+**/.env
+**/.env.*

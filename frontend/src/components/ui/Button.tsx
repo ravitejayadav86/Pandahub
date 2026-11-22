@@ -14,7 +14,7 @@ export interface ButtonProps extends React.ButtonHTMLAttributes<HTMLButtonElemen
 }
 
 const Button = React.forwardRef<HTMLButtonElement, ButtonProps>(
-  ({ className, variant = "primary", ripple = true, loading = false, disabled, children, ...props }, ref) => {
+  ({ className, variant = "primary", ripple = true, loading = false, disabled, children, onClick, ...props }, ref) => {
     
     // Maps variant to the specific CSS classes defined in globals.css
     const variantClasses = {
@@ -29,20 +29,21 @@ const Button = React.forwardRef<HTMLButtonElement, ButtonProps>(
     const handleRipple = (e: React.MouseEvent<HTMLButtonElement>) => {
       const button = e.currentTarget
       const rect = button.getBoundingClientRect()
-      const x = e.clientX - rect.left
-      const y = e.clientY - rect.top
+      const keyboardClick = e.detail === 0
+      const x = keyboardClick ? rect.width / 2 : e.clientX - rect.left
+      const y = keyboardClick ? rect.height / 2 : e.clientY - rect.top
       button.style.setProperty("--mouse-x", `${x}px`)
       button.style.setProperty("--mouse-y", `${y}px`)
-      props.onClick?.(e)
+      onClick?.(e)
     }
 
     return (
       <button
         ref={ref}
         disabled={disabled || loading}
-        onClick={ripple ? handleRipple : props.onClick}
+        onClick={ripple ? handleRipple : onClick}
         className={cn(
-          "inline-flex items-center justify-center gap-2 outline-none disabled:opacity-50 disabled:pointer-events-none cursor-pointer btn-motion-",
+          "inline-flex items-center justify-center gap-2 outline-none disabled:opacity-50 disabled:pointer-events-none cursor-pointer ph-premium-button active:scale-[0.975] transition-all duration-150",
           variantClasses[variant],
           ripple && "btn-ripple",
           className

@@ -1,4 +1,4 @@
-﻿"use client";
+'use client';
 
 export default function GeneratedPage() {
   return (
@@ -26,7 +26,7 @@ export default function GeneratedPage() {
 
 <div className="flex border-b border-white/10 w-full relative">
 
-<div className="absolute bottom-0 left-0 w-1/2 h-[2px] bg-[#E6E6E6] shadow-[0_-2px_10px_rgba(10,132,255,0.5)] transition-transform duration-300 ease-out" id="tabIndicator"></div>
+<div className="absolute bottom-0 left-0 w-1/2 h-[2px] bg-[#C5BAFF] shadow-[0_-2px_10px_rgba(10,132,255,0.5)] transition-transform duration-300 ease-out" id="tabIndicator"></div>
 <button className="flex-1 py-5 text-sm font-semibold tracking-wide text-on-surface transition-colors duration-300" id="tabSignIn" onClick={() => {}} data-onclick="switchTab(0)">
                     Sign In
                 </button>
@@ -65,7 +65,7 @@ export default function GeneratedPage() {
 </button>
 </div>
 </div>
-<button className="w-full flex justify-center py-4 px-4 border border-transparent rounded-xl shadow-sm text-sm font-bold text-white bg-[#E6E6E6] hover:bg-blue-500 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-[#E6E6E6] focus:ring-offset-background transition-all duration-200 active:scale-[0.98] glow-accent mt-8" type="submit">
+<button className="w-full flex justify-center py-4 px-4 border border-transparent rounded-xl shadow-sm text-sm font-bold text-white bg-[#C5BAFF] hover:bg-blue-500 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-[#E6E6E6] focus:ring-offset-background transition-all duration-200 active:scale-[0.98] glow-accent mt-8" type="submit">
                         Sign In
                     </button>
 </form>

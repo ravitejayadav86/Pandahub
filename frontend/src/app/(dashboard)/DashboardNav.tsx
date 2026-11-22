@@ -1,4 +1,4 @@
-﻿"use client";
+'use client';
 import { useState, useEffect, useRef } from 'react';
 import { useRouter, usePathname } from 'next/navigation';
 import Link from 'next/link';
@@ -66,7 +66,7 @@ export default function DashboardNav() {
             <div className="flex items-center gap-2 font-bold text-[16px] tracking-tight" style={{ color: 'var(--text-primary)' }}>
               <div
                 className="flex items-center justify-center text-[15px]"
-                style={{ width:28, height:28, borderRadius:8, background:'#18181b', border:'1px solid #333333', boxShadow:'none' }}
+                style={{ width:28, height:28, borderRadius:8, background: '#E8F9FF', border:'1px solid #C4D9FF', boxShadow:'none' }}
               >ðŸ¼</div>
               PandaHub
             </div>
@@ -105,8 +105,8 @@ export default function DashboardNav() {
         background: scrolled
           ? 'rgba(255,255,255,0.88)'
           : 'rgba(255,255,255,0.72)',
-        backdropFilter: '(20px) saturate(1.6)',
-        WebkitBackdropFilter: '(20px) saturate(1.6)',
+        backdropFilter: 'blur(20px) saturate(1.6)',
+        WebkitBackdropFilter: 'blur(20px) saturate(1.6)',
         borderBottom: scrolled
           ? '1px solid rgba(15,23,42,0.1)'
           : '1px solid rgba(15,23,42,0.06)',
@@ -129,7 +129,7 @@ export default function DashboardNav() {
             className="flex items-center justify-center text-[17px] transition-transform duration-300 group-hover:scale-110 group-hover:rotate-[-6deg]"
             style={{
               width: 32, height: 32, borderRadius: 9,
-              background: '#18181b', border: '1px solid #333333',
+              background: '#E8F9FF', border: '1px solid #C4D9FF',
               boxShadow: '0 4px 12px rgba(10,132,255,0.3)',
             }}
           >
@@ -191,7 +191,7 @@ export default function DashboardNav() {
                 className="relative flex items-center justify-center rounded-full font-bold text-[13px] text-white transition-all duration-200 hover:scale-110 focus:outline-none"
                 style={{
                   width: 34, height: 34,
-                  background: '#18181b', border: '1px solid #333333',
+                  background: '#E8F9FF', border: '1px solid #C4D9FF',
                   boxShadow: isProfileOpen
                     ? '0 0 0 3px rgba(10,132,255,0.35), 0 0 0 1px rgba(10,132,255,0.8)'
                     : '0 0 0 2px rgba(10,132,255,0)',
@@ -214,8 +214,8 @@ export default function DashboardNav() {
                   className="dropdown absolute right-0 mt-2 w-56 rounded-2xl overflow-hidden z-50"
                   style={{
                     background: 'rgba(255,255,255,0.96)',
-                    backdropFilter: '(20px)',
-                    WebkitBackdropFilter: '(20px)',
+                    backdropFilter: 'blur(20px)',
+                    WebkitBackdropFilter: 'blur(20px)',
                     border: '1px solid rgba(15,23,42,0.09)',
                     boxShadow: '0 16px 50px rgba(15,23,42,0.14), 0 0 0 1px rgba(255,255,255,0.8) inset',
                     maxWidth: 'calc(100vw - 24px)',
@@ -229,7 +229,7 @@ export default function DashboardNav() {
                     <div className="flex items-center gap-3">
                       <div
                         className="w-9 h-9 rounded-full flex items-center justify-center text-white font-bold text-[14px] shrink-0"
-                        style={{ background: '#18181b', border: '1px solid #333333', boxShadow: 'none' }}
+                        style={{ background: '#E8F9FF', border: '1px solid #C4D9FF', boxShadow: 'none' }}
                       >
                         {initial}
                       </div>

@@ -50,18 +50,18 @@ export default function ActivityFeedCard({ activity }: { activity: ActivityEvent
     <Card variant="glass-card" interactive="lift" className="p-4 card-motion-">
       <CardHeader className="pb-2">
         <div className="flex items-center space-x-3">
-          <div className="p-2 bg-blue-50 dark:bg-blue-900/30 rounded-full text-blue-500">
+          <div className="p-2 bg-blue-50 bg-[#E8F9FF] rounded-full text-blue-500">
             <ActivityIcon type={activity.type} />
           </div>
           <div className="flex-1 min-w-0">
-            <p className="text-sm text-slate-600 dark:text-slate-300">
-              <span className="font-semibold text-slate-900 dark:text-white">{activity.author}</span>{' '}
+            <p className="text-sm text-slate-600 text-[#475569]">
+              <span className="font-semibold text-slate-900 text-[#1F2937]">{activity.author}</span>{' '}
               {activityDescription(activity.type)}{' '}
               <Link href={`/${activity.repo}`} className="font-medium text-blue-600 hover:underline">
                 {activity.repo}
               </Link>
             </p>
-            <p className="text-sm font-medium text-slate-900 dark:text-white truncate mt-0.5">
+            <p className="text-sm font-medium text-slate-900 text-[#1F2937] truncate mt-0.5">
               {activity.title}
             </p>
             <p className="text-xs text-slate-400 mt-1 flex items-center gap-1">

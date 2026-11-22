@@ -17,6 +17,7 @@ from sqlalchemy.ext.asyncio import AsyncSession
 from app.api.dependencies import get_repository, require_repo_permission
 from app.db.session import get_db
 from app.models.ci_run import CIRun
+from app.models.ci_run_attempt import CIRunAttempt
 from app.models.ci_runner_credential import CIRunnerCredential
 from app.models.enums import PermissionLevel
 from app.models.repo import Repository
@@ -74,6 +75,7 @@ def _lease_view(run: CIRun) -> dict:
         "branch": run.branch_name,
         "sha": run.commit_sha,
         "status": run.status,
+        "attempt_number": run.attempt_count,
         "lease_id": str(run.lease_id),
         "lease_expires_at": run.lease_expires_at.isoformat(),
         "trusted_for_deployment": False,
@@ -173,6 +175,14 @@ async def runner_claim_next(
     run.runner_credential_id = credential.id
     run.lease_id = uuid.uuid4()
     run.lease_expires_at = now + LEASE_DURATION
+    run.attempt_count = (run.attempt_count or 0) + 1
+    db.add(CIRunAttempt(
+        run_id=run.id,
+        attempt_number=run.attempt_count,
+        runner_credential_id=credential.id,
+        lease_id=run.lease_id,
+        started_at=now,
+    ))
     await db.commit()
     return _lease_view(run)
 
@@ -219,6 +229,17 @@ async def runner_complete(
     now = datetime.now(timezone.utc)
     if not _lease_valid(run, credential.id, payload.lease_id, now):
         raise HTTPException(status_code=409, detail="CI runner lease is not active")
+    attempt = await db.scalar(select(CIRunAttempt).where(
+        CIRunAttempt.run_id == run.id,
+        CIRunAttempt.attempt_number == run.attempt_count,
+        CIRunAttempt.lease_id == payload.lease_id,
+    ).with_for_update())
+    if attempt is None or attempt.completed_at is not None:
+        raise HTTPException(status_code=409, detail="Active CI attempt audit missing")
+    attempt.conclusion = payload.conclusion
+    attempt.log_excerpt = payload.log_excerpt
+    attempt.completed_at = now
+    attempt.end_reason = "runner_reported"
     run.status = "completed"
     run.conclusion = payload.conclusion
     run.log_excerpt = payload.log_excerpt
@@ -226,4 +247,5 @@ async def runner_complete(
     run.lease_expires_at = None
     await db.commit()
     return {"id": str(run.id), "status": run.status,
+            "attempt_number": run.attempt_count,
             "conclusion": run.conclusion, "trusted_for_deployment": False}

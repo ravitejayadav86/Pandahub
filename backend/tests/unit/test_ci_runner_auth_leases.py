@@ -161,6 +161,7 @@ def test_expired_wrong_runner_or_wrong_lease_is_denied():
     runner_id = uuid.uuid4()
     run = queued_job(repo_id)
     run.status = "running"
+    run.started_at = now - timedelta(minutes=1)
     run.runner_credential_id = runner_id
     run.lease_id = uuid.uuid4()
     run.lease_expires_at = now + timedelta(minutes=1)
@@ -170,6 +171,10 @@ def test_expired_wrong_runner_or_wrong_lease_is_denied():
     assert not _lease_valid(run, runner_id, run.lease_id, now + timedelta(minutes=2))
     run.status = "completed"
     assert not _lease_valid(run, runner_id, run.lease_id, now)
+    run.status = "running"
+    assert not _lease_valid(
+        run, runner_id, run.lease_id, now + timedelta(minutes=11)
+    )
 
 
 @pytest.mark.asyncio
@@ -178,6 +183,7 @@ async def test_heartbeat_extends_only_current_lease():
     ident, token, _ = mint_runner_token()
     job = queued_job(repo_id)
     job.status = "running"
+    job.started_at = datetime.now(timezone.utc) - timedelta(minutes=1)
     job.runner_credential_id = ident
     job.lease_id = uuid.uuid4()
     job.lease_expires_at = datetime.now(timezone.utc) + timedelta(seconds=20)
@@ -197,6 +203,7 @@ async def test_late_result_cannot_replace_expired_lease_with_success():
     ident, token, _ = mint_runner_token()
     job = queued_job(repo_id)
     job.status = "running"
+    job.started_at = datetime.now(timezone.utc) - timedelta(minutes=1)
     job.runner_credential_id = ident
     job.lease_id = uuid.uuid4()
     job.lease_expires_at = datetime.now(timezone.utc) - timedelta(seconds=1)
@@ -218,6 +225,7 @@ async def test_valid_completion_preserves_advisory_status_and_burns_lease():
     ident, token, _ = mint_runner_token()
     job = queued_job(repo_id)
     job.status = "running"
+    job.started_at = datetime.now(timezone.utc) - timedelta(minutes=1)
     job.runner_credential_id = ident
     job.lease_id = uuid.uuid4()
     job.lease_expires_at = datetime.now(timezone.utc) + timedelta(minutes=2)

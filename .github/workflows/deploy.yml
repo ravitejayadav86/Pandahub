@@ -1,11 +1,9 @@
-name: Deploy
+name: Deploy (not configured)
 
-# Full deployment pipeline (build+push images, run migrations against
-# production DB, blue/green or rolling restart) is implemented in
-# Module 17 — Deployment, once infrastructure targets are finalized.
-# This scaffold reserves the trigger contract so branch protection rules
-# can be configured against it now.
-
+# Intentionally fail closed: a green deployment job must correspond to
+# a real deployment. This workflow does NOT touch any production services.
+# Implement deployment only after setting an explicit target, GitHub
+# environment approvals, image provenance and rollback strategy.
 on:
   push:
     tags:
@@ -13,9 +11,10 @@ on:
   workflow_dispatch: {}
 
 jobs:
-  build-and-push:
+  deployment-blocked:
     runs-on: ubuntu-latest
     steps:
-      - uses: actions/checkout@v4
-      - name: Placeholder — implemented in Module 17
-        run: echo "Deployment pipeline pending Module 17"
+      - name: Block unconfigured deployment
+        run: |
+          echo "::error::PandaHub deployment is not configured. No application was deployed. Configure a production target, environment protection, image publishing and rollback before enabling deployment."
+          exit 1

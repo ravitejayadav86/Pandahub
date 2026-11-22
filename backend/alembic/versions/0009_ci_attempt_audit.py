@@ -42,6 +42,8 @@ def upgrade() -> None:
         sa.Column("conclusion", sa.String(20)),
         sa.Column("end_reason", sa.String(35)),
         sa.Column("log_excerpt", sa.String(10000)),
+        sa.Column("retry_requested_at", sa.DateTime(timezone=True)),
+        sa.Column("retry_reason", sa.String(300)),
         sa.UniqueConstraint(
             "run_id", "attempt_number", name="uq_ci_attempt_run_number"
         ),

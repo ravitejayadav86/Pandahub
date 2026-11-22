@@ -67,6 +67,21 @@ class RealDockerRunnerTests(unittest.TestCase):
         self.assertEqual(status, "failure", logs)
         self.assertIn("FAILED", logs)
 
+    def test_python_syntax_error_is_a_failure(self):
+        tmp, root = self._workspace({
+            "app.py": "def broken(:\n    pass\n",
+            "tests/test_app.py": (
+                "import unittest\n"
+                "class Sample(unittest.TestCase):\n"
+                "    def test_dummy(self):\n"
+                "        self.assertTrue(True)\n"
+            ),
+        })
+        with tmp:
+            status, logs = runner.run_docker(root)
+        self.assertEqual(status, "failure", logs)
+        self.assertIn("SyntaxError", logs)
+
     def test_empty_suite_is_a_failure_not_a_pass(self):
         tmp, root = self._workspace({"app.py": "value = 1\n"})
         with tmp:

@@ -4,10 +4,12 @@ on:
   pull_request:
     paths:
       - "backend/**"
+      - ".github/workflows/test-backend.yml"
   push:
     branches: [main]
     paths:
       - "backend/**"
+      - ".github/workflows/test-backend.yml"
   workflow_dispatch: {}
 
 jobs:
@@ -71,4 +73,4 @@ jobs:
 
       - name: Run tests with coverage
         working-directory: backend
-        run: pytest -v --cov=app --cov-report=term-missing || [ "$?" = "5" ]
+        run: pytest -v --cov=app --cov-report=term-missing

@@ -1,0 +1,388 @@
+{
+  "version": "1.0",
+  "description": "Seed benchmark for deterministic PandaHub Python/Java static rules. Small demonstration set, not a statistically sufficient benchmark and not model-training data by itself.",
+  "split_ratio": {
+    "train": 0.7,
+    "validation": 0.15,
+    "test": 0.15
+  },
+  "label_space": [
+    "PY-SYNTAX",
+    "PY-DIV-ZERO",
+    "PY-INPUT-COMPARE",
+    "PY-EVAL",
+    "PY-EXEC",
+    "PY-BARE-EXCEPT",
+    "JAVA-BRACES",
+    "JAVA-MISSING-SEMICOLON",
+    "JAVA-RUNTIME-EXEC"
+  ],
+  "cases": [
+    {
+      "case_id": "py-tr-01-div-literal",
+      "language": "python",
+      "filename": "main.py",
+      "source_code": "value = 8 / 0\nprint(value)\n",
+      "expected_rule_ids": [
+        "PY-DIV-ZERO"
+      ],
+      "split": "train"
+    },
+    {
+      "case_id": "py-tr-02-div-assigned",
+      "language": "python",
+      "filename": "main.py",
+      "source_code": "denominator = 0\nresult = 12 / denominator\n",
+      "expected_rule_ids": [
+        "PY-DIV-ZERO"
+      ],
+      "split": "train"
+    },
+    {
+      "case_id": "py-tr-03-mod-zero",
+      "language": "python",
+      "filename": "main.py",
+      "source_code": "remainder = 10 % 0\n",
+      "expected_rule_ids": [
+        "PY-DIV-ZERO"
+      ],
+      "split": "train"
+    },
+    {
+      "case_id": "py-tr-04-eval",
+      "language": "python",
+      "filename": "main.py",
+      "source_code": "expression = input()\nresult = eval(expression)\n",
+      "expected_rule_ids": [
+        "PY-EVAL"
+      ],
+      "split": "train"
+    },
+    {
+      "case_id": "py-tr-05-exec",
+      "language": "python",
+      "filename": "main.py",
+      "source_code": "code_text = input()\nexec(code_text)\n",
+      "expected_rule_ids": [
+        "PY-EXEC"
+      ],
+      "split": "train"
+    },
+    {
+      "case_id": "py-tr-06-bare-except",
+      "language": "python",
+      "filename": "main.py",
+      "source_code": "try:\n    risky_operation()\nexcept:\n    pass\n",
+      "expected_rule_ids": [
+        "PY-BARE-EXCEPT"
+      ],
+      "split": "train"
+    },
+    {
+      "case_id": "py-tr-07-syntax",
+      "language": "python",
+      "filename": "main.py",
+      "source_code": "if True\n    print('missing colon')\n",
+      "expected_rule_ids": [
+        "PY-SYNTAX"
+      ],
+      "split": "train"
+    },
+    {
+      "case_id": "py-tr-08-input-object",
+      "language": "python",
+      "filename": "main.py",
+      "source_code": "if input == 'yes':\n    print('yes')\n",
+      "expected_rule_ids": [
+        "PY-INPUT-COMPARE"
+      ],
+      "split": "train"
+    },
+    {
+      "case_id": "py-tr-09-safe-div",
+      "language": "python",
+      "filename": "main.py",
+      "source_code": "denominator = 4\nif denominator != 0:\n    print(20 / denominator)\n",
+      "expected_rule_ids": [],
+      "split": "train"
+    },
+    {
+      "case_id": "py-tr-10-input-call",
+      "language": "python",
+      "filename": "main.py",
+      "source_code": "answer = input('Continue? ')\nif answer == 'yes':\n    print('ok')\n",
+      "expected_rule_ids": [],
+      "split": "train"
+    },
+    {
+      "case_id": "py-tr-11-specific-except",
+      "language": "python",
+      "filename": "main.py",
+      "source_code": "try:\n    risky_operation()\nexcept ValueError:\n    print('invalid')\n",
+      "expected_rule_ids": [],
+      "split": "train"
+    },
+    {
+      "case_id": "py-tr-12-print",
+      "language": "python",
+      "filename": "main.py",
+      "source_code": "print('PandaHub')\n",
+      "expected_rule_ids": [],
+      "split": "train"
+    },
+    {
+      "case_id": "py-tr-13-safe-mod",
+      "language": "python",
+      "filename": "main.py",
+      "source_code": "number = 7\nbase = 3\nprint(number % base)\n",
+      "expected_rule_ids": [],
+      "split": "train"
+    },
+    {
+      "case_id": "py-tr-14-safe-input",
+      "language": "python",
+      "filename": "main.py",
+      "source_code": "input_value = input()\nprint(input_value.strip())\n",
+      "expected_rule_ids": [],
+      "split": "train"
+    },
+    {
+      "case_id": "py-va-01-div",
+      "language": "python",
+      "filename": "main.py",
+      "source_code": "x = 14\ny = 0\nprint(x // y)\n",
+      "expected_rule_ids": [
+        "PY-DIV-ZERO"
+      ],
+      "split": "validation"
+    },
+    {
+      "case_id": "py-va-02-safe",
+      "language": "python",
+      "filename": "main.py",
+      "source_code": "denominator = 5\nprint(25 / denominator)\n",
+      "expected_rule_ids": [],
+      "split": "validation"
+    },
+    {
+      "case_id": "py-va-03-syntax",
+      "language": "python",
+      "filename": "main.py",
+      "source_code": "for item in [1, 2]\n    print(item)\n",
+      "expected_rule_ids": [
+        "PY-SYNTAX"
+      ],
+      "split": "validation"
+    },
+    {
+      "case_id": "py-te-01-div",
+      "language": "python",
+      "filename": "main.py",
+      "source_code": "a = 10\nb = 0\nc = a / b\nprint(c)\n",
+      "expected_rule_ids": [
+        "PY-DIV-ZERO"
+      ],
+      "split": "test"
+    },
+    {
+      "case_id": "py-te-02-eval",
+      "language": "python",
+      "filename": "main.py",
+      "source_code": "raw = input()\nvalue = eval(raw)\nprint(value)\n",
+      "expected_rule_ids": [
+        "PY-EVAL"
+      ],
+      "split": "test"
+    },
+    {
+      "case_id": "py-te-03-clean",
+      "language": "python",
+      "filename": "main.py",
+      "source_code": "items = [1, 2, 3]\nprint(sum(items))\n",
+      "expected_rule_ids": [],
+      "split": "test"
+    },
+    {
+      "case_id": "ja-tr-01-semicolon",
+      "language": "java",
+      "filename": "Main.java",
+      "source_code": "public class Main {\n  public static void main(String[] args) {\n    System.out.println(\"hello\")\n  }\n}\n",
+      "expected_rule_ids": [
+        "JAVA-MISSING-SEMICOLON"
+      ],
+      "split": "train"
+    },
+    {
+      "case_id": "ja-tr-02-braces",
+      "language": "java",
+      "filename": "Main.java",
+      "source_code": "public class Main {\n  public static void main(String[] args) {\n    System.out.println(\"hello\");\n  \n}\n",
+      "expected_rule_ids": [
+        "JAVA-BRACES"
+      ],
+      "split": "train"
+    },
+    {
+      "case_id": "ja-tr-03-runtime",
+      "language": "java",
+      "filename": "Main.java",
+      "source_code": "public class Main {\n  void run(String command) throws Exception {\n    Runtime.getRuntime().exec(command);\n  }\n}\n",
+      "expected_rule_ids": [
+        "JAVA-RUNTIME-EXEC"
+      ],
+      "split": "train"
+    },
+    {
+      "case_id": "ja-tr-04-clean",
+      "language": "java",
+      "filename": "Main.java",
+      "source_code": "public class Main { public static void main(String[] args) { System.out.println(\"ok\"); } }\n",
+      "expected_rule_ids": [],
+      "split": "train"
+    },
+    {
+      "case_id": "ja-tr-05-clean",
+      "language": "java",
+      "filename": "Main.java",
+      "source_code": "class Greeter { void greet() { System.out.println(\"hi\"); } }\n",
+      "expected_rule_ids": [],
+      "split": "train"
+    },
+    {
+      "case_id": "ja-tr-06-clean",
+      "language": "java",
+      "filename": "Main.java",
+      "source_code": "class Counter { int next(int value) { return value + 1; } }\n",
+      "expected_rule_ids": [],
+      "split": "train"
+    },
+    {
+      "case_id": "ja-tr-07-semicolon",
+      "language": "java",
+      "filename": "Main.java",
+      "source_code": "class App { void start() { System.out.print(\"start\") } }\n",
+      "expected_rule_ids": [
+        "JAVA-MISSING-SEMICOLON"
+      ],
+      "split": "train"
+    },
+    {
+      "case_id": "ja-tr-08-braces",
+      "language": "java",
+      "filename": "Main.java",
+      "source_code": "class App { void start() { if (true) { System.out.println(\"x\"); }\n",
+      "expected_rule_ids": [
+        "JAVA-BRACES"
+      ],
+      "split": "train"
+    },
+    {
+      "case_id": "ja-tr-09-runtime",
+      "language": "java",
+      "filename": "Main.java",
+      "source_code": "class Runner { void go() throws Exception { Runtime.getRuntime().exec(\"calc\"); } }\n",
+      "expected_rule_ids": [
+        "JAVA-RUNTIME-EXEC"
+      ],
+      "split": "train"
+    },
+    {
+      "case_id": "ja-tr-10-clean",
+      "language": "java",
+      "filename": "Main.java",
+      "source_code": "class MathBox { int sum(int a, int b) { return a + b; } }\n",
+      "expected_rule_ids": [],
+      "split": "train"
+    },
+    {
+      "case_id": "ja-tr-11-clean",
+      "language": "java",
+      "filename": "Main.java",
+      "source_code": "class Message { String value() { return \"PandaHub\"; } }\n",
+      "expected_rule_ids": [],
+      "split": "train"
+    },
+    {
+      "case_id": "ja-tr-12-semicolon",
+      "language": "java",
+      "filename": "Main.java",
+      "source_code": "class Printer { void print() { System.out.println(123) } }\n",
+      "expected_rule_ids": [
+        "JAVA-MISSING-SEMICOLON"
+      ],
+      "split": "train"
+    },
+    {
+      "case_id": "ja-tr-13-clean",
+      "language": "java",
+      "filename": "Main.java",
+      "source_code": "class Empty { void run() { int count = 1; count++; } }\n",
+      "expected_rule_ids": [],
+      "split": "train"
+    },
+    {
+      "case_id": "ja-tr-14-clean",
+      "language": "java",
+      "filename": "Main.java",
+      "source_code": "class Flags { boolean enabled() { return true; } }\n",
+      "expected_rule_ids": [],
+      "split": "train"
+    },
+    {
+      "case_id": "ja-va-01-semicolon",
+      "language": "java",
+      "filename": "Main.java",
+      "source_code": "class App { void run() { System.out.println(\"test\") } }\n",
+      "expected_rule_ids": [
+        "JAVA-MISSING-SEMICOLON"
+      ],
+      "split": "validation"
+    },
+    {
+      "case_id": "ja-va-02-clean",
+      "language": "java",
+      "filename": "Main.java",
+      "source_code": "class App { void run() { System.out.println(\"test\"); } }\n",
+      "expected_rule_ids": [],
+      "split": "validation"
+    },
+    {
+      "case_id": "ja-va-03-runtime",
+      "language": "java",
+      "filename": "Main.java",
+      "source_code": "class Proc { void run() throws Exception { Runtime.getRuntime().exec(\"whoami\"); } }\n",
+      "expected_rule_ids": [
+        "JAVA-RUNTIME-EXEC"
+      ],
+      "split": "validation"
+    },
+    {
+      "case_id": "ja-te-01-braces",
+      "language": "java",
+      "filename": "Main.java",
+      "source_code": "public class Main { public static void main(String[] args) { System.out.println(\"oops\"); }\n",
+      "expected_rule_ids": [
+        "JAVA-BRACES"
+      ],
+      "split": "test"
+    },
+    {
+      "case_id": "ja-te-02-semicolon",
+      "language": "java",
+      "filename": "Main.java",
+      "source_code": "public class Main { public static void main(String[] args) { System.out.println(\"missing\") } }\n",
+      "expected_rule_ids": [
+        "JAVA-MISSING-SEMICOLON"
+      ],
+      "split": "test"
+    },
+    {
+      "case_id": "ja-te-03-clean",
+      "language": "java",
+      "filename": "Main.java",
+      "source_code": "public class Main { public static void main(String[] args) { System.out.println(\"clean\"); } }\n",
+      "expected_rule_ids": [],
+      "split": "test"
+    }
+  ]
+}

@@ -15,12 +15,15 @@ const config: Config = {
       colors: {
         // Brand
         panda: {
-          black: "#050505",
-          white: "#ffffff",
-          accent: "#D7FF4F", // bamboo green â€” primary brand accent
+          black: "#1F2937",
+          white: "#FBFBFB",
+          accent: "#C5BAFF", // soft lavender primary accent
+          background: "#FBFBFB",
+          surface: "#E8F9FF",
+          card: "#C4D9FF",
         },
-        // Semantic surface tokens â€” backed by CSS vars in globals.css
-        primary: "var(--color-primary, #0A84FF)",
+        // Semantic surface tokens Ã¢â‚¬â€ backed by CSS vars in globals.css
+        primary: "var(--color-primary, #C5BAFF)",
         "on-surface": "var(--text-primary)",
         "on-surface-variant": "var(--text-secondary)",
         surface: "var(--bg-primary)",
@@ -41,7 +44,7 @@ const config: Config = {
       borderColor: {
         "border-color": "var(--border-color)",
         "glass-border": "var(--glass-border)",
-        primary: "var(--color-primary, #0A84FF)",
+        primary: "var(--color-primary, #C5BAFF)",
       },
     },
   },
@@ -49,4 +52,5 @@ const config: Config = {
 };
 
 export default config;
+
 

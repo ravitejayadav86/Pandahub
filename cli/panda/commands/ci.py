@@ -108,8 +108,6 @@ def runner_register(repository: str, name: str, out_path: str | None) -> None:
         raise click.ClickException(
             f"Refusing to overwrite runner credential file: {dest}"
         )
-    if not dest.parent.is_dir():
-        dest.parent.mkdir(parents=True, exist_ok=True)
     # Refuse secrets inside any surrounding Git worktree, not merely under
     # the process cwd (which might itself be the user's home directory).
     for ancestor in (Path.cwd(), *Path.cwd().parents):
@@ -117,6 +115,8 @@ def runner_register(repository: str, name: str, out_path: str | None) -> None:
             raise click.ClickException(
                 "Runner credentials must not be saved inside a Git repository."
             )
+    if not dest.parent.is_dir():
+        dest.parent.mkdir(parents=True, exist_ok=True)
 
     data = _call(
         "POST", f"/{target}/ci/runner/credentials",

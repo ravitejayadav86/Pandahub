@@ -6,11 +6,12 @@ import subprocess
 import sys
 from pathlib import Path
 from urllib.parse import urlparse
+from panda.core import config
 
 # Derive the Git host from the same env var as the API client so they stay
 # in sync: PANDAHUB_API_URL=http://localhost:8000/api/v1  →  localhost:8000
 def _derive_git_host() -> str:
-    api_url = os.environ.get("PANDAHUB_API_URL", "http://localhost:8000/api/v1")
+    api_url = config.get_api_base_url()
     parsed = urlparse(api_url)
     host = parsed.hostname or "localhost"
     port = parsed.port
@@ -19,11 +20,14 @@ def _derive_git_host() -> str:
     return host
 
 GIT_HOST = _derive_git_host()
+GIT_SCHEME = urlparse(config.get_api_base_url()).scheme
+if GIT_SCHEME not in ('http', 'https'):
+    raise ValueError('Invalid PandaHub Git scheme')
 
 
 def build_repo_url(owner: str, repo_name: str) -> str:
     """Build the HTTPS Git URL for a PandaHub repository."""
-    return f"https://{GIT_HOST}/git/{owner}/{repo_name}.git"
+    return f"{GIT_SCHEME}://{GIT_HOST}/git/{owner}/{repo_name}.git"
 
 
 def _get_panda_command() -> str:
@@ -66,7 +70,7 @@ def ensure_credential_helper() -> None:
                 "git",
                 "config",
                 "--global",
-                f"credential.https://{GIT_HOST}.helper",
+                f"credential.{GIT_SCHEME}://{GIT_HOST}.helper",
                 helper_command,
             ],
             capture_output=True,
@@ -90,7 +94,7 @@ def credential_helper_configured() -> bool:
                 "config",
                 "--global",
                 "--get",
-                f"credential.https://{GIT_HOST}.helper",
+                f"credential.{GIT_SCHEME}://{GIT_HOST}.helper",
             ],
             capture_output=True,
             text=True,
@@ -110,7 +114,7 @@ def remove_credential_helper() -> None:
                 "config",
                 "--global",
                 "--unset-all",
-                f"credential.https://{GIT_HOST}.helper",
+                f"credential.{GIT_SCHEME}://{GIT_HOST}.helper",
             ],
             capture_output=True,
             text=True,

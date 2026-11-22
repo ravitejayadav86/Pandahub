@@ -11,7 +11,6 @@ Run against disposable repositories only. Image must be pulled deliberately.
 from __future__ import annotations
 
 import argparse
-import io
 import json
 import os
 from pathlib import Path, PurePosixPath
@@ -148,10 +147,9 @@ def extract_archive(repo: Path, sha: str, destination: Path) -> None:
             process.wait()
 
 
-def run_docker(workspace: Path) -> tuple[str, str]:
-    checked(["docker", "image", "inspect", IMAGE], timeout=15)
-    name = "pandahub-ci-" + secrets.token_hex(6)
-    cmd = [
+def _docker_command(workspace: Path, name: str) -> list[str]:
+    """Construct a bounded local sandbox; pure to allow security assertions."""
+    return [
         "docker", "run", "--rm", "--pull=never", "--name", name,
         "--network", "none", "--read-only", "--cap-drop=ALL",
         "--security-opt", "no-new-privileges:true",
@@ -162,6 +160,12 @@ def run_docker(workspace: Path) -> tuple[str, str]:
         "--env", "PYTHONDONTWRITEBYTECODE=1",
         IMAGE, "python", "-I", "-B", "-c", PYTHON_TEST_SCRIPT,
     ]
+
+
+def run_docker(workspace: Path) -> tuple[str, str]:
+    checked(["docker", "image", "inspect", IMAGE], timeout=15)
+    name = "pandahub-ci-" + secrets.token_hex(6)
+    cmd = _docker_command(workspace, name)
     try:
         process = subprocess.Popen(
             cmd, stdout=subprocess.PIPE, stderr=subprocess.STDOUT,

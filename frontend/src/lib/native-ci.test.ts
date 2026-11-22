@@ -1,7 +1,8 @@
 import { describe, expect, it } from "vitest";
 import {
   ciApiError, ciCanResolveStaleRun, ciDuration, ciStateLabel, ciSummary, ciTime,
-  ciVisualState, filterCiRuns, type CIRun,
+  ciVisualState, ciAttemptVisualState, ciAttemptCountLabel,
+  filterCiRuns, type CIAttempt, type CIRun,
 } from "./native-ci";
 
 const makeRun = (changes: Partial<CIRun> = {}): CIRun => ({
@@ -81,5 +82,71 @@ describe("advisory CI dashboard presentation logic", () => {
   it("surfaces permission failures and missing CI endpoints accurately", () => {
     expect(ciApiError({ response: { status: 403 } })).toContain("administrator");
     expect(ciApiError({ response: { status: 404 } })).toContain("Native CI");
+  });
+});
+
+
+const makeAttempt = (changes: Partial<CIAttempt> = {}): CIAttempt => ({
+  attempt_number: 1,
+  started_at: "2026-11-22T16:59:52Z",
+  completed_at: "2026-11-22T16:59:56Z",
+  conclusion: "failure",
+  end_reason: "runner_reported",
+  log_excerpt: "Deliberate assertion failed",
+  retry_requested_at: "2026-11-22T17:04:42Z",
+  retry_reason: "Operator inspected Docker and confirmed shutdown",
+  trusted_for_deployment: false,
+  ...changes,
+});
+
+describe("CI attempt history display remains advisory and read-only", () => {
+  it("renders individual failures, successes and timeouts without conflating run status", () => {
+    expect(ciAttemptVisualState(makeAttempt())).toBe("failure");
+    expect(ciAttemptVisualState(makeAttempt({
+      attempt_number: 2, conclusion: "failure",
+    }))).toBe("failure");
+    expect(ciAttemptVisualState(makeAttempt({
+      conclusion: "success",
+    }))).toBe("success");
+    expect(ciAttemptVisualState(makeAttempt({
+      conclusion: "timed_out", end_reason: "admin_unverified_timeout",
+    }))).toBe("timed_out");
+  });
+
+  it("never fabricates success for incomplete or malformed attempts", () => {
+    expect(ciAttemptVisualState(makeAttempt({
+      conclusion: null, completed_at: null,
+    }))).toBe("running");
+    expect(ciAttemptVisualState(makeAttempt({
+      conclusion: "success", completed_at: null,
+    }))).toBe("running");
+    expect(ciAttemptVisualState(makeAttempt({
+      conclusion: null,
+    }))).toBe("unknown");
+  });
+
+  it("shows real persisted attempt counts without guessing for older servers", () => {
+    expect(ciAttemptCountLabel(0)).toBe("0");
+    expect(ciAttemptCountLabel(1)).toBe("1");
+    expect(ciAttemptCountLabel(2)).toBe("2");
+    expect(ciAttemptCountLabel(undefined)).toBe("—");
+    expect(ciAttemptCountLabel(-2)).toBe("—");
+    expect(ciAttemptCountLabel(2.5)).toBe("—");
+  });
+
+  it("preserves two historical failures for unchanged commit and a separate success", () => {
+    const original = [
+      makeAttempt({ attempt_number: 1 }),
+      makeAttempt({ attempt_number: 2, retry_reason: null, retry_requested_at: null }),
+    ];
+    expect(original.map(ciAttemptVisualState)).toEqual(["failure", "failure"]);
+    expect(original[0].retry_reason).toContain("Docker");
+    expect(original.every((attempt) => attempt.trusted_for_deployment === false)).toBe(true);
+
+    const fixedCommit = makeAttempt({
+      attempt_number: 1, conclusion: "success", retry_reason: null,
+      retry_requested_at: null,
+    });
+    expect(ciAttemptVisualState(fixedCommit)).toBe("success");
   });
 });

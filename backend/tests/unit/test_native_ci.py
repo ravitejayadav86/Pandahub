@@ -39,7 +39,9 @@ def test_enabled_repository_queues_one_durable_record():
     assert queue_ci_runs(uuid.uuid4(), [_update()], factory) == 1
     assert db.scalar.call_count == 2
     statement = db.scalar.call_args.args[0]
-    assert "ON CONFLICT DO NOTHING" in str(statement)
+    assert "ON CONFLICT" in str(statement)
+    assert "DO NOTHING" in str(statement)
+    assert "uq_ci_run_repo_branch_sha" in str(statement)
     assert "ci_runs" in str(statement)
     db.add.assert_not_called()
     db.commit.assert_called_once()

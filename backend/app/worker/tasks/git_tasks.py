@@ -326,10 +326,35 @@ def post_receive_hook(
     # ------------------------------------------------------------------
     # 5. [Module 11 hook point] AI review dispatch & Security Scanning
     # ------------------------------------------------------------------
-    # Trigger AI Review
-    # When Module 11 (AI) is built, add:
-    #   from app.worker.tasks.ai_tasks import trigger_ai_review_for_push
-    #   trigger_ai_review_for_push.delay(repo_id=repo_id, pushed_refs=[...])
+    # Automatically re-review open PRs whose source branch was pushed.
+    # Disabled by default: this sends repository diffs to the configured AI
+    # provider and therefore requires a deliberate deployment opt-in.
+    if settings.AUTO_AI_REVIEW_PR_ON_PUSH:
+        updated_branches = {
+            update.branch_name for update in updates
+            if update.is_branch and not update.is_delete
+        }
+        if updated_branches:
+            try:
+                from app.models.pull_request import PullRequest
+                from app.models.enums import PullRequestState
+                from app.worker.tasks.ai_tasks import generate_pr_review_task
+                with _get_sync_session() as ai_session:
+                    prs = ai_session.execute(
+                        select(PullRequest).where(
+                            PullRequest.source_repository_id == repo_uuid,
+                            PullRequest.state == PullRequestState.OPEN,
+                            PullRequest.source_branch.in_(updated_branches),
+                        )
+                    ).scalars().all()
+                    for pr in prs:
+                        generate_pr_review_task.apply_async(
+                            args=[str(pr.id)], queue="ai_ops"
+                        )
+                summary["ai_pr_reviews_queued"] = len(prs)
+            except Exception as exc:
+                logger.exception("Could not enqueue AI PR review: %s", exc)
+                summary["errors"].append("AI PR review dispatch failed")
     
     # Trigger Security Scanning
     try:

@@ -16,6 +16,7 @@ import os
 from pathlib import Path, PurePosixPath
 import re
 import secrets
+import uuid
 import subprocess
 import sys
 import tarfile
@@ -23,7 +24,7 @@ import tempfile
 import threading
 import time
 from urllib.error import HTTPError, URLError
-from urllib.parse import quote, urlparse
+from urllib.parse import quote
 from urllib.request import Request, urlopen
 
 IMAGE = "python:3.12-slim"
@@ -72,13 +73,16 @@ class RunnerError(RuntimeError):
 
 def api_call(base: str, token: str, method: str, path: str, payload=None):
     data = None if payload is None else json.dumps(payload).encode("utf-8")
-    headers = {"Authorization": "Bearer " + token}
+    headers = {"X-PandaHub-CI-Token": token}
     if data is not None:
         headers["Content-Type"] = "application/json"
     request = Request(base + path, data=data, headers=headers, method=method)
     try:
         with urlopen(request, timeout=15) as response:
-            return json.loads(response.read().decode("utf-8"))
+            raw = response.read()
+            if response.status == 204 or not raw:
+                return None
+            return json.loads(raw.decode("utf-8"))
     except HTTPError as exc:
         raise RunnerError(f"CI API {method} failed (HTTP {exc.code})") from None
     except URLError as exc:
@@ -238,9 +242,11 @@ def run_docker(workspace: Path) -> tuple[str, str]:
 
 
 def process_one(base: str, token: str, spec: str, run: dict) -> None:
+    """Execute exactly the commit claimed by this scoped runner lease."""
     branch = run["branch"]
     sha = run["sha"]
     run_id = run["id"]
+    lease_id = run["lease_id"]
     if (
         not re.fullmatch(r"[A-Za-z0-9][A-Za-z0-9._/-]{0,200}", branch)
         or ".." in branch or "//" in branch
@@ -248,10 +254,34 @@ def process_one(base: str, token: str, spec: str, run: dict) -> None:
         or not re.fullmatch(r"[0-9a-f]{40}", sha)
     ):
         raise RunnerError("Unsafe CI branch/SHA from API")
+    try:
+        lease_id = str(uuid.UUID(lease_id))
+        run_id = str(uuid.UUID(run_id))
+    except (TypeError, ValueError):
+        raise RunnerError("Invalid lease or CI run identifier") from None
 
-    path = "/" + "/".join(quote(s, safe="") for s in spec.split("/")) + "/ci/runs/" + run_id
-    api_call(base, token, "POST", path + "/claim")
-    outcome, logs = "error", "CI runner did not complete"
+    prefix = "/" + "/".join(quote(part, safe="") for part in spec.split("/"))
+    endpoint = prefix + "/ci/runner/runs/" + run_id
+    stop = threading.Event()
+    lease_errors: list[str] = []
+
+    def heartbeat() -> None:
+        while not stop.wait(20):
+            try:
+                api_call(
+                    base, token, "POST", endpoint + "/heartbeat",
+                    {"lease_id": lease_id},
+                )
+            except RunnerError as exc:
+                # Lease expiry/credential revocation prevents late success.
+                # Do not leak credentials or HTTP headers into logs.
+                if len(lease_errors) < 3:
+                    lease_errors.append(str(exc))
+                # Keep retrying transient errors until the local run ends.
+
+    pulse = threading.Thread(target=heartbeat, daemon=True)
+    pulse.start()
+    outcome, logs = "error", "Runner did not complete"
     try:
         with tempfile.TemporaryDirectory(prefix="pandahub-ci-") as tmp:
             root = Path(tmp)
@@ -261,7 +291,8 @@ def process_one(base: str, token: str, spec: str, run: dict) -> None:
             git_url = f"http://localhost:8000/git/{spec}.git"
             env = dict(os.environ)
             env["GIT_TERMINAL_PROMPT"] = "0"
-            # --no-checkout: no worktree content, hooks or smudge filters on host.
+            # Git credential helpers must be configured separately for
+            # private-repository read access. Never inject the CI token.
             checked([
                 "git", "-c", "init.templateDir=", "clone",
                 "--no-checkout", "--single-branch", "--depth=1",
@@ -278,54 +309,61 @@ def process_one(base: str, token: str, spec: str, run: dict) -> None:
         outcome, logs = "error", str(exc)
     except Exception as exc:
         outcome, logs = "error", f"Runner error ({type(exc).__name__})"
+    finally:
+        stop.set()
+        pulse.join(timeout=25)
 
-    api_call(base, token, "POST", path + "/complete", {
+    if lease_errors:
+        logs += "\\n[Runner heartbeat warnings: check lease expiry and network]"
+    # Completion may return 409 if the lease expired or an admin timed it
+    # out; never claim a PASS locally without a successful server response.
+    result = api_call(base, token, "POST", endpoint + "/complete", {
+        "lease_id": lease_id,
         "conclusion": outcome,
         "log_excerpt": logs[:10000],
     })
-    print(f"CI {run_id}: {outcome} for {sha[:12]}")
+    print(f'CI {run_id}: {result["conclusion"]} for {sha[:12]}')
     if logs:
         print(logs[:1600])
 
-
 def main() -> int:
-    parser = argparse.ArgumentParser(description="Local, advisory PandaHub CI runner")
-    parser.add_argument("--repo", required=True, help="OWNER/REPO")
-    parser.add_argument("--watch", action="store_true", help="Poll for new queued runs")
+    parser = argparse.ArgumentParser(
+        description="Local PandaHub CI runner with repository-scoped lease authentication",
+    )
+    parser.add_argument("--repo", required=True, help="OWNER/REPO (disposable local repo)")
+    parser.add_argument(
+        "--token-file", required=True, type=Path,
+        help="Access-restricted runner token file OUTSIDE the repository",
+    )
+    parser.add_argument("--watch", action="store_true", help="Poll for new jobs")
     args = parser.parse_args()
     if not re.fullmatch(r"[A-Za-z0-9_.-]+/[A-Za-z0-9_.-]+", args.repo):
         parser.error("--repo must be OWNER/REPO")
-    config_path = Path.home() / ".pandahub" / "config.json"
-    if not config_path.exists():
-        parser.error("Log in via panda login first")
-    cfg = json.loads(config_path.read_text(encoding="utf-8"))
-    base = str(cfg.get("api_base_url") or "").rstrip("/")
-    parsed = urlparse(base)
-    if (
-        parsed.scheme != "http" or parsed.hostname not in ("localhost", "127.0.0.1")
-        or parsed.port != 8000 or parsed.path != "/api/v1"
-    ):
-        parser.error("MVP runner allows ONLY http://localhost:8000/api/v1")
-    token = cfg.get("access_token")
-    if not token:
-        parser.error("No PandaHub CLI session; run panda login")
-    prefix = "/" + "/".join(quote(s, safe="") for s in args.repo.split("/"))
-    print("PandaHub local CI runner: network-disabled Docker execution; advisory only.")
-    print("Only run against disposable repos. Stop --watch with Ctrl+C.")
+
+    # Hard-pinned loopback endpoint: this is still a local development runner.
+    base = "http://localhost:8000/api/v1"
+    try:
+        token = args.token_file.expanduser().read_text(encoding="utf-8").strip()
+    except OSError:
+        parser.error("Runner token file not found or not readable")
+    if not token.startswith("phci_") or len(token) < 70:
+        parser.error("Invalid CI runner token format")
+    prefix = "/" + "/".join(quote(part, safe="") for part in args.repo.split("/"))
+    print("PandaHub scoped CI runner: local Docker execution; advisory only.")
+    print("No user JWT is used for CI claims or result submission.")
+    print("Stop --watch with Ctrl+C.")
     try:
         while True:
-            rows = api_call(base, token, "GET", prefix + "/ci/runs?limit=100")
-            queued = [r for r in rows if r["status"] == "queued"]
-            if queued:
-                # Oldest first, no unexpected parallel execution.
-                process_one(base, token, args.repo, queued[-1])
+            claimed = api_call(base, token, "POST", prefix + "/ci/runner/claim")
+            if claimed is not None:
+                process_one(base, token, args.repo, claimed)
             elif not args.watch:
                 print("No queued CI jobs.")
             if not args.watch:
                 break
             time.sleep(5)
     except KeyboardInterrupt:
-        print("Runner stopped.")
+        print("Runner stopped; inspect Docker if interrupted mid-job.")
     except RunnerError as exc:
         print(f"CI runner: {exc}", file=sys.stderr)
         return 1

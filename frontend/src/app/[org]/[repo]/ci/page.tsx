@@ -147,8 +147,8 @@ export default function NativeCIDashboard() {
   const pages = Math.max(1, Math.ceil(filteredRuns.length / PAGE_SIZE));
   const visibleRuns = filteredRuns.slice((page - 1) * PAGE_SIZE, page * PAGE_SIZE);
   const selected = useMemo(
-    () => runs.find((run) => run.id === selectedId) ?? null,
-    [runs, selectedId],
+    () => filteredRuns.find((run) => run.id === selectedId) ?? filteredRuns[0] ?? null,
+    [filteredRuns, selectedId],
   );
 
   // Only poll while a job is actually pending. No perpetual animation or polling.
@@ -408,7 +408,7 @@ export default function NativeCIDashboard() {
               <div role="list" aria-label="CI run records" className="divide-y divide-white/[0.07]">
                 {visibleRuns.map((run) => {
                   const visual = ciVisualState(run);
-                  const active = selectedId === run.id;
+                  const active = selected?.id === run.id;
                   return (
                     <button
                       type="button"
